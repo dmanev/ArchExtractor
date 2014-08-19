@@ -7,8 +7,9 @@
 <icon BUILTIN="yes"/>
 <icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#990000" CREATED="1408468723787" ID="ID_1051024860" MODIFIED="1408468745731" TEXT="Fill-in Tasks in GitHub">
+<node COLOR="#990000" CREATED="1408468723787" ID="ID_1051024860" MODIFIED="1408470474926" TEXT="Fill-in Tasks in GitHub">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="hourglass"/>
 </node>
 </node>
 <node COLOR="#006633" CREATED="1408461698834" ID="ID_80881935" MODIFIED="1408465320243" POSITION="right" STYLE="fork" TEXT="Design Tasks">
@@ -24,9 +25,6 @@
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#669900" CREATED="1408467353630" ID="ID_1554163198" MODIFIED="1408467366074" STYLE="fork" TEXT="Quality based">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#990000" CREATED="1408466838754" ID="ID_304912270" MODIFIED="1408467347512" TEXT="Install MS Office and convert LibreOffice files to MS formats">
-<icon BUILTIN="yes"/>
-</node>
 <node COLOR="#990000" CREATED="1408466900714" ID="ID_336481484" MODIFIED="1408467347512" TEXT="Double check the document for copy-paste and translation glitches">
 <icon BUILTIN="yes"/>
 </node>
@@ -45,10 +43,13 @@
 <icon BUILTIN="edit"/>
 </node>
 </node>
+<node COLOR="#990000" CREATED="1408466838754" ID="ID_304912270" MODIFIED="1408467347512" TEXT="Install MS Office and convert LibreOffice files to MS formats">
+<icon BUILTIN="yes"/>
+</node>
 </node>
 <node COLOR="#669900" CREATED="1408467376956" ID="ID_928335063" MODIFIED="1408467382757" STYLE="fork" TEXT="Content based">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#990000" CREATED="1408467520409" ID="ID_1524977373" MODIFIED="1408468757357" TEXT="Fill-in Front Page details">
+<node COLOR="#990000" CREATED="1408467520409" ID="ID_1524977373" MODIFIED="1408471046694" TEXT="Fill-in Front Page details">
 <icon BUILTIN="yes"/>
 </node>
 <node COLOR="#990000" CREATED="1408467816027" ID="ID_769622663" MODIFIED="1408468762028" TEXT="Fill-in &quot;4. Methods/Models/Technologies&quot;">
@@ -92,6 +93,24 @@
 </node>
 <node COLOR="#006633" CREATED="1408461704519" ID="ID_816670732" MODIFIED="1408465320238" POSITION="right" STYLE="fork" TEXT="Testing &amp; Verification">
 <font BOLD="true" NAME="SansSerif" SIZE="14"/>
+<node COLOR="#990000" CREATED="1408471461916" ID="ID_303917883" MODIFIED="1408471474410" TEXT="Investigate testing strategy">
+<icon BUILTIN="yes"/>
+</node>
+<node COLOR="#990000" CREATED="1408471812553" ID="ID_1693455273" MODIFIED="1408471819582" TEXT="Implement testing strategy">
+<icon BUILTIN="yes"/>
+</node>
+</node>
+<node COLOR="#006633" CREATED="1408470268242" ID="ID_1262742815" MODIFIED="1408470294502" POSITION="right" STYLE="fork" TEXT="Review">
+<font BOLD="true" NAME="SansSerif" SIZE="14"/>
+<node COLOR="#669900" CREATED="1408470349630" ID="ID_1321265844" MODIFIED="1408470359507" STYLE="fork" TEXT="FMI communication">
+<font BOLD="true" NAME="SansSerif" SIZE="12"/>
+<node COLOR="#990000" CREATED="1408470299377" ID="ID_1893860112" MODIFIED="1408470314350" TEXT="Contact S. Ilieva">
+<icon BUILTIN="yes"/>
+</node>
+<node COLOR="#990000" CREATED="1408470315818" ID="ID_483991954" MODIFIED="1408470340063" TEXT="Contact Alexander Dimov, initiate review">
+<icon BUILTIN="yes"/>
+</node>
+</node>
 </node>
 </node>
 </map>
