@@ -1,0 +1,10 @@
+class StkCHeaderFileParser
+!!!225007.python!!!	__init__(inout self : , in inpIPortCriteriaList : IPortCriteria)
+        self.fileFilterCriteria = r'\w+\.h$'
+!!!225135.python!!!	preprocessFile(in self : any, in inpFilePath : string) : bool
+        bResult = True
+        self.fileContent = open(inpFilePath, 'r').read()
+        
+        self.removeComment()
+        
+        return bResult

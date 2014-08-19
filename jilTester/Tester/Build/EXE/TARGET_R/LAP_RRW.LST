@@ -1,0 +1,2914 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:27:31 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_RRW.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LAP_RRW.LST -o                           #
+#                    ..\EXE\TARGET_R\LAP_RRW.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_RRW.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\LAP_RRW.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LAP_RRW.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_RRW.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_RRW - Controls the rear wiper.             
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 22 2010 14:23:06  $
+     15          // $Archive::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_RRW/LAP_RRW.c-arc  $
+     16          // $Revision:   1.18  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_RRW/LAP_RRW.c-arc  $
+     19          // 
+     20          //    Rev 1.18   Mar 22 2010 14:23:06   amanevd
+     21          // Cm006814: HWP - Code review corrections
+     22          // 
+     23          //    Rev 1.17   Mar 19 2010 10:04:16   adzhelp
+     24          // Cm006814: Code review corrections
+     25          // 
+     26          //    Rev 1.16   Mar 02 2010 10:39:52   adzhelp
+     27          // Cm006814: TPS_ARRET, TPS_MAX_COUPLBLOC, TPS_REPRISE, TPS,ESSUIE_MINI, PROLONG_APPUI_ARR normalized
+     28          // 
+     29          //    Rev 1.15   Feb 18 2010 15:15:02   adzhelp
+     30          // Cm006593: Activation on washer switch rising edge.
+     31          // 
+     32          //    Rev 1.14   Feb 17 2010 17:36:18   adzhelp
+     33          // Cm007550: IGN ON condition filtration for 500 ms
+     34          // 
+     35          //    Rev 1.13   Feb 10 2010 16:47:58   amanevd
+     36          // Cm007075: Volatile Faults and Deprotection cleared at IGN ON
+     37          // 
+     38          //    Rev 1.12   Jan 29 2010 11:52:02   amanevd
+     39          // Cm007267: Permanent protection applied if SCLimit reached
+     40          // 
+     41          //    Rev 1.11   Jan 29 2010 11:31:16   amanevd
+     42          // Cm007267: cSClimit replaced with EEP_SCLimit
+     43          // 
+     44          //    Rev 1.10   Jan 07 2010 15:55:28   amanevd
+     45          // Cm005566: Stop position fault memorised is never deleted from component
+     46          // 
+     47          //    Rev 1.9   Dec 16 2009 14:54:34   amanevd
+     48          // Cm005566: External Lights Buzzer signal removed
+     49          // 
+     50          //    Rev 1.8   Dec 14 2009 11:02:18   amanevd
+     51          // Cm005566: Full Hardware Protection
+     52          // 
+     53          //    Rev 1.7   Nov 30 2009 13:17:04   amarinm1
+     54          // Cm006742: Configuration parameters are now calculated only when needed.
+     55          // 
+     56          //    Rev 1.6   Nov 06 2009 15:08:56   amarinm1
+     57          // Cm006421: Initial parking was implemented.
+     58          // 
+     59          //    Rev 1.6   Nov 06 2009 11:39:00   amarinm1
+     60          // Cm006421: Initial parking was implemented.
+     61          // 
+     62          //    Rev 1.5   Nov 04 2009 16:16:40   adzhelp
+     63          // Cm005566: Implementation of HW Protection
+     64          // 
+     65          //    Rev 1.4   Nov 04 2009 16:01:28   adzhelp
+     66          // Cm006576: FRW, RRW: Front and Rear wiper request should not be taken into account at the same time.
+     67          // 
+     68          //    Rev 1.3   Oct 09 2009 16:05:18   amarinm1
+     69          // Cm006451: Signal RearWiperStopIsAllowed_LAP_RRW is now read in LAPRrwINTStartWiping() in order to clear it.
+     70          // 
+     71          //    Rev 1.3   Oct 09 2009 15:24:20   amarinm1
+     72          // Cm006451: Signal RearWiperStopIsAllowed_LAP_RRW is now read in LAPRrwINTStartWiping() in order to clear it.
+     73          // 
+     74          //    Rev 1.2   Sep 24 2009 10:15:28   adzhelp
+     75          // Cm003262: EEP_EVAR_PRESENT renamed to EEP_EV_ARR
+     76          // 
+     77          //    Rev 1.1   Sep 15 2009 11:52:40   amarinm1
+     78          // Cm003262: Component was fully implemented.
+     79          // 
+     80          //    Rev 1.0   Sep 04 2009 16:55:22   amarinm1
+     81          // Initial revision.
+     82          // 
+     83          //******************************************************************************
+     84          #endif
+     85          
+     86          //------------------------------------------------------------------------------
+     87          // Body Identification
+     88          //------------------------------------------------------------------------------
+     89          #define lap_rrw  "lap_rrw"
+     90          
+     91          
+     92          //------------------------------------------------------------------------------
+     93          // Included files to resolve specific definitions in this file
+     94          //------------------------------------------------------------------------------
+     95          #include "tos.h"
+     96          #include "dat.h"
+     97          #include "lib.h"
+     98          #include "LAP_RRW.h"
+     99          #include "LAP_RRW.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPRrwEngineProtection[10]
+   \                     LAPRrwEngineProtection:
+   \   0000   ........       DW LAPRrwOutputIsActive, LAPRrwEnableWiping
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPRrwOutputIsInactive, TOSSeqNoAction
+   \   000A   0200           DB 2, 0
+   \   000C   ........       DW LAPRrwEPStopPositionIsDetected, LAPRrwEnableWiping
+   \   0010   0301           DB 3, 1
+   \   0012   ........       DW LAPRrwInitialWipingTimeoutHasElapsed, LAPRrwDisableWiping
+   \   0016   FF04           DB 255, 4
+   \   0018   ........       DW LAPRrwWipingIsNotRequested, LAPRrwStopProtectionMode
+   \   001C   0500           DB 5, 0
+   \   001E   ........       DW LAPRrwDisableTimeoutHasElapsed, LAPRrwTryWiping
+   \   0022   FF06           DB 255, 6
+   \   0024   ........       DW LAPRrwEPStopPositionIsDetected, LAPRrwEnableWiping
+   \   0028   0701           DB 7, 1
+   \   002A   ........       DW LAPRrwWipingIsNotRequested, TOSSeqNoAction
+   \   002E   0908           DB 9, 8
+   \   0030   ........       DW LAPRrwStopTryingTimeoutHasElapsed, LAPRrwStopProtectionMode
+   \   0034   FF00           DB 255, 0
+   \   0036   ........       DW LAPRrwWipingTimeoutHasElapsed, LAPRrwDisableWiping
+   \   003A   FF04           DB 255, 4
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPRrwWashing[8]
+   \                     LAPRrwWashing:
+   \   0000   ........       DW LAPRrwWashRequestIsOn, LAPRrwStartWashWait
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPRrwWashWaitHasElapsed, LAPRrwStartWashWiping
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPRrwWashRequestIsOff, LAPRrwInitWashProlongation
+   \   0010   FF03           DB 255, 3
+   \   0012   ........       DW LAPRrwWashRequestIsOn, TOSSeqNoAction
+   \   0016   0402           DB 4, 2
+   \   0018   ........       DW LAPRrwWashExtraWipeBegining, LAPRrwWashProlongation
+   \   001C   0503           DB 5, 3
+   \   001E   ........       DW LAPRrwWashCycleIsFinished, LAPRrwPrepareToStopWashProlongation
+   \   0022   FF06           DB 255, 6
+   \   0024   ........       DW LAPRrwWashRequestIsOn, TOSSeqNoAction
+   \   0028   0702           DB 7, 2
+   \   002A   ........       DW LAPRrwWashStopPositionIsDetected, LAPRrwStopWashWiping
+   \   002E   FF00           DB 255, 0
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPRrwIntermittentWipe[4]
+   \                     LAPRrwIntermittentWipe:
+   \   0000   ........       DW LAPRrwINTRequestIsOn, LAPRrwINTStartWiping
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPRrwINTConditionsToStopArePresent, LAPRrwINTStopWiping
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPRrwINTRequestIsOff, LAPRrwINTStopTimer
+   \   0010   0300           DB 3, 0
+   \   0012   ........       DW LAPRrwINTPauseHasElapsed, LAPRrwINTStartWiping
+   \   0016   FF01           DB 255, 1
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPRrwInitialParking[3]
+   \                     LAPRrwInitialParking:
+   \   0000   ........       DW LAPRrwWiperIsInSpeedPosition, LAPRrwStartParking
+   \   0004   0201           DB 2, 1
+   \   0006   ........       DW LAPRrwStopPositionHasBeenReached, LAPRrwStopParking
+   \   000A   FFFF           DB 255, 255
+   \   000C   ........       DW LAPRrwWiperIsInStopPosition, TOSSeqNoAction
+   \   0010   FFFF           DB 255, 255
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPRrwControl[1]
+   \                     LAPRrwControl:
+   \   0000   ........       DW TOSSeqTrueEval, LAPRrwArbitration
+   \   0004   FF00           DB 255, 0
+    100          
+    101          
+    102          //------------------------------------------------------------------------------
+    103          // Local constants
+    104          //------------------------------------------------------------------------------
+    105          #define cDisableWiping               cFalse
+    106          #define cEnableWiping                cTrue
+    107          
+    108          #define cMotorOff                    (0)
+    109          #define cMotorOn                     (1)
+    110          
+    111          // EEP parameter steps
+    112          #define cMsInASecond                 ((U32)1000)
+    113          #define cTPS_CAD_FIXE_step           ((U16)80)
+    114          #define cTPS_ESSUIE_MINI_step        ((U16)12)
+    115          #define cWashWaitInMs                ((U32)750)
+    116          
+    117          // Initial parking states
+    118          #define cNotDefined                  ((U8)0)
+    119          #define cWiperInSpeedPosition        ((U8)1)
+    120          #define cStopPositionHasBeenReached  ((U8)2)
+    121          
+    122          #define cIgnitionOnTimeoutMs         (500UL)
+    123          #define cIgnitionOnTimeoutTicks      (mTOSConvMsInTimerTick(cIgnitionOnTimeoutMs) - (tTOSTimer)1)
+    124          
+    125          // HW Protection
+    126          #define cProtectionHeatCountInitial ((U8)20U)
+    127          #define cFaultCountProtectThreshold ((U8)10U)
+    128          
+    129          //------------------------------------------------------------------------------
+    130          // Local macros
+    131          //------------------------------------------------------------------------------
+    132          #define mConvSecInTimerTick(delay)   (mTOSConvMsInTimerTick( ( cMsInASecond * (delay) ) ))
+    133          
+    134          
+    135          
+    136          //------------------------------
+    137          #define mReadDisableTimeout() \
+    138              ( DATCmnFrRrwDisableTimeout = (u8DATCmnTPS_ARRET_old == mDATRead(U8Bit, NEEP_TPS_ARRET, Default)) ? \
+    139              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    140              DATCmnFrRrwDisableTimeout : mCalcDisableTimeout() )
+    141          
+    142          #define mCalcDisableTimeout() \
+    143              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    144              (tTOSTimer)(mConvSecInTimerTick( (U32)(u8DATCmnTPS_ARRET_old = mDATRead(U8Bit, NEEP_TPS_ARRET, Default)) ))
+    145          
+    146          
+    147          
+    148          //------------------------------
+    149          #define mReadWipingTimeout() \
+    150              ( DATCmnFrRrwWipingTimeout = (u8DATCmnTPS_MAX_COUPLBLOC_old == mDATRead(U8Bit, NEEP_TPS_MAX_COUPLBLOC, Default)) ? \
+    151              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    152              DATCmnFrRrwWipingTimeout : mCalcWipingTimeout() )
+    153          
+    154          #define mCalcWipingTimeout() \
+    155              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    156              (tTOSTimer)(mConvSecInTimerTick( (U32)(u8DATCmnTPS_MAX_COUPLBLOC_old = mDATRead(U8Bit, NEEP_TPS_MAX_COUPLBLOC, Default)) ))
+    157          
+    158          
+    159          
+    160          //------------------------------
+    161          #define mReadWipingTimeoutReprise() \
+    162              ( DATCmnRrwWipingTimeoutReprise = (u8DATCmnTPS_REPRISE_old == mDATRead(U8Bit, NEEP_TPS_REPRISE, Default)) ? \
+    163              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    164              DATCmnRrwWipingTimeoutReprise : mCalcWipingTimeoutReprise() )
+    165                  
+    166          #define mCalcWipingTimeoutReprise() \
+    167              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    168              (tTOSTimer)(mConvSecInTimerTick( (U32)(u8DATCmnTPS_REPRISE_old = mDATRead(U8Bit, NEEP_TPS_REPRISE, Default)) ))
+    169          
+    170          
+    171          
+    172          //------------------------------
+    173          #define mReadIntermittentPause() \
+    174              ( DATCmnFrRrwIntermittentPause = (u8DATCmnTPS_CAD_FIXE_old == mDATRead(U8Bit, EEP_TPS_CAD_FIXE, Default)) ? \
+    175              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    176              DATCmnFrRrwIntermittentPause : mCalcIntermittentPause() )
+    177          
+    178          #define mCalcIntermittentPause() \
+    179              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    180              (tTOSTimer)(mTOSConvMsInTimerTick( (U32)( cTPS_CAD_FIXE_step * (u8DATCmnTPS_CAD_FIXE_old = mDATRead(U8Bit, EEP_TPS_CAD_FIXE, Default)) ) ) - (tTOSTimer)1U)
+    181          
+    182          
+    183          
+    184          //------------------------------
+    185          #define mReadMinimumWipingTime() \
+    186              ( DATCmnFrRrwMinimumWipingTime = (u8DATCmnTPS_ESSUIE_MINI_old == mDATRead(U8Bit, NEEP_TPS_ESSUIE_MINI, Default)) ? \
+    187              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    188              DATCmnFrRrwMinimumWipingTime : mCalcMinimumWipingTime() )
+    189          
+    190          #define mCalcMinimumWipingTime() \
+    191              /* //QACJ 3443: amarinm1: There is no recursion - second macro is formed through concatenation. */ \
+    192              (tTOSTimer)(mTOSConvMsInTimerTick( (U32)( cTPS_ESSUIE_MINI_step * (u8DATCmnTPS_ESSUIE_MINI_old = mDATRead(U8Bit, NEEP_TPS_ESSUIE_MINI, Default)) ) ) - (tTOSTimer)1U)
+    193          
+    194          
+    195          
+    196          //------------------------------
+    197          #define mReadWashWait() \
+    198              (tTOSTimer)(mTOSConvMsInTimerTick( (U32)cWashWaitInMs ))
+    199          
+    200          
+    201          //------------------------------------------------------------------------------
+    202          // Local types
+    203          //------------------------------------------------------------------------------
+    204          
+    205          
+    206          //------------------------------------------------------------------------------
+    207          // Local data
+    208          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    209          static tTOSTimer    TempoEP;
+   \                     TempoEP:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    210          static tTOSTimer    TempoINT;
+   \                     TempoINT:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    211          static tTOSTimer    TimerWashWait;
+   \                     TimerWashWait:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    212          static tTOSTimer    IgnitionOnTimer;
+   \                     IgnitionOnTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    213          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    214          static U8           u8ExtraWipeCounter;
+   \                     u8ExtraWipeCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    215          static U8           u8InitialParkingState;
+   \                     u8InitialParkingState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    216          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    217          static BOOL         bProtectionOutput;
+   \                     bProtectionOutput:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    218          static BOOL         bParkingOutput;
+   \                     bParkingOutput:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    219          static BOOL         bOutputINTOn;
+   \                     bOutputINTOn:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    220          static BOOL         bOutputWSHOn;
+   \                     bOutputWSHOn:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    221          static BOOL         bMotorCommand;
+   \                     bMotorCommand:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    222          static BOOL         bComponentIsEnabled;
+   \                     bComponentIsEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    223          
+    224          // HWP
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    225          static BOOL         bPWR_IGNOld;
+   \                     bPWR_IGNOld:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    226          static U8           u8ProtectionCounter;
+   \                     u8ProtectionCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    227          static U8           u8FaultCounter;
+   \                     u8FaultCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    228          
+    229          //------------------------------------------------------------------------------
+    230          // Constant local data
+    231          //------------------------------------------------------------------------------
+    232          
+    233          
+    234          //------------------------------------------------------------------------------
+    235          // Exported data
+    236          //------------------------------------------------------------------------------
+    237          
+    238          
+    239          //------------------------------------------------------------------------------
+    240          // Constant exported data
+    241          //------------------------------------------------------------------------------
+    242          
+    243          
+    244          //------------------------------------------------------------------------------
+    245          // Local function prototypes
+    246          //------------------------------------------------------------------------------
+    247          static MEM_TYPE void StopRearWiper( void );
+    248          static MEM_TYPE void RearWiperArbitration( void );
+    249          static MEM_TYPE void DisableFunctionallity( void );
+    250          static MEM_TYPE void ResumeAfterDisable( void );
+    251          static MEM_TYPE void HWProtection( void );
+    252          
+    253          #ifdef X90_PROJECT
+    254          static MEM_TYPE void LAPRrwStopProtectionMode_Static(void);
+    255          static MEM_TYPE BOOL LAPRrwINTConditionsToStopArePresent_Static(void);
+    256          static MEM_TYPE void LAPRrwInitWashProlongation_Static(void);
+    257          static MEM_TYPE void LAPRrwArbitration_Static(void);
+    258          static MEM_TYPE void LAPRrwEnterActiveState_Static(void);
+    259          #endif
+    260          
+    261          //==============================================================================
+    262          //=========================== LOCAL FUNCTIONS ==================================
+    263          //==============================================================================
+    264          
+    265          
+    266          //==============================================================================
+    267          // DESCRIPTION:         Rear Wiper Arbitration
+    268          //
+    269          // PARAMETERS:          None
+    270          //
+    271          // RETURN VALUE:        None
+    272          //
+    273          // DESIGN INFORMATION:  Refer to DCD
+    274          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    275          static MEM_TYPE void RearWiperArbitration( void )
+   \                     RearWiperArbitration:
+    276          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    277              if (bProtectionOutput == cDisableWiping)
+   \   0000   8E....         MOV       A,bProtectionOutput
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD08           BNZ       ??LAPRrwInitialize_0
+    278              {
+    279                  // Motor Protection is active => the motor must be stopped immediatly
+    280                  bMotorCommand = cMotorOff;
+   \                     ??RearWiperArbitration_0:
+   \   0007   A100           MOV       A,#0
+   \   0009   9E....         MOV       bMotorCommand,A
+    281              }
+    282              else
+    283              {
+    284                  if (   (bOutputWSHOn   == cTrue)
+    285                      || (bOutputINTOn   == cTrue)
+    286                      || (bParkingOutput == cTrue)   )
+    287                  {
+    288                      // Washing or INT request or protection graph is trying to release the blocked wiper
+    289                      bMotorCommand = cMotorOn;
+    290                  }
+    291                  else
+    292                  {
+    293                      bMotorCommand = cMotorOff;
+    294                  }
+    295              }
+    296          
+    297              mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMP, bMotorCommand, Default);
+   \   000C   5B..           CLR1      S:DATPouSoftOutputBuffer+3.5
+   \   000E   AF             RET       
+   \                     ??LAPRrwInitialize_0:
+   \   000F   8E....         MOV       A,bOutputWSHOn
+   \   0012   51             DEC       A
+   \   0013   AD0C           BZ        ??LAPRrwInitialize_1
+   \   0015   8E....         MOV       A,bOutputINTOn
+   \   0018   51             DEC       A
+   \   0019   AD06           BZ        ??LAPRrwInitialize_1
+   \   001B   8E....         MOV       A,bParkingOutput
+   \   001E   51             DEC       A
+   \   001F   BDE6           BNZ       ??RearWiperArbitration_0
+   \                     ??LAPRrwInitialize_1:
+   \   0021   A101           MOV       A,#1
+   \   0023   9E....         MOV       bMotorCommand,A
+   \   0026   5A..           SET1      S:DATPouSoftOutputBuffer+3.5
+    298          }
+   \   0028   AF             RET       
+   \   0029                  REQUIRE ?CL78K_V4_6_L00
+    299          
+    300          
+    301          //==============================================================================
+    302          // DESCRIPTION:         Stop rear wiper
+    303          //
+    304          // PARAMETERS:          None
+    305          //
+    306          // RETURN VALUE:        None
+    307          //
+    308          // DESIGN INFORMATION:  Refer to DCD
+    309          //==============================================================================
+    310          static MEM_TYPE void StopRearWiper( void )
+    311          {
+    312              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwInitialParking);
+    313              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwEngineProtection);
+    314              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+    315              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwWashing);
+    316          
+    317              bProtectionOutput     = cEnableWiping;
+    318              bParkingOutput        = cFalse;
+    319              bOutputINTOn          = cFalse;
+    320              bOutputWSHOn          = cFalse;
+    321              u8ExtraWipeCounter    = 0;
+    322          
+    323              TOSStopTimer( &TempoEP );
+    324              TOSStopTimer( &TempoINT );
+    325              TOSStopTimer( &TimerWashWait );
+    326          }
+    327          
+    328          
+    329          //==============================================================================
+    330          // DESCRIPTION :  Stop rear wiper, disable output
+    331          //
+    332          // PARAMETERS (Type,Name,Min,Max) :   none
+    333          //
+    334          // RETURN VALUE :   none
+    335          //
+    336          // DESIGN INFORMATION : Refer to DCD
+    337          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    338          static MEM_TYPE void DisableFunctionallity(void)
+   \                     DisableFunctionallity:
+    339          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    340              StopRearWiper();
+   \   0000   A11B           MOV       A,#27
+   \   0002   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0003   A118           MOV       A,#24
+   \   0005   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0006   A119           MOV       A,#25
+   \   0008   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0009   A11A           MOV       A,#26
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   000C   A101           MOV       A,#1
+   \   000E   9E....         MOV       bProtectionOutput,A
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       bParkingOutput,A
+   \   0016   9E....         MOV       bOutputINTOn,A
+   \   0019   9E....         MOV       bOutputWSHOn,A
+   \   001C   9E....         MOV       u8ExtraWipeCounter,A
+   \   001F   10....         MOVW      AX,#TempoEP
+   \   0022   ..             CALLT     [__T_TOSStopTimer]
+   \   0023   10....         MOVW      AX,#TempoINT
+   \   0026   ..             CALLT     [__T_TOSStopTimer]
+   \   0027   10....         MOVW      AX,#TimerWashWait
+   \   002A   ..             CALLT     [__T_TOSStopTimer]
+    341              mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMP, cMotorOff, Default);  
+   \   002B   A100           MOV       A,#0
+   \   002D   5B..           CLR1      S:DATPouSoftOutputBuffer+3.5
+    342          
+    343              bComponentIsEnabled = cFalse;
+   \   002F   9E....         MOV       bComponentIsEnabled,A
+    344          }
+   \   0032   AF             RET       
+   \   0033                  REQUIRE ?CL78K_V4_6_L00
+    345          
+    346          
+    347          //==============================================================================
+    348          // DESCRIPTION :  Resume component after it has been disabled
+    349          //
+    350          // PARAMETERS (Type,Name,Min,Max) :   none
+    351          //
+    352          // RETURN VALUE :   none
+    353          //
+    354          // DESIGN INFORMATION : Refer to DCD
+    355          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    356          static MEM_TYPE void ResumeAfterDisable(void)
+   \                     ResumeAfterDisable:
+    357          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    358              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwInitialParking);
+   \   0000   A11B           MOV       A,#27
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    359              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwEngineProtection);
+   \   0003   A118           MOV       A,#24
+   \   0005   ..             CALLT     [__T_TOSSeqActivateGraph]
+    360              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+   \   0006   A119           MOV       A,#25
+   \   0008   ..             CALLT     [__T_TOSSeqActivateGraph]
+    361              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwWashing);
+   \   0009   A11A           MOV       A,#26
+   \   000B   ..             CALLT     [__T_TOSSeqActivateGraph]
+    362          
+    363              bComponentIsEnabled = cTrue;
+   \   000C   A101           MOV       A,#1
+   \   000E   9E....         MOV       bComponentIsEnabled,A
+    364          
+    365              mDATWrite(U1Bit, RearWasherButtonBlocked, 
+    366                        (mDATRead(U1Bit, RR_WASHER_SW, Default) != cFalse), Default);
+   \   0011   3123..02       BF        S:DATDinInputBuffers+5.2, ??LAPRrwInitialize_2
+   \   0015   FA02           BR        ??LAPRrwInitialize_3
+   \                     ??LAPRrwInitialize_2:
+   \   0017   A100           MOV       A,#0
+   \                     ??LAPRrwInitialize_3:
+   \   0019   16....         MOVW      HL,#DATCmnData+30
+   \   001C   97             MOV       [HL],A
+    367          }
+   \   001D   AF             RET       
+   \   001E                  REQUIRE ?CL78K_V4_6_L00
+    368          
+    369          //==============================================================================
+    370          // DESCRIPTION :  Hardware protection routine
+    371          //
+    372          // PARAMETERS (Type,Name,Min,Max) :   none
+    373          //
+    374          // RETURN VALUE :   none
+    375          //
+    376          // DESIGN INFORMATION : Refer to DCD
+    377          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    378          static MEM_TYPE void HWProtection( void )
+   \                     HWProtection:
+    379          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    380              U16 u16TempL;
+    381          
+    382              // Manage inrush current timeout after output activation
+    383              if (mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Immediate) != cFalse)
+   \   0000   16....         MOVW      HL,#DATDouOutputBuffer+3
+   \   0003   31D70A         BF        [HL].5, ??LAPRrwInitialize_4
+    384              {
+    385                  if (u8ProtectionCounter > 0)
+   \   0006   8E....         MOV       A,u8ProtectionCounter
+   \   0009   4D00           CMP       A,#0
+   \   000B   AD08           BZ        ??LAPRrwInitialize_5
+    386                  {
+    387                      u8ProtectionCounter--;            
+   \   000D   51             DEC       A
+   \   000E   FA02           BR        ??LAPRrwInitialize_6
+    388                  }
+    389              }
+    390              else
+    391              {
+    392                  u8ProtectionCounter = cProtectionHeatCountInitial;
+   \                     ??LAPRrwInitialize_4:
+   \   0010   A114           MOV       A,#20
+   \                     ??LAPRrwInitialize_6:
+   \   0012   9E....         MOV       u8ProtectionCounter,A
+    393              }
+    394          
+    395              // Deprotection on rising edge of PWR_IGN
+    396              if(     (cFalse != mDATRead(U1Bit, PWR_IGN, Default))
+    397                  &&  (cFalse == bPWR_IGNOld)
+    398                )
+   \                     ??LAPRrwInitialize_5:
+   \   0015   3103..21       BF        S:DATDinInputBuffers+6.0, ??LAPRrwInitialize_7
+   \   0019   8E....         MOV       A,bPWR_IGNOld
+   \   001C   4D00           CMP       A,#0
+   \   001E   BD1A           BNZ       ??LAPRrwInitialize_7
+    399              {
+    400                  if(mDATRead(U16Bit, EEP_SCLimit, Default) > mDATRead(U16Bit, EEP_CDRearWiper, Default))
+   \   0020   02....         MOVW      AX,DATDbkMirrors+12
+   \   0023   30             XCH       A,X
+   \   0024   18....         SUB       A,DATDbkMirrors+14
+   \   0027   60             MOV       A,X
+   \   0028   38....         SUBC      A,DATDbkMirrors+15
+   \   002B   9D08           BNC       ??LAPRrwInitialize_8
+    401                  {
+    402                      mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMPProtection, 0, Default);            
+   \   002D   A100           MOV       A,#0
+   \   002F   5B..           CLR1      S:DATPouHardMaskBuffer+3.5
+    403                      mDATWrite(U1Bit, DefRrwCC, 0, Default);
+   \   0031   16....         MOVW      HL,#DATCmnData+21
+   \   0034   97             MOV       [HL],A
+    404                  }
+    405                  u8FaultCounter = 0;
+   \                     ??LAPRrwInitialize_8:
+   \   0035   A100           MOV       A,#0
+   \   0037   9E....         MOV       u8FaultCounter,A
+    406              }
+    407          
+    408              // Protection applied if SCLimit is reached
+    409              if(mDATRead(U16Bit, EEP_SCLimit, Default) <= mDATRead(U16Bit, EEP_CDRearWiper, Default))
+   \                     ??LAPRrwInitialize_7:
+   \   003A   02....         MOVW      AX,DATDbkMirrors+12
+   \   003D   30             XCH       A,X
+   \   003E   18....         SUB       A,DATDbkMirrors+14
+   \   0041   60             MOV       A,X
+   \   0042   38....         SUBC      A,DATDbkMirrors+15
+   \   0045   8D08           BC        ??LAPRrwInitialize_9
+    410              {
+    411                  mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMPProtection, 1, Default);
+   \   0047   101000         MOVW      AX,#16
+   \   004A   5A..           SET1      S:DATPouHardMaskBuffer+3.5
+   \   004C   9A....         CALL      TOSActivateTask
+    412              }
+    413          
+    414              // SC GND detection management
+    415              if (1 == mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Immediate))
+   \                     ??LAPRrwInitialize_9:
+   \   004F   16....         MOVW      HL,#DATDouOutputBuffer+3
+   \   0052   31D758         BF        [HL].5, ??LAPRrwInitialize_10
+    416              {
+    417                  // Inrush current timeout has elapsed
+    418                  if (u8ProtectionCounter == 0)
+   \   0055   8E....         MOV       A,u8ProtectionCounter
+   \   0058   4D00           CMP       A,#0
+   \   005A   BD51           BNZ       ??LAPRrwInitialize_10
+    419                  {
+    420                      if (mDATRead(U1Bit, DIAG_DRIVER_HIGH_SIDE_SCGnd, Default) != cFalse)
+   \   005C   02....         MOVW      AX,DATAnaBufferFromLDB
+   \   005F   EAD703         CMPW      AX,#983
+   \   0062   8D40           BC        ??LAPRrwInitialize_11
+    421                      {
+    422                          u8FaultCounter++;
+   \   0064   8E....         MOV       A,u8FaultCounter
+   \   0067   41             INC       A
+   \   0068   9E....         MOV       u8FaultCounter,A
+    423                          if(u8FaultCounter >= cFaultCountProtectThreshold)
+   \   006B   4D0A           CMP       A,#10
+   \   006D   8D3E           BC        ??LAPRrwInitialize_10
+    424                          {
+    425                              mDATWrite(U1Bit, DefRrwCC, 1, Default);
+   \   006F   A101           MOV       A,#1
+   \   0071   16....         MOVW      HL,#DATCmnData+21
+   \   0074   97             MOV       [HL],A
+    426                              mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMPProtection, 1, Default);
+   \   0075   101000         MOVW      AX,#16
+   \   0078   5A..           SET1      S:DATPouHardMaskBuffer+3.5
+   \   007A   9A....         CALL      TOSActivateTask
+    427                              mDATWrite(U1Bit, EEP_DefRrwCC, 1, Default);
+   \   007D   16....         MOVW      HL,#DATDbkMirrors+21
+   \   0080   319607         BT        [HL].1, ??LAPRrwInitialize_12
+   \   0083   A100           MOV       A,#0
+   \   0085   7192           SET1      [HL].1
+   \   0087   9A....         CALL      DATDbkStartUpdate
+    428          
+    429                              u16TempL = mDATRead(U16Bit, EEP_CDRearWiper, Default);
+   \                     ??LAPRrwInitialize_12:
+   \   008A   02....         MOVW      AX,DATDbkMirrors+12
+   \   008D   D6             MOVW      HL,AX
+    430                              if(u16TempL < mDATRead(U16Bit, EEP_SCLimit, Default))
+   \   008E   30             XCH       A,X
+   \   008F   18....         SUB       A,DATDbkMirrors+14
+   \   0092   60             MOV       A,X
+   \   0093   38....         SUBC      A,DATDbkMirrors+15
+   \   0096   9D15           BNC       ??LAPRrwInitialize_10
+    431                              {
+    432                                  u16TempL ++;
+    433                                  mDATWrite(U16Bit, EEP_CDRearWiper, u16TempL, Default);
+   \   0098   86             INCW      HL
+   \   0099   C6             MOVW      AX,HL
+   \   009A   03....         MOVW      DATDbkMirrors+12,AX
+   \   009D   A100           MOV       A,#0
+   \   009F   9A....         CALL      DATDbkStartUpdate
+   \   00A2   FA09           BR        ??LAPRrwInitialize_10
+    434                              }
+    435                          }
+    436                      }
+    437                      else
+    438                      {
+    439                          mDATWrite(U1Bit, DefRrwCC, 0, Default);
+   \                     ??LAPRrwInitialize_11:
+   \   00A4   A100           MOV       A,#0
+   \   00A6   16....         MOVW      HL,#DATCmnData+21
+   \   00A9   97             MOV       [HL],A
+    440                          u8FaultCounter = 0;
+   \   00AA   9E....         MOV       u8FaultCounter,A
+    441                      }
+    442                  }
+    443              }
+    444          
+    445              bPWR_IGNOld = mDATRead(U1Bit, PWR_IGN, Default);
+   \                     ??LAPRrwInitialize_10:
+   \   00AD   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   00AF   5D01           AND       A,#1
+   \   00B1   9E....         MOV       bPWR_IGNOld,A
+    446          }
+   \   00B4   AF             RET       
+   \   00B5                  REQUIRE ?CL78K_V4_6_L00
+    447          
+    448          //==============================================================================
+    449          //=========================== EXPORTED FUNCTIONS ===============================
+    450          //==============================================================================
+    451          
+    452          //---------------------------------------------------------------------------
+    453          //                      Functions used in several graphs
+    454          //---------------------------------------------------------------------------
+    455          
+    456          
+    457          //==============================================================================
+    458          // DESCRIPTION:         Monitors for stop position detected
+    459          //
+    460          // PARAMETERS:          None
+    461          //
+    462          // RETURN VALUE:        BOOL: cTrue if stop position is detected
+    463          //
+    464          // DESIGN INFORMATION:  Refer to DCD
+    465          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    466          BOOL LAPRrwEPStopPositionIsDetected( void )
+   \                     LAPRrwEPStopPositionIsDetected:
+    467          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    468              const BOOL bReturnValueL = TOSReadSignal(cTOSSignalRearStopPositionDetected_LAP_RRW1);
+    469            
+    470              return bReturnValueL;
+   \   0000   101100         MOVW      AX,#17
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    471          }
+    472          
+    473          
+    474          //==============================================================================
+    475          // DESCRIPTION:         Monitors for stop position detected (for washing)
+    476          //
+    477          // PARAMETERS:          None
+    478          //
+    479          // RETURN VALUE:        BOOL: cTrue if stop position is detected
+    480          //
+    481          // DESIGN INFORMATION:  Refer to DCD
+    482          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    483          BOOL LAPRrwWashStopPositionIsDetected( void )
+   \                     LAPRrwWashStopPositionIsDetected:
+    484          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    485              const BOOL bReturnValueL = TOSReadSignal(cTOSSignalRearStopPositionDetected_LAP_RRW2);
+    486            
+    487              return bReturnValueL;
+   \   0000   101200         MOVW      AX,#18
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    488          }
+    489          
+    490          
+    491          //---------------------------------------------------------------------------
+    492          //                      RRWEngineProtection Graph Functions
+    493          //---------------------------------------------------------------------------
+    494          //==============================================================================
+    495          // DESCRIPTION:         Checks if output is inactive
+    496          //
+    497          // PARAMETERS:          None
+    498          //
+    499          // RETURN VALUE:        BOOL: cTrue if rear wiper output is inactive
+    500          //
+    501          // DESIGN INFORMATION:  Refer to DCD
+    502          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    503          BOOL LAPRrwOutputIsInactive( void )
+   \                     LAPRrwOutputIsInactive:
+    504          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    505              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Default) == 0);
+    506            
+    507              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7154..         MOV1      CY,S:DATPouSoftOutputBuffer+3.5
+   \   0005   27             ROLC      A,0x1
+   \   0006   7D01           XOR       A,#1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    508          }
+    509          
+    510          
+    511          //==============================================================================
+    512          // DESCRIPTION:         Checks if output is active
+    513          //
+    514          // PARAMETERS:          None
+    515          //
+    516          // RETURN VALUE:        BOOL: cTrue if rear wiper output is active
+    517          //
+    518          // DESIGN INFORMATION:  Refer to DCD
+    519          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    520          BOOL LAPRrwOutputIsActive( void )
+   \                     LAPRrwOutputIsActive:
+    521          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    522              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Default) == 1);
+    523            
+    524              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7154..         MOV1      CY,S:DATPouSoftOutputBuffer+3.5
+   \   0005   27             ROLC      A,0x1
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    525          }
+    526          
+    527          
+    528          //==============================================================================
+    529          // DESCRIPTION:         Checks if initial wiping timeout has elapsed
+    530          //
+    531          // PARAMETERS:          None
+    532          //
+    533          // RETURN VALUE:        BOOL: cTrue if timeout elapsed
+    534          //
+    535          // DESIGN INFORMATION:  Refer to DCD
+    536          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    537          BOOL LAPRrwInitialWipingTimeoutHasElapsed( void )
+   \                     LAPRrwInitialWipingTimeoutHasElapsed:
+    538          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    539          #ifdef X90_PROJECT
+    540              static MEM_TYPE BOOL LAPRrwInitialWipingTimeoutHasElapsed_Static(void);
+    541              return LAPRrwInitialWipingTimeoutHasElapsed_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwInitialWipingTimeoutHasElapsed_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwInitialWipingTimeoutHasElapsed_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    542          }
+    543          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    544          static MEM_TYPE BOOL LAPRrwInitialWipingTimeoutHasElapsed_Static(void)
+   \                     LAPRrwInitialWipingTimeoutHasElapsed_Static:
+    545          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    546          #endif  
+    547              tTOSTimer TempoL;
+    548              BOOL bReturnValueL;
+    549          
+    550              //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    551              TempoL = mReadMinimumWipingTime() + mReadWipingTimeout();
+   \   0001   8E....         MOV       A,u8DATCmnTPS_ESSUIE_MINI_old
+   \   0004   48....         CMP       A,DATPeeCalibrationData+4
+   \   0007   BD06           BNZ       ??LAPRrwInitialize_13
+   \   0009   02....         MOVW      AX,DATCmnFrRrwMinimumWipingTime
+   \   000C   D6             MOVW      HL,AX
+   \   000D   FA10           BR        ??LAPRrwInitialize_14
+   \                     ??LAPRrwInitialize_13:
+   \   000F   8E....         MOV       A,DATPeeCalibrationData+4
+   \   0012   9E....         MOV       u8DATCmnTPS_ESSUIE_MINI_old,A
+   \   0015   A00C           MOV       X,#12
+   \   0017   3188           MULU      X
+   \   0019   A20A           MOV       C,#10
+   \   001B   3182           DIVUW     C
+   \   001D   D6             MOVW      HL,AX
+   \   001E   96             DECW      HL
+   \                     ??LAPRrwInitialize_14:
+   \   001F   C6             MOVW      AX,HL
+   \   0020   03....         MOVW      DATCmnFrRrwMinimumWipingTime,AX
+   \   0023   8E....         MOV       A,u8DATCmnTPS_MAX_COUPLBLOC_old
+   \   0026   48....         CMP       A,DATPeeCalibrationData+5
+   \   0029   BD05           BNZ       ??LAPRrwInitialize_15
+   \   002B   02....         MOVW      AX,DATCmnFrRrwWipingTimeout
+   \   002E   FA1D           BR        ??LAPRrwInitialize_16
+   \                     ??LAPRrwInitialize_15:
+   \   0030   8E....         MOV       A,DATPeeCalibrationData+5
+   \   0033   9E....         MOV       u8DATCmnTPS_MAX_COUPLBLOC_old,A
+   \   0036   100000         MOVW      AX,#0
+   \   0039   B1             PUSH      AX
+   \   003A   A00A           MOV       X,#10
+   \   003C   B1             PUSH      AX
+   \   003D   70             MOV       X,A
+   \   003E   B1             PUSH      AX
+   \   003F   10E803         MOVW      AX,#1000
+   \   0042   B1             PUSH      AX
+   \   0043   8E....         MOV       A,u8DATCmnTPS_MAX_COUPLBLOC_old
+   \   0046   120000         MOVW      BC,#0
+   \   0049   70             MOV       X,A
+   \   004A   63             MOV       A,B
+   \   004B   ..             CALLT     [__T_?L_MUL_L03]
+   \   004C   ..             CALLT     [__T_?UL_DIV_L03]
+   \                     ??LAPRrwInitialize_16:
+   \   004D   D4             MOVW      DE,AX
+   \   004E   03....         MOVW      DATCmnFrRrwWipingTimeout,AX
+   \   0051   C6             MOVW      AX,HL
+   \   0052   30             XCH       A,X
+   \   0053   610C           ADD       A,E
+   \   0055   30             XCH       A,X
+   \   0056   612D           ADDC      A,D
+    552              bReturnValueL = TOSIsTempoElapsed( &TempoEP, TempoL );
+    553          
+    554              return bReturnValueL;
+   \   0058   D2             MOVW      BC,AX
+   \   0059   10....         MOVW      AX,#TempoEP
+   \   005C   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   005D   B2             POP       BC
+   \   005E   AF             RET       
+   \   005F                  REQUIRE ?CL78K_V4_6_L00
+    555          }
+    556          
+    557          
+    558          //==============================================================================
+    559          // DESCRIPTION:         Enable wiping
+    560          //
+    561          // PARAMETERS:          None
+    562          //
+    563          // RETURN VALUE:        None
+    564          //
+    565          // DESIGN INFORMATION:  Refer to DCD
+    566          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    567          void LAPRrwEnableWiping( void )
+   \                     LAPRrwEnableWiping:
+    568          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    569              bProtectionOutput = cEnableWiping;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bProtectionOutput,A
+    570          
+    571              if (u8InitialParkingState < cStopPositionHasBeenReached)
+   \   0005   8E....         MOV       A,u8InitialParkingState
+   \   0008   4D02           CMP       A,#2
+   \   000A   9D04           BNC       ??LAPRrwInitialize_36
+    572              {
+    573                  u8InitialParkingState++;
+   \   000C   41             INC       A
+   \   000D   9E....         MOV       u8InitialParkingState,A
+    574              }
+    575          
+    576              // Clear front fixed stop fault
+    577              mDATWrite(U1Bit, DefAFAR,     cFalse, Default);                             
+   \                     ??LAPRrwInitialize_36:
+   \   0010   A100           MOV       A,#0
+   \   0012   16....         MOVW      HL,#DATCmnData+18
+   \   0015   97             MOV       [HL],A
+    578          
+    579              TOSStartTimer( &TempoEP );
+   \   0016   10....         MOVW      AX,#TempoEP
+   \   0019   ..             CALLT     [__T_TOSStartTimer]
+    580          }
+   \   001A   AF             RET       
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+    581          
+    582          
+    583          //==============================================================================
+    584          // DESCRIPTION:         Try wiping
+    585          //
+    586          // PARAMETERS:          None
+    587          //
+    588          // RETURN VALUE:        None
+    589          //
+    590          // DESIGN INFORMATION:  Refer to DCD
+    591          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    592          void LAPRrwTryWiping( void )
+   \                     LAPRrwTryWiping:
+    593          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    594              bProtectionOutput = cEnableWiping;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bProtectionOutput,A
+    595              TOSStartTimer( &TempoEP );
+   \   0005   10....         MOVW      AX,#TempoEP
+   \   0008   ..             CALLT     [__T_TOSStartTimer]
+    596          }
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    597          
+    598          
+    599          //==============================================================================
+    600          // DESCRIPTION:         Disable wiping
+    601          //
+    602          // PARAMETERS:          None
+    603          //
+    604          // RETURN VALUE:        None
+    605          //
+    606          // DESIGN INFORMATION:  Refer to DCD
+    607          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    608          void LAPRrwDisableWiping( void )
+   \                     LAPRrwDisableWiping:
+    609          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    610              bProtectionOutput = cDisableWiping;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bProtectionOutput,A
+    611          
+    612              // Declare front fixed stop fault
+    613              mDATWrite(U1Bit, DefAFAR,     cTrue, Default);                              
+   \   0005   A101           MOV       A,#1
+   \   0007   16....         MOVW      HL,#DATCmnData+18
+   \   000A   97             MOV       [HL],A
+    614              mDATWrite(U1Bit, EEP_DefAfar, cTrue, Immediate);
+   \   000B   16....         MOVW      HL,#DATDbkMirrors+19
+   \   000E   319607         BT        [HL].1, ??LAPRrwInitialize_37
+   \   0011   A100           MOV       A,#0
+   \   0013   7192           SET1      [HL].1
+   \   0015   9A....         CALL      DATDbkStartUpdate
+    615              
+    616              TOSStartTimer( &TempoEP );
+   \                     ??LAPRrwInitialize_37:
+   \   0018   10....         MOVW      AX,#TempoEP
+   \   001B   ..             CALLT     [__T_TOSStartTimer]
+    617          }
+   \   001C   AF             RET       
+   \   001D                  REQUIRE ?CL78K_V4_6_L00
+    618          
+    619          
+    620          //==============================================================================
+    621          // DESCRIPTION:         Check if disable timeout is elapsed
+    622          //
+    623          // PARAMETERS:          None
+    624          //
+    625          // RETURN VALUE:        BOOL: cTrue if timeout elapsed
+    626          //
+    627          // DESIGN INFORMATION:  Refer to DCD
+    628          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    629          BOOL LAPRrwDisableTimeoutHasElapsed( void )
+   \                     LAPRrwDisableTimeoutHasElapsed:
+    630          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    631          #ifdef X90_PROJECT
+    632              static MEM_TYPE BOOL LAPRrwDisableTimeoutHasElapsed_Static(void);
+    633              return LAPRrwDisableTimeoutHasElapsed_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwDisableTimeoutHasElapsed_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwDisableTimeoutHasElapsed_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    634          }
+    635          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    636          static MEM_TYPE BOOL LAPRrwDisableTimeoutHasElapsed_Static(void)
+   \                     LAPRrwDisableTimeoutHasElapsed_Static:
+    637          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    638          #endif  
+    639              tTOSTimer DisableTimeoutL;
+    640              BOOL bReturnValueL;
+    641          
+    642              //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    643              DisableTimeoutL = mReadDisableTimeout();
+   \   0001   8E....         MOV       A,u8DATCmnTPS_ARRET_old
+   \   0004   48....         CMP       A,DATPeeCalibrationData+6
+   \   0007   BD05           BNZ       ??LAPRrwInitialize_17
+   \   0009   02....         MOVW      AX,DATCmnFrRrwDisableTimeout
+   \   000C   FA1D           BR        ??LAPRrwInitialize_18
+   \                     ??LAPRrwInitialize_17:
+   \   000E   8E....         MOV       A,DATPeeCalibrationData+6
+   \   0011   9E....         MOV       u8DATCmnTPS_ARRET_old,A
+   \   0014   100000         MOVW      AX,#0
+   \   0017   B1             PUSH      AX
+   \   0018   A00A           MOV       X,#10
+   \   001A   B1             PUSH      AX
+   \   001B   70             MOV       X,A
+   \   001C   B1             PUSH      AX
+   \   001D   10E803         MOVW      AX,#1000
+   \   0020   B1             PUSH      AX
+   \   0021   8E....         MOV       A,u8DATCmnTPS_ARRET_old
+   \   0024   120000         MOVW      BC,#0
+   \   0027   70             MOV       X,A
+   \   0028   63             MOV       A,B
+   \   0029   ..             CALLT     [__T_?L_MUL_L03]
+   \   002A   ..             CALLT     [__T_?UL_DIV_L03]
+   \                     ??LAPRrwInitialize_18:
+   \   002B   03....         MOVW      DATCmnFrRrwDisableTimeout,AX
+    644              bReturnValueL   = TOSIsTempoElapsed( &TempoEP, DisableTimeoutL );
+    645            
+    646              return bReturnValueL;
+   \   002E   D2             MOVW      BC,AX
+   \   002F   10....         MOVW      AX,#TempoEP
+   \   0032   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0033   B2             POP       BC
+   \   0034   AF             RET       
+   \   0035                  REQUIRE ?CL78K_V4_6_L00
+    647          }
+    648          
+    649          
+    650          //==============================================================================
+    651          // DESCRIPTION:         Check if wiping timeout is elapsed
+    652          //
+    653          // PARAMETERS:          None
+    654          //
+    655          // RETURN VALUE:        BOOL: cTrue if timeout elapsed
+    656          //
+    657          // DESIGN INFORMATION:  Refer to DCD
+    658          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    659          BOOL LAPRrwWipingTimeoutHasElapsed( void )
+   \                     LAPRrwWipingTimeoutHasElapsed:
+    660          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    661          #ifdef X90_PROJECT
+    662              static MEM_TYPE BOOL LAPRrwWipingTimeoutHasElapsed_Static(void);
+    663              return LAPRrwWipingTimeoutHasElapsed_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwWipingTimeoutHasElapsed_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwWipingTimeoutHasElapsed_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    664          }
+    665          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    666          static MEM_TYPE BOOL LAPRrwWipingTimeoutHasElapsed_Static(void)
+   \                     LAPRrwWipingTimeoutHasElapsed_Static:
+    667          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    668          #endif  
+    669              tTOSTimer WipingTimeoutL;
+    670              BOOL bReturnValueL;
+    671          
+    672              //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    673              WipingTimeoutL = mReadWipingTimeoutReprise();
+   \   0001   8E....         MOV       A,u8DATCmnTPS_REPRISE_old
+   \   0004   48....         CMP       A,DATPeeCalibrationData+7
+   \   0007   BD05           BNZ       ??LAPRrwInitialize_19
+   \   0009   02....         MOVW      AX,DATCmnRrwWipingTimeoutReprise
+   \   000C   FA1D           BR        ??LAPRrwInitialize_20
+   \                     ??LAPRrwInitialize_19:
+   \   000E   8E....         MOV       A,DATPeeCalibrationData+7
+   \   0011   9E....         MOV       u8DATCmnTPS_REPRISE_old,A
+   \   0014   100000         MOVW      AX,#0
+   \   0017   B1             PUSH      AX
+   \   0018   A00A           MOV       X,#10
+   \   001A   B1             PUSH      AX
+   \   001B   70             MOV       X,A
+   \   001C   B1             PUSH      AX
+   \   001D   10E803         MOVW      AX,#1000
+   \   0020   B1             PUSH      AX
+   \   0021   8E....         MOV       A,u8DATCmnTPS_REPRISE_old
+   \   0024   120000         MOVW      BC,#0
+   \   0027   70             MOV       X,A
+   \   0028   63             MOV       A,B
+   \   0029   ..             CALLT     [__T_?L_MUL_L03]
+   \   002A   ..             CALLT     [__T_?UL_DIV_L03]
+   \                     ??LAPRrwInitialize_20:
+   \   002B   03....         MOVW      DATCmnRrwWipingTimeoutReprise,AX
+    674              bReturnValueL  = TOSIsTempoElapsed( &TempoEP, WipingTimeoutL );
+    675          
+    676              return bReturnValueL;
+   \   002E   D2             MOVW      BC,AX
+   \   002F   10....         MOVW      AX,#TempoEP
+   \   0032   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0033   B2             POP       BC
+   \   0034   AF             RET       
+   \   0035                  REQUIRE ?CL78K_V4_6_L00
+    677          }
+    678          
+    679          
+    680          //==============================================================================
+    681          // DESCRIPTION:         Check if stop wiping timeout is elapsed
+    682          //
+    683          // PARAMETERS:          None
+    684          //
+    685          // RETURN VALUE:        BOOL: cTrue if timeout elapsed
+    686          //
+    687          // DESIGN INFORMATION:  Refer to DCD
+    688          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    689          BOOL LAPRrwStopTryingTimeoutHasElapsed( void )
+   \                     LAPRrwStopTryingTimeoutHasElapsed:
+    690          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    691          #ifdef X90_PROJECT
+    692              static MEM_TYPE BOOL LAPRrwStopTryingTimeoutHasElapsed_Static(void);
+    693              return LAPRrwStopTryingTimeoutHasElapsed_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwStopTryingTimeoutHasElapsed_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwStopTryingTimeoutHasElapsed_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    694          }
+    695          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    696          static MEM_TYPE BOOL LAPRrwStopTryingTimeoutHasElapsed_Static(void)
+   \                     LAPRrwStopTryingTimeoutHasElapsed_Static:
+    697          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    698          #endif  
+    699              tTOSTimer WipingTimeoutL;
+    700              BOOL bReturnValueL;
+    701          
+    702              //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    703              WipingTimeoutL = mReadWipingTimeout();
+   \   0001   8E....         MOV       A,u8DATCmnTPS_MAX_COUPLBLOC_old
+   \   0004   48....         CMP       A,DATPeeCalibrationData+5
+   \   0007   BD05           BNZ       ??LAPRrwInitialize_21
+   \   0009   02....         MOVW      AX,DATCmnFrRrwWipingTimeout
+   \   000C   FA1D           BR        ??LAPRrwInitialize_22
+   \                     ??LAPRrwInitialize_21:
+   \   000E   8E....         MOV       A,DATPeeCalibrationData+5
+   \   0011   9E....         MOV       u8DATCmnTPS_MAX_COUPLBLOC_old,A
+   \   0014   100000         MOVW      AX,#0
+   \   0017   B1             PUSH      AX
+   \   0018   A00A           MOV       X,#10
+   \   001A   B1             PUSH      AX
+   \   001B   70             MOV       X,A
+   \   001C   B1             PUSH      AX
+   \   001D   10E803         MOVW      AX,#1000
+   \   0020   B1             PUSH      AX
+   \   0021   8E....         MOV       A,u8DATCmnTPS_MAX_COUPLBLOC_old
+   \   0024   120000         MOVW      BC,#0
+   \   0027   70             MOV       X,A
+   \   0028   63             MOV       A,B
+   \   0029   ..             CALLT     [__T_?L_MUL_L03]
+   \   002A   ..             CALLT     [__T_?UL_DIV_L03]
+   \                     ??LAPRrwInitialize_22:
+   \   002B   03....         MOVW      DATCmnFrRrwWipingTimeout,AX
+    704              bReturnValueL  = TOSIsTempoElapsed( &TempoEP, WipingTimeoutL );
+    705          
+    706              return bReturnValueL;
+   \   002E   D2             MOVW      BC,AX
+   \   002F   10....         MOVW      AX,#TempoEP
+   \   0032   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0033   B2             POP       BC
+   \   0034   AF             RET       
+   \   0035                  REQUIRE ?CL78K_V4_6_L00
+    707          }
+    708          
+    709          
+    710          //==============================================================================
+    711          // DESCRIPTION:         Check if wiping is not requested
+    712          //
+    713          // PARAMETERS:          None
+    714          //
+    715          // RETURN VALUE:        BOOL: cTrue if wiping not requested
+    716          //
+    717          // DESIGN INFORMATION:  Refer to DCD
+    718          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    719          BOOL LAPRrwWipingIsNotRequested( void )
+   \                     LAPRrwWipingIsNotRequested:
+    720          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    721              const BOOL bReturnValueL = (   (bParkingOutput == cFalse)
+    722                                          && (mDATRead(U1Bit, RR_WASHER_SW, Default)    == 0)
+    723                                          && (mDATRead(U1Bit, RR_WIPER_INT_SW, Default) == 0)  );
+   \   0000   8E....         MOV       A,bParkingOutput
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD09           BNZ       ??LAPRrwInitialize_38
+   \   0007   F0..           MOV       A,S:DATDinInputBuffers+5
+   \   0009   5D0C           AND       A,#12
+   \   000B   BD03           BNZ       ??LAPRrwInitialize_38
+   \   000D   A101           MOV       A,#1
+   \   000F   AF             RET       
+   \                     ??LAPRrwInitialize_38:
+   \   0010   A100           MOV       A,#0
+    724            
+    725              return bReturnValueL;
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    726          }
+    727          
+    728          
+    729          //==============================================================================
+    730          // DESCRIPTION:         Stop protection mode
+    731          //
+    732          // PARAMETERS:          None
+    733          //
+    734          // RETURN VALUE:        None
+    735          //
+    736          // DESIGN INFORMATION:  Refer to DCD
+    737          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    738          void LAPRrwStopProtectionMode( void )
+   \                     LAPRrwStopProtectionMode:
+    739          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    740          #ifdef X90_PROJECT
+    741              LAPRrwStopProtectionMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwStopProtectionMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwStopProtectionMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    742          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    743          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    744          static MEM_TYPE void LAPRrwStopProtectionMode_Static(void)
+   \                     LAPRrwStopProtectionMode_Static:
+    745          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    746          #endif    
+    747              // Reset flag
+    748              bProtectionOutput = cEnableWiping;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bProtectionOutput,A
+    749          
+    750              // Clear front fixed stop fault
+    751              mDATWrite(U1Bit, DefAFAR,     cFalse, Default);                             
+   \   0005   A100           MOV       A,#0
+   \   0007   16....         MOVW      HL,#DATCmnData+18
+   \   000A   97             MOV       [HL],A
+    752          
+    753              // Clear Output
+    754              mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMP, cMotorOff, Default);
+   \   000B   A119           MOV       A,#25
+   \   000D   5B..           CLR1      S:DATPouSoftOutputBuffer+3.5
+    755          
+    756              // Restart the command graphs
+    757              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+   \   000F   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    758              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwWashing);
+   \   0010   A11A           MOV       A,#26
+   \   0012   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    759          
+    760              bOutputWSHOn = cFalse;
+   \   0013   A100           MOV       A,#0
+   \   0015   9E....         MOV       bOutputWSHOn,A
+    761              bOutputINTOn = cFalse;
+   \   0018   9E....         MOV       bOutputINTOn,A
+    762              u8ExtraWipeCounter = 0;
+   \   001B   9E....         MOV       u8ExtraWipeCounter,A
+    763          
+    764              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+   \   001E   A119           MOV       A,#25
+   \   0020   ..             CALLT     [__T_TOSSeqActivateGraph]
+    765              TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwWashing);
+   \   0021   A11A           MOV       A,#26
+   \   0023   ..             CALLT     [__T_TOSSeqActivateGraph]
+    766          }
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+    767          
+    768          
+    769          //---------------------------------------------------------------------------
+    770          //                      RRWIntermittentWipe Graph Functions
+    771          //---------------------------------------------------------------------------
+    772          
+    773          //See Definition of the functions used in several graphs.
+    774          //==============================================================================
+    775          // DESCRIPTION:         Check if intermittent conditions to stop are present
+    776          //
+    777          // PARAMETERS:          None
+    778          //
+    779          // RETURN VALUE:        BOOL: cTrue if stop conditions present
+    780          //
+    781          // DESIGN INFORMATION:  Refer to DCD
+    782          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    783          BOOL LAPRrwINTConditionsToStopArePresent( void )
+   \                     LAPRrwINTConditionsToStopArePresent:
+    784          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    785          #ifdef X90_PROJECT
+    786              return LAPRrwINTConditionsToStopArePresent_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwINTConditionsToStopArePresent_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwINTConditionsToStopArePresent_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    787          }
+    788          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    789          static MEM_TYPE BOOL LAPRrwINTConditionsToStopArePresent_Static(void)
+   \                     LAPRrwINTConditionsToStopArePresent_Static:
+    790          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    791          #endif    
+    792              tTOSTimer  MinimumWipingTimeL;
+    793              BOOL       bReturnValueL;
+    794              BOOL       bFrontWiperStopIsAllowedL;
+    795          
+    796              if ( bOutputWSHOn == cTrue )
+   \   0001   8E....         MOV       A,bOutputWSHOn
+   \   0004   51             DEC       A
+   \   0005   BD04           BNZ       ??LAPRrwInitialize_23
+    797              {
+    798                  bReturnValueL = cTrue;
+   \   0007   A201           MOV       C,#1
+   \   0009   FA2B           BR        ??LAPRrwInitialize_24
+    799              }
+    800              else
+    801              {
+    802                  //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    803                  MinimumWipingTimeL = mReadMinimumWipingTime();
+   \                     ??LAPRrwInitialize_23:
+   \   000B   8E....         MOV       A,u8DATCmnTPS_ESSUIE_MINI_old
+   \   000E   48....         CMP       A,DATPeeCalibrationData+4
+   \   0011   BD05           BNZ       ??LAPRrwInitialize_25
+   \   0013   02....         MOVW      AX,DATCmnFrRrwMinimumWipingTime
+   \   0016   FA0F           BR        ??LAPRrwInitialize_26
+   \                     ??LAPRrwInitialize_25:
+   \   0018   8E....         MOV       A,DATPeeCalibrationData+4
+   \   001B   9E....         MOV       u8DATCmnTPS_ESSUIE_MINI_old,A
+   \   001E   A00C           MOV       X,#12
+   \   0020   3188           MULU      X
+   \   0022   A20A           MOV       C,#10
+   \   0024   3182           DIVUW     C
+   \   0026   90             DECW      AX
+   \                     ??LAPRrwInitialize_26:
+   \   0027   03....         MOVW      DATCmnFrRrwMinimumWipingTime,AX
+    804                  bReturnValueL = TOSIsTempoElapsed( &TempoINT, MinimumWipingTimeL );
+   \   002A   D2             MOVW      BC,AX
+   \   002B   10....         MOVW      AX,#TempoINT
+   \   002E   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   002F   72             MOV       C,A
+    805          
+    806                  bFrontWiperStopIsAllowedL = 
+    807                      TOSReadSignal(cTOSSignalRearWiperStopIsAllowed_LAP_RRW);
+    808                  bReturnValueL &= bFrontWiperStopIsAllowedL;
+   \   0030   100100         MOVW      AX,#1
+   \   0033   ..             CALLT     [__T_TOSReadSignal]
+   \   0034   6152           AND       C,A
+    809              }
+    810          
+    811              return bReturnValueL;
+   \                     ??LAPRrwInitialize_24:
+   \   0036   62             MOV       A,C
+   \   0037   B2             POP       BC
+   \   0038   AF             RET       
+   \   0039                  REQUIRE ?CL78K_V4_6_L00
+    812          }
+    813          
+    814          
+    815          //==============================================================================
+    816          // DESCRIPTION:         Check if intermittent request is off
+    817          //
+    818          // PARAMETERS:          None
+    819          //
+    820          // RETURN VALUE:        BOOL: cTrue if request is off
+    821          //
+    822          // DESIGN INFORMATION:  Refer to DCD
+    823          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    824          BOOL LAPRrwINTRequestIsOff( void )
+   \                     LAPRrwINTRequestIsOff:
+    825          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    826              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_WIPER_INT_SW, Default) == 0);
+    827              
+    828              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7134..         MOV1      CY,S:DATDinInputBuffers+5.3
+   \   0005   27             ROLC      A,0x1
+   \   0006   7D01           XOR       A,#1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    829          }
+    830          
+    831          
+    832          //==============================================================================
+    833          // DESCRIPTION:         Check if intermittent request is on
+    834          //
+    835          // PARAMETERS:          None
+    836          //
+    837          // RETURN VALUE:        BOOL: cTrue if request is on
+    838          //
+    839          // DESIGN INFORMATION:  Refer to DCD
+    840          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    841          BOOL LAPRrwINTRequestIsOn( void )
+   \                     LAPRrwINTRequestIsOn:
+    842          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    843              const BOOL bReturnValue = (mDATRead(U1Bit, RR_WIPER_INT_SW, Default) == 1);
+    844           
+    845              return bReturnValue;
+   \   0000   A100           MOV       A,#0
+   \   0002   7134..         MOV1      CY,S:DATDinInputBuffers+5.3
+   \   0005   27             ROLC      A,0x1
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    846          }
+    847          
+    848          
+    849          //==============================================================================
+    850          // DESCRIPTION:         Intermittent mode: stop wiping
+    851          //
+    852          // PARAMETERS:          None
+    853          //
+    854          // RETURN VALUE:        None
+    855          //
+    856          // DESIGN INFORMATION:  Refer to DCD
+    857          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    858          void LAPRrwINTStopWiping( void )
+   \                     LAPRrwINTStopWiping:
+    859          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    860              if ( bOutputWSHOn == cTrue )
+   \   0000   8E....         MOV       A,bOutputWSHOn
+   \   0003   51             DEC       A
+   \   0004   A100           MOV       A,#0
+   \   0006   9E....         MOV       bOutputINTOn,A
+   \   0009   BD05           BNZ       ??LAPRrwInitialize_39
+    861              {
+    862                  bOutputINTOn = cFalse;
+    863                  TOSSeqFreezeGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+   \   000B   A119           MOV       A,#25
+   \   000D   9B....         BR        N:TOSSeqFreezeGraph
+    864              }
+    865              else
+    866              {
+    867                  bOutputINTOn = cFalse;
+    868                  TOSStartTimer( &TempoINT );
+   \                     ??LAPRrwInitialize_39:
+   \   0010   10....         MOVW      AX,#TempoINT
+   \   0013   ..             CALLT     [__T_TOSStartTimer]
+    869              }
+    870          }
+   \   0014   AF             RET       
+   \   0015                  REQUIRE ?CL78K_V4_6_L00
+    871          
+    872          
+    873          //==============================================================================
+    874          // DESCRIPTION:         Check if intermittent pause has elapsed
+    875          //
+    876          // PARAMETERS:          None
+    877          //
+    878          // RETURN VALUE:        BOOL: cTrue if elapsed
+    879          //
+    880          // DESIGN INFORMATION:  Refer to DCD
+    881          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    882          BOOL LAPRrwINTPauseHasElapsed( void )
+   \                     LAPRrwINTPauseHasElapsed:
+    883          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    884          #ifdef X90_PROJECT
+    885              static MEM_TYPE BOOL LAPRrwINTPauseHasElapsed_Static(void);
+    886              return LAPRrwINTPauseHasElapsed_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwINTPauseHasElapsed_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwINTPauseHasElapsed_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    887          }
+    888          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    889          static MEM_TYPE BOOL LAPRrwINTPauseHasElapsed_Static(void)
+   \                     LAPRrwINTPauseHasElapsed_Static:
+    890          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    891          #endif  
+    892              tTOSTimer IntermittentPauseL;
+    893              BOOL bReturnValueL;
+    894          
+    895              //QACJ 3226: amarinm1: This is intentional and is checked for problems.
+    896              IntermittentPauseL = mReadIntermittentPause();
+   \   0001   8E....         MOV       A,u8DATCmnTPS_CAD_FIXE_old
+   \   0004   48....         CMP       A,DATDbkMirrors+41
+   \   0007   BD05           BNZ       ??LAPRrwInitialize_27
+   \   0009   02....         MOVW      AX,DATCmnFrRrwIntermittentPause
+   \   000C   FA0F           BR        ??LAPRrwInitialize_28
+   \                     ??LAPRrwInitialize_27:
+   \   000E   8E....         MOV       A,DATDbkMirrors+41
+   \   0011   9E....         MOV       u8DATCmnTPS_CAD_FIXE_old,A
+   \   0014   A050           MOV       X,#80
+   \   0016   3188           MULU      X
+   \   0018   A20A           MOV       C,#10
+   \   001A   3182           DIVUW     C
+   \   001C   90             DECW      AX
+   \                     ??LAPRrwInitialize_28:
+   \   001D   03....         MOVW      DATCmnFrRrwIntermittentPause,AX
+    897              bReturnValueL = TOSIsTempoElapsed( &TempoINT, IntermittentPauseL );
+    898          
+    899              return bReturnValueL;
+   \   0020   D2             MOVW      BC,AX
+   \   0021   10....         MOVW      AX,#TempoINT
+   \   0024   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0025   B2             POP       BC
+   \   0026   AF             RET       
+   \   0027                  REQUIRE ?CL78K_V4_6_L00
+    900          }
+    901          
+    902          
+    903          //==============================================================================
+    904          // DESCRIPTION:         Intermittent mode: start wiping
+    905          //
+    906          // PARAMETERS:          None
+    907          //
+    908          // RETURN VALUE:        None
+    909          //
+    910          // DESIGN INFORMATION:  Refer to DCD
+    911          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    912          void LAPRrwINTStartWiping( void )
+   \                     LAPRrwINTStartWiping:
+    913          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    914              bOutputINTOn = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bOutputINTOn,A
+    915              TOSStartTimer( &TempoINT );
+   \   0005   10....         MOVW      AX,#TempoINT
+   \   0008   ..             CALLT     [__T_TOSStartTimer]
+    916              
+    917              // Stop initial parking at first wiping request
+    918              bParkingOutput = cFalse;
+   \   0009   A100           MOV       A,#0
+   \   000B   9E....         MOV       bParkingOutput,A
+    919              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwInitialParking);
+   \   000E   A11B           MOV       A,#27
+   \   0010   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    920          
+    921              //QACJ 3200: amarinm1: This is done just to clear the signal.
+    922              TOSReadSignal(cTOSSignalRearWiperStopIsAllowed_LAP_RRW);
+   \   0011   100100         MOVW      AX,#1
+   \   0014   ..             CALLT     [__T_TOSReadSignal]
+    923          }
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+    924          
+    925          
+    926          //==============================================================================
+    927          // DESCRIPTION:         Intermittent mode: stop timer
+    928          //
+    929          // PARAMETERS:          None
+    930          //
+    931          // RETURN VALUE:        None
+    932          //
+    933          // DESIGN INFORMATION:  Refer to DCD
+    934          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    935          void LAPRrwINTStopTimer( void )
+   \                     LAPRrwINTStopTimer:
+    936          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    937              TOSStopTimer( &TempoINT );
+   \   0000   10....         MOVW      AX,#TempoINT
+   \   0003   ..             CALLT     [__T_TOSStopTimer]
+    938          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    939          
+    940          
+    941          //---------------------------------------------------------------------------
+    942          //                      RRWWashing Graph Functions
+    943          //---------------------------------------------------------------------------
+    944          
+    945          //==============================================================================
+    946          // DESCRIPTION:         Check if wash cycle is finished
+    947          //
+    948          // PARAMETERS:          None
+    949          //
+    950          // RETURN VALUE:        BOOL: cTrue if finished
+    951          //
+    952          // DESIGN INFORMATION:  Refer to DCD
+    953          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    954          BOOL LAPRrwWashCycleIsFinished( void )
+   \                     LAPRrwWashCycleIsFinished:
+    955          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    956              const BOOL bReturnValueL = (u8ExtraWipeCounter == 0);
+   \   0000   8E....         MOV       A,u8ExtraWipeCounter
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??LAPRrwInitialize_40
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPRrwInitialize_40:
+   \   000A   A100           MOV       A,#0
+    957           
+    958              return bReturnValueL;
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    959          }
+    960          
+    961          
+    962          //==============================================================================
+    963          // DESCRIPTION:         Check if extra wipe beginning is requested
+    964          //
+    965          // PARAMETERS:          None
+    966          //
+    967          // RETURN VALUE:        BOOL: cTrue if requested
+    968          //
+    969          // DESIGN INFORMATION:  Refer to DCD
+    970          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    971          BOOL LAPRrwWashExtraWipeBegining( void )
+   \                     LAPRrwWashExtraWipeBegining:
+    972          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    973              const BOOL bRR_AUTOSTOP_SW_FallingEdgeIsDetectedL = 
+    974                  TOSReadSignal(cTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW);
+   \   0000   100300         MOVW      AX,#3
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   70             MOV       X,A
+    975              const BOOL bReturnValueL = 
+    976                        (   (u8ExtraWipeCounter > 0)
+    977                         && (bRR_AUTOSTOP_SW_FallingEdgeIsDetectedL == 1) );
+   \   0005   8E....         MOV       A,u8ExtraWipeCounter
+   \   0008   4D00           CMP       A,#0
+   \   000A   AD07           BZ        ??LAPRrwInitialize_41
+   \   000C   60             MOV       A,X
+   \   000D   51             DEC       A
+   \   000E   BD03           BNZ       ??LAPRrwInitialize_41
+   \   0010   A101           MOV       A,#1
+   \   0012   AF             RET       
+   \                     ??LAPRrwInitialize_41:
+   \   0013   A100           MOV       A,#0
+    978            
+    979              return bReturnValueL;
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+    980          }
+    981          
+    982          
+    983          //==============================================================================
+    984          // DESCRIPTION:         Wash prolongation
+    985          //
+    986          // PARAMETERS:          None
+    987          //
+    988          // RETURN VALUE:        None
+    989          //
+    990          // DESIGN INFORMATION:  Refer to DCD
+    991          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    992          void LAPRrwWashProlongation( void )
+   \                     LAPRrwWashProlongation:
+    993          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    994              u8ExtraWipeCounter--;
+   \   0000   8E....         MOV       A,u8ExtraWipeCounter
+   \   0003   51             DEC       A
+   \   0004   9E....         MOV       u8ExtraWipeCounter,A
+    995          }
+   \   0007   AF             RET       
+   \   0008                  REQUIRE ?CL78K_V4_6_L00
+    996          
+    997          
+    998          //==============================================================================
+    999          // DESCRIPTION:         Prepare to stop wash prolongation
+   1000          //
+   1001          // PARAMETERS:          None
+   1002          //
+   1003          // RETURN VALUE:        None
+   1004          //
+   1005          // DESIGN INFORMATION:  Refer to DCD
+   1006          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1007          void LAPRrwPrepareToStopWashProlongation( void )
+   \                     LAPRrwPrepareToStopWashProlongation:
+   1008          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1009              //QACJ 3200: amarinm1: This is done just to clear the signal.
+   1010              TOSReadSignal(cTOSSignalRearStopPositionDetected_LAP_RRW2);
+   \   0000   101200         MOVW      AX,#18
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   1011          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+   1012          
+   1013          
+   1014          //==============================================================================
+   1015          // DESCRIPTION:         Check if wash request is off
+   1016          //
+   1017          // PARAMETERS:          None
+   1018          //
+   1019          // RETURN VALUE:        BOOL: cTrue if not requested
+   1020          //
+   1021          // DESIGN INFORMATION:  Refer to DCD
+   1022          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1023          BOOL LAPRrwWashRequestIsOff( void )
+   \                     LAPRrwWashRequestIsOff:
+   1024          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1025              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_WASHER_SW, Default) == 0);
+   1026           
+   1027              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7124..         MOV1      CY,S:DATDinInputBuffers+5.2
+   \   0005   27             ROLC      A,0x1
+   \   0006   7D01           XOR       A,#1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1028          }
+   1029          
+   1030          
+   1031          //==============================================================================
+   1032          // DESCRIPTION:         Check if wash request is on
+   1033          //
+   1034          // PARAMETERS:          None
+   1035          //
+   1036          // RETURN VALUE:        BOOL: cTrue if requested
+   1037          //
+   1038          // DESIGN INFORMATION:  Refer to DCD
+   1039          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1040          BOOL LAPRrwWashRequestIsOn( void )
+   \                     LAPRrwWashRequestIsOn:
+   1041          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1042              BOOL bReturnValueL = cFalse;
+   \   0000   A000           MOV       X,#0
+   1043          
+   1044              if (mDATRead(U1Bit, RearWasherButtonBlocked, Default) != cFalse)
+   \   0002   8E....         MOV       A,DATCmnData+30
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD0B           BZ        ??LAPRrwInitialize_42
+   1045              {
+   1046                  // button pressed before ignition on
+   1047                  // ignore button
+   1048                  if (mDATRead(U1Bit, RR_WASHER_SW, Default) == cFalse)
+   \   0009   AC..23         BT        S:DATDinInputBuffers+5.2, ??LAPRrwInitialize_43
+   1049                  {
+   1050                      mDATWrite(U1Bit, RearWasherButtonBlocked, cFalse, Default);
+   \   000C   A100           MOV       A,#0
+   \   000E   16....         MOVW      HL,#DATCmnData+30
+   \   0011   97             MOV       [HL],A
+   \   0012   FA1B           BR        ??LAPRrwInitialize_43
+   1051                  }
+   1052                  else
+   1053                  {
+   1054                      // wait for button release
+   1055                  }
+   1056              }
+   1057              else
+   1058              {
+   1059                  if (mDATRead(U1Bit, FrontWasherButtonBlocked, Default) == cFalse)
+   \                     ??LAPRrwInitialize_42:
+   \   0014   8E....         MOV       A,DATCmnData+29
+   \   0017   4D00           CMP       A,#0
+   \   0019   BD0E           BNZ       ??LAPRrwInitialize_44
+   1060                  {
+   1061                      bReturnValueL = (   (mDATRead(U1Bit, RR_WASHER_SW, Default) == 1)
+   1062                                       && (mDATRead(U1Bit, FR_WASHER_SW, Default) == 0)   );
+   \   001B   3123..10       BF        S:DATDinInputBuffers+5.2, ??LAPRrwInitialize_43
+   \   001F   A100           MOV       A,#0
+   \   0021   7104..         MOV1      CY,S:DATDinInputBuffers+4.0
+   \   0024   01             NOT1      CY
+   \   0025   27             ROLC      A,0x1
+   \   0026   70             MOV       X,A
+   \   0027   FA06           BR        ??LAPRrwInitialize_43
+   1063                  }
+   1064                  else
+   1065                  {
+   1066                      // front washer button blocked, disregard it
+   1067                      bReturnValueL = (mDATRead(U1Bit, RR_WASHER_SW, Default) == 1);
+   \                     ??LAPRrwInitialize_44:
+   \   0029   3123..02       BF        S:DATDinInputBuffers+5.2, ??LAPRrwInitialize_43
+   \   002D   A001           MOV       X,#1
+   1068                  }
+   1069              }
+   1070              
+   1071              return bReturnValueL;
+   \                     ??LAPRrwInitialize_43:
+   \   002F   60             MOV       A,X
+   \   0030   AF             RET       
+   \   0031                  REQUIRE ?CL78K_V4_6_L00
+   1072          }
+   1073          
+   1074          
+   1075          //==============================================================================
+   1076          // DESCRIPTION:         Stop wash wiping
+   1077          //
+   1078          // PARAMETERS:          None
+   1079          //
+   1080          // RETURN VALUE:        None
+   1081          //
+   1082          // DESIGN INFORMATION:  Refer to DCD
+   1083          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1084          void LAPRrwStopWashWiping( void )
+   \                     LAPRrwStopWashWiping:
+   1085          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1086              const tTOSSeqGraphStateType INTGraphStateL = 
+   1087                  TOSSeqGraphState(cTOSSeqGraphIdLAPRrwIntermittentWipe);
+   \   0000   A119           MOV       A,#25
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   70             MOV       X,A
+   1088          
+   1089              bOutputWSHOn = cFalse;
+   \   0004   A100           MOV       A,#0
+   \   0006   9E....         MOV       bOutputWSHOn,A
+   1090          
+   1091              if ( INTGraphStateL == cTOSSeqFrozenGraph ) 
+   \   0009   60             MOV       A,X
+   \   000A   4D02           CMP       A,#2
+   \   000C   BD09           BNZ       ??LAPRrwInitialize_45
+   1092              {
+   1093                  // INT graph has been frozen in 'stop' position because of the wash wiping
+   1094          
+   1095                  // INT wiping should continue with an off phase after the wash wiping
+   1096                  // and timer is currently stopped(elapsed) so start it
+   1097                  TOSStartTimer( &TempoINT );
+   \   000E   10....         MOVW      AX,#TempoINT
+   \   0011   ..             CALLT     [__T_TOSStartTimer]
+   1098          
+   1099                  TOSSeqUnfreezeGraph(cTOSSeqGraphIdLAPRrwIntermittentWipe);        
+   \   0012   A119           MOV       A,#25
+   \   0014   9A....         CALL      TOSSeqUnfreezeGraph
+   1100              }
+   1101              else
+   1102              {
+   1103                  // Do nothing
+   1104              }
+   1105          }
+   \                     ??LAPRrwInitialize_45:
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+   1106          
+   1107          
+   1108          //==============================================================================
+   1109          // DESCRIPTION:         Initialize wash prolongation
+   1110          //
+   1111          // PARAMETERS:          None
+   1112          //
+   1113          // RETURN VALUE:        None
+   1114          //
+   1115          // DESIGN INFORMATION:  Refer to DCD
+   1116          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1117          void LAPRrwInitWashProlongation( void )
+   \                     LAPRrwInitWashProlongation:
+   1118          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1119          #ifdef X90_PROJECT
+   1120              LAPRrwInitWashProlongation_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwInitWashProlongation_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwInitWashProlongation_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   1121          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1122          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1123          static MEM_TYPE void LAPRrwInitWashProlongation_Static(void)
+   \                     LAPRrwInitWashProlongation_Static:
+   1124          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1125          #endif
+   1126          
+   1127              u8ExtraWipeCounter = mDATRead(U8Bit, NEEP_PROLONG_APPUI_ARR, Default);
+   \   0000   8E....         MOV       A,DATPeeCalibrationData+11
+   \   0003   9E....         MOV       u8ExtraWipeCounter,A
+   1128          
+   1129              // Determine the number of extra wipes.
+   1130              // According the spec, the wipe will stop after u8ExtraWipeCounter rising edge of RR_AUTOSTOP_SW
+   1131              if ( mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate) == 0 )
+   \   0006   9C..08         BT        S:DATDinInputBuffers+11.1, ??LAPRrwInitialize_29
+   1132              {
+   1133                  // rear is wiping (Stop position is not reached)
+   1134                  if ( u8ExtraWipeCounter > 0 )
+   \   0009   4D00           CMP       A,#0
+   \   000B   AD04           BZ        ??LAPRrwInitialize_29
+   1135                  {
+   1136                      u8ExtraWipeCounter--;   //first extra wipe has already begun
+   \   000D   51             DEC       A
+   \   000E   9E....         MOV       u8ExtraWipeCounter,A
+   1137                  }
+   1138                  else
+   1139                  {
+   1140                      u8ExtraWipeCounter = u8ExtraWipeCounter;
+   1141                      // Do nothing
+   1142                  }
+   1143              }
+   1144              else
+   1145              {
+   1146                  // rear is not wiping (Stop position is reached)
+   1147              }
+   1148          
+   1149              //QACJ 3200: amarinm1: This is done just to clear the signal.
+   1150              TOSReadSignal(cTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW);
+   \                     ??LAPRrwInitialize_29:
+   \   0011   100300         MOVW      AX,#3
+   \   0014   ..             CALLT     [__T_TOSReadSignal]
+   1151          }
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+   1152          
+   1153          
+   1154          //==============================================================================
+   1155          // DESCRIPTION:         Start wash wiping
+   1156          //
+   1157          // PARAMETERS:          None
+   1158          //
+   1159          // RETURN VALUE:        None
+   1160          //
+   1161          // DESIGN INFORMATION:  Refer to DCD
+   1162          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1163          void LAPRrwStartWashWiping( void )
+   \                     LAPRrwStartWashWiping:
+   1164          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1165              bOutputWSHOn = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bOutputWSHOn,A
+   1166          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+   1167          
+   1168          
+   1169          //==============================================================================
+   1170          // DESCRIPTION:         Start wash wait
+   1171          //
+   1172          // PARAMETERS:          None
+   1173          //
+   1174          // RETURN VALUE:        None
+   1175          //
+   1176          // DESIGN INFORMATION:  Refer to DCD
+   1177          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1178          void LAPRrwStartWashWait( void )
+   \                     LAPRrwStartWashWait:
+   1179          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1180              TOSStartTimer( &TimerWashWait );
+   \   0000   10....         MOVW      AX,#TimerWashWait
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+   1181              
+   1182              // Stop initial parking graph at first wiping request
+   1183              bParkingOutput = cFalse;
+   \   0004   A100           MOV       A,#0
+   \   0006   9E....         MOV       bParkingOutput,A
+   1184              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwInitialParking);
+   \   0009   A11B           MOV       A,#27
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   1185          }
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1186          
+   1187          
+   1188          //==============================================================================
+   1189          // DESCRIPTION:         Check if wash wait has elapsed
+   1190          //
+   1191          // PARAMETERS:          None
+   1192          //
+   1193          // RETURN VALUE:        BOOL: cTrue if elapsed
+   1194          //
+   1195          // DESIGN INFORMATION:  Refer to DCD
+   1196          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1197          BOOL LAPRrwWashWaitHasElapsed( void )
+   \                     LAPRrwWashWaitHasElapsed:
+   1198          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#TimerWashWait
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+   1199              BOOL            bReturnValueL;
+   1200              const tTOSTimer WashWaitL = mReadWashWait();
+   1201          
+   1202              bReturnValueL = TOSIsTimerElapsed( &TimerWashWait, WashWaitL );
+   1203          
+   1204              return bReturnValueL;
+   \   0004   124B00         MOVW      BC,#75
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   1205          }
+   1206          
+   1207          
+   1208          //---------------------------------------------------------------------------
+   1209          //                      Initial Parking Graph Functions
+   1210          //---------------------------------------------------------------------------
+   1211          
+   1212          //==============================================================================
+   1213          // DESCRIPTION:         Check if wiper is in speed position
+   1214          //
+   1215          // PARAMETERS:          None
+   1216          //
+   1217          // RETURN VALUE:        BOOL: cTrue if in speed position
+   1218          //
+   1219          // DESIGN INFORMATION:  Refer to DCD
+   1220          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1221          BOOL LAPRrwWiperIsInSpeedPosition( void )
+   \                     LAPRrwWiperIsInSpeedPosition:
+   1222          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1223              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate) == 0);
+   1224          
+   1225              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7114..         MOV1      CY,S:DATDinInputBuffers+11.1
+   \   0005   27             ROLC      A,0x1
+   \   0006   7D01           XOR       A,#1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1226          }
+   1227          
+   1228          
+   1229          //==============================================================================
+   1230          // DESCRIPTION:         Check if wiper is in stop position
+   1231          //
+   1232          // PARAMETERS:          None
+   1233          //
+   1234          // RETURN VALUE:        BOOL: cTrue if in stop position
+   1235          //
+   1236          // DESIGN INFORMATION:  Refer to DCD
+   1237          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1238          BOOL LAPRrwWiperIsInStopPosition( void )
+   \                     LAPRrwWiperIsInStopPosition:
+   1239          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1240              const BOOL bReturnValueL = (mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate) == 1);
+   1241          
+   1242              return bReturnValueL;
+   \   0000   A100           MOV       A,#0
+   \   0002   7114..         MOV1      CY,S:DATDinInputBuffers+11.1
+   \   0005   27             ROLC      A,0x1
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+   1243          }
+   1244          
+   1245          
+   1246          //==============================================================================
+   1247          // DESCRIPTION:         Start parking
+   1248          //
+   1249          // PARAMETERS:          None
+   1250          //
+   1251          // RETURN VALUE:        None
+   1252          //
+   1253          // DESIGN INFORMATION:  Refer to DCD
+   1254          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1255          void LAPRrwStartParking( void )
+   \                     LAPRrwStartParking:
+   1256          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1257              bParkingOutput = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bParkingOutput,A
+   1258          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+   1259          
+   1260          
+   1261          //==============================================================================
+   1262          // DESCRIPTION:         Check if stop position has been reached
+   1263          //
+   1264          // PARAMETERS:          None
+   1265          //
+   1266          // RETURN VALUE:        BOOL: cTrue if position reached
+   1267          //
+   1268          // DESIGN INFORMATION:  Refer to DCD
+   1269          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1270          BOOL LAPRrwStopPositionHasBeenReached( void )
+   \                     LAPRrwStopPositionHasBeenReached:
+   1271          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1272              const BOOL bReturnValueL = (u8InitialParkingState >= cStopPositionHasBeenReached);
+   \   0000   8E....         MOV       A,u8InitialParkingState
+   \   0003   4D02           CMP       A,#2
+   \   0005   8D03           BC        ??LAPRrwInitialize_46
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPRrwInitialize_46:
+   \   000A   A100           MOV       A,#0
+   1273          
+   1274              return bReturnValueL;
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1275          }
+   1276          
+   1277          
+   1278          //==============================================================================
+   1279          // DESCRIPTION:         Stop parking
+   1280          //
+   1281          // PARAMETERS:          None
+   1282          //
+   1283          // RETURN VALUE:        None
+   1284          //
+   1285          // DESIGN INFORMATION:  Refer to DCD
+   1286          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1287          void LAPRrwStopParking( void )
+   \                     LAPRrwStopParking:
+   1288          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1289              bParkingOutput = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bParkingOutput,A
+   1290          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+   1291          
+   1292          
+   1293          //---------------------------------------------------------------------------
+   1294          //                      RRWControl Graph Functions
+   1295          //---------------------------------------------------------------------------
+   1296          
+   1297          //==============================================================================
+   1298          // DESCRIPTION:         Rear wiper arbitration management and HW protection
+   1299          //
+   1300          // PARAMETERS:          None
+   1301          //
+   1302          // RETURN VALUE:        None
+   1303          //
+   1304          // DESIGN INFORMATION:  Refer to DCD
+   1305          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1306          void LAPRrwArbitration( void )
+   \                     LAPRrwArbitration:
+   1307          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1308          #ifdef X90_PROJECT
+   1309              LAPRrwArbitration_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwArbitration_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwArbitration_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   1310          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1311          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1312          static MEM_TYPE void LAPRrwArbitration_Static(void)
+   \                     LAPRrwArbitration_Static:
+   1313          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   1314          #endif
+   1315              BOOL bTimerStartedL;
+   1316              BOOL bTimerElapsedL;
+   1317          
+   1318              if (   (mDATRead(U1Bit, EEP_EV_ARR, Default) == 1)
+   1319                  && (mDATRead(U1Bit, PWR_IGN,    Default) == 1)   )
+   \   0001   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0004   31B737         BF        [HL].3, ??LAPRrwInitialize_30
+   \   0007   3103..33       BF        S:DATDinInputBuffers+6.0, ??LAPRrwInitialize_30
+   1320              {
+   1321                  if (bComponentIsEnabled == cFalse)
+   \   000B   8E....         MOV       A,bComponentIsEnabled
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD24           BNZ       ??LAPRrwInitialize_31
+   1322                  {
+   1323                      bTimerStartedL = TOSIsTimerStarted(&IgnitionOnTimer);
+   1324          
+   1325                      if (bTimerStartedL == cFalse)
+   \   0012   10....         MOVW      AX,#IgnitionOnTimer
+   \   0015   9A....         CALL      TOSIsTimerStarted
+   \   0018   4D00           CMP       A,#0
+   \   001A   10....         MOVW      AX,#IgnitionOnTimer
+   \   001D   BD09           BNZ       ??LAPRrwInitialize_32
+   1326                      {
+   1327                          TOSStartTimer(&IgnitionOnTimer);
+   \   001F   ..             CALLT     [__T_TOSStartTimer]
+   1328          
+   1329                          // Clear the front wiper fault immediately
+   1330                          mDATWrite(U1Bit, DefAFAR,     cFalse, Default);                             
+   \   0020   A100           MOV       A,#0
+   \   0022   16....         MOVW      HL,#DATCmnData+18
+   \   0025   97             MOV       [HL],A
+   \   0026   FA0E           BR        ??LAPRrwInitialize_31
+   1331                      }
+   1332                      else
+   1333                      {
+   1334                          bTimerElapsedL = TOSIsTimerElapsed(&IgnitionOnTimer, cIgnitionOnTimeoutTicks);
+   1335          
+   1336                          if (bTimerElapsedL != cFalse)
+   \                     ??LAPRrwInitialize_32:
+   \   0028   123100         MOVW      BC,#49
+   \   002B   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   002C   4D00           CMP       A,#0
+   \   002E   AD06           BZ        ??LAPRrwInitialize_31
+   1337                          {
+   1338                              ResumeAfterDisable();
+   \   0030   16....         MOVW      HL,#LWRD(ResumeAfterDisable)
+   \   0033   A4..           MOV       E,#BYTE3(ResumeAfterDisable)
+   \   0035   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   1339                          }
+   1340                      }
+   1341                  }
+   1342                  else
+   1343                  {
+   1344                      // Do nothing
+   1345                  }
+   1346                  
+   1347                  // Rear wiper arbitration management
+   1348                  RearWiperArbitration();
+   \                     ??LAPRrwInitialize_31:
+   \   0036   16....         MOVW      HL,#LWRD(RearWiperArbitration)
+   \   0039   A4..           MOV       E,#BYTE3(RearWiperArbitration)
+   \   003B   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   003C   FA1C           BR        ??LAPRrwInitialize_33
+   1349              }
+   1350              else // Rear wiper disabled
+   1351              {
+   1352                  TOSStopTimer(&IgnitionOnTimer);
+   \                     ??LAPRrwInitialize_30:
+   \   003E   10....         MOVW      AX,#IgnitionOnTimer
+   \   0041   ..             CALLT     [__T_TOSStopTimer]
+   1353          
+   1354                  if (bComponentIsEnabled == cTrue)
+   \   0042   8E....         MOV       A,bComponentIsEnabled
+   \   0045   51             DEC       A
+   \   0046   BD06           BNZ       ??LAPRrwInitialize_34
+   1355                  {
+   1356                      DisableFunctionallity();
+   \   0048   16....         MOVW      HL,#LWRD(DisableFunctionallity)
+   \   004B   A4..           MOV       E,#BYTE3(DisableFunctionallity)
+   \   004D   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   1357                  }
+   1358                  else
+   1359                  {
+   1360                      // Do nothing
+   1361                  }
+   1362                  u8InitialParkingState = cNotDefined;
+   \                     ??LAPRrwInitialize_34:
+   \   004E   A100           MOV       A,#0
+   \   0050   9E....         MOV       u8InitialParkingState,A
+   1363          
+   1364                  //QACJ 3200: amarinm1: This is done just to clear the signal.
+   1365                  TOSReadSignal(cTOSSignalRearStopPositionDetected_LAP_RRW1);
+   \   0053   A011           MOV       X,#17
+   \   0055   ..             CALLT     [__T_TOSReadSignal]
+   1366                  //QACJ 3200: amarinm1: This is done just to clear the signal.
+   1367                  TOSReadSignal(cTOSSignalRearStopPositionDetected_LAP_RRW2);
+   \   0056   101200         MOVW      AX,#18
+   \   0059   ..             CALLT     [__T_TOSReadSignal]
+   1368              }
+   1369          
+   1370              // Run hardware protection routine
+   1371              HWProtection();
+   \                     ??LAPRrwInitialize_33:
+   \   005A   16....         MOVW      HL,#LWRD(HWProtection)
+   \   005D   A4..           MOV       E,#BYTE3(HWProtection)
+   \   005F   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   1372          }
+   \   0060   B2             POP       BC
+   \   0061   AF             RET       
+   \   0062                  REQUIRE ?CL78K_V4_6_L00
+   1373          
+   1374          //==============================================================================
+   1375          // DESCRIPTION:         Enter active state
+   1376          //
+   1377          // PARAMETERS:          None
+   1378          //
+   1379          // RETURN VALUE:        None
+   1380          //
+   1381          // DESIGN INFORMATION:  Refer to DCD
+   1382          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1383          void LAPRrwEnterActiveState( void )
+   \                     LAPRrwEnterActiveState:
+   1384          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1385          #ifdef X90_PROJECT
+   1386              LAPRrwEnterActiveState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPRrwEnterActiveState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPRrwEnterActiveState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   1387          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1388          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1389          static MEM_TYPE void LAPRrwEnterActiveState_Static(void)
+   \                     LAPRrwEnterActiveState_Static:
+   1390          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1391          #endif
+   1392              tTOSSeqGraphStateType ControlGraphStateL;
+   1393          
+   1394              ControlGraphStateL = TOSSeqGraphState(cTOSSeqGraphIdLAPRrwControl);
+   1395          
+   1396              if (ControlGraphStateL == cTOSSeqInactiveGraph)
+   \   0000   A11C           MOV       A,#28
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??LAPRrwInitialize_35
+   1397              {
+   1398                  TOSSeqActivateGraph(cTOSSeqGraphIdLAPRrwControl);
+   \   0007   A11C           MOV       A,#28
+   \   0009   ..             CALLT     [__T_TOSSeqActivateGraph]
+   1399              }
+   1400              else
+   1401              {
+   1402                  // Nothing to do.
+   1403              }     
+   1404              bPWR_IGNOld = cFalse;
+   \                     ??LAPRrwInitialize_35:
+   \   000A   A100           MOV       A,#0
+   \   000C   9E....         MOV       bPWR_IGNOld,A
+   1405              u8FaultCounter = 0;
+   \   000F   9E....         MOV       u8FaultCounter,A
+   1406              u8ProtectionCounter = cProtectionHeatCountInitial;
+   \   0012   A114           MOV       A,#20
+   \   0014   9E....         MOV       u8ProtectionCounter,A
+   1407          }
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+   1408          
+   1409          
+   1410          //==============================================================================
+   1411          // DESCRIPTION:         Leave active state
+   1412          //
+   1413          // PARAMETERS:          None
+   1414          //
+   1415          // RETURN VALUE:        None
+   1416          //
+   1417          // DESIGN INFORMATION:  Refer to DCD
+   1418          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1419          void LAPRrwLeaveActiveState( void )
+   \                     LAPRrwLeaveActiveState:
+   1420          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1421              DisableFunctionallity();
+   \   0001   16....         MOVW      HL,#LWRD(DisableFunctionallity)
+   \   0004   A4..           MOV       E,#BYTE3(DisableFunctionallity)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   1422          
+   1423              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPRrwControl);
+   \   0007   A11C           MOV       A,#28
+   \   0009   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   1424          }
+   \   000A   B4             POP       DE
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+   1425          
+   1426          
+   1427          //==============================================================================
+   1428          // DESCRIPTION:         Initialize component
+   1429          //
+   1430          // PARAMETERS:          None
+   1431          //
+   1432          // RETURN VALUE:        None
+   1433          //
+   1434          // DESIGN INFORMATION:  Refer to DCD
+   1435          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1436          void LAPRrwInitialize( void )
+   \                     LAPRrwInitialize:
+   1437          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1438              StopRearWiper();
+   \   0000   A11B           MOV       A,#27
+   \   0002   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0003   A118           MOV       A,#24
+   \   0005   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0006   A119           MOV       A,#25
+   \   0008   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   0009   A11A           MOV       A,#26
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   000C   A101           MOV       A,#1
+   \   000E   9E....         MOV       bProtectionOutput,A
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       bParkingOutput,A
+   \   0016   9E....         MOV       bOutputINTOn,A
+   \   0019   9E....         MOV       bOutputWSHOn,A
+   \   001C   9E....         MOV       u8ExtraWipeCounter,A
+   \   001F   10....         MOVW      AX,#TempoEP
+   \   0022   ..             CALLT     [__T_TOSStopTimer]
+   \   0023   10....         MOVW      AX,#TempoINT
+   \   0026   ..             CALLT     [__T_TOSStopTimer]
+   \   0027   10....         MOVW      AX,#TimerWashWait
+   \   002A   ..             CALLT     [__T_TOSStopTimer]
+   1439          
+   1440              // Check the initial value
+   1441              mLIBassert( mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Default) == 0 );
+   1442              bPWR_IGNOld = cFalse;
+   \   002B   A100           MOV       A,#0
+   \   002D   9E....         MOV       bPWR_IGNOld,A
+   1443              u8FaultCounter = 0;
+   \   0030   9E....         MOV       u8FaultCounter,A
+   1444              u8ProtectionCounter = cProtectionHeatCountInitial;
+   \   0033   A114           MOV       A,#20
+   \   0035   9E....         MOV       u8ProtectionCounter,A
+   1445          }
+   \   0038   AF             RET       
+   \   0039                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSReadSignal:
+   \   0000   ....           DW       TOSReadSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?L_MUL_L03:
+   \   0000   ....           DW       ?L_MUL_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?UL_DIV_L03:
+   \   0000   ....           DW       ?UL_DIV_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqGraphState:
+   \   0000   ....           DW       TOSSeqGraphState
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+   1446          
+   1447          
+   1448          /* [EXPORTED_FUNCTIONS_END] */
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LAPRrwEngineProtection           60
+     LAPRrwWashing                    48
+     LAPRrwIntermittentWipe           24
+     LAPRrwInitialParking             18
+     LAPRrwControl                     6
+     TempoEP                           2
+     TempoINT                          2
+     TimerWashWait                     2
+     IgnitionOnTimer                   2
+     u8ExtraWipeCounter                1
+     u8InitialParkingState             1
+     bProtectionOutput                 1
+     bParkingOutput                    1
+     bOutputINTOn                      1
+     bOutputWSHOn                      1
+     bMotorCommand                     1
+     bComponentIsEnabled               1
+     bPWR_IGNOld                       1
+     u8ProtectionCounter               1
+     u8FaultCounter                    1
+     RearWiperArbitration             41
+     DisableFunctionallity            51
+     ResumeAfterDisable               30
+     HWProtection                    181
+     LAPRrwEPStopPositionIsDetected    5
+     LAPRrwWashStopPositionIsDetected
+                                       5
+     LAPRrwOutputIsInactive            9
+     LAPRrwOutputIsActive              7
+     LAPRrwInitialWipingTimeoutHasElapsed
+                                       9
+     LAPRrwInitialWipingTimeoutHasElapsed_Static
+                                      95
+     LAPRrwEnableWiping               27
+     LAPRrwTryWiping                  10
+     LAPRrwDisableWiping              29
+     LAPRrwDisableTimeoutHasElapsed    9
+     LAPRrwDisableTimeoutHasElapsed_Static
+                                      53
+     LAPRrwWipingTimeoutHasElapsed     9
+     LAPRrwWipingTimeoutHasElapsed_Static
+                                      53
+     LAPRrwStopTryingTimeoutHasElapsed
+                                       9
+     LAPRrwStopTryingTimeoutHasElapsed_Static
+                                      53
+     LAPRrwWipingIsNotRequested       19
+     LAPRrwStopProtectionMode          9
+     LAPRrwStopProtectionMode_Static
+                                      37
+     LAPRrwINTConditionsToStopArePresent
+                                       9
+     LAPRrwINTConditionsToStopArePresent_Static
+                                      57
+     LAPRrwINTRequestIsOff             9
+     LAPRrwINTRequestIsOn              7
+     LAPRrwINTStopWiping              21
+     LAPRrwINTPauseHasElapsed          9
+     LAPRrwINTPauseHasElapsed_Static
+                                      39
+     LAPRrwINTStartWiping             22
+     LAPRrwINTStopTimer                5
+     LAPRrwWashCycleIsFinished        13
+     LAPRrwWashExtraWipeBegining      22
+     LAPRrwWashProlongation            8
+     LAPRrwPrepareToStopWashProlongation
+                                       5
+     LAPRrwWashRequestIsOff            9
+     LAPRrwWashRequestIsOn            49
+     LAPRrwStopWashWiping             24
+     LAPRrwInitWashProlongation        9
+     LAPRrwInitWashProlongation_Static
+                                      22
+     LAPRrwStartWashWiping             6
+     LAPRrwStartWashWait              13
+     LAPRrwWashWaitHasElapsed         10
+     LAPRrwWiperIsInSpeedPosition      9
+     LAPRrwWiperIsInStopPosition       7
+     LAPRrwStartParking                6
+     LAPRrwStopPositionHasBeenReached
+                                      13
+     LAPRrwStopParking                 6
+     LAPRrwArbitration                 9
+     LAPRrwArbitration_Static         98
+     LAPRrwEnterActiveState            9
+     LAPRrwEnterActiveState_Static    24
+     LAPRrwLeaveActiveState           12
+     LAPRrwInitialize                 57
+     __T_TOSSeqDeactivateGraph         2
+     __T_TOSStopTimer                  2
+     __T_TOSSeqActivateGraph           2
+     __T_TOSReadSignal                 2
+     __T_?FAR_CALL_L07                 2
+     __T_?L_MUL_L03                    2
+     __T_?UL_DIV_L03                   2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStartTimer                 2
+     __T_TOSSeqGraphState              2
+     __T_?FAR_FAST_CALL_L07            2
+
+ 
+ 834 bytes in segment BCODE
+  22 bytes in segment CLTVEC
+ 534 bytes in segment CODE
+ 156 bytes in segment CONST
+  19 bytes in segment NEAR_Z
+ 
+ 1 368 bytes of CODE  memory (+ 22 bytes shared)
+   156 bytes of CONST memory
+    19 bytes of DATA  memory
+
+Errors: none
+Warnings: none

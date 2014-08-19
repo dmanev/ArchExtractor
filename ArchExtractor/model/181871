@@ -1,0 +1,377 @@
+format 74
+"Datatype" // EA_Model::System::Base::SwComponent::Datatype
+  revision 7
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Base/SwComponent/Datatype/"
+  python_package "Datatype"
+  classview 174319 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 187887 "CompositeDataType class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 174191 "DataType class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 289007 "DataTypeFactory class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 185071 "CompositeDataType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 191215 // <generalisation>
+	relation 190959 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 191215 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+    end
+
+    class 170991 "DataType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      attribute 148335 "lowerLimit"
+	private explicit_type "long"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+      end
+
+      attribute 148463 "upperLimit"
+	private explicit_type "long"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+      end
+
+      classrelation 278767 // <generalisation>
+	relation 278255 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278767 // <generalisation>
+	  b parent class_ref 258799 // PackageableElement
+      end
+    end
+
+    class 185199 "ArrayDataType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 191343 // <generalisation>
+	relation 191087 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 191343 // <generalisation>
+	  b parent class_ref 185071 // CompositeDataType
+      end
+
+      classrelation 191471 // itsDataType (<unidirectional association>)
+	relation 191215 --->
+	  a role_name "itsDataType" private
+	    python "${comment}${self}${name} = ${value}
+"
+	    classrelation_ref 191471 // itsDataType (<unidirectional association>)
+	  b parent class_ref 170991 // DataType
+	get_oper operation_ref 340591 // get_itsDataType
+	set_oper operation_ref 340719 // set_itsDataType
+      end
+
+      attribute 154991 "maxNumberOfElements"
+	private explicit_type "ushort"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+	get_oper operation_ref 181743 // get_maxNumberOfElements
+	set_oper operation_ref 181871 // set_maxNumberOfElements
+      end
+
+      operation 181743 "get_maxNumberOfElements"
+	force_body_gen const cpp_inline public explicit_return_type "ushort"
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.maxNumberOfElements
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_attribute attribute_ref 154991 // maxNumberOfElements
+      end
+
+      operation 181871 "set_maxNumberOfElements"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" explicit_type "ushort"
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.maxNumberOfElements = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_attribute attribute_ref 154991 // maxNumberOfElements
+      end
+
+      operation 340591 "get_itsDataType"
+	force_body_gen const cpp_inline public return_type class_ref 170991 // DataType
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataType
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 191471 // itsDataType (<unidirectional association>)
+      end
+
+      operation 340719 "set_itsDataType"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 170991 // DataType
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsDataType = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 191471 // itsDataType (<unidirectional association>)
+      end
+    end
+
+    class 285423 "DataTypeFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 308975 // itsDataTypeMap (<directional aggregation>)
+	relation 308463 o-->
+	  stereotype "map"
+	  a role_name "itsDataTypeMap" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 308975 // itsDataTypeMap (<directional aggregation>)
+	  b parent class_ref 170991 // DataType
+	get_oper operation_ref 300399 // get_itsDataTypeMap
+      end
+
+      classrelation 309103 // <dependency>
+	relation 308591 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309103 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      operation 284783 "getDataType"
+	preserve_cpp_body_indent public return_type class_ref 170991 // DataType
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpDataTypeName" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 284655 "getArrayDataType"
+	preserve_cpp_body_indent public return_type class_ref 185199 // ArrayDataType
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpDataTypeName" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 300399 "get_itsDataTypeMap"
+	stereotype "map"
+	force_body_gen const cpp_inline public return_type class_ref 170991 // DataType
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataTypeMap
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 308975 // itsDataTypeMap (<directional aggregation>)
+      end
+    end
+  end
+
+  deploymentview 148591 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 188015 "deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A4
+    end
+
+    artifact 169711 "DataType"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 170991 // DataType
+      end
+    end
+
+    artifact 177391 "CompositeDataType"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 185071 // CompositeDataType
+      end
+      simplerelation 176111
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 177519 "ArrayDataType"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 185199 // ArrayDataType
+      end
+      simplerelation 176239
+	-_->
+	  on artifact_ref 177391 // CompositeDataType
+      end
+    end
+
+    artifact 277743 "DataTypeFactory"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 285423 // DataTypeFactory
+      end
+    end
+  end
+end

@@ -1,0 +1,728 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:27 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_CMN.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_CMN.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_CMN.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_CMN.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_CMN.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_CMN.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_CMN.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_CMN
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Oct 11 2010 16:17:52  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CMN/DAT_CMN.C-arc  $
+     15          // $Revision:   1.36  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CMN/DAT_CMN.C-arc  $
+     18          // 
+     19          //    Rev 1.36   Oct 11 2010 16:17:52   adzhelp
+     20          // Cm007166: SW version ID updated to 03.08
+     21          // 
+     22          //    Rev 1.35   Jul 09 2010 14:20:00   adzhelp
+     23          // Cm007166: SW version ID updated to B3.07
+     24          // 
+     25          //    Rev 1.34   Jul 01 2010 13:46:36   adzhelp
+     26          // Cm007166: SW version ID updated to 03.06
+     27          // 
+     28          //    Rev 1.33   Jun 30 2010 15:04:42   adzhelp
+     29          // Cm007166: SW version ID updated to 03.05a
+     30          // 
+     31          //    Rev 1.32   Jun 21 2010 15:48:58   adzhelp
+     32          // Cm007166: SW version ID updated to B3.06
+     33          // 
+     34          //    Rev 1.31   Jun 16 2010 14:40:14   adzhelp
+     35          // Cm007166: SW version ID updated to 03.05
+     36          // 
+     37          //    Rev 1.30   Jun 02 2010 09:29:54   adzhelp
+     38          // Cm007166: SW version ID updated to B3.05
+     39          // 
+     40          //    Rev 1.29   May 19 2010 15:35:02   adzhelp
+     41          // Cm007166: SW version ID updated to 03.04
+     42          // 
+     43          //    Rev 1.28   Mar 31 2010 09:09:06   adzhelp
+     44          // Cm007166: SW version ID updated to 03.03
+     45          // 
+     46          //    Rev 1.27   Mar 22 2010 11:08:54   adzhelp
+     47          // Cm007166: SW version ID updated to B3.03
+     48          // 
+     49          //    Rev 1.26   Mar 05 2010 10:22:48   adzhelp
+     50          // Cm007166: SW version ID updated to B3.02
+     51          // 
+     52          //    Rev 1.25   Mar 02 2010 17:24:50   adzhelp
+     53          // Cm007166: SW version ID updated to B3.01d
+     54          // 
+     55          //    Rev 1.24   Feb 26 2010 08:59:48   adzhelp
+     56          // Cm007166: SW version ID updated to B3.01c
+     57          // 
+     58          //    Rev 1.23   Feb 23 2010 11:25:06   adzhelp
+     59          // Cm007166: SW version ID updated to B3.01b
+     60          // 
+     61          //    Rev 1.22   Feb 19 2010 10:13:12   adzhelp
+     62          // Cm007575: Management of no-init flag 'BcmSleepRequested'
+     63          // 
+     64          //    Rev 1.21   Feb 15 2010 16:14:08   adzhelp
+     65          // Cm007166: SW version ID updated to B3.01a
+     66          // 
+     67          //    Rev 1.20   Feb 13 2010 09:16:32   adzhelp
+     68          // Cm007166: SW Version ID updated for VB3.01
+     69          // 
+     70          //    Rev 1.19   Feb 12 2010 09:45:18   adzhelp
+     71          // Cm007166: SW version ID updated to B3.00b
+     72          // 
+     73          //    Rev 1.18   Feb 05 2010 11:14:06   adzhelp
+     74          // Cm007006: Management of a Reset counter
+     75          // 
+     76          //    Rev 1.17   Feb 03 2010 11:53:30   adzhelp
+     77          // Cm005245: Refresh callback for LIB_PCF implemented
+     78          // 
+     79          //    Rev 1.16   Jan 28 2010 14:10:04   adzhelp
+     80          // Cm007166: SW Version ID updated for VB3.01
+     81          // 
+     82          //    Rev 1.15   Jan 26 2010 14:39:24   adzhelp
+     83          // Cm007166: SW version ID updated to B3.00a
+     84          // 
+     85          //    Rev 1.14   Jan 15 2010 14:15:00   adzhelp
+     86          // Cm007166: SW Version ID updated for VB3.00
+     87          // 
+     88          //    Rev 1.13   Dec 14 2009 12:26:10   adzhelp
+     89          // Cm006837: SW Version ID updated to B2.02
+     90          // 
+     91          //    Rev 1.12   Dec 04 2009 17:09:04   adzhelp
+     92          // Cm006837: SW Version ID updated to V02.02
+     93          // 
+     94          //    Rev 1.11   Nov 30 2009 15:40:46   adzhelp
+     95          // Cm006742: FRW / RRW common data added
+     96          // 
+     97          //    Rev 1.10   Oct 28 2009 11:13:00   adzhelp
+     98          // Cm006580: Version edition changed to '01'
+     99          // 
+    100          //    Rev 1.9   Sep 23 2009 10:25:08   amanevd
+    101          // Cm005133: tDATCmnData structure split to tDATCmnData and tDATCmnImmoData
+    102          // 
+    103          //    Rev 1.8   Sep 03 2009 12:37:04   amanevd
+    104          // Cm005133: Diagnostic information is cleared on MERA timeout, VERLOGON included
+    105          // 
+    106          //    Rev 1.7   Jul 17 2009 14:52:08   adzhelp
+    107          // Cm005574: Project checking excluded for simulation
+    108          // 
+    109          //    Rev 1.6   Jul 15 2009 10:08:32   adzhelp
+    110          // Cm005586: Code review corrections
+    111          // 
+    112          //    Rev 1.5   Jul 14 2009 14:29:18   amanevd
+    113          // Cm005586: KeyFrequency signal removed
+    114          // 
+    115          //    Rev 1.4   Jun 25 2009 09:47:58   adzhelp
+    116          // Cm005484: Version number updated for SW2
+    117          // 
+    118          //    Rev 1.3   Apr 28 2009 09:54:26   adzhelp
+    119          // Cm003619: Common object updated for immobilizer and RF integration
+    120          // 
+    121          //    Rev 1.2   Mar 23 2009 12:28:16   adzhelp
+    122          // Cm003465: Added stub functions for DAT_TRP
+    123          // 
+    124          //    Rev 1.1   Mar 20 2009 17:55:44   adzhelp
+    125          // Cm003619, Cm003128, Cm003263: Version number updated and stub interfaces created
+    126          // 
+    127          //    Rev 1.0   18 Feb 2009 14:18:18   ailievb
+    128          // Initial revision.
+    129          //******************************************************************************
+    130          
+    131          //--------------------------------------------------------------------------
+    132          //  Body Identification
+    133          //--------------------------------------------------------------------------
+    134          #define dat_cmn   "dat_cmn"
+    135          
+    136          //------------------------------------------------------------------------------
+    137          // Included files to resolve specific definitions in this file
+    138          //------------------------------------------------------------------------------
+    139          #include "dat.h"
+    140          #include "lib_pcf.h"
+    141          #include "DAT_CMN.h"
+    142          
+    143          //------------------------------------------------------------------------------
+    144          // Local constants
+    145          //------------------------------------------------------------------------------
+    146          // Software version / revision numbers
+    147          // version number
+    148          #define cVersionNumber      (U8)0x03U
+    149          // version edition
+    150          #define cVersionEdition     (U8)0x08U
+    151          // version patch: 0x00 for no patch or 'a', 'b', 'c', ...
+    152          #define cVersionPatch       (U8)'a'
+    153          
+    154          #define cCarTrp       ((U8)0x01)
+    155          #define cAprTrp       ((U8)0x02)
+    156          
+    157          
+    158          #define cMaxByte            ((U8)0xFFU)
+    159          
+    160          #define cSleepRequestedValue    ((U16)0x4AC3U)
+    161          #define cSleepNotRequestedValue ((U16)0x6F91U)
+    162          
+    163          //------------------------------------------------------------------------------
+    164          // Local macros
+    165          //------------------------------------------------------------------------------
+    166          
+    167          //------------------------------------------------------------------------------
+    168          // Local types
+    169          //------------------------------------------------------------------------------
+    170          
+    171          //------------------------------------------------------------------------------
+    172          // Local data
+    173          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    174          static U8      TrpResource;
+   \                     TrpResource:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    175          
+    176          #if !defined(COMPILATION_NATIVE) && !defined(DEBUG)
+
+   \                                 In  segment NEAR_N, align 2
+    177          __no_init static U16 u16SleepRequestedState;
+   \                     u16SleepRequestedState:
+   \   0000                  DS 2
+    178          #else
+    179          static U16 u16SleepRequestedState;
+    180          #endif
+    181          
+    182          //------------------------------------------------------------------------------
+    183          // Constant local data
+    184          //------------------------------------------------------------------------------
+    185          
+    186          //------------------------------------------------------------------------------
+    187          // Exported data
+    188          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    189          tDATCmnData DATCmnData;
+   \                     DATCmnData:
+   \   0000                  DS 31
+   \   001F                  REQUIRE __INIT_NEAR_Z
+    190          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    191          tDATCmnImmoData DATCmnImmoData;
+   \                     DATCmnImmoData:
+   \   0000                  DS 26
+   \   001A                  REQUIRE __INIT_NEAR_Z
+    192          
+    193          // FRW / RRW common data
+    194          // Zero initialization is enough
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    195          U8 u8DATCmnTPS_ARRET_old;
+   \                     u8DATCmnTPS_ARRET_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    196          U8 u8DATCmnTPS_MAX_COUPLBLOC_old;
+   \                     u8DATCmnTPS_MAX_COUPLBLOC_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    197          U8 u8DATCmnTPS_CAD_FIXE_old;
+   \                     u8DATCmnTPS_CAD_FIXE_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    198          U8 u8DATCmnTPS_APPUILAV_old;
+   \                     u8DATCmnTPS_APPUILAV_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    199          U8 u8DATCmnTPS_ESSUIE_MINI_old;
+   \                     u8DATCmnTPS_ESSUIE_MINI_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    200          U8 u8DATCmnTPS_REPRISE_old;
+   \                     u8DATCmnTPS_REPRISE_old:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    201          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    202          tTOSTimer DATCmnFrRrwDisableTimeout;
+   \                     DATCmnFrRrwDisableTimeout:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    203          tTOSTimer DATCmnFrRrwWipingTimeout;
+   \                     DATCmnFrRrwWipingTimeout:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    204          tTOSTimer DATCmnFrRrwIntermittentPause;
+   \                     DATCmnFrRrwIntermittentPause:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    205          tTOSTimer DATCmnFrRrwMinimumWipingTime;
+   \                     DATCmnFrRrwMinimumWipingTime:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    206          tTOSTimer DATCmnFrwWashPressThreshold;
+   \                     DATCmnFrwWashPressThreshold:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    207          tTOSTimer DATCmnRrwWipingTimeoutReprise;
+   \                     DATCmnRrwWipingTimeoutReprise:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    208          
+    209          //------------------------------------------------------------------------------
+    210          // Constant exported data
+    211          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 1
+    212          const U8 DATCmnVerVersionNum[2] = {0x00U, cVersionNumber};
+   \                     DATCmnVerVersionNum:
+   \   0000   0003           DB 0, 3
+
+   \                                 In  segment CONST, align 1
+    213          const U8 DATCmnVerRevisionNum[2] = {cVersionEdition, cVersionPatch};
+   \                     DATCmnVerRevisionNum:
+   \   0000   0861           DB 8, 97
+
+   \                                 In  segment CONST, align 1
+    214          const U8 DATCmnTfcVersionNum = cVersionNumber;
+   \                     DATCmnTfcVersionNum:
+   \   0000   03             DB 3
+
+   \                                 In  segment CONST, align 1
+    215          const U8 DATCmnTfcRevisionNum = cVersionEdition;
+   \                     DATCmnTfcRevisionNum:
+   \   0000   08             DB 8
+    216          
+    217          //------------------------------------------------------------------------------
+    218          // Local function prototypes
+    219          //------------------------------------------------------------------------------
+    220          
+    221          //==============================================================================
+    222          //=========================== LOCAL FUNCTIONS ==================================
+    223          //==============================================================================
+    224          
+    225          //==============================================================================
+    226          //=========================== EXPORTED FUNCTIONS ===============================
+    227          //==============================================================================
+    228          
+    229          //============================================================================
+    230          // DESCRIPTION:  Initialization
+    231          //
+    232          // PARAMETERS:          none
+    233          //
+    234          // RETURN VALUE:        none
+    235          // 
+    236          // DESIGN INFORMATION:  refer to Detailed Design Document
+    237          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    238          void DATCmnInitialize(void)
+   \                     DATCmnInitialize:
+    239          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    240              // Init here only data different from zero or cFalse
+    241              DATCmnImmoData.LearningModeInProgress = cDATNoLearningMode;
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#DATCmnImmoData+17
+   \   0005   97             MOV       [HL],A
+    242              DATCmnImmoData.LedVerlogPattern = cDATSwitchOffVerlogPattern;
+   \   0006   A103           MOV       A,#3
+   \   0008   86             INCW      HL
+   \   0009   97             MOV       [HL],A
+    243              DATCmnImmoData.VerlogOn = 1;
+   \   000A   A101           MOV       A,#1
+   \   000C   16....         MOVW      HL,#DATCmnImmoData+12
+   \   000F   97             MOV       [HL],A
+    244              #if (!defined(X90_PROJECT) && !defined(COMPILATION_NATIVE))
+    245                  #error "DATCmnData shall be initialized explicitly when cFalse != 0"
+    246              #endif
+    247          }
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    248          //============================================================================
+    249          // DESCRIPTION:  On TOS Control LeaveStartingStepState
+    250          //
+    251          // PARAMETERS:          none
+    252          //
+    253          // RETURN VALUE:        none
+    254          // 
+    255          // DESIGN INFORMATION:  refer to Detailed Design Document
+    256          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    257          void DATCmnLeaveStartingStepState(void)
+   \                     DATCmnLeaveStartingStepState:
+    258          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#DATCmnPcfRefresh
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    259              U8 u8ResetCountL;
+    260          
+    261              mLIBassert(TrpResource == 0);
+    262              #ifndef COMPILATION_NATIVE
+    263                  pLIBPcfRefresh = DATCmnPcfRefresh;
+   \   0004   03....         MOVW      pLIBPcfRefresh,AX
+    264              #endif
+    265              mDATControl(Rf,Start);
+   \   0007   9A....         CALL      DATRfStart
+    266          
+    267              // Reset counter management
+    268              u8ResetCountL = mDATRead(U8Bit, EEP_ResetCount, Default);
+   \   000A   8E....         MOV       A,DATDbkMirrors+5
+   \   000D   72             MOV       C,A
+    269              if (u8ResetCountL < cMaxByte)
+   \   000E   41             INC       A
+   \   000F   AD13           BZ        ??DATCmnSetBcmSleepRequested_0
+    270              {
+    271                  mDATWrite(U8Bit, EEP_ResetCount, (u8ResetCountL + (U8)1U), Default);
+   \   0011   62             MOV       A,C
+   \   0012   70             MOV       X,A
+   \   0013   A100           MOV       A,#0
+   \   0015   80             INCW      AX
+   \   0016   5DFF           AND       A,#255
+   \   0018   BD05           BNZ       ??DATCmnSetBcmSleepRequested_1
+   \   001A   42             INC       C
+   \   001B   62             MOV       A,C
+   \   001C   9E....         MOV       DATDbkMirrors+5,A
+   \                     ??DATCmnSetBcmSleepRequested_1:
+   \   001F   A100           MOV       A,#0
+   \   0021   9A....         CALL      DATDbkStartUpdate
+    272              }
+    273          }
+   \                     ??DATCmnSetBcmSleepRequested_0:
+   \   0024   B2             POP       BC
+   \   0025   AF             RET       
+   \   0026                  REQUIRE ?CL78K_V4_6_L00
+    274          //============================================================================
+    275          // DESCRIPTION:  On TOS Control GetAprTrpResource
+    276          //
+    277          // PARAMETERS:          none
+    278          //
+    279          // RETURN VALUE:        none
+    280          // 
+    281          // DESIGN INFORMATION:  refer to Detailed Design Document
+    282          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    283          void DATCmnGetAprTrpResource(void)
+   \                     DATCmnGetAprTrpResource:
+    284          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    285              if (TrpResource == 0) // Stop RF
+   \   0000   8E....         MOV       A,TrpResource
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??DATCmnSetBcmSleepRequested_2
+    286              {
+    287                  mDATControl(Rf,Stop);
+   \   0007   9A....         CALL      DATRfStop
+    288              }
+    289              TrpResource |= cAprTrp;
+   \                     ??DATCmnSetBcmSleepRequested_2:
+   \   000A   16....         MOVW      HL,#TrpResource
+   \   000D   7192           SET1      [HL].1
+    290          }
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+    291          
+    292          //============================================================================
+    293          // DESCRIPTION:  On TOS Control ReleaseAprTrpResource
+    294          //
+    295          // PARAMETERS:          none
+    296          //
+    297          // RETURN VALUE:        none
+    298          // 
+    299          // DESIGN INFORMATION:  refer to Detailed Design Document
+    300          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    301          void DATCmnReleaseAprTrpResource(void)
+   \                     DATCmnReleaseAprTrpResource:
+    302          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    303              TrpResource &=~cAprTrp;
+   \   0000   16....         MOVW      HL,#TrpResource
+   \   0003   7193           CLR1      [HL].1
+    304              if (TrpResource == 0) // Start RF
+   \   0005   87             MOV       A,[HL]
+   \   0006   4D00           CMP       A,#0
+   \   0008   BD03           BNZ       ??DATCmnSetBcmSleepRequested_3
+    305              {
+    306                  mDATControl(Rf,Start);
+   \   000A   9A....         CALL      DATRfStart
+    307              }
+    308          }
+   \                     ??DATCmnSetBcmSleepRequested_3:
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    309          
+    310          //============================================================================
+    311          // DESCRIPTION:  On TOS Control GetCarTrpResource
+    312          //
+    313          // PARAMETERS:          none
+    314          //
+    315          // RETURN VALUE:        none
+    316          // 
+    317          // DESIGN INFORMATION:  refer to Detailed Design Document
+    318          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    319          void DATCmnGetCarTrpResource(void)
+   \                     DATCmnGetCarTrpResource:
+    320          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    321              if (TrpResource == 0) // Stop RF
+   \   0000   8E....         MOV       A,TrpResource
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??DATCmnSetBcmSleepRequested_4
+    322              {
+    323                  mDATControl(Rf,Stop);
+   \   0007   9A....         CALL      DATRfStop
+    324              }
+    325              TrpResource |= cCarTrp;
+   \                     ??DATCmnSetBcmSleepRequested_4:
+   \   000A   16....         MOVW      HL,#TrpResource
+   \   000D   7182           SET1      [HL].0
+    326          }
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+    327          
+    328          //============================================================================
+    329          // DESCRIPTION:  On TOS Control ReleaseCarTrpResource
+    330          //
+    331          // PARAMETERS:          none
+    332          //
+    333          // RETURN VALUE:        none
+    334          // 
+    335          // DESIGN INFORMATION:  refer to Detailed Design Document
+    336          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    337          void DATCmnReleaseCarTrpResource(void)
+   \                     DATCmnReleaseCarTrpResource:
+    338          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    339              TrpResource &=~ cCarTrp;
+   \   0000   16....         MOVW      HL,#TrpResource
+   \   0003   7183           CLR1      [HL].0
+    340              if (TrpResource == 0) // Start RF
+   \   0005   87             MOV       A,[HL]
+   \   0006   4D00           CMP       A,#0
+   \   0008   BD03           BNZ       ??DATCmnSetBcmSleepRequested_5
+    341              {
+    342                  mDATControl(Rf,Start);
+   \   000A   9A....         CALL      DATRfStart
+    343              }
+    344          }
+   \                     ??DATCmnSetBcmSleepRequested_5:
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    345          
+    346          //============================================================================
+    347          // DESCRIPTION:  Performs refresh of tasks when LIB_PCF is being executed
+    348          //
+    349          // PARAMETERS:          none
+    350          //
+    351          // RETURN VALUE:        none
+    352          // 
+    353          // DESIGN INFORMATION:  refer to Detailed Design Document
+    354          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    355          void DATCmnPcfRefresh(void)
+   \                     DATCmnPcfRefresh:
+    356          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    357              // This refresh must be performed only for RF operation
+    358              // In active mode of BCM and if resynchronization is needed
+    359          
+    360              if (  (TrpResource == 0)  // RF active
+    361                  &&(mDATRead(U1Bit, BcmSleepMode, Default) == cFalse) // active mode
+    362                  &&(DATCmnData.PcfRefreshAllowed != cFalse) )
+   \   0000   8E....         MOV       A,TrpResource
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD14           BNZ       ??DATCmnSetBcmSleepRequested_6
+   \   0007   8E....         MOV       A,bDATPinSleepMode
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD0D           BNZ       ??DATCmnSetBcmSleepRequested_6
+   \   000E   8E....         MOV       A,DATCmnData
+   \   0011   4D00           CMP       A,#0
+   \   0013   AD06           BZ        ??DATCmnSetBcmSleepRequested_6
+    363              {
+    364                  TOSSchedule();
+   \   0015   9A....         CALL      TOSSchedule
+    365                  LDBRefreshWatchDog();
+   \   0018   9A....         CALL      LDBRefreshWatchDog
+    366              }
+    367          }
+   \                     ??DATCmnSetBcmSleepRequested_6:
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    368          
+    369          //============================================================================
+    370          // DESCRIPTION: 
+    371          //
+    372          // PARAMETERS:          none
+    373          //
+    374          // RETURN VALUE:        none
+    375          // 
+    376          // DESIGN INFORMATION:  refer to Detailed Design Document
+    377          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    378          MEM_TYPE BOOL DATCmnGetBcmSleepRequested (void)
+   \                     DATCmnGetBcmSleepRequested:
+    379          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    380              return (u16SleepRequestedState == cSleepRequestedValue);
+   \   0000   02....         MOVW      AX,u16SleepRequestedState
+   \   0003   EAC34A         CMPW      AX,#19139
+   \   0006   BD03           BNZ       ??DATCmnSetBcmSleepRequested_7
+   \   0008   A101           MOV       A,#1
+   \   000A   AF             RET       
+   \                     ??DATCmnSetBcmSleepRequested_7:
+   \   000B   A100           MOV       A,#0
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    381          }
+    382          
+    383          //============================================================================
+    384          // DESCRIPTION: 
+    385          //
+    386          // PARAMETERS:          none
+    387          //
+    388          // RETURN VALUE:        none
+    389          // 
+    390          // DESIGN INFORMATION:  refer to Detailed Design Document
+    391          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    392          MEM_TYPE void DATCmnSetBcmSleepRequested (BOOL bSleepRequestedP)
+   \                     DATCmnSetBcmSleepRequested:
+    393          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    394              u16SleepRequestedState = (bSleepRequestedP != cFalse) ? cSleepRequestedValue
+    395                                                                    : cSleepNotRequestedValue;
+   \   0000   4D00           CMP       A,#0
+   \   0002   AD05           BZ        ??DATCmnSetBcmSleepRequested_8
+   \   0004   10C34A         MOVW      AX,#19139
+   \   0007   FA03           BR        ??DATCmnSetBcmSleepRequested_9
+   \                     ??DATCmnSetBcmSleepRequested_8:
+   \   0009   10916F         MOVW      AX,#28561
+   \                     ??DATCmnSetBcmSleepRequested_9:
+   \   000C   03....         MOVW      u16SleepRequestedState,AX
+    396          }
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+
+   Segment part sizes:
+
+     Function/Label                Bytes
+     --------------                -----
+     TrpResource                      1
+     u16SleepRequestedState           2
+     DATCmnData                      31
+     DATCmnImmoData                  26
+     u8DATCmnTPS_ARRET_old            1
+     u8DATCmnTPS_MAX_COUPLBLOC_old    1
+     u8DATCmnTPS_CAD_FIXE_old         1
+     u8DATCmnTPS_APPUILAV_old         1
+     u8DATCmnTPS_ESSUIE_MINI_old      1
+     u8DATCmnTPS_REPRISE_old          1
+     DATCmnFrRrwDisableTimeout        2
+     DATCmnFrRrwWipingTimeout         2
+     DATCmnFrRrwIntermittentPause     2
+     DATCmnFrRrwMinimumWipingTime     2
+     DATCmnFrwWashPressThreshold      2
+     DATCmnRrwWipingTimeoutReprise    2
+     DATCmnVerVersionNum              2
+     DATCmnVerRevisionNum             2
+     DATCmnTfcVersionNum              1
+     DATCmnTfcRevisionNum             1
+     DATCmnInitialize                17
+     DATCmnLeaveStartingStepState    38
+     DATCmnGetAprTrpResource         16
+     DATCmnReleaseAprTrpResource     14
+     DATCmnGetCarTrpResource         16
+     DATCmnReleaseCarTrpResource     14
+     DATCmnPcfRefresh                28
+     DATCmnGetBcmSleepRequested      14
+     DATCmnSetBcmSleepRequested      16
+
+ 
+  30 bytes in segment BCODE
+ 143 bytes in segment CODE
+   6 bytes in segment CONST
+   2 bytes in segment NEAR_N
+  76 bytes in segment NEAR_Z
+ 
+ 173 bytes of CODE  memory
+   6 bytes of CONST memory
+  78 bytes of DATA  memory
+
+Errors: none
+Warnings: none

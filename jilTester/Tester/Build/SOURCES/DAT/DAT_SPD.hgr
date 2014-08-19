@@ -1,0 +1,72 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef dat_spd
+   extern const tTOSSeqGraphType SpeedManagement;
+   extern const tTOSSeqGraphType RPMManagement; 
+#endif
+
+#ifdef dat_spd
+   extern BOOL DATSpdIsRPMTimeoutIsElapsed(void);
+   extern BOOL DATSpdIsSpeedTimeoutIsElapsed(void);
+   extern void     DATSpdReceiveRPMState(void);
+   extern void     DATSpdReseiveSPDState(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef dat_spd
+  const tTOSSeqGraphType SpeedManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "SpeedManagement",
+    {
+#endif
+  /*   0*/  {DATSpdIsSpeedTimeoutIsElapsed,DATSpdReseiveSPDState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef dat_spd
+  const tTOSSeqGraphType RPMManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "RPMManagement",
+    {
+#endif
+  /*   0*/  {DATSpdIsRPMTimeoutIsElapsed,DATSpdReceiveRPMState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

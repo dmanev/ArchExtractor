@@ -1,0 +1,1963 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:26 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PIN.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_PIN.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_PIN.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PIN.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_PIN.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_PIN.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_PIN.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_PIN
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Mar 02 2010 10:53:38  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PIN/DAT_PIN.C-arc  $
+     15          // $Revision:   1.29  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PIN/DAT_PIN.C-arc  $
+     18          // 
+     19          //    Rev 1.29   Mar 02 2010 10:53:38   adzhelp
+     20          // Cm006814: Max values for TPS_IMPUL_MINI and TPS_FILT_AF corrected
+     21          // 
+     22          //    Rev 1.28   Mar 01 2010 15:37:58   adzhelp
+     23          // Cm007579: Changed thresholds on inputs managed by analog input
+     24          // 
+     25          //    Rev 1.27   Feb 24 2010 15:55:14   adzhelp
+     26          // Cm007212:  HWP: SC detection of Verlog LED in sleep mode
+     27          // 
+     28          //    Rev 1.26   Feb 19 2010 14:15:16   adzhelp
+     29          // Cm006690: FRW&RRW: Big initial time delay of output relay switching off
+     30          // 
+     31          //    Rev 1.25   Feb 05 2010 15:27:06   adzhelp
+     32          // Cm006567: Defroster filtration after reset
+     33          // 
+     34          //    Rev 1.24   Feb 03 2010 10:11:54   adzhelp
+     35          // Cm006590, Cm006698: Inputs management during undervoltage
+     36          // 
+     37          //    Rev 1.23   Jan 15 2010 13:46:16   adzhelp
+     38          // Cm006838: HSI: Changing thresholds on the three digital input managed by analog input
+     39          // 
+     40          //    Rev 1.22   Dec 03 2009 10:34:40   amarinm1
+     41          // Cm006636: SW is now kept awake only when Position lights, hazard switch or ignition are active (doors and CDL switch removed).
+     42          // 
+     43          //    Rev 1.21   Nov 30 2009 16:33:34   amarinm1
+     44          // Cm006695: TPS_FILT_AF new value is taken into account on IGN rising edge.
+     45          // 
+     46          //    Rev 1.20   Nov 03 2009 16:36:14   adzhelp
+     47          // Cm006598: Wake-up on raising edge of POSITION_LIGHTS
+     48          // 
+     49          //    Rev 1.19   Oct 06 2009 11:00:10   adzhelp
+     50          // Cm006155: Enter in active sleep mode when requested from LDB_DIN
+     51          // 
+     52          //    Rev 1.18   Sep 24 2009 10:13:00   adzhelp
+     53          // Cm003262: EFX90_SW2_FP04 : Implementation of the Rear Wipers functionality
+     54          // 
+     55          //    Rev 1.17   Sep 16 2009 10:54:20   amarinm1
+     56          // Cm006271: Reading of TPS_FILT_AF was moved from DATPinLeaveStartingStepState() to FrontWiperAutostopFiltration().
+     57          // 
+     58          //    Rev 1.16   Jul 24 2009 09:07:48   adzhelp
+     59          // Cm005136: Produce control after inputs are read after starting step
+     60          // 
+     61          //    Rev 1.15   Jul 24 2009 08:48:54   adzhelp
+     62          // Cm005104: Allow fast initialization by analog inputs and shorten time by explicit tasks activation on starting step
+     63          // 
+     64          //    Rev 1.14   Jul 10 2009 10:02:56   adzhelp
+     65          // Cm005104, Cm004985: Immediate checks for wakeup implemented
+     66          // 
+     67          //    Rev 1.13   Apr 27 2009 16:56:12   adzhelp
+     68          // Cm003264: Implementation of doorlock
+     69          // 
+     70          //    Rev 1.12   Apr 22 2009 10:01:06   adzhelp
+     71          // Cm003261: Implementation of front wiper autostop filtration
+     72          // 
+     73          //    Rev 1.11   Apr 16 2009 09:40:44   adzhelp
+     74          // Cm003276: Analog inputs reading synchronized with LDB_SUP; callback for wakeup from LDB_DIN added
+     75          // 
+     76          //    Rev 1.10   Apr 13 2009 15:55:12   adzhelp
+     77          // Cm003619: Analog converter changed to 10 bit
+     78          // 
+     79          //    Rev 1.9   Apr 07 2009 12:22:58   adzhelp
+     80          // Cm003270: Implementation of DEFROSTER filtration
+     81          // 
+     82          //    Rev 1.8   Mar 31 2009 15:25:26   adzhelp
+     83          // Cm003276: Controls produced for changing of inputs instead of signals writing
+     84          // 
+     85          //    Rev 1.7   Mar 30 2009 14:17:58   adzhelp
+     86          // Cm003465: Conversion of analog inputs to digital ones excluded for simulation
+     87          // 
+     88          //    Rev 1.6   Mar 20 2009 18:02:36   adzhelp
+     89          // Cm003263: Added signaling for HAZARD_SW and PWR_IGN for LAP_FLI
+     90          // 
+     91          //    Rev 1.5   Mar 20 2009 17:30:14   adzhelp
+     92          // Cm003619: Parameterization according to HSI
+     93          // 
+     94          //    Rev 1.4   21 Jan 2009 15:55:58   avidoly
+     95          // Cm003209: EFX90_SW1_FP02: Implementation of the Interior Lights functionality (corrected signal)
+     96          // 
+     97          //    Rev 1.3   20 Jan 2009 14:10:40   avidoly
+     98          // Cm003276:  EFX90_SW1_FP13 : Implementation of the Wake Up & Sleep functionality
+     99          // Added signals for system wake up and maintain Active state
+    100          // 
+    101          //    Rev 1.2   02 Dec 2008 16:07:12   ailievb
+    102          // Cm003619: Parametrization of DAT_PIN
+    103          //
+    104          //    Rev 1.1   24 Nov 2008 15:19:12   ailievb
+    105          // Cm003619: Integration of DAT_PIN
+    106          //
+    107          //    Rev 1.0   10 Nov 2008 10:21:12   ailievb
+    108          // Initial revision.
+    109          //******************************************************************************
+    110          
+    111          //------------------------------------------------------------------------------
+    112          // Body Identification
+    113          //------------------------------------------------------------------------------
+    114          #define dat_Pin  "dat_Pin"
+    115          
+    116          //------------------------------------------------------------------------------
+    117          // Included files to resolve specific definitions in this file
+    118          //------------------------------------------------------------------------------
+    119          #include "lib.h"
+    120          #include "tos.h"
+    121          #include "dat.h"
+    122          #include "dat_Pin.h"
+    123          #include "dat_Pinp.h"
+    124          
+    125          
+    126          //------------------------------------------------------------------------------
+    127          // Local constants
+    128          //------------------------------------------------------------------------------
+    129          // Analog inputs
+    130          #if (cDATAnaNumberOfBitsNonType == 8UL)
+    131          // 1 LSB = 19.608 mV
+    132          #define cAdcThresholdHigh                   (U8)64 // 1.25 V
+    133          #define cAdcThresholdLow                    (U8)51 // 1 V
+    134          #elif (cDATAnaNumberOfBitsNonType == 10UL)
+    135          // 1 LSB = 4.89 mV
+    136          #define cAdcThresholdHigh                   (U16)153 // 0.75 V
+    137          #define cAdcThresholdLow                    (U16)102 // 0.5 V
+    138          #endif
+    139          
+    140          #define cValueActiveMaxAI_RR_DOORS_SW       cAdcThresholdLow
+    141          #define cValueInactiveMinAI_RR_DOORS_SW     cAdcThresholdHigh
+    142          #define cValueActiveMaxAI_DOOR_UNLOCK_SW    cAdcThresholdLow
+    143          #define cValueInactiveMinAI_DOOR_UNLOCK_SW  cAdcThresholdHigh
+    144          #define cValueActiveMinFR_WIPER_INT_SW      cAdcThresholdHigh
+    145          #define cValueInactiveMaxFR_WIPER_INT_SW    cAdcThresholdLow
+    146          
+    147          // Defroster
+    148          // number of steps for dat_din task( task is at 5ms) to reach 25 ms ( TPS_IMPUL_MINI step):
+    149          #define cDATPinNbOfStepsForTPS_IMPUL_MINI   (U8)5U 
+    150          // Maximal value of EEP_TPS_IMPUL_MINI
+    151          #define cDATPinMaxTPS_IMPUL_MINI            (U8)20U
+    152          
+    153          // Front wipers
+    154          #define cEEP_TPS_FILT_AFMax                 (U8)13U
+    155          #define cTPS_FILT_AFStepMs                  (U8)6U
+    156          #define cEEP_TPS_POSIT_BALAISMax            (U8)7U
+    157          #define cEEP_TPS_POSIT_BALAISStepMs         (U8)6U
+    158          
+    159          #define cSpeedPosition              ((U8)0)
+    160          #define cTransitionToStopPosition   ((U8)1)
+    161          #define cStopPositionDetected       ((U8)2)
+    162          #define cStopAllowed                ((U8)3)
+    163          
+    164          // Active sleep duration
+    165          #define cActiveSleepDurationInMs    600UL
+    166          
+    167          //------------------------------------------------------------------------------
+    168          // Local macros
+    169          //------------------------------------------------------------------------------
+    170          
+    171          // ****************************************************************************
+    172          //  State Change Macros
+    173          //                        *** WARNING ***
+    174          //  Theses states are available during the call of DATPinStateChange function.
+    175          //  ***************************************************************************
+    176          #define mIsRaisingEdge(Data)    \
+    177             mDATDinGetRaisingEdge( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )   
+    178                   
+    179          #define mIsFallingEdge(Data)    \
+    180             mDATDinGetFallingEdge( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )  
+    181                    
+    182          #define mIsStateChange(Data)    \
+    183             mDATDinGetStateChange( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )            
+    184          
+    185          // *****************************************************************************
+    186          //  Immediate State Change Macros : for use in sleep mode
+    187          //                        *** WARNING ***
+    188          //  Non-filtered states are used
+    189          //  ***************************************************************************/
+    190          #define mIsRaisingEdgeImmediate(Data)    \
+    191             mGetRaisingEdgeImmediate( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )   
+    192                   
+    193          #define mIsFallingEdgeImmediate(Data)    \
+    194             mGetFallingEdgeImmediate( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )  
+    195                    
+    196          #define mIsStateChangeImmediate(Data)    \
+    197             mGetStateChangeImmediate( cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex )            
+    198          
+    199          // Implementation of immediate state change macros
+    200          #define mGetRaisingEdgeImmediate(ByteNbr,BitNbr) \
+    201                ((BOOL)((mDATDinGetNonFilteredValue( (ByteNbr),(BitNbr)) == cTrue)\
+    202                         && (mDATDinGetFilteredValue( (ByteNbr),(BitNbr)) == cFalse)))
+    203          
+    204          #define mGetFallingEdgeImmediate(ByteNbr,BitNbr) \
+    205                ((BOOL)((mDATDinGetNonFilteredValue( (ByteNbr),(BitNbr)) == cFalse)\
+    206                         && (mDATDinGetFilteredValue( (ByteNbr),(BitNbr)) == cTrue)))
+    207          
+    208          #define mGetStateChangeImmediate(ByteNbr,BitNbr) \
+    209                ((BOOL)(mDATDinGetNonFilteredValue( (ByteNbr),(BitNbr)) \
+    210                         != mDATDinGetFilteredValue( (ByteNbr),(BitNbr)) ) )
+    211          
+    212          // Retain present filtered value: copy from filtered to non-filtered buffer
+    213          #define mRetainInput(Data) \
+    214              mDATDinSetNonFilteredValue(cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex, \
+    215                  mDATDinGetFilteredValue(cDATPin##Data##ByteIndex, cDATPin##Data##BitIndex))
+    216          
+    217          // Rear and front wipers
+    218          #if defined(_QAC_) || defined(TESTU)
+    219          #define mForceFrwGraphsExecution() NOP()
+    220          #define mForceRrwGraphsExecution() NOP()
+    221          #else
+    222          #define mForceFrwGraphsExecution() \
+    223                  /* Call all front wiper graphs */ \
+    224                  TOSSeqMotor(cTOSSeqGraphIdLAPFrwEngineProtection, cTOSSeqGraphIdLAPFrwControl); \
+    225                  mForceOutputsRefresh()
+    226          
+    227          #define mForceRrwGraphsExecution() \
+    228                  /* Call all rear wiper graphs */ \
+    229                  TOSSeqMotor(cTOSSeqGraphIdLAPRrwEngineProtection, cTOSSeqGraphIdLAPRrwControl); \
+    230                  mForceOutputsRefresh()
+    231          
+    232          #define mForceOutputsRefresh() mDATDouRefreshOutput()
+    233          
+    234          #endif
+    235          
+    236          //------------------------------------------------------------------------------
+    237          // Local types
+    238          //------------------------------------------------------------------------------
+    239          
+    240          // This is an example:
+    241          // typedef Expression   tTypeName;
+    242          
+    243          //------------------------------------------------------------------------------
+    244          // Local data
+    245          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    246          static U8 u8DefrosterSWCounter;
+   \                     u8DefrosterSWCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    247          static BOOL bPreviousFR_AUTOSTOP_SW;
+   \                     bPreviousFR_AUTOSTOP_SW:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    248          static BOOL bPreviousRR_AUTOSTOP_SW;
+   \                     bPreviousRR_AUTOSTOP_SW:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    249          static U8 u8WipersStopFilteringTicks;
+   \                     u8WipersStopFilteringTicks:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    250          static U8 u8FrAutostopTimeCounter;
+   \                     u8FrAutostopTimeCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    251          static U8 u8RrAutostopTimeCounter;
+   \                     u8RrAutostopTimeCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    252          static U8 u8FrontWiperStopState;
+   \                     u8FrontWiperStopState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    253          static U8 u8RearWiperStopState;
+   \                     u8RearWiperStopState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    254          static BOOL bInputsReadAfterStartingStepState;
+   \                     bInputsReadAfterStartingStepState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    255          static U8 u8TPS_FILT_AF;
+   \                     u8TPS_FILT_AF:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    256          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    257          static tTOSTimer ActiveSleepTimer;
+   \                     ActiveSleepTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    258          
+    259          //------------------------------------------------------------------------------
+    260          // Constant local data
+    261          //------------------------------------------------------------------------------
+    262          
+    263          // This is an example:
+    264          // static const tType  cConstantName;
+    265          
+    266          //------------------------------------------------------------------------------
+    267          // Exported data
+    268          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    269          BOOL bDATPinDefrosterSWFiltered;
+   \                     bDATPinDefrosterSWFiltered:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    270          BOOL bDATPinSleepMode = cTrue;
+   \                     bDATPinSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bDATPinSleepMode>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    271          
+    272          //------------------------------------------------------------------------------
+    273          // Constant exported data
+    274          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 1
+    275          const U8 DATPinInitArray[] = cDATPinInitBufferDinGeneratorMessage;
+   \                     DATPinInitArray:
+   \   0000   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00      
+    276          
+    277          //------------------------------------------------------------------------------
+    278          // Local function prototypes
+    279          //------------------------------------------------------------------------------
+    280          static void DefrosterFiltration(void);
+    281          static U8 DetermineFrwAutostopOffset(void);
+    282          static void FrontWiperAutostopFiltration(void);
+    283          static U8 DetermineRrwAutostopOffset(void);
+    284          static void RearWiperAutostopFiltration(void);
+    285          static MEM_TYPE void WipersParametersRefresh(void);
+    286          static MEM_TYPE void SleepModeAnalogInputsReading(void);
+    287          static MEM_TYPE void SleepModeStateChange(void);
+    288          
+    289          #ifdef X90_PROJECT
+    290          static MEM_TYPE void DATPinEnterActiveState_Static(void);
+    291          #endif
+    292          
+    293          //==============================================================================
+    294          //=========================== LOCAL FUNCTIONS ==================================
+    295          //==============================================================================
+    296          
+    297          //==============================================================================
+    298          // DESCRIPTION : Rear defroster filtration
+    299          //  
+    300          // PARAMETERS (Type,Name,Min,Max) :  none
+    301          //
+    302          // RETURN VALUE :  none
+    303          // 
+    304          // DESIGN INFORMATION :  refer to Detailed Design Document
+    305          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    306          static void DefrosterFiltration(void)
+   \                     DefrosterFiltration:
+    307          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    308              if (u8DefrosterSWCounter > 0)
+   \   0000   8E....         MOV       A,u8DefrosterSWCounter
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD06           BZ        ??DATPinCallBackCtrl_0
+    309              {
+    310                  u8DefrosterSWCounter--;
+    311              }
+    312          
+    313              if (u8DefrosterSWCounter == 0)
+   \   0007   51             DEC       A
+   \   0008   9E....         MOV       u8DefrosterSWCounter,A
+   \   000B   BD1F           BNZ       ??DATPinCallBackCtrl_1
+    314              {
+    315                  bDATPinDefrosterSWFiltered = mDATRead(U1Bit,DEFROSTER_SW,Default);
+   \                     ??DATPinCallBackCtrl_0:
+   \   000D   F0..           MOV       A,S:DATDinInputBuffers+3
+   \   000F   5D01           AND       A,#1
+   \   0011   9E....         MOV       bDATPinDefrosterSWFiltered,A
+    316          
+    317                  if (mIsFallingEdge(DEFROSTER_SW))
+   \   0014   8C..15         BT        S:DATDinInputBuffers+3.0, ??DATPinCallBackCtrl_1
+   \   0017   3103..11       BF        S:DATDinInputBuffers+21.0, ??DATPinCallBackCtrl_1
+    318                  {
+    319                      U8 u8EEP_TPS_IMPUL_MINI = mDATRead(U8Bit, EEP_TPS_IMPUL_MINI, Default);
+   \   001B   8E....         MOV       A,DATDbkMirrors+51
+    320                      if (u8EEP_TPS_IMPUL_MINI > cDATPinMaxTPS_IMPUL_MINI)
+   \   001E   4D15           CMP       A,#21
+   \   0020   8D02           BC        ??DATPinCallBackCtrl_2
+    321                      {
+    322                          u8EEP_TPS_IMPUL_MINI = cDATPinMaxTPS_IMPUL_MINI;
+   \   0022   A114           MOV       A,#20
+    323                      }
+    324                      u8DefrosterSWCounter = u8EEP_TPS_IMPUL_MINI * cDATPinNbOfStepsForTPS_IMPUL_MINI;
+   \                     ??DATPinCallBackCtrl_2:
+   \   0024   A005           MOV       X,#5
+   \   0026   3188           MULU      X
+   \   0028   60             MOV       A,X
+   \   0029   9E....         MOV       u8DefrosterSWCounter,A
+    325                  }
+    326              }
+    327              else
+    328              {
+    329                  // Wait for Tpush timeout
+    330              }
+    331          }
+   \                     ??DATPinCallBackCtrl_1:
+   \   002C   AF             RET       
+   \   002D                  REQUIRE ?CL78K_V4_6_L00
+    332          
+    333          //==============================================================================
+    334          // DESCRIPTION : Determine front wiper autostop offset
+    335          //  
+    336          // PARAMETERS (Type,Name,Min,Max) :  none
+    337          //
+    338          // RETURN VALUE :  none
+    339          // 
+    340          // DESIGN INFORMATION :  refer to Detailed Design Document
+    341          //==============================================================================
+    342          #ifdef X90_PROJECT
+    343          #pragma optimize=no_inline
+    344          #endif
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    345          static U8 DetermineFrwAutostopOffset(void)
+   \                     DetermineFrwAutostopOffset:
+    346          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    347              U8 u8FrOffsetTimeInTaskTicksL;
+    348              U8 u8TPS_POSIT_BALAISL = mDATRead(U8Bit, EEP_TPS_POSIT_BALAIS, Default);
+   \   0000   8E....         MOV       A,DATDbkMirrors+34
+    349          
+    350          
+    351              if (u8TPS_POSIT_BALAISL > cEEP_TPS_POSIT_BALAISMax)
+   \   0003   4D08           CMP       A,#8
+   \   0005   8D04           BC        ??DATPinCallBackCtrl_3
+    352              {
+    353                  u8TPS_POSIT_BALAISL = cEEP_TPS_POSIT_BALAISMax;
+   \   0007   A107           MOV       A,#7
+    354              }
+    355          
+    356              // TPS_POSIT_BALAIS     DATDinTask   Ticks  Corrected ticks
+    357              // x 1 = 6 ms           5 ms         1      0
+    358              // x 2 = 12 ms          10 ms        2      1
+    359              // x 3 = 18 ms          20 ms        4      3
+    360              // x 4 = 24 ms          25 ms        5      4
+    361              // x 5 = 30 ms          30 ms        6      5
+    362              // x 6 = 36 ms          35 ms        7      6
+    363              // x 7 = 42 ms          40 ms        8      7
+    364          
+    365              // aim is to avoid use of DIV / MUL in active mode
+    366              if (u8TPS_POSIT_BALAISL < (U8)2U)
+    367              {
+    368                  u8FrOffsetTimeInTaskTicksL = 0;
+    369              }
+    370              else if (u8TPS_POSIT_BALAISL == (U8)2U)
+    371              {
+    372                  u8FrOffsetTimeInTaskTicksL = 1U;
+    373              }
+    374              else
+    375              {
+    376                  u8FrOffsetTimeInTaskTicksL = u8TPS_POSIT_BALAISL - 1U;
+   \                     ??DetermineFrwAutostopOffset_0:
+   \   0009   51             DEC       A
+    377              }
+    378          
+    379              return u8FrOffsetTimeInTaskTicksL;
+   \   000A   AF             RET       
+   \                     ??DATPinCallBackCtrl_3:
+   \   000B   4D02           CMP       A,#2
+   \   000D   9D03           BNC       ??DATPinCallBackCtrl_4
+   \   000F   A100           MOV       A,#0
+   \   0011   AF             RET       
+   \                     ??DATPinCallBackCtrl_4:
+   \   0012   BDF5           BNZ       ??DetermineFrwAutostopOffset_0
+   \   0014   A101           MOV       A,#1
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    380          }
+    381          
+    382          //==============================================================================
+    383          // DESCRIPTION : Front Wiper Autostop Filtration
+    384          //  
+    385          // PARAMETERS (Type,Name,Min,Max) :  none
+    386          //
+    387          // RETURN VALUE :  none
+    388          // 
+    389          // DESIGN INFORMATION :  refer to Detailed Design Document
+    390          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    391          static void FrontWiperAutostopFiltration(void)
+   \                     FrontWiperAutostopFiltration:
+    392          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    393              BOOL bFR_AUTOSTOP_SW = mDATRead(U1Bit, FR_AUTOSTOP_SW, Immediate);
+    394              U8 u8FrOffsetTimeInTaskTicksL;
+    395          
+    396          
+    397              if (bFR_AUTOSTOP_SW != cFalse)
+   \   0001   3123..73       BF        S:DATDinInputBuffers+11.2, ??DATPinCallBackCtrl_5
+    398              {
+    399                  if (bPreviousFR_AUTOSTOP_SW == cFalse) 
+   \   0005   8E....         MOV       A,bPreviousFR_AUTOSTOP_SW
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD13           BNZ       ??DATPinCallBackCtrl_6
+    400                  {
+    401                      u8FrAutostopTimeCounter = 0;
+   \   000C   A100           MOV       A,#0
+   \   000E   9E....         MOV       u8FrAutostopTimeCounter,A
+    402                      u8FrontWiperStopState = cTransitionToStopPosition;
+   \   0011   A101           MOV       A,#1
+   \   0013   9E....         MOV       u8FrontWiperStopState,A
+   \   0016   8E....         MOV       A,u8WipersStopFilteringTicks
+   \   0019   4D00           CMP       A,#0
+   \   001B   BD6E           BNZ       ??DATPinCallBackCtrl_7
+   \   001D   FA06           BR        ??DATPinCallBackCtrl_8
+    403                  }
+    404          
+    405                  if (   (bPreviousFR_AUTOSTOP_SW != cFalse) 
+    406                      || (u8WipersStopFilteringTicks < 1)   ) // important for short durations
+    407                  {
+    408                      if (u8FrontWiperStopState == cTransitionToStopPosition)
+   \                     ??DATPinCallBackCtrl_6:
+   \   001F   8E....         MOV       A,u8FrontWiperStopState
+   \   0022   51             DEC       A
+   \   0023   BD38           BNZ       ??DATPinCallBackCtrl_9
+    409                      {
+    410                          u8FrAutostopTimeCounter++;
+   \                     ??DATPinCallBackCtrl_8:
+   \   0025   8E....         MOV       A,u8FrAutostopTimeCounter
+   \   0028   41             INC       A
+   \   0029   9E....         MOV       u8FrAutostopTimeCounter,A
+    411                          if (u8FrAutostopTimeCounter >= u8WipersStopFilteringTicks)
+   \   002C   48....         CMP       A,u8WipersStopFilteringTicks
+   \   002F   8D5A           BC        ??DATPinCallBackCtrl_7
+    412                          {
+    413                              TOSSendControl(cTOSControlFrontStopPositionDetected);
+   \   0031   A108           MOV       A,#8
+   \   0033   ..             CALLT     [__T_TOSSendControl]
+    414                              u8FrontWiperStopState = cStopPositionDetected;
+   \   0034   A102           MOV       A,#2
+   \   0036   9E....         MOV       u8FrontWiperStopState,A
+    415                              u8FrAutostopTimeCounter = 0;
+   \   0039   A100           MOV       A,#0
+   \   003B   9E....         MOV       u8FrAutostopTimeCounter,A
+    416          
+    417                              // Determination of offset time
+    418                              // placed here for optimization
+    419                              u8FrOffsetTimeInTaskTicksL = DetermineFrwAutostopOffset();
+    420                          
+    421                              if(u8FrAutostopTimeCounter >= u8FrOffsetTimeInTaskTicksL)
+   \   003E   9A....         CALL      DetermineFrwAutostopOffset
+   \   0041   4D00           CMP       A,#0
+   \   0043   BD46           BNZ       ??DATPinCallBackCtrl_7
+    422                              {
+    423                                  TOSWriteSignal(cTOSSignalFrontWiperStopIsAllowed_LAP_FRW);
+   \                     ??FrontWiperAutostopFiltration_0:
+   \   0045   100000         MOVW      AX,#0
+   \   0048   ..             CALLT     [__T_TOSWriteSignal]
+    424                                  mForceFrwGraphsExecution();
+   \   0049   A114           MOV       A,#20
+   \   004B   A317           MOV       B,#23
+   \   004D   9A....         CALL      TOSSeqMotor
+   \   0050   101000         MOVW      AX,#16
+   \   0053   9A....         CALL      TOSActivateTask
+    425                                  u8FrontWiperStopState = cStopAllowed;
+   \   0056   A103           MOV       A,#3
+   \   0058   9E....         MOV       u8FrontWiperStopState,A
+   \   005B   FA2E           BR        ??DATPinCallBackCtrl_7
+    426                              }
+    427                          }
+    428                      }
+    429                      else if (u8FrontWiperStopState == cStopPositionDetected)
+   \                     ??DATPinCallBackCtrl_9:
+   \   005D   8E....         MOV       A,u8FrontWiperStopState
+   \   0060   4D02           CMP       A,#2
+   \   0062   BD27           BNZ       ??DATPinCallBackCtrl_7
+    430                      {
+    431                          u8FrAutostopTimeCounter++;
+   \   0064   8E....         MOV       A,u8FrAutostopTimeCounter
+   \   0067   41             INC       A
+   \   0068   9E....         MOV       u8FrAutostopTimeCounter,A
+    432          
+    433                          // Determination of offset time
+    434                          // placed here for optimization
+    435                          u8FrOffsetTimeInTaskTicksL = DetermineFrwAutostopOffset();
+    436                          
+    437                          if(u8FrAutostopTimeCounter >= u8FrOffsetTimeInTaskTicksL)
+   \   006B   9A....         CALL      DetermineFrwAutostopOffset
+   \   006E   70             MOV       X,A
+   \   006F   8E....         MOV       A,u8FrAutostopTimeCounter
+   \   0072   6148           CMP       A,X
+   \   0074   8D15           BC        ??DATPinCallBackCtrl_7
+   \   0076   FACD           BR        ??FrontWiperAutostopFiltration_0
+    438                          {
+    439                              TOSWriteSignal(cTOSSignalFrontWiperStopIsAllowed_LAP_FRW);
+    440                              mForceFrwGraphsExecution();
+    441                              u8FrontWiperStopState = cStopAllowed;
+    442                          }
+    443                      }
+    444                      else
+    445                      {
+    446                          //cStopAllowed
+    447                      }
+    448                  }
+    449              }
+    450              else // FR_AUTOSTOP_SW == 0
+    451              {
+    452                  u8FrAutostopTimeCounter = 0;
+   \                     ??DATPinCallBackCtrl_5:
+   \   0078   A100           MOV       A,#0
+   \   007A   9E....         MOV       u8FrAutostopTimeCounter,A
+    453                  u8FrontWiperStopState = cSpeedPosition;
+   \   007D   9E....         MOV       u8FrontWiperStopState,A
+    454          
+    455                  if (bPreviousFR_AUTOSTOP_SW != cFalse)
+   \   0080   8E....         MOV       A,bPreviousFR_AUTOSTOP_SW
+   \   0083   4D00           CMP       A,#0
+   \   0085   AD04           BZ        ??DATPinCallBackCtrl_7
+    456                  {
+    457                      TOSWriteSignal(cTOSSignalFR_AUTOSTOP_SWFalling_LAP_FRW);
+   \   0087   100200         MOVW      AX,#2
+   \   008A   ..             CALLT     [__T_TOSWriteSignal]
+    458                  }
+    459              }
+    460              bPreviousFR_AUTOSTOP_SW = mDATRead(U1Bit, FR_AUTOSTOP_SW, Immediate);
+   \                     ??DATPinCallBackCtrl_7:
+   \   008B   3123..04       BF        S:DATDinInputBuffers+11.2, ??DATPinCallBackCtrl_10
+   \   008F   A101           MOV       A,#1
+   \   0091   FA02           BR        ??DATPinCallBackCtrl_11
+   \                     ??DATPinCallBackCtrl_10:
+   \   0093   A100           MOV       A,#0
+   \                     ??DATPinCallBackCtrl_11:
+   \   0095   9E....         MOV       bPreviousFR_AUTOSTOP_SW,A
+    461          }
+   \   0098   B2             POP       BC
+   \   0099   AF             RET       
+   \   009A                  REQUIRE ?CL78K_V4_6_L00
+    462          
+    463          //==============================================================================
+    464          // DESCRIPTION : Determine rear wiper autostop offset
+    465          //  
+    466          // PARAMETERS (Type,Name,Min,Max) :  none
+    467          //
+    468          // RETURN VALUE :  none
+    469          // 
+    470          // DESIGN INFORMATION :  refer to Detailed Design Document
+    471          //==============================================================================
+    472          #ifdef X90_PROJECT
+    473          #pragma optimize=no_inline
+    474          #endif
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    475          static U8 DetermineRrwAutostopOffset(void)
+   \                     DetermineRrwAutostopOffset:
+    476          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    477              U8 u8RrOffsetTimeInTaskTicksL;
+    478              U8 u8TPS_POSIT_BALAIS_ARL = mDATRead(U8Bit, EEP_TPS_POSIT_BALAIS_AR, Default);
+   \   0000   8E....         MOV       A,DATDbkMirrors+43
+    479              
+    480              if (u8TPS_POSIT_BALAIS_ARL > cEEP_TPS_POSIT_BALAISMax)
+   \   0003   4D08           CMP       A,#8
+   \   0005   8D04           BC        ??DATPinCallBackCtrl_12
+    481              {
+    482                  u8TPS_POSIT_BALAIS_ARL = cEEP_TPS_POSIT_BALAISMax;
+   \   0007   A107           MOV       A,#7
+    483              }
+    484          
+    485              // TPS_POSIT_BALAIS_AR  DATDinTask   Ticks  Corrected ticks
+    486              // x 1 = 6 ms           5 ms         1      0
+    487              // x 2 = 12 ms          10 ms        2      1
+    488              // x 3 = 18 ms          20 ms        4      3
+    489              // x 4 = 24 ms          25 ms        5      4
+    490              // x 5 = 30 ms          30 ms        6      5
+    491              // x 6 = 36 ms          35 ms        7      6
+    492              // x 7 = 42 ms          40 ms        8      7
+    493          
+    494              // aim is to avoid use of DIV / MUL in active mode
+    495              if (u8TPS_POSIT_BALAIS_ARL < (U8)2U)
+    496              {
+    497                  u8RrOffsetTimeInTaskTicksL = 0;
+    498              }
+    499              else if (u8TPS_POSIT_BALAIS_ARL == (U8)2U)
+    500              {
+    501                  u8RrOffsetTimeInTaskTicksL = 1U;
+    502              }
+    503              else
+    504              {
+    505                  u8RrOffsetTimeInTaskTicksL = u8TPS_POSIT_BALAIS_ARL - 1U;
+   \                     ??DetermineRrwAutostopOffset_0:
+   \   0009   51             DEC       A
+    506              }
+    507          
+    508              return u8RrOffsetTimeInTaskTicksL;
+   \   000A   AF             RET       
+   \                     ??DATPinCallBackCtrl_12:
+   \   000B   4D02           CMP       A,#2
+   \   000D   9D03           BNC       ??DATPinCallBackCtrl_13
+   \   000F   A100           MOV       A,#0
+   \   0011   AF             RET       
+   \                     ??DATPinCallBackCtrl_13:
+   \   0012   BDF5           BNZ       ??DetermineRrwAutostopOffset_0
+   \   0014   A101           MOV       A,#1
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    509          }
+    510          
+    511          //==============================================================================
+    512          // DESCRIPTION : Rear Wiper Autostop Filtration
+    513          //  
+    514          // PARAMETERS (Type,Name,Min,Max) :  none
+    515          //
+    516          // RETURN VALUE :  none
+    517          // 
+    518          // DESIGN INFORMATION :  refer to Detailed Design Document
+    519          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    520          static void RearWiperAutostopFiltration(void)
+   \                     RearWiperAutostopFiltration:
+    521          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    522              BOOL bRR_AUTOSTOP_SW = mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate);
+    523              U8 u8RrOffsetTimeInTaskTicksL;
+    524          
+    525              if (bRR_AUTOSTOP_SW != cFalse)
+   \   0001   3113..73       BF        S:DATDinInputBuffers+11.1, ??DATPinCallBackCtrl_14
+    526              {
+    527                  if (bPreviousRR_AUTOSTOP_SW == cFalse) 
+   \   0005   8E....         MOV       A,bPreviousRR_AUTOSTOP_SW
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD13           BNZ       ??DATPinCallBackCtrl_15
+    528                  {
+    529                      u8RrAutostopTimeCounter = 0;
+   \   000C   A100           MOV       A,#0
+   \   000E   9E....         MOV       u8RrAutostopTimeCounter,A
+    530                      u8RearWiperStopState = cTransitionToStopPosition;
+   \   0011   A101           MOV       A,#1
+   \   0013   9E....         MOV       u8RearWiperStopState,A
+   \   0016   8E....         MOV       A,u8WipersStopFilteringTicks
+   \   0019   4D00           CMP       A,#0
+   \   001B   BD6E           BNZ       ??DATPinCallBackCtrl_16
+   \   001D   FA06           BR        ??DATPinCallBackCtrl_17
+    531                  }
+    532          
+    533                  if (   (bPreviousRR_AUTOSTOP_SW != cFalse) 
+    534                      || (u8WipersStopFilteringTicks < 1)   ) // important for short durations
+    535                  {
+    536                      if (u8RearWiperStopState == cTransitionToStopPosition)
+   \                     ??DATPinCallBackCtrl_15:
+   \   001F   8E....         MOV       A,u8RearWiperStopState
+   \   0022   51             DEC       A
+   \   0023   BD38           BNZ       ??DATPinCallBackCtrl_18
+    537                      {
+    538                          u8RrAutostopTimeCounter++;
+   \                     ??DATPinCallBackCtrl_17:
+   \   0025   8E....         MOV       A,u8RrAutostopTimeCounter
+   \   0028   41             INC       A
+   \   0029   9E....         MOV       u8RrAutostopTimeCounter,A
+    539                          if (u8RrAutostopTimeCounter >= u8WipersStopFilteringTicks)
+   \   002C   48....         CMP       A,u8WipersStopFilteringTicks
+   \   002F   8D5A           BC        ??DATPinCallBackCtrl_16
+    540                          {
+    541                              TOSSendControl(cTOSControlRearStopPositionDetected);
+   \   0031   A109           MOV       A,#9
+   \   0033   ..             CALLT     [__T_TOSSendControl]
+    542                              u8RearWiperStopState = cStopPositionDetected;
+   \   0034   A102           MOV       A,#2
+   \   0036   9E....         MOV       u8RearWiperStopState,A
+    543                              u8RrAutostopTimeCounter = 0;
+   \   0039   A100           MOV       A,#0
+   \   003B   9E....         MOV       u8RrAutostopTimeCounter,A
+    544          
+    545                              // Determination of offset time
+    546                              // placed here for optimization
+    547                              u8RrOffsetTimeInTaskTicksL = DetermineRrwAutostopOffset();
+    548                          
+    549                              if(u8RrAutostopTimeCounter >= u8RrOffsetTimeInTaskTicksL)
+   \   003E   9A....         CALL      DetermineRrwAutostopOffset
+   \   0041   4D00           CMP       A,#0
+   \   0043   BD46           BNZ       ??DATPinCallBackCtrl_16
+    550                              {
+    551                                  TOSWriteSignal(cTOSSignalRearWiperStopIsAllowed_LAP_RRW);                    
+   \                     ??RearWiperAutostopFiltration_0:
+   \   0045   100100         MOVW      AX,#1
+   \   0048   ..             CALLT     [__T_TOSWriteSignal]
+    552                                  mForceRrwGraphsExecution();
+   \   0049   A118           MOV       A,#24
+   \   004B   A31C           MOV       B,#28
+   \   004D   9A....         CALL      TOSSeqMotor
+   \   0050   101000         MOVW      AX,#16
+   \   0053   9A....         CALL      TOSActivateTask
+    553                                  u8RearWiperStopState = cStopAllowed;
+   \   0056   A103           MOV       A,#3
+   \   0058   9E....         MOV       u8RearWiperStopState,A
+   \   005B   FA2E           BR        ??DATPinCallBackCtrl_16
+    554                              }
+    555                          }
+    556                      }
+    557                      else if (u8RearWiperStopState == cStopPositionDetected)
+   \                     ??DATPinCallBackCtrl_18:
+   \   005D   8E....         MOV       A,u8RearWiperStopState
+   \   0060   4D02           CMP       A,#2
+   \   0062   BD27           BNZ       ??DATPinCallBackCtrl_16
+    558                      {
+    559                          u8RrAutostopTimeCounter++;
+   \   0064   8E....         MOV       A,u8RrAutostopTimeCounter
+   \   0067   41             INC       A
+   \   0068   9E....         MOV       u8RrAutostopTimeCounter,A
+    560          
+    561                          // Determination of offset time
+    562                          // placed here for optimization
+    563                          u8RrOffsetTimeInTaskTicksL = DetermineRrwAutostopOffset();
+    564                          
+    565                          if(u8RrAutostopTimeCounter >= u8RrOffsetTimeInTaskTicksL)
+   \   006B   9A....         CALL      DetermineRrwAutostopOffset
+   \   006E   70             MOV       X,A
+   \   006F   8E....         MOV       A,u8RrAutostopTimeCounter
+   \   0072   6148           CMP       A,X
+   \   0074   8D15           BC        ??DATPinCallBackCtrl_16
+   \   0076   FACD           BR        ??RearWiperAutostopFiltration_0
+    566                          {
+    567                              TOSWriteSignal(cTOSSignalRearWiperStopIsAllowed_LAP_RRW);                    
+    568                              mForceRrwGraphsExecution();
+    569                              u8RearWiperStopState = cStopAllowed;
+    570                          }
+    571                      }
+    572                      else
+    573                      {
+    574                          //cStopAllowed
+    575                      }
+    576                  }
+    577              }
+    578              else // RR_AUTOSTOP_SW == 0
+    579              {
+    580                  u8RrAutostopTimeCounter = 0;
+   \                     ??DATPinCallBackCtrl_14:
+   \   0078   A100           MOV       A,#0
+   \   007A   9E....         MOV       u8RrAutostopTimeCounter,A
+    581                  u8RearWiperStopState = cSpeedPosition;
+   \   007D   9E....         MOV       u8RearWiperStopState,A
+    582          
+    583                  if (bPreviousRR_AUTOSTOP_SW != cFalse)
+   \   0080   8E....         MOV       A,bPreviousRR_AUTOSTOP_SW
+   \   0083   4D00           CMP       A,#0
+   \   0085   AD04           BZ        ??DATPinCallBackCtrl_16
+    584                  {
+    585                      TOSWriteSignal(cTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW);
+   \   0087   100300         MOVW      AX,#3
+   \   008A   ..             CALLT     [__T_TOSWriteSignal]
+    586                  }
+    587              }
+    588              bPreviousRR_AUTOSTOP_SW = mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate);
+   \                     ??DATPinCallBackCtrl_16:
+   \   008B   3113..04       BF        S:DATDinInputBuffers+11.1, ??DATPinCallBackCtrl_19
+   \   008F   A101           MOV       A,#1
+   \   0091   FA02           BR        ??DATPinCallBackCtrl_20
+   \                     ??DATPinCallBackCtrl_19:
+   \   0093   A100           MOV       A,#0
+   \                     ??DATPinCallBackCtrl_20:
+   \   0095   9E....         MOV       bPreviousRR_AUTOSTOP_SW,A
+    589          }
+   \   0098   B2             POP       BC
+   \   0099   AF             RET       
+   \   009A                  REQUIRE ?CL78K_V4_6_L00
+    590          
+    591          //==============================================================================
+    592          // DESCRIPTION : Wipers Parameters Refresh
+    593          //  
+    594          // PARAMETERS (Type,Name,Min,Max) :  none
+    595          //
+    596          // RETURN VALUE :  none
+    597          // 
+    598          // DESIGN INFORMATION :  refer to Detailed Design Document
+    599          //==============================================================================
+    600          #ifdef X90_PROJECT
+    601          #pragma optimize=no_inline
+    602          #endif
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    603          static MEM_TYPE void WipersParametersRefresh(void)
+   \                     WipersParametersRefresh:
+    604          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    605              // Wipers parameter to be updated on ignition on
+    606              if (u8TPS_FILT_AF != mDATRead(U8Bit, EEP_TPS_FILT_AF, Default))
+   \   0001   8E....         MOV       A,u8TPS_FILT_AF
+   \   0004   48....         CMP       A,DATDbkMirrors+35
+   \   0007   AD23           BZ        ??DATPinCallBackCtrl_62
+    607              {
+    608                  u8TPS_FILT_AF = mDATRead(U8Bit, EEP_TPS_FILT_AF, Default);
+   \   0009   8E....         MOV       A,DATDbkMirrors+35
+   \   000C   9E....         MOV       u8TPS_FILT_AF,A
+    609          
+    610                  if (u8TPS_FILT_AF > cEEP_TPS_FILT_AFMax)
+   \   000F   4D0E           CMP       A,#14
+   \   0011   8D1B           BC        ??DATPinCallBackCtrl_63
+    611                  {
+    612                      u8TPS_FILT_AF = cEEP_TPS_FILT_AFMax;
+   \   0013   A10D           MOV       A,#13
+   \   0015   9E....         MOV       u8TPS_FILT_AF,A
+    613                  }
+    614                  
+    615                  
+    616                  if (u8TPS_FILT_AF < (U8)2U)
+    617                  {
+    618                      u8WipersStopFilteringTicks = 0;
+    619                  }
+    620                  else if (u8TPS_FILT_AF == (U8)2U)
+    621                  {
+    622                      u8WipersStopFilteringTicks = 1U;
+    623                  }
+    624                  else
+    625                  {
+    626                      u8WipersStopFilteringTicks = mDiv((U8)(u8TPS_FILT_AF * (U8)cTPS_FILT_AFStepMs), 
+    627                          (U8)cDATDinNominalSamplingPeriodValueMs) - (U8)1U;
+   \                     ??WipersParametersRefresh_0:
+   \   0018   120500         MOVW      BC,#5
+   \   001B   A006           MOV       X,#6
+   \   001D   8E....         MOV       A,u8TPS_FILT_AF
+   \   0020   3188           MULU      X
+   \   0022   A100           MOV       A,#0
+   \   0024   80             INCW      AX
+   \   0025   80             INCW      AX
+   \   0026   ..             CALLT     [__T_?SI_DIV_L02]
+   \   0027   60             MOV       A,X
+   \   0028   51             DEC       A
+   \                     ??WipersParametersRefresh_1:
+   \   0029   9E....         MOV       u8WipersStopFilteringTicks,A
+    628                  }
+    629              }
+    630          }
+   \                     ??DATPinCallBackCtrl_62:
+   \   002C   B2             POP       BC
+   \   002D   AF             RET       
+   \                     ??DATPinCallBackCtrl_63:
+   \   002E   8E....         MOV       A,u8TPS_FILT_AF
+   \   0031   4D02           CMP       A,#2
+   \   0033   9D04           BNC       ??DATPinCallBackCtrl_64
+   \   0035   A100           MOV       A,#0
+   \   0037   FAF0           BR        ??WipersParametersRefresh_1
+   \                     ??DATPinCallBackCtrl_64:
+   \   0039   BDDD           BNZ       ??WipersParametersRefresh_0
+   \   003B   A101           MOV       A,#1
+   \   003D   FAEA           BR        ??WipersParametersRefresh_1
+   \   003F                  REQUIRE ?CL78K_V4_6_L00
+    631          
+    632          //==============================================================================
+    633          // DESCRIPTION :
+    634          //  
+    635          // PARAMETERS (Type,Name,Min,Max) :  none
+    636          //
+    637          // RETURN VALUE :  none
+    638          // 
+    639          // DESIGN INFORMATION :  refer to Detailed Design Document
+    640          //==============================================================================
+    641          #ifdef X90_PROJECT
+    642          #pragma optimize=no_inline
+    643          #endif
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    644          static MEM_TYPE void SleepModeAnalogInputsReading(void)
+   \                     SleepModeAnalogInputsReading:
+    645          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 6
+   \   0000   B7             PUSH      HL
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+    646              tMsg Msg;
+    647              U8 Buffer[cLDBSupMessageLength];
+    648              Msg.Lng = cLDBSupMessageLength;
+   \   0003   891C           MOVW      AX,SP
+   \   0005   80             INCW      AX
+   \   0006   80             INCW      AX
+   \   0007   D6             MOVW      HL,AX
+   \   0008   A100           MOV       A,#0
+   \   000A   BE03           MOV       [HL+0x03],A
+   \   000C   A102           MOV       A,#2
+   \   000E   BE02           MOV       [HL+0x02],A
+    649              Msg.pBuffer = Buffer;
+   \   0010   891C           MOVW      AX,SP
+   \   0012   D6             MOVW      HL,AX
+   \   0013   BE03           MOV       [HL+0x03],A
+   \   0015   60             MOV       A,X
+   \   0016   BE02           MOV       [HL+0x02],A
+    650              LDBReceiveWithoutAddr(cLDBChannelSup, &Msg);
+   \   0018   891C           MOVW      AX,SP
+   \   001A   80             INCW      AX
+   \   001B   80             INCW      AX
+   \   001C   9A....         CALL      LDBSupReceiveWithoutAddr
+    651          
+    652              if (Buffer[cLDBSupAnalogConversionAllowedIndex] != cFalse)
+   \   001F   891C           MOVW      AX,SP
+   \   0021   D6             MOVW      HL,AX
+   \   0022   AE01           MOV       A,[HL+0x01]
+   \   0024   4D00           CMP       A,#0
+   \   0026   AD17           BZ        ??DATPinCallBackCtrl_65
+    653              {
+    654                  // Only in sleep mode during wake up detection sequence on 40 ms
+    655                  // need to be done here in order to capture analog wakeup inputs
+    656                  if (Buffer[cLDBSupClockForActiveModeSelectedIndex] == cFalse)
+   \   0028   87             MOV       A,[HL]
+   \   0029   4D00           CMP       A,#0
+   \   002B   BD07           BNZ       ??DATPinCallBackCtrl_66
+    657                  {
+    658                      // DATDinTask is executed on internal oscillator: need to synchronize 
+    659                      // sleep system timer
+    660                      LDBControl(cLDBChannelSup, cLDBSupSynchronizeSleepTimer);
+   \   002D   A102           MOV       A,#2
+   \   002F   9A....         CALL      LDBSupControl
+   \   0032   FA03           BR        ??DATPinCallBackCtrl_67
+    661                  }
+    662                  else
+    663                  {
+    664                      // invoke directly DAT_ANA task
+    665                      #ifndef cLDB_ANAIsSynchronous
+    666                          #error "LDB_ANA must operate in synchronous mode"
+    667                      #endif
+    668                      DATAnaTask();
+   \                     ??DATPinCallBackCtrl_66:
+   \   0034   9A....         CALL      DATAnaTask
+    669                  }
+    670                  LDBControl(cLDBChannelSup, cLDBSupWakeUpDetectionPinStarted);
+   \                     ??DATPinCallBackCtrl_67:
+   \   0037   A101           MOV       A,#1
+   \   0039   9A....         CALL      LDBSupControl
+    671          
+    672                  // HW protection of LED verlog in sleep mode
+    673                  TOSSendControl(cTOSControlProtectionLedVerlogSleepMode);
+   \   003C   A111           MOV       A,#17
+   \   003E   ..             CALLT     [__T_TOSSendControl]
+    674              }
+    675              else
+    676              {
+    677                  // direct analog conversion is not allowed yet by LDB
+    678              }
+    679          }
+   \                     ??DATPinCallBackCtrl_65:
+   \   003F   B0             POP       AX
+   \   0040   B0             POP       AX
+   \   0041   B0             POP       AX
+   \   0042   AF             RET       
+   \   0043                  REQUIRE ?CL78K_V4_6_L00
+    680          
+    681          //==============================================================================
+    682          //  DESCRIPTION : Indicates that input has changed in sleep mode
+    683          //  
+    684          //  PARAMETERS (Type,Name,Min,Max) :  none
+    685          //
+    686          //  RETURN VALUE :  none
+    687          // 
+    688          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    689          //==============================================================================
+    690          #ifdef X90_PROJECT
+    691          #pragma optimize=no_inline
+    692          #endif
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    693          static MEM_TYPE void SleepModeStateChange(void)
+   \                     SleepModeStateChange:
+    694          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    695              // Sleep mode
+    696              // Check for wake up conditions (non-filtered inputs)
+    697          
+    698              if (  mIsRaisingEdgeImmediate(PWR_IGN)
+    699                 || mIsRaisingEdgeImmediate(POSITION_LIGHTS)
+    700                 || mIsRaisingEdgeImmediate(HAZARD_SW)
+    701                 || mIsStateChangeImmediate(FR_DOORS_SW)
+    702                 || mIsStateChangeImmediate(RR_DOORS_SW)
+    703                 || mIsRaisingEdgeImmediate(DOOR_LOCK_SW)
+    704                 || mIsRaisingEdgeImmediate(DOOR_UNLOCK_SW))
+   \   0000   3103..04       BF        S:DATDinInputBuffers+15.0, ??DATPinCallBackCtrl_68
+   \   0004   3103..2F       BF        S:DATDinInputBuffers+6.0, ??DATPinCallBackCtrl_69
+   \                     ??DATPinCallBackCtrl_68:
+   \   0008   3133..04       BF        S:DATDinInputBuffers+13.3, ??DATPinCallBackCtrl_70
+   \   000C   3133..27       BF        S:DATDinInputBuffers+4.3, ??DATPinCallBackCtrl_69
+   \                     ??DATPinCallBackCtrl_70:
+   \   0010   3143..04       BF        S:DATDinInputBuffers+10.4, ??DATPinCallBackCtrl_71
+   \   0014   3143..1F       BF        S:DATDinInputBuffers+1.4, ??DATPinCallBackCtrl_69
+   \                     ??DATPinCallBackCtrl_71:
+   \   0018   7134..         MOV1      CY,S:DATDinInputBuffers+6.3
+   \   001B   7137..         XOR1      CY,S:DATDinInputBuffers+15.3
+   \   001E   8D17           BC        ??DATPinCallBackCtrl_69
+   \   0020   7104..         MOV1      CY,S:DATDinInputBuffers+8.0
+   \   0023   7107..         XOR1      CY,S:DATDinInputBuffers+17.0
+   \   0026   8D0F           BC        ??DATPinCallBackCtrl_69
+   \   0028   3143..04       BF        S:DATDinInputBuffers+15.4, ??DATPinCallBackCtrl_72
+   \   002C   3143..07       BF        S:DATDinInputBuffers+6.4, ??DATPinCallBackCtrl_69
+   \                     ??DATPinCallBackCtrl_72:
+   \   0030   3113..0B       BF        S:DATDinInputBuffers+17.1, ??DATPinCallBackCtrl_73
+   \   0034   9C..08         BT        S:DATDinInputBuffers+8.1, ??DATPinCallBackCtrl_73
+    705              {
+    706                 TOSSendControl(cTOSControlWakeUpRequest);
+   \                     ??DATPinCallBackCtrl_69:
+   \   0037   A102           MOV       A,#2
+   \   0039   ..             CALLT     [__T_TOSSendControl]
+    707                 bDATPinSleepMode = cFalse; // set flag immediate to forbid further direct analog conversion
+   \   003A   A100           MOV       A,#0
+   \   003C   9E....         MOV       bDATPinSleepMode,A
+    708              }
+    709          
+    710              if (bInputsReadAfterStartingStepState != cFalse)
+   \                     ??DATPinCallBackCtrl_73:
+   \   003F   8E....         MOV       A,bInputsReadAfterStartingStepState
+   \   0042   4D00           CMP       A,#0
+   \   0044   AD1C           BZ        ??DATPinCallBackCtrl_74
+    711              {
+    712                  // Components connected to this control may read inputs using Immediate access
+    713                  TOSSendControl(cTOSControlInputsReadAfterStartingStepState); 
+   \   0046   A110           MOV       A,#16
+   \   0048   ..             CALLT     [__T_TOSSendControl]
+    714                  // Used by components to check blocked buttons
+    715                  bInputsReadAfterStartingStepState = cFalse;
+   \   0049   A100           MOV       A,#0
+   \   004B   9E....         MOV       bInputsReadAfterStartingStepState,A
+    716          
+    717                  // Check for defroster blocked button
+    718                  if (  (mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) != cFalse)
+    719                      &&(mDATRead(U1Bit,DEFROSTER_SW, Immediate) != cFalse))
+   \   004E   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0051   31B70E         BF        [HL].3, ??DATPinCallBackCtrl_74
+   \   0054   3103..0A       BF        S:DATDinInputBuffers+12.0, ??DATPinCallBackCtrl_74
+    720                  {
+    721                      bDATPinDefrosterSWFiltered = cTrue;
+   \   0058   A101           MOV       A,#1
+   \   005A   9E....         MOV       bDATPinDefrosterSWFiltered,A
+    722                      u8DefrosterSWCounter = cDATPinNbOfStepsForTPS_IMPUL_MINI;
+   \   005D   A105           MOV       A,#5
+   \   005F   9E....         MOV       u8DefrosterSWCounter,A
+    723                  }
+    724              }
+    725          }
+   \                     ??DATPinCallBackCtrl_74:
+   \   0062   AF             RET       
+   \   0063                  REQUIRE ?CL78K_V4_6_L00
+    726          
+    727          //==============================================================================
+    728          //=========================== EXPORTED FUNCTIONS ===============================
+    729          //==============================================================================
+    730          
+    731          //==============================================================================
+    732          //  DESCRIPTION : Initialise DAT_Pin and DAT_DIN component
+    733          //  
+    734          //  PARAMETERS (Type,Name,Min,Max) :  none
+    735          //
+    736          //  RETURN VALUE :  none
+    737          // 
+    738          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    739          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    740          void DATPinInit(void)
+   \                     DATPinInit:
+    741          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#DATPinInitArray
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    742              DATDinInit(DATPinInitArray);
+   \   0004   16....         MOVW      HL,#LWRD(DATDinInit)
+   \   0007   A4..           MOV       E,#BYTE3(DATDinInit)
+   \   0009   ..             CALLT     [__T_?FAR_CALL_L07]
+    743          }
+   \   000A   B4             POP       DE
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    744          
+    745          //==============================================================================
+    746          //  DESCRIPTION : Allows to invalidate some inputs
+    747          //  
+    748          //  PARAMETERS (Type,Name,Min,Max) :  none
+    749          //
+    750          //  RETURN VALUE :  none
+    751          // 
+    752          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    753          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    754          void DATPinSelection(void)
+   \                     DATPinSelection:
+    755          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    756          #if (!defined(COMPILATION_NATIVE) || defined(TESTU))
+    757          
+    758              // For simulation the inputs RR_DOORS_SW, DOOR_UNLOCK_SW, FR_WIPER_INT_SW
+    759              // can be set as digital inputs
+    760              U16 u16AdcValue;
+    761          
+    762              if (bDATPinSleepMode != cFalse)
+   \   0001   8E....         MOV       A,bDATPinSleepMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD06           BZ        ??DATPinCallBackCtrl_21
+    763              {
+    764                  SleepModeAnalogInputsReading();
+   \   0008   16....         MOVW      HL,#LWRD(SleepModeAnalogInputsReading)
+   \   000B   A4..           MOV       E,#BYTE3(SleepModeAnalogInputsReading)
+   \   000D   ..             CALLT     [__T_?FAR_CALL_L07]
+    765              }
+    766          
+    767              u16AdcValue = mDATRead(U16Bit, AI_RR_DOORS_SW, Immediate);
+   \                     ??DATPinCallBackCtrl_21:
+   \   000E   02....         MOVW      AX,DATAnaBufferFromLDB+2
+    768              if (u16AdcValue < cValueActiveMaxAI_RR_DOORS_SW)
+   \   0011   EA6600         CMPW      AX,#102
+   \   0014   9D04           BNC       ??DATPinCallBackCtrl_22
+    769              {
+    770                  mDATWrite(U1Bit, RR_DOORS_SW, cTrue, Delayed);
+   \   0016   0A..           SET1      S:DATDinInputBuffers+17.0
+   \   0018   FA07           BR        ??DATPinCallBackCtrl_23
+    771              }
+    772              else if (u16AdcValue > cValueInactiveMinAI_RR_DOORS_SW)
+   \                     ??DATPinCallBackCtrl_22:
+   \   001A   EA9A00         CMPW      AX,#154
+   \   001D   8D02           BC        ??DATPinCallBackCtrl_23
+    773              {
+    774                  mDATWrite(U1Bit, RR_DOORS_SW, cFalse, Delayed);
+   \   001F   0B..           CLR1      S:DATDinInputBuffers+17.0
+    775              }
+    776              else
+    777              {
+    778                  // no change of input
+    779              }
+    780          
+    781              u16AdcValue = mDATRead(U16Bit, AI_DOOR_UNLOCK_SW, Immediate);
+   \                     ??DATPinCallBackCtrl_23:
+   \   0021   02....         MOVW      AX,DATAnaBufferFromLDB+4
+    782              if (u16AdcValue < cValueActiveMaxAI_DOOR_UNLOCK_SW)
+   \   0024   EA6600         CMPW      AX,#102
+   \   0027   9D04           BNC       ??DATPinCallBackCtrl_24
+    783              {
+    784                  mDATWrite(U1Bit, DOOR_UNLOCK_SW, cTrue, Delayed);
+   \   0029   1A..           SET1      S:DATDinInputBuffers+17.1
+   \   002B   FA07           BR        ??DATPinCallBackCtrl_25
+    785              }
+    786              else if (u16AdcValue > cValueInactiveMinAI_DOOR_UNLOCK_SW)
+   \                     ??DATPinCallBackCtrl_24:
+   \   002D   EA9A00         CMPW      AX,#154
+   \   0030   8D02           BC        ??DATPinCallBackCtrl_25
+    787              {
+    788                  mDATWrite(U1Bit, DOOR_UNLOCK_SW, cFalse, Delayed);
+   \   0032   1B..           CLR1      S:DATDinInputBuffers+17.1
+    789              }
+    790              else
+    791              {
+    792                  // no change of input
+    793              }
+    794          
+    795              u16AdcValue = mDATRead(U16Bit, AI_FR_WIPER_INT_SW, Immediate);
+   \                     ??DATPinCallBackCtrl_25:
+   \   0034   02....         MOVW      AX,DATAnaBufferFromLDB+8
+    796              if (u16AdcValue > cValueActiveMinFR_WIPER_INT_SW)
+   \   0037   EA9A00         CMPW      AX,#154
+   \   003A   8D04           BC        ??DATPinCallBackCtrl_26
+    797              {
+    798                  mDATWrite(U1Bit, FR_WIPER_INT_SW, cTrue, Delayed);
+   \   003C   2A..           SET1      S:DATDinInputBuffers+17.2
+   \   003E   FA07           BR        ??DATPinCallBackCtrl_27
+    799              }
+    800              else if (u16AdcValue < cValueInactiveMaxFR_WIPER_INT_SW)
+   \                     ??DATPinCallBackCtrl_26:
+   \   0040   EA6600         CMPW      AX,#102
+   \   0043   9D02           BNC       ??DATPinCallBackCtrl_27
+    801              {
+    802                  mDATWrite(U1Bit, FR_WIPER_INT_SW, cFalse, Delayed);
+   \   0045   2B..           CLR1      S:DATDinInputBuffers+17.2
+    803              }
+    804              else
+    805              {
+    806                  // no change of input
+    807              }
+    808          #endif // COMPILATION_NATIVE
+    809          
+    810              // Undervoltage management
+    811              if ((mDATRead(U1Bit, UnderVoltageIsDetected, Default) != cFalse) &&
+    812                  (bDATPinSleepMode == cFalse) )
+   \                     ??DATPinCallBackCtrl_27:
+   \   0047   8E....         MOV       A,bDATPanUnderVoltageIsDetected
+   \   004A   4D00           CMP       A,#0
+   \   004C   AD61           BZ        ??DATPinCallBackCtrl_28
+   \   004E   8E....         MOV       A,bDATPinSleepMode
+   \   0051   4D00           CMP       A,#0
+   \   0053   BD5A           BNZ       ??DATPinCallBackCtrl_28
+    813              {
+    814                  // Mask actual input values with last good values (filtered values)
+    815                  mRetainInput(DOOR_UNLOCK_SW);
+   \   0055   3113..04       BF        S:DATDinInputBuffers+8.1, ??DATPinCallBackCtrl_29
+   \   0059   1A..           SET1      S:DATDinInputBuffers+17.1
+   \   005B   FA02           BR        ??DATPinCallBackCtrl_30
+   \                     ??DATPinCallBackCtrl_29:
+   \   005D   1B..           CLR1      S:DATDinInputBuffers+17.1
+    816                  mRetainInput(DOOR_LOCK_SW);
+   \                     ??DATPinCallBackCtrl_30:
+   \   005F   3143..04       BF        S:DATDinInputBuffers+6.4, ??DATPinCallBackCtrl_31
+   \   0063   4A..           SET1      S:DATDinInputBuffers+15.4
+   \   0065   FA02           BR        ??DATPinCallBackCtrl_32
+   \                     ??DATPinCallBackCtrl_31:
+   \   0067   4B..           CLR1      S:DATDinInputBuffers+15.4
+    817                  mRetainInput(FR_DOORS_SW);
+   \                     ??DATPinCallBackCtrl_32:
+   \   0069   3133..04       BF        S:DATDinInputBuffers+6.3, ??DATPinCallBackCtrl_33
+   \   006D   3A..           SET1      S:DATDinInputBuffers+15.3
+   \   006F   FA02           BR        ??DATPinCallBackCtrl_34
+   \                     ??DATPinCallBackCtrl_33:
+   \   0071   3B..           CLR1      S:DATDinInputBuffers+15.3
+    818                  mRetainInput(RR_DOORS_SW);
+   \                     ??DATPinCallBackCtrl_34:
+   \   0073   3103..04       BF        S:DATDinInputBuffers+8.0, ??DATPinCallBackCtrl_35
+   \   0077   0A..           SET1      S:DATDinInputBuffers+17.0
+   \   0079   FA02           BR        ??DATPinCallBackCtrl_36
+   \                     ??DATPinCallBackCtrl_35:
+   \   007B   0B..           CLR1      S:DATDinInputBuffers+17.0
+    819                  mRetainInput(AIRBAG_CRASH);
+   \                     ??DATPinCallBackCtrl_36:
+   \   007D   3113..04       BF        S:DATDinInputBuffers.1, ??DATPinCallBackCtrl_37
+   \   0081   1A..           SET1      S:DATDinInputBuffers+9.1
+   \   0083   FA02           BR        ??DATPinCallBackCtrl_38
+   \                     ??DATPinCallBackCtrl_37:
+   \   0085   1B..           CLR1      S:DATDinInputBuffers+9.1
+    820                  mRetainInput(DEFROSTER_SW);
+   \                     ??DATPinCallBackCtrl_38:
+   \   0087   3103..04       BF        S:DATDinInputBuffers+3.0, ??DATPinCallBackCtrl_39
+   \   008B   0A..           SET1      S:DATDinInputBuffers+12.0
+   \   008D   FA02           BR        ??DATPinCallBackCtrl_40
+   \                     ??DATPinCallBackCtrl_39:
+   \   008F   0B..           CLR1      S:DATDinInputBuffers+12.0
+    821                  mRetainInput(L_FLASHER_SW);
+   \                     ??DATPinCallBackCtrl_40:
+   \   0091   3133..04       BF        S:DATDinInputBuffers+3.3, ??DATPinCallBackCtrl_41
+   \   0095   3A..           SET1      S:DATDinInputBuffers+12.3
+   \   0097   FA02           BR        ??DATPinCallBackCtrl_42
+   \                     ??DATPinCallBackCtrl_41:
+   \   0099   3B..           CLR1      S:DATDinInputBuffers+12.3
+    822                  mRetainInput(R_FLASHER_SW);
+   \                     ??DATPinCallBackCtrl_42:
+   \   009B   3123..04       BF        S:DATDinInputBuffers+3.2, ??DATPinCallBackCtrl_43
+   \   009F   2A..           SET1      S:DATDinInputBuffers+12.2
+   \   00A1   FA02           BR        ??DATPinCallBackCtrl_44
+   \                     ??DATPinCallBackCtrl_43:
+   \   00A3   2B..           CLR1      S:DATDinInputBuffers+12.2
+    823                  mRetainInput(HAZARD_SW);
+   \                     ??DATPinCallBackCtrl_44:
+   \   00A5   3143..04       BF        S:DATDinInputBuffers+1.4, ??DATPinCallBackCtrl_45
+   \   00A9   4A..           SET1      S:DATDinInputBuffers+10.4
+   \   00AB   FA02           BR        ??DATPinCallBackCtrl_28
+   \                     ??DATPinCallBackCtrl_45:
+   \   00AD   4B..           CLR1      S:DATDinInputBuffers+10.4
+    824              }
+    825          }
+   \                     ??DATPinCallBackCtrl_28:
+   \   00AF   B4             POP       DE
+   \   00B0   AF             RET       
+   \   00B1                  REQUIRE ?CL78K_V4_6_L00
+    826          
+    827          //===============================================================================
+    828          //  DESCRIPTION : Indicates that input has changed
+    829          //  
+    830          //  PARAMETERS (Type,Name,Min,Max) :  none
+    831          //
+    832          //  RETURN VALUE :  none
+    833          // 
+    834          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    835          // ==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    836          void DATPinStateChange(void)
+   \                     DATPinStateChange:
+    837          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    838              // the wake up by DIN is call on filtered changement on an input
+    839          
+    840              if (bDATPinSleepMode == cFalse)
+   \   0001   8E....         MOV       A,bDATPinSleepMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD03           BZ        $+5
+   \   0008   9B....         BR        N:??DATPinCallBackCtrl_46
+    841              {
+    842                  //RR_DOORS_SW
+    843                  if (mIsStateChange(RR_DOORS_SW))
+   \   000B   3103..12       BF        S:DATDinInputBuffers+26.0, ??DATPinCallBackCtrl_47
+    844                  {
+    845                      TOSSendControl(cTOSControlChanging_RR_DOORS_SW);
+   \   000F   A103           MOV       A,#3
+   \   0011   ..             CALLT     [__T_TOSSendControl]
+    846                      if (mIsFallingEdge(RR_DOORS_SW))
+   \   0012   8C..09         BT        S:DATDinInputBuffers+8.0, ??DATPinCallBackCtrl_48
+   \   0015   3103..05       BF        S:DATDinInputBuffers+26.0, ??DATPinCallBackCtrl_48
+    847                      {
+    848                          TOSSendControl(cTOSControlFalling_RR_DOORS_SW);
+   \   0019   A10E           MOV       A,#14
+   \   001B   ..             CALLT     [__T_TOSSendControl]
+   \   001C   FA03           BR        ??DATPinCallBackCtrl_47
+    849                      }
+    850                      else
+    851                      {
+    852                          TOSSendControl(cTOSControlRising_RR_DOORS_SW);
+   \                     ??DATPinCallBackCtrl_48:
+   \   001E   A10F           MOV       A,#15
+   \   0020   ..             CALLT     [__T_TOSSendControl]
+    853                      }
+    854                  }
+    855              
+    856                  //FR_DOORS_SW
+    857                  if (mIsStateChange(FR_DOORS_SW))
+   \                     ??DATPinCallBackCtrl_47:
+   \   0021   3133..12       BF        S:DATDinInputBuffers+24.3, ??DATPinCallBackCtrl_49
+    858                  {
+    859                     TOSSendControl(cTOSControlChanging_FR_DOORS_SW);
+   \   0025   A104           MOV       A,#4
+   \   0027   ..             CALLT     [__T_TOSSendControl]
+    860                     if (mIsFallingEdge(FR_DOORS_SW))
+   \   0028   BC..09         BT        S:DATDinInputBuffers+6.3, ??DATPinCallBackCtrl_50
+   \   002B   3133..05       BF        S:DATDinInputBuffers+24.3, ??DATPinCallBackCtrl_50
+    861                     {
+    862                         TOSSendControl(cTOSControlFalling_FR_DOORS_SW);
+   \   002F   A10C           MOV       A,#12
+   \   0031   ..             CALLT     [__T_TOSSendControl]
+   \   0032   FA03           BR        ??DATPinCallBackCtrl_49
+    863                     }
+    864                     else
+    865                     {
+    866                         TOSSendControl(cTOSControlRising_FR_DOORS_SW);
+   \                     ??DATPinCallBackCtrl_50:
+   \   0034   A10D           MOV       A,#13
+   \   0036   ..             CALLT     [__T_TOSSendControl]
+    867                     }
+    868                  }
+    869          
+    870                  //DOOR_LOCK_SW
+    871                  if (mIsRaisingEdge(DOOR_LOCK_SW))
+   \                     ??DATPinCallBackCtrl_49:
+   \   0037   3143..07       BF        S:DATDinInputBuffers+6.4, ??DATPinCallBackCtrl_51
+   \   003B   3143..03       BF        S:DATDinInputBuffers+24.4, ??DATPinCallBackCtrl_51
+    872                  {
+    873                      TOSSendControl(cTOSControlRising_DOOR_LOCK_SW);
+   \   003F   A10A           MOV       A,#10
+   \   0041   ..             CALLT     [__T_TOSSendControl]
+    874                  }
+    875          
+    876                  //DOOR_UNLOCK_SW
+    877                  if (mIsRaisingEdge(DOOR_UNLOCK_SW))
+   \                     ??DATPinCallBackCtrl_51:
+   \   0042   3113..07       BF        S:DATDinInputBuffers+8.1, ??DATPinCallBackCtrl_52
+   \   0046   3113..03       BF        S:DATDinInputBuffers+26.1, ??DATPinCallBackCtrl_52
+    878                  {
+    879                      TOSSendControl(cTOSControlRising_DOOR_UNLOCK_SW);
+   \   004A   A10B           MOV       A,#11
+   \   004C   ..             CALLT     [__T_TOSSendControl]
+    880                  }
+    881          
+    882                  //HAZARD_SW
+    883                  if (mIsFallingEdge(HAZARD_SW))
+   \                     ??DATPinCallBackCtrl_52:
+   \   004D   CC..07         BT        S:DATDinInputBuffers+1.4, ??DATPinCallBackCtrl_53
+   \   0050   3143..03       BF        S:DATDinInputBuffers+19.4, ??DATPinCallBackCtrl_53
+    884                  {
+    885                      TOSSendControl(cTOSControlFalling_HAZARD_SW);
+   \   0054   A105           MOV       A,#5
+   \   0056   ..             CALLT     [__T_TOSSendControl]
+    886                  }
+    887          
+    888                  //PWR_IGN
+    889                  if (mIsFallingEdge(PWR_IGN))
+   \                     ??DATPinCallBackCtrl_53:
+   \   0057   8C..09         BT        S:DATDinInputBuffers+6.0, ??DATPinCallBackCtrl_54
+   \   005A   3103..12       BF        S:DATDinInputBuffers+24.0, ??DATPinCallBackCtrl_55
+    890                  {
+    891                      TOSSendControl(cTOSControlFalling_PWR_IGN);
+   \   005E   A106           MOV       A,#6
+   \   0060   ..             CALLT     [__T_TOSSendControl]
+   \   0061   FA0D           BR        ??DATPinCallBackCtrl_55
+    892                  }
+    893                  else
+    894                  {
+    895                      if (mIsRaisingEdge(PWR_IGN))
+   \                     ??DATPinCallBackCtrl_54:
+   \   0063   3103..09       BF        S:DATDinInputBuffers+24.0, ??DATPinCallBackCtrl_55
+    896                      {
+    897                          TOSSendControl(cTOSControlRising_PWR_IGN);
+   \   0067   A107           MOV       A,#7
+   \   0069   ..             CALLT     [__T_TOSSendControl]
+    898              
+    899                          // Wipers parameter to be updated on ignition on
+    900                          WipersParametersRefresh();
+   \   006A   16....         MOVW      HL,#LWRD(WipersParametersRefresh)
+   \   006D   A4..           MOV       E,#BYTE3(WipersParametersRefresh)
+   \   006F   ..             CALLT     [__T_?FAR_CALL_L07]
+    901                      }
+    902                  }
+    903          
+    904                  // Defroster button filtration
+    905                  if (mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) != cFalse)
+   \                     ??DATPinCallBackCtrl_55:
+   \   0070   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0073   31B703         BF        [HL].3, ??DATPinCallBackCtrl_56
+    906                  {
+    907                      DefrosterFiltration();
+   \   0076   9A....         CALL      DefrosterFiltration
+    908                  }
+    909                  
+    910                  // Wipers operate only when ignition is on
+    911                  if (mDATRead(U1Bit, PWR_IGN, Default) != cFalse)
+   \                     ??DATPinCallBackCtrl_56:
+   \   0079   3103..14       BF        S:DATDinInputBuffers+6.0, ??DATPinCallBackCtrl_57
+    912                  {
+    913                      // Front wiper filtration
+    914                      FrontWiperAutostopFiltration();
+   \   007D   9A....         CALL      FrontWiperAutostopFiltration
+    915                  
+    916                      // Rear wiper filtration
+    917                      if (mDATRead(U1Bit, EEP_EV_ARR, Default) != cFalse)
+   \   0080   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0083   31B70B         BF        [HL].3, ??DATPinCallBackCtrl_57
+    918                      {
+    919                          RearWiperAutostopFiltration();
+   \   0086   9A....         CALL      RearWiperAutostopFiltration
+   \   0089   FA06           BR        ??DATPinCallBackCtrl_57
+    920                      }
+    921                  }
+    922              }
+    923              else
+    924              {
+    925                  // Sleep mode
+    926                  // Check for wake up conditions (non-filtered inputs)
+    927                  SleepModeStateChange();
+   \                     ??DATPinCallBackCtrl_46:
+   \   008B   16....         MOVW      HL,#LWRD(SleepModeStateChange)
+   \   008E   A4..           MOV       E,#BYTE3(SleepModeStateChange)
+   \   0090   ..             CALLT     [__T_?FAR_CALL_L07]
+    928              }
+    929          }
+   \                     ??DATPinCallBackCtrl_57:
+   \   0091   B4             POP       DE
+   \   0092   AF             RET       
+   \   0093                  REQUIRE ?CL78K_V4_6_L00
+    930          
+    931          //===============================================================================
+    932          //  DESCRIPTION         : Maintain Active State
+    933          //
+    934          // PARAMETERS          : None
+    935          //  (Type,Name,Min,Max) 
+    936          //
+    937          //  RETURN VALUE        : None
+    938          //
+    939          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    940          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    941          void DATPinIsMaintainActiveState(void)
+   \                     DATPinIsMaintainActiveState:
+    942          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    943              if(       (mDATRead(U1Bit, POSITION_LIGHTS,    Default) == (U1)1)
+    944                  ||    (mDATRead(U1Bit, HAZARD_SW,            Default) == (U1)1)
+    945                  ||    (mDATRead(U1Bit, PWR_IGN,            Default) == (U1)1)
+    946                )
+   \   0000   BC..07         BT        S:DATDinInputBuffers+4.3, ??DATPinCallBackCtrl_58
+   \   0003   CC..04         BT        S:DATDinInputBuffers+1.4, ??DATPinCallBackCtrl_58
+   \   0006   3103..04       BF        S:DATDinInputBuffers+6.0, ??DATPinCallBackCtrl_59
+    947              {
+    948                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \                     ??DATPinCallBackCtrl_58:
+   \   000A   102900         MOVW      AX,#41
+   \   000D   ..             CALLT     [__T_TOSWriteSignal]
+    949              }
+    950          }
+   \                     ??DATPinCallBackCtrl_59:
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+    951          
+    952          //===============================================================================
+    953          //  DESCRIPTION         : Maintain Active Sleep State
+    954          //
+    955          // PARAMETERS          : None
+    956          //  (Type,Name,Min,Max) 
+    957          //
+    958          //  RETURN VALUE        : None
+    959          //
+    960          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    961          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    962          void DATPinIsMaintainActiveSleepState(void)
+   \                     DATPinIsMaintainActiveSleepState:
+    963          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#ActiveSleepTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    964              if ((TOSIsTimerStarted(&ActiveSleepTimer) != cFalse) &&
+    965                  (TOSIsTimerElapsed(&ActiveSleepTimer, 
+    966                      mTOSConvMsInTimerTick(cActiveSleepDurationInMs)) == cFalse))
+   \   0004   9A....         CALL      TOSIsTimerStarted
+   \   0007   4D00           CMP       A,#0
+   \   0009   AD0F           BZ        ??DATPinCallBackCtrl_60
+   \   000B   10....         MOVW      AX,#ActiveSleepTimer
+   \   000E   123C00         MOVW      BC,#60
+   \   0011   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0012   4D00           CMP       A,#0
+   \   0014   BD04           BNZ       ??DATPinCallBackCtrl_60
+    967              {
+    968                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveSleepState);
+   \   0016   102800         MOVW      AX,#40
+   \   0019   ..             CALLT     [__T_TOSWriteSignal]
+    969              }     
+    970          }
+   \                     ??DATPinCallBackCtrl_60:
+   \   001A   B2             POP       BC
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    971          
+    972          //===============================================================================
+    973          //  DESCRIPTION         : Put DAT_PIN in active state
+    974          //  
+    975          // PARAMETERS (Type,Name,Min,Max) :  none
+    976          //
+    977          // RETURN VALUE :  none
+    978          // 
+    979          // DESIGN INFORMATION :  refer to Detailed Design Document
+    980          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    981          void DATPinEnterActiveState (void)
+   \                     DATPinEnterActiveState:
+    982          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    983          #ifdef X90_PROJECT
+    984              DATPinEnterActiveState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATPinEnterActiveState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATPinEnterActiveState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    985          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    986          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    987          static MEM_TYPE void DATPinEnterActiveState_Static(void)
+   \                     DATPinEnterActiveState_Static:
+    988          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    989          #endif
+    990              bDATPinSleepMode = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bDATPinSleepMode,A
+    991              u8FrAutostopTimeCounter = 0;
+   \   0005   9E....         MOV       u8FrAutostopTimeCounter,A
+    992              u8RrAutostopTimeCounter = 0;
+   \   0008   9E....         MOV       u8RrAutostopTimeCounter,A
+    993              u8FrontWiperStopState = cStopAllowed;
+   \   000B   A103           MOV       A,#3
+   \   000D   9E....         MOV       u8FrontWiperStopState,A
+    994              u8RearWiperStopState  = cStopAllowed;
+   \   0010   9E....         MOV       u8RearWiperStopState,A
+    995              bPreviousFR_AUTOSTOP_SW = mDATRead(U1Bit, FR_AUTOSTOP_SW, Immediate);
+   \   0013   3123..04       BF        S:DATDinInputBuffers+11.2, ??DATPinCallBackCtrl_75
+   \   0017   A101           MOV       A,#1
+   \   0019   FA02           BR        ??DATPinCallBackCtrl_76
+   \                     ??DATPinCallBackCtrl_75:
+   \   001B   A100           MOV       A,#0
+   \                     ??DATPinCallBackCtrl_76:
+   \   001D   9E....         MOV       bPreviousFR_AUTOSTOP_SW,A
+    996              bPreviousRR_AUTOSTOP_SW = mDATRead(U1Bit, RR_AUTOSTOP_SW, Immediate);
+   \   0020   3113..04       BF        S:DATDinInputBuffers+11.1, ??DATPinCallBackCtrl_77
+   \   0024   A101           MOV       A,#1
+   \   0026   FA02           BR        ??DATPinCallBackCtrl_78
+   \                     ??DATPinCallBackCtrl_77:
+   \   0028   A100           MOV       A,#0
+   \                     ??DATPinCallBackCtrl_78:
+   \   002A   9E....         MOV       bPreviousRR_AUTOSTOP_SW,A
+    997              u8TPS_FILT_AF = 0;
+   \   002D   A100           MOV       A,#0
+   \   002F   9E....         MOV       u8TPS_FILT_AF,A
+    998              u8WipersStopFilteringTicks = 0;
+   \   0032   9E....         MOV       u8WipersStopFilteringTicks,A
+    999          }
+   \   0035   AF             RET       
+   \   0036                  REQUIRE ?CL78K_V4_6_L00
+   1000          
+   1001          //===============================================================================
+   1002          //  DESCRIPTION         : Put DAT_PIN in inactive state
+   1003          //  
+   1004          // PARAMETERS (Type,Name,Min,Max) :  none
+   1005          //
+   1006          // RETURN VALUE :  none
+   1007          // 
+   1008          // DESIGN INFORMATION :  refer to Detailed Design Document
+   1009          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1010          void DATPinLeaveActiveState (void)
+   \                     DATPinLeaveActiveState:
+   1011          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1012              bDATPinSleepMode = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bDATPinSleepMode,A
+   1013              TOSStopTimer(&ActiveSleepTimer);
+   \   0005   10....         MOVW      AX,#ActiveSleepTimer
+   \   0008   ..             CALLT     [__T_TOSStopTimer]
+   1014              u8DefrosterSWCounter = 0;
+   \   0009   A100           MOV       A,#0
+   \   000B   9E....         MOV       u8DefrosterSWCounter,A
+   1015          }
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+   1016          
+   1017          //===============================================================================
+   1018          //  DESCRIPTION         : Put DAT_PIN in leave starting state
+   1019          //  
+   1020          // PARAMETERS (Type,Name,Min,Max) :  none
+   1021          //
+   1022          // RETURN VALUE :  none
+   1023          // 
+   1024          // DESIGN INFORMATION :  refer to Detailed Design Document
+   1025          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1026          void DATPinLeaveStartingStepState(void)
+   \                     DATPinLeaveStartingStepState:
+   1027          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1028              // Check wake-up conditions immediately after starting step
+   1029              // Reduce power on initialization time for both analog and digital inputs
+   1030              // Allow wake-up by analog inputs
+   1031              TOSActivateTask(cTOSTaskID_TacheANA); // ANA task must have higher priority than DIN task
+   \   0000   100008         MOVW      AX,#2048
+   \   0003   9A....         CALL      TOSActivateTask
+   1032              TOSActivateTask(cTOSTaskID_ReadLogical);
+   \   0006   100004         MOVW      AX,#1024
+   \   0009   9A....         CALL      TOSActivateTask
+   1033              bInputsReadAfterStartingStepState = cTrue;
+   \   000C   A101           MOV       A,#1
+   \   000E   9E....         MOV       bInputsReadAfterStartingStepState,A
+   1034          }
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+   1035          
+   1036          //===============================================================================
+   1037          // DESCRIPTION         : Callback control from LDB_DIN
+   1038          //  
+   1039          // PARAMETERS (Type,Name,Min,Max) :  none
+   1040          //
+   1041          // RETURN VALUE :  none
+   1042          // 
+   1043          // DESIGN INFORMATION :  refer to Detailed Design Document
+   1044          //===============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1045          void DATPinCallBackCtrl (const tCtrl Ctrl)
+   \                     DATPinCallBackCtrl:
+   1046          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1047              if (Ctrl == cLDBPinWakeUpRequested)
+   \   0000   4D05           CMP       A,#5
+   \   0002   BD07           BNZ       ??DATPinCallBackCtrl_61
+   1048              {
+   1049                  TOSSendControl(cTOSControlActiveSleepRequest);
+   \   0004   A101           MOV       A,#1
+   \   0006   ..             CALLT     [__T_TOSSendControl]
+   1050                  TOSStartTimer(&ActiveSleepTimer);
+   \   0007   10....         MOVW      AX,#ActiveSleepTimer
+   \   000A   ..             CALLT     [__T_TOSStartTimer]
+   1051              }
+   1052              else
+   1053              {
+   1054                  mLIBassert(cFalse);
+   1055              }
+   1056          }
+   \                     ??DATPinCallBackCtrl_61:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bDATPinSleepMode>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?SI_DIV_L02:
+   \   0000   ....           DW       ?SI_DIV_L02
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   Segment part sizes:
+
+     Function/Label                      Bytes
+     --------------                      -----
+     u8DefrosterSWCounter                   1
+     bPreviousFR_AUTOSTOP_SW                1
+     bPreviousRR_AUTOSTOP_SW                1
+     u8WipersStopFilteringTicks             1
+     u8FrAutostopTimeCounter                1
+     u8RrAutostopTimeCounter                1
+     u8FrontWiperStopState                  1
+     u8RearWiperStopState                   1
+     bInputsReadAfterStartingStepState
+                                            1
+     u8TPS_FILT_AF                          1
+     ActiveSleepTimer                       2
+     bDATPinDefrosterSWFiltered             1
+     bDATPinSleepMode                       1
+     DATPinInitArray                        9
+     DefrosterFiltration                   45
+     DetermineFrwAutostopOffset            23
+     FrontWiperAutostopFiltration         154
+     DetermineRrwAutostopOffset            23
+     RearWiperAutostopFiltration          154
+     WipersParametersRefresh               63
+     SleepModeAnalogInputsReading          67
+     SleepModeStateChange                  99
+     DATPinInit                            12
+     DATPinSelection                      177
+     DATPinStateChange                    147
+     DATPinIsMaintainActiveState           15
+     DATPinIsMaintainActiveSleepState
+                                           28
+     DATPinEnterActiveState                 9
+     DATPinEnterActiveState_Static         54
+     DATPinLeaveActiveState                15
+     DATPinLeaveStartingStepState          18
+     DATPinCallBackCtrl                    12
+     ?<Initializer for bDATPinSleepMode>    1
+     __T_TOSSendControl                     2
+     __T_TOSWriteSignal                     2
+     __T_?SI_DIV_L02                        2
+     __T_?FAR_CALL_L07                      2
+     __T_TOSIsTimerElapsed                  2
+     __T_TOSStopTimer                       2
+     __T_TOSStartTimer                      2
+
+ 
+ 283 bytes in segment BCODE
+  14 bytes in segment CLTVEC
+ 832 bytes in segment CODE
+   9 bytes in segment CONST
+   1 byte  in segment NEAR_I
+   1 byte  in segment NEAR_ID
+  13 bytes in segment NEAR_Z
+ 
+ 1 115 bytes of CODE  memory (+ 14 bytes shared)
+    10 bytes of CONST memory
+    14 bytes of DATA  memory
+
+Errors: none
+Warnings: none

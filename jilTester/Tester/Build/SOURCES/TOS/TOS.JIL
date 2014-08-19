@@ -1,0 +1,49 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      STK
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    TOS_JIL
+//               JIL definitions
+// -----------------------------------------------------------------------------
+// $Date:   04 Feb 2009 17:03:04  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS.JIL-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:03:04   adzhelp
+// Initial revision.
+*/
+//******************************************************************************
+#ifndef I_TOS_JIL
+#define I_TOS_JIL
+
+//------------------------------------------------------------------------------
+// Included files to resolve specific definitions in this file
+//------------------------------------------------------------------------------
+#include "tos_ord.jil"
+#include "tos_seq.jil"
+#ifdef USE_TOS_SIG
+  #include "tos_sig.jil"
+#endif
+#include "tos_ala.jil"
+#include "tos_tpo.jil"
+
+
+
+Component Tos 
+{
+    
+    ProdControl {Name="TOSInitialize";};
+
+
+};
+
+
+#endif /* I_TOS_JIL */

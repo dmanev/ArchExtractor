@@ -1,0 +1,2007 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:25 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_DIN.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_DIN.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_DIN.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_DIN.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_DIN.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_DIN.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_DIN.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      <STANDARD>
+      9          // Language:     C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_DIN : Digital input management see NT 
+     12          //******************************************************************************
+     13          
+     14          //------------------------------------------------------------------------------
+     15          // Body Identification
+     16          //------------------------------------------------------------------------------
+     17          #define dat_Din  "dat_Din"
+     18          
+     19          //------------------------------------------------------------------------------
+     20          // Included files to resolve specific definitions in this file
+     21          //
+     22          // #include <system_file_name.h>
+     23          // #include "project_file_name.h"
+     24          //------------------------------------------------------------------------------
+     25          #include "deftypes.h"
+     26          #include "lib.h"
+     27          #include "tos.h"
+     28          #include "dat.h"
+     29          
+     30          #include "dat_Din.h"
+     31          
+     32          //------------------------------------------------------------------------------
+     33          // Local constants
+     34          //
+     35          // #define cConstantName   ((tType) ConstantValue)
+     36          //------------------------------------------------------------------------------
+     37          
+     38          #if (defined(DATDIN_FAST_FILTER_X3) || defined(DATDIN_FAST_FILTER_X5))
+     39          
+     40          #if( cDATDinWordNbrToFilterInNormalModeNonType > 1UL )
+     41          #define SeveralWordToFilter
+     42          #endif
+     43          
+     44          #endif
+     45          
+     46          //------------------------------------------------------------------------------
+     47          // Local macros
+     48          //
+     49          // #define mMacroName   (MacroDefinition)
+     50          //------------------------------------------------------------------------------
+     51          
+     52          // the byte ByteNbr of the buffer BufferNbr of the SampleBuffers array
+     53          #define mFilteredBuffer()    (DATDinInputBuffers.Filtered)
+     54          #define mNonFilteredBuffer() (DATDinInputBuffers.NonFiltered)
+     55          #define mStateChangeBuffer() (DATDinInputBuffers.StateChange)
+     56          
+     57          //------------------------------------------------------------------------------
+     58          // Local types
+     59          //
+     60          // typedef Expression    tTypeName;
+     61          //------------------------------------------------------------------------------
+     62          
+     63          
+     64          
+     65          //------------------------------------------------------------------------------
+     66          // Data prefix
+     67          //
+     68          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+     69          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+     70          //
+     71          // -----------------------------------------------------------------------------
+     72          // Local data
+     73          //
+     74          // static  tType   u8VariableName;  
+     75          // static  tType*  pu8VariableName; 
+     76          //------------------------------------------------------------------------------
+     77          #ifndef M_DEBUG
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     78              static tDATDinState     State;
+   \                     State:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     79              #ifndef DATDIN_FAST_FILTER_X3
+     80                  #ifndef DATDIN_FAST_FILTER_X5
+     81                      static U8 CptArray [cDATDinLastBitPosInNominalMode+1];
+     82                  #else
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     83                  static MEM_FAST tDATDinWord Memo1[cDATDinWordNbrToFilterInNormalMode];
+   \                     Memo1:
+   \   0000                  DS 9
+   \   0009                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     84                  static MEM_FAST tDATDinWord Memo2[cDATDinWordNbrToFilterInNormalMode];
+   \                     Memo2:
+   \   0000                  DS 9
+   \   0009                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     85                  static MEM_FAST tDATDinWord Memo3[cDATDinWordNbrToFilterInNormalMode];
+   \                     Memo3:
+   \   0000                  DS 9
+   \   0009                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     86                  static MEM_FAST tDATDinWord Memo4[cDATDinWordNbrToFilterInNormalMode];
+   \                     Memo4:
+   \   0000                  DS 9
+   \   0009                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     87                  static MEM_FAST tDATDinWord Memo5[cDATDinWordNbrToFilterInNormalMode];
+   \                     Memo5:
+   \   0000                  DS 9
+   \   0009                  REQUIRE __INIT_SADDR_Z
+     88                  #endif
+     89              #else
+     90                  static tDATDinWord B0[cDATDinWordNbrToFilterInNormalMode];
+     91                  static tDATDinWord B1[cDATDinWordNbrToFilterInNormalMode];
+     92              #endif
+     93          #else
+     94              // for unitary test
+     95              tDATDinState     State;
+     96              #ifndef DATDIN_FAST_FILTER_X3
+     97                  #ifndef DATDIN_FAST_FILTER_X5
+     98                  U8 CptArray [cDATDinLastBitPosInNominalMode+1];
+     99                  #else
+    100                  tDATDinWord Memo1[cDATDinWordNbrToFilterInNormalMode];
+    101                  tDATDinWord Memo2[cDATDinWordNbrToFilterInNormalMode];
+    102                  tDATDinWord Memo3[cDATDinWordNbrToFilterInNormalMode];
+    103                  tDATDinWord Memo4[cDATDinWordNbrToFilterInNormalMode];
+    104                  tDATDinWord Memo5[cDATDinWordNbrToFilterInNormalMode];
+    105                  #endif
+    106              #else
+    107                  tDATDinWord B0[cDATDinWordNbrToFilterInNormalMode];
+    108                  tDATDinWord B1[cDATDinWordNbrToFilterInNormalMode];
+    109              #endif
+    110          #endif
+    111          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    112          static tTOSAlarm  PeriodicAlarm; // the periodic alarm
+   \                     PeriodicAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    113          
+    114          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    115          static tMsg       InputMsg;
+   \                     InputMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    116          
+    117          #ifdef WAKE_BY_DIN
+    118          
+    119          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    120              #if(defined(DATDIN_FAST_FILTER_X3)||defined(DATDIN_FAST_FILTER_X5))
+    121              #ifdef SeveralWordToFilter
+    122                  static U8  NumberOfWordToFilter;
+    123              #endif
+    124              #else
+    125                  static U8  PositionOfLastLogicalInput;
+    126              #endif
+    127          
+    128          #endif
+    129          #endif
+    130          
+    131          
+    132          //------------------------------------------------------------------------------
+    133          // Constant local data
+    134          //
+    135          // static const tType  VariableName;
+    136          //------------------------------------------------------------------------------
+    137          #ifndef DATDIN_FAST_FILTER_X3
+    138          #ifndef DATDIN_FAST_FILTER_X5
+    139          static const U8 CptHigherLimit[cDATDinLastBitPosInNominalMode+1] = mDATDinInitHigherFilterValue();
+    140          #endif
+    141          #endif
+    142          
+    143          //------------------------------------------------------------------------------
+    144          // Exported data
+    145          //
+    146          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    147          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    148          //------------------------------------------------------------------------------
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    149          MEM_FAST tDATDinLogicalInputBuffers DATDinInputBuffers;
+   \                     DATDinInputBuffers:
+   \   0000                  DS 27
+   \   001B                  REQUIRE __INIT_SADDR_Z
+    150          
+    151          //------------------------------------------------------------------------------
+    152          // Constant exported data
+    153          //
+    154          //             (LAY: 3 characters to identify the layer)
+    155          //             (Cmp: 3 characters to identify this component)
+    156          // 
+    157          // const tType   LAYCmpVariableName;
+    158          //------------------------------------------------------------------------------
+    159          
+    160          //------------------------------------------------------------------------------
+    161          // Local function prototypes
+    162          // 
+    163          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    164          //------------------------------------------------------------------------------
+    165          
+    166          #ifdef WAKE_BY_DIN
+    167          static BOOL Filter(void);
+    168          #else
+    169          static void Filter(void);
+    170          #endif
+    171          
+    172          //==============================================================================
+    173          //=========================== LOCAL FUNCTIONS ==================================
+    174          //==============================================================================
+    175          
+    176          
+    177          //============================================================================
+    178          //  DESCRIPTION : Function's objectives : update the input counter. For each 
+    179          //                logical input, we look is the sample is different as the 
+    180          //                filtered input. In this case a counter is incremented. 
+    181          //                When the counter reach a specified value. The state of the 
+    182          //                filtered input change.
+    183          //  
+    184          //  PARAMETERS (Type,Name,Min,Max) :  none
+    185          //
+    186          //  RETURN VALUE :  none
+    187          // 
+    188          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    189          //============================================================================
+    190          #ifdef DATDIN_FAST_FILTER_X5
+    191          
+    192          #ifdef WAKE_BY_DIN
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    193          static BOOL Filter(void)
+   \                     Filter:
+    194          #else
+    195          static void Filter(void)
+    196          #endif
+    197          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 64
+   \   0002   ..             CALLT     [__T_?FUNC_ENTER_L06]
+   \   0003   4000           DW        0x40
+    198              #ifdef WAKE_BY_DIN
+    199              BOOL IsFilterNotStable = cFalse;
+   \   0005   891C           MOVW      AX,SP
+   \   0007   CA1400         ADDW      AX,#20
+   \   000A   D6             MOVW      HL,AX
+   \   000B   A100           MOV       A,#0
+   \   000D   97             MOV       [HL],A
+    200              #endif
+    201              tDATDinWord Change,ConfChange;
+    202              
+    203              tDATDinWord Tmp1[cDATDinWordNbrToFilterInNormalMode];
+    204              tDATDinWord Tmp2[cDATDinWordNbrToFilterInNormalMode];
+    205              tDATDinWord Tmp3[cDATDinWordNbrToFilterInNormalMode];
+    206              tDATDinWord Tmp4[cDATDinWordNbrToFilterInNormalMode];
+    207          
+    208              // This algorithm is faster than the classical.
+    209              // The input bit are not filtered bit by bit 
+    210              // but word by word.
+    211          
+    212              // Each input is linked the filter output by a boolean expression.
+    213              // This expression use 6 state bit : Memo1..Memo5
+    214              // MemoX represent the value of the counter (see classical filter)
+    215          
+    216              // Cpt is increase when IN != OUT
+    217              // Cpt is decrease when IN == OUT
+    218          
+    219              // OUT state change when CPT reach 5
+    220          
+    221          #ifdef SeveralWordToFilter
+    222          
+    223              U8 i;
+    224          
+    225              #ifdef WAKE_BY_DIN
+    226              #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    227              for( i=0; i < NumberOfWordToFilter ; i++ )
+    228              #else
+    229              for( i=0; i < cDATDinWordNbrToFilter ; i++ )
+   \   000E   10....         MOVW      AX,#S:DATDinInputBuffers
+   \   0011   D6             MOVW      HL,AX
+   \   0012   891C           MOVW      AX,SP
+   \   0014   E6             XCHW      AX,HL
+   \   0015   BE13           MOV       [HL+0x13],A
+   \   0017   60             MOV       A,X
+   \   0018   BE12           MOV       [HL+0x12],A
+   \   001A   10....         MOVW      AX,#S:DATDinInputBuffers+9
+   \   001D   D6             MOVW      HL,AX
+   \   001E   891C           MOVW      AX,SP
+   \   0020   E6             XCHW      AX,HL
+   \   0021   BE1B           MOV       [HL+0x1B],A
+   \   0023   60             MOV       A,X
+   \   0024   BE1A           MOV       [HL+0x1A],A
+   \   0026   891C           MOVW      AX,SP
+   \   0028   CA3700         ADDW      AX,#55
+   \   002B   D6             MOVW      HL,AX
+   \   002C   891C           MOVW      AX,SP
+   \   002E   E6             XCHW      AX,HL
+   \   002F   BE19           MOV       [HL+0x19],A
+   \   0031   60             MOV       A,X
+   \   0032   BE18           MOV       [HL+0x18],A
+   \   0034   891C           MOVW      AX,SP
+   \   0036   CA2E00         ADDW      AX,#46
+   \   0039   D6             MOVW      HL,AX
+   \   003A   891C           MOVW      AX,SP
+   \   003C   E6             XCHW      AX,HL
+   \   003D   BE11           MOV       [HL+0x11],A
+   \   003F   60             MOV       A,X
+   \   0040   BE10           MOV       [HL+0x10],A
+   \   0042   10....         MOVW      AX,#S:Memo2
+   \   0045   D6             MOVW      HL,AX
+   \   0046   891C           MOVW      AX,SP
+   \   0048   E6             XCHW      AX,HL
+   \   0049   BE09           MOV       [HL+0x09],A
+   \   004B   60             MOV       A,X
+   \   004C   BE08           MOV       [HL+0x08],A
+   \   004E   10....         MOVW      AX,#S:Memo3
+   \   0051   D6             MOVW      HL,AX
+   \   0052   891C           MOVW      AX,SP
+   \   0054   E6             XCHW      AX,HL
+   \   0055   BE07           MOV       [HL+0x07],A
+   \   0057   60             MOV       A,X
+   \   0058   BE06           MOV       [HL+0x06],A
+   \   005A   891C           MOVW      AX,SP
+   \   005C   CA2500         ADDW      AX,#37
+   \   005F   D6             MOVW      HL,AX
+   \   0060   891C           MOVW      AX,SP
+   \   0062   E6             XCHW      AX,HL
+   \   0063   BE0D           MOV       [HL+0x0D],A
+   \   0065   60             MOV       A,X
+   \   0066   BE0C           MOV       [HL+0x0C],A
+   \   0068   10....         MOVW      AX,#S:Memo1
+   \   006B   D6             MOVW      HL,AX
+   \   006C   891C           MOVW      AX,SP
+   \   006E   E6             XCHW      AX,HL
+   \   006F   BE05           MOV       [HL+0x05],A
+   \   0071   60             MOV       A,X
+   \   0072   BE04           MOV       [HL+0x04],A
+   \   0074   10....         MOVW      AX,#S:Memo4
+   \   0077   D6             MOVW      HL,AX
+   \   0078   891C           MOVW      AX,SP
+   \   007A   E6             XCHW      AX,HL
+   \   007B   BE03           MOV       [HL+0x03],A
+   \   007D   60             MOV       A,X
+   \   007E   BE02           MOV       [HL+0x02],A
+   \   0080   891C           MOVW      AX,SP
+   \   0082   CA1C00         ADDW      AX,#28
+   \   0085   D6             MOVW      HL,AX
+   \   0086   891C           MOVW      AX,SP
+   \   0088   E6             XCHW      AX,HL
+   \   0089   BE0F           MOV       [HL+0x0F],A
+   \   008B   60             MOV       A,X
+   \   008C   BE0E           MOV       [HL+0x0E],A
+   \   008E   10....         MOVW      AX,#S:Memo5
+   \   0091   D6             MOVW      HL,AX
+   \   0092   891C           MOVW      AX,SP
+   \   0094   E6             XCHW      AX,HL
+   \   0095   BE0B           MOV       [HL+0x0B],A
+   \   0097   60             MOV       A,X
+   \   0098   BE0A           MOV       [HL+0x0A],A
+   \   009A   10....         MOVW      AX,#S:DATDinInputBuffers+18
+   \   009D   D6             MOVW      HL,AX
+   \   009E   891C           MOVW      AX,SP
+   \   00A0   E6             XCHW      AX,HL
+   \   00A1   BE17           MOV       [HL+0x17],A
+   \   00A3   60             MOV       A,X
+   \   00A4   BE16           MOV       [HL+0x16],A
+   \   00A6   891C           MOVW      AX,SP
+   \   00A8   CA1500         ADDW      AX,#21
+   \   00AB   D6             MOVW      HL,AX
+   \   00AC   A109           MOV       A,#9
+   \   00AE   97             MOV       [HL],A
+    230              #endif
+    231              #else
+    232              for( i=0; i < cDATDinWordNbrToFilterInNormalMode ; i++ )
+    233              #endif
+    234              {
+    235                  Change = ((tDATDinWord*)DATDinInputBuffers.Filtered)[i];
+    236                  Change ^= ((tDATDinWord*)DATDinInputBuffers.NonFiltered)[i];
+   \                     ??Filter_0:
+   \   00AF   891C           MOVW      AX,SP
+   \   00B1   D6             MOVW      HL,AX
+   \   00B2   B7             PUSH      HL
+   \   00B3   B4             POP       DE
+   \   00B4   AE1A           MOV       A,[HL+0x1A]
+   \   00B6   70             MOV       X,A
+   \   00B7   AE1B           MOV       A,[HL+0x1B]
+   \   00B9   D6             MOVW      HL,AX
+   \   00BA   87             MOV       A,[HL]
+   \   00BB   72             MOV       C,A
+   \   00BC   891C           MOVW      AX,SP
+   \   00BE   D6             MOVW      HL,AX
+   \   00BF   AE12           MOV       A,[HL+0x12]
+   \   00C1   70             MOV       X,A
+   \   00C2   AE13           MOV       A,[HL+0x13]
+   \   00C4   D6             MOVW      HL,AX
+   \   00C5   87             MOV       A,[HL]
+   \   00C6   617A           XOR       A,C
+   \   00C8   B5             PUSH      DE
+   \   00C9   B6             POP       HL
+   \   00CA   97             MOV       [HL],A
+    237                  Tmp1[i]      = ~Change;
+   \   00CB   7DFF           XOR       A,#255
+   \   00CD   74             MOV       E,A
+   \   00CE   AE18           MOV       A,[HL+0x18]
+   \   00D0   70             MOV       X,A
+   \   00D1   AE19           MOV       A,[HL+0x19]
+   \   00D3   D6             MOVW      HL,AX
+   \   00D4   64             MOV       A,E
+   \   00D5   97             MOV       [HL],A
+    238                  Tmp2[i]      = (Tmp1[i] & Memo2[i]) | (Change & Memo3[i]);
+   \   00D6   891C           MOVW      AX,SP
+   \   00D8   D6             MOVW      HL,AX
+   \   00D9   AE10           MOV       A,[HL+0x10]
+   \   00DB   70             MOV       X,A
+   \   00DC   AE11           MOV       A,[HL+0x11]
+   \   00DE   D6             MOVW      HL,AX
+   \   00DF   B7             PUSH      HL
+   \   00E0   891C           MOVW      AX,SP
+   \   00E2   D6             MOVW      HL,AX
+   \   00E3   AE08           MOV       A,[HL+0x08]
+   \   00E5   70             MOV       X,A
+   \   00E6   AE09           MOV       A,[HL+0x09]
+   \   00E8   D6             MOVW      HL,AX
+   \   00E9   87             MOV       A,[HL]
+   \   00EA   72             MOV       C,A
+   \   00EB   891C           MOVW      AX,SP
+   \   00ED   D6             MOVW      HL,AX
+   \   00EE   AE02           MOV       A,[HL+0x02]
+   \   00F0   615A           AND       A,C
+   \   00F2   72             MOV       C,A
+   \   00F3   AE0A           MOV       A,[HL+0x0A]
+   \   00F5   70             MOV       X,A
+   \   00F6   AE0B           MOV       A,[HL+0x0B]
+   \   00F8   D6             MOVW      HL,AX
+   \   00F9   87             MOV       A,[HL]
+   \   00FA   70             MOV       X,A
+   \   00FB   64             MOV       A,E
+   \   00FC   30             XCH       A,X
+   \   00FD   6150           AND       X,A
+   \   00FF   62             MOV       A,C
+   \   0100   6160           OR        X,A
+   \   0102   60             MOV       A,X
+   \   0103   B6             POP       HL
+   \   0104   97             MOV       [HL],A
+    239                  Tmp3[i]      = (Tmp1[i] & Memo1[i]) | (Change & Memo4[i]);
+   \   0105   891C           MOVW      AX,SP
+   \   0107   D6             MOVW      HL,AX
+   \   0108   AE0C           MOV       A,[HL+0x0C]
+   \   010A   70             MOV       X,A
+   \   010B   AE0D           MOV       A,[HL+0x0D]
+   \   010D   D6             MOVW      HL,AX
+   \   010E   B7             PUSH      HL
+   \   010F   891C           MOVW      AX,SP
+   \   0111   D6             MOVW      HL,AX
+   \   0112   AE04           MOV       A,[HL+0x04]
+   \   0114   70             MOV       X,A
+   \   0115   AE05           MOV       A,[HL+0x05]
+   \   0117   D6             MOVW      HL,AX
+   \   0118   87             MOV       A,[HL]
+   \   0119   72             MOV       C,A
+   \   011A   891C           MOVW      AX,SP
+   \   011C   D6             MOVW      HL,AX
+   \   011D   AE02           MOV       A,[HL+0x02]
+   \   011F   615A           AND       A,C
+   \   0121   72             MOV       C,A
+   \   0122   AE06           MOV       A,[HL+0x06]
+   \   0124   70             MOV       X,A
+   \   0125   AE07           MOV       A,[HL+0x07]
+   \   0127   D6             MOVW      HL,AX
+   \   0128   87             MOV       A,[HL]
+   \   0129   70             MOV       X,A
+   \   012A   64             MOV       A,E
+   \   012B   30             XCH       A,X
+   \   012C   6150           AND       X,A
+   \   012E   62             MOV       A,C
+   \   012F   6160           OR        X,A
+   \   0131   60             MOV       A,X
+   \   0132   B6             POP       HL
+   \   0133   97             MOV       [HL],A
+    240                  ConfChange  = Change & Memo2[i];
+   \   0134   891C           MOVW      AX,SP
+   \   0136   80             INCW      AX
+   \   0137   D6             MOVW      HL,AX
+   \   0138   B7             PUSH      HL
+   \   0139   891C           MOVW      AX,SP
+   \   013B   D6             MOVW      HL,AX
+   \   013C   AE0A           MOV       A,[HL+0x0A]
+   \   013E   70             MOV       X,A
+   \   013F   AE0B           MOV       A,[HL+0x0B]
+   \   0141   D6             MOVW      HL,AX
+   \   0142   87             MOV       A,[HL]
+   \   0143   72             MOV       C,A
+   \   0144   891C           MOVW      AX,SP
+   \   0146   D6             MOVW      HL,AX
+   \   0147   AE02           MOV       A,[HL+0x02]
+   \   0149   615A           AND       A,C
+   \   014B   B6             POP       HL
+   \   014C   97             MOV       [HL],A
+    241                  Tmp4[i]      = ConfChange | (Tmp1[i] & Memo5[i]) | (Memo4[i] & ((tDATDinWord)~Tmp3[i]));
+   \   014D   891C           MOVW      AX,SP
+   \   014F   D6             MOVW      HL,AX
+   \   0150   AE0E           MOV       A,[HL+0x0E]
+   \   0152   70             MOV       X,A
+   \   0153   AE0F           MOV       A,[HL+0x0F]
+   \   0155   D6             MOVW      HL,AX
+   \   0156   B7             PUSH      HL
+   \   0157   891C           MOVW      AX,SP
+   \   0159   D6             MOVW      HL,AX
+   \   015A   AE0E           MOV       A,[HL+0x0E]
+   \   015C   70             MOV       X,A
+   \   015D   AE0F           MOV       A,[HL+0x0F]
+   \   015F   D6             MOVW      HL,AX
+   \   0160   87             MOV       A,[HL]
+   \   0161   7DFF           XOR       A,#255
+   \   0163   72             MOV       C,A
+   \   0164   891C           MOVW      AX,SP
+   \   0166   D6             MOVW      HL,AX
+   \   0167   AE04           MOV       A,[HL+0x04]
+   \   0169   70             MOV       X,A
+   \   016A   AE05           MOV       A,[HL+0x05]
+   \   016C   D6             MOVW      HL,AX
+   \   016D   87             MOV       A,[HL]
+   \   016E   615A           AND       A,C
+   \   0170   73             MOV       B,A
+   \   0171   891C           MOVW      AX,SP
+   \   0173   D6             MOVW      HL,AX
+   \   0174   AE0C           MOV       A,[HL+0x0C]
+   \   0176   70             MOV       X,A
+   \   0177   AE0D           MOV       A,[HL+0x0D]
+   \   0179   D6             MOVW      HL,AX
+   \   017A   87             MOV       A,[HL]
+   \   017B   72             MOV       C,A
+   \   017C   64             MOV       A,E
+   \   017D   32             XCH       A,C
+   \   017E   6152           AND       C,A
+   \   0180   891C           MOVW      AX,SP
+   \   0182   D6             MOVW      HL,AX
+   \   0183   AE03           MOV       A,[HL+0x03]
+   \   0185   616A           OR        A,C
+   \   0187   616B           OR        A,B
+   \   0189   B6             POP       HL
+   \   018A   97             MOV       [HL],A
+    242          
+    243                  Memo4[i] = (Tmp1[i] & Memo3[i]) | (Change & Memo5[i]);
+   \   018B   891C           MOVW      AX,SP
+   \   018D   D6             MOVW      HL,AX
+   \   018E   AE02           MOV       A,[HL+0x02]
+   \   0190   70             MOV       X,A
+   \   0191   AE03           MOV       A,[HL+0x03]
+   \   0193   D6             MOVW      HL,AX
+   \   0194   B7             PUSH      HL
+   \   0195   891C           MOVW      AX,SP
+   \   0197   D6             MOVW      HL,AX
+   \   0198   AE0C           MOV       A,[HL+0x0C]
+   \   019A   70             MOV       X,A
+   \   019B   AE0D           MOV       A,[HL+0x0D]
+   \   019D   D6             MOVW      HL,AX
+   \   019E   87             MOV       A,[HL]
+   \   019F   72             MOV       C,A
+   \   01A0   891C           MOVW      AX,SP
+   \   01A2   D6             MOVW      HL,AX
+   \   01A3   AE02           MOV       A,[HL+0x02]
+   \   01A5   615A           AND       A,C
+   \   01A7   72             MOV       C,A
+   \   01A8   AE08           MOV       A,[HL+0x08]
+   \   01AA   70             MOV       X,A
+   \   01AB   AE09           MOV       A,[HL+0x09]
+   \   01AD   D6             MOVW      HL,AX
+   \   01AE   87             MOV       A,[HL]
+   \   01AF   6154           AND       E,A
+   \   01B1   62             MOV       A,C
+   \   01B2   6164           OR        E,A
+   \   01B4   64             MOV       A,E
+   \   01B5   B6             POP       HL
+   \   01B6   97             MOV       [HL],A
+    244                  Memo2[i] = Change & Memo1[i];
+   \   01B7   891C           MOVW      AX,SP
+   \   01B9   D6             MOVW      HL,AX
+   \   01BA   AE08           MOV       A,[HL+0x08]
+   \   01BC   70             MOV       X,A
+   \   01BD   AE09           MOV       A,[HL+0x09]
+   \   01BF   D4             MOVW      DE,AX
+   \   01C0   AE04           MOV       A,[HL+0x04]
+   \   01C2   70             MOV       X,A
+   \   01C3   AE05           MOV       A,[HL+0x05]
+   \   01C5   D6             MOVW      HL,AX
+   \   01C6   87             MOV       A,[HL]
+   \   01C7   72             MOV       C,A
+   \   01C8   891C           MOVW      AX,SP
+   \   01CA   D6             MOVW      HL,AX
+   \   01CB   87             MOV       A,[HL]
+   \   01CC   615A           AND       A,C
+   \   01CE   95             MOV       [DE],A
+    245                  Memo1[i] = Tmp2[i];
+   \   01CF   AE04           MOV       A,[HL+0x04]
+   \   01D1   70             MOV       X,A
+   \   01D2   AE05           MOV       A,[HL+0x05]
+   \   01D4   D4             MOVW      DE,AX
+   \   01D5   AE10           MOV       A,[HL+0x10]
+   \   01D7   70             MOV       X,A
+   \   01D8   AE11           MOV       A,[HL+0x11]
+   \   01DA   D6             MOVW      HL,AX
+   \   01DB   87             MOV       A,[HL]
+   \   01DC   95             MOV       [DE],A
+    246                  Memo3[i] = Tmp3[i];
+   \   01DD   891C           MOVW      AX,SP
+   \   01DF   D6             MOVW      HL,AX
+   \   01E0   AE06           MOV       A,[HL+0x06]
+   \   01E2   70             MOV       X,A
+   \   01E3   AE07           MOV       A,[HL+0x07]
+   \   01E5   D4             MOVW      DE,AX
+   \   01E6   AE0C           MOV       A,[HL+0x0C]
+   \   01E8   70             MOV       X,A
+   \   01E9   AE0D           MOV       A,[HL+0x0D]
+   \   01EB   D6             MOVW      HL,AX
+   \   01EC   87             MOV       A,[HL]
+   \   01ED   95             MOV       [DE],A
+    247                  Memo5[i] = Tmp4[i];
+   \   01EE   891C           MOVW      AX,SP
+   \   01F0   D6             MOVW      HL,AX
+   \   01F1   AE0A           MOV       A,[HL+0x0A]
+   \   01F3   70             MOV       X,A
+   \   01F4   AE0B           MOV       A,[HL+0x0B]
+   \   01F6   D4             MOVW      DE,AX
+   \   01F7   AE0E           MOV       A,[HL+0x0E]
+   \   01F9   70             MOV       X,A
+   \   01FA   AE0F           MOV       A,[HL+0x0F]
+   \   01FC   D6             MOVW      HL,AX
+   \   01FD   87             MOV       A,[HL]
+   \   01FE   95             MOV       [DE],A
+    248                  
+    249                  ((tDATDinWord*)DATDinInputBuffers.StateChange)[i] = ConfChange;
+   \   01FF   891C           MOVW      AX,SP
+   \   0201   D6             MOVW      HL,AX
+   \   0202   AE16           MOV       A,[HL+0x16]
+   \   0204   70             MOV       X,A
+   \   0205   AE17           MOV       A,[HL+0x17]
+   \   0207   D4             MOVW      DE,AX
+   \   0208   AE01           MOV       A,[HL+0x01]
+   \   020A   95             MOV       [DE],A
+    250                  ((tDATDinWord*)DATDinInputBuffers.Filtered)[i] ^= ConfChange;
+   \   020B   72             MOV       C,A
+   \   020C   AE12           MOV       A,[HL+0x12]
+   \   020E   70             MOV       X,A
+   \   020F   AE13           MOV       A,[HL+0x13]
+   \   0211   D6             MOVW      HL,AX
+   \   0212   87             MOV       A,[HL]
+   \   0213   617A           XOR       A,C
+   \   0215   97             MOV       [HL],A
+    251          
+    252                  #ifdef WAKE_BY_DIN
+    253                  if( (Memo1[i] | Memo2[i] |Memo3[i] |Memo4[i]) != 0 )
+   \   0216   891C           MOVW      AX,SP
+   \   0218   D6             MOVW      HL,AX
+   \   0219   AE02           MOV       A,[HL+0x02]
+   \   021B   70             MOV       X,A
+   \   021C   AE03           MOV       A,[HL+0x03]
+   \   021E   D6             MOVW      HL,AX
+   \   021F   87             MOV       A,[HL]
+   \   0220   74             MOV       E,A
+   \   0221   891C           MOVW      AX,SP
+   \   0223   D6             MOVW      HL,AX
+   \   0224   AE06           MOV       A,[HL+0x06]
+   \   0226   70             MOV       X,A
+   \   0227   AE07           MOV       A,[HL+0x07]
+   \   0229   D6             MOVW      HL,AX
+   \   022A   87             MOV       A,[HL]
+   \   022B   73             MOV       B,A
+   \   022C   891C           MOVW      AX,SP
+   \   022E   D6             MOVW      HL,AX
+   \   022F   AE08           MOV       A,[HL+0x08]
+   \   0231   70             MOV       X,A
+   \   0232   AE09           MOV       A,[HL+0x09]
+   \   0234   D6             MOVW      HL,AX
+   \   0235   87             MOV       A,[HL]
+   \   0236   72             MOV       C,A
+   \   0237   891C           MOVW      AX,SP
+   \   0239   D6             MOVW      HL,AX
+   \   023A   AE04           MOV       A,[HL+0x04]
+   \   023C   70             MOV       X,A
+   \   023D   AE05           MOV       A,[HL+0x05]
+   \   023F   D6             MOVW      HL,AX
+   \   0240   87             MOV       A,[HL]
+   \   0241   616A           OR        A,C
+   \   0243   616B           OR        A,B
+   \   0245   616C           OR        A,E
+   \   0247   AD09           BZ        ??DATDinMaintainActiveSleepState_0
+    254                  {
+    255                      IsFilterNotStable = cTrue;
+   \   0249   891C           MOVW      AX,SP
+   \   024B   CA1400         ADDW      AX,#20
+   \   024E   D6             MOVW      HL,AX
+   \   024F   A101           MOV       A,#1
+   \   0251   97             MOV       [HL],A
+    256                  }
+    257                  #endif
+    258              }
+   \                     ??DATDinMaintainActiveSleepState_0:
+   \   0252   891C           MOVW      AX,SP
+   \   0254   D6             MOVW      HL,AX
+   \   0255   AE16           MOV       A,[HL+0x16]
+   \   0257   70             MOV       X,A
+   \   0258   AE17           MOV       A,[HL+0x17]
+   \   025A   D6             MOVW      HL,AX
+   \   025B   86             INCW      HL
+   \   025C   891C           MOVW      AX,SP
+   \   025E   E6             XCHW      AX,HL
+   \   025F   BE17           MOV       [HL+0x17],A
+   \   0261   60             MOV       A,X
+   \   0262   BE16           MOV       [HL+0x16],A
+   \   0264   AE0A           MOV       A,[HL+0x0A]
+   \   0266   70             MOV       X,A
+   \   0267   AE0B           MOV       A,[HL+0x0B]
+   \   0269   80             INCW      AX
+   \   026A   D6             MOVW      HL,AX
+   \   026B   891C           MOVW      AX,SP
+   \   026D   E6             XCHW      AX,HL
+   \   026E   BE0B           MOV       [HL+0x0B],A
+   \   0270   60             MOV       A,X
+   \   0271   BE0A           MOV       [HL+0x0A],A
+   \   0273   AE0E           MOV       A,[HL+0x0E]
+   \   0275   70             MOV       X,A
+   \   0276   AE0F           MOV       A,[HL+0x0F]
+   \   0278   D6             MOVW      HL,AX
+   \   0279   86             INCW      HL
+   \   027A   891C           MOVW      AX,SP
+   \   027C   E6             XCHW      AX,HL
+   \   027D   BE0F           MOV       [HL+0x0F],A
+   \   027F   60             MOV       A,X
+   \   0280   BE0E           MOV       [HL+0x0E],A
+   \   0282   AE02           MOV       A,[HL+0x02]
+   \   0284   70             MOV       X,A
+   \   0285   AE03           MOV       A,[HL+0x03]
+   \   0287   80             INCW      AX
+   \   0288   D6             MOVW      HL,AX
+   \   0289   891C           MOVW      AX,SP
+   \   028B   E6             XCHW      AX,HL
+   \   028C   BE03           MOV       [HL+0x03],A
+   \   028E   60             MOV       A,X
+   \   028F   BE02           MOV       [HL+0x02],A
+   \   0291   AE04           MOV       A,[HL+0x04]
+   \   0293   70             MOV       X,A
+   \   0294   AE05           MOV       A,[HL+0x05]
+   \   0296   80             INCW      AX
+   \   0297   D6             MOVW      HL,AX
+   \   0298   891C           MOVW      AX,SP
+   \   029A   E6             XCHW      AX,HL
+   \   029B   BE05           MOV       [HL+0x05],A
+   \   029D   60             MOV       A,X
+   \   029E   BE04           MOV       [HL+0x04],A
+   \   02A0   AE0C           MOV       A,[HL+0x0C]
+   \   02A2   70             MOV       X,A
+   \   02A3   AE0D           MOV       A,[HL+0x0D]
+   \   02A5   D6             MOVW      HL,AX
+   \   02A6   86             INCW      HL
+   \   02A7   891C           MOVW      AX,SP
+   \   02A9   E6             XCHW      AX,HL
+   \   02AA   BE0D           MOV       [HL+0x0D],A
+   \   02AC   60             MOV       A,X
+   \   02AD   BE0C           MOV       [HL+0x0C],A
+   \   02AF   AE06           MOV       A,[HL+0x06]
+   \   02B1   70             MOV       X,A
+   \   02B2   AE07           MOV       A,[HL+0x07]
+   \   02B4   80             INCW      AX
+   \   02B5   D6             MOVW      HL,AX
+   \   02B6   891C           MOVW      AX,SP
+   \   02B8   E6             XCHW      AX,HL
+   \   02B9   BE07           MOV       [HL+0x07],A
+   \   02BB   60             MOV       A,X
+   \   02BC   BE06           MOV       [HL+0x06],A
+   \   02BE   AE08           MOV       A,[HL+0x08]
+   \   02C0   70             MOV       X,A
+   \   02C1   AE09           MOV       A,[HL+0x09]
+   \   02C3   80             INCW      AX
+   \   02C4   D6             MOVW      HL,AX
+   \   02C5   891C           MOVW      AX,SP
+   \   02C7   E6             XCHW      AX,HL
+   \   02C8   BE09           MOV       [HL+0x09],A
+   \   02CA   60             MOV       A,X
+   \   02CB   BE08           MOV       [HL+0x08],A
+   \   02CD   AE10           MOV       A,[HL+0x10]
+   \   02CF   70             MOV       X,A
+   \   02D0   AE11           MOV       A,[HL+0x11]
+   \   02D2   D6             MOVW      HL,AX
+   \   02D3   86             INCW      HL
+   \   02D4   891C           MOVW      AX,SP
+   \   02D6   E6             XCHW      AX,HL
+   \   02D7   BE11           MOV       [HL+0x11],A
+   \   02D9   60             MOV       A,X
+   \   02DA   BE10           MOV       [HL+0x10],A
+   \   02DC   AE18           MOV       A,[HL+0x18]
+   \   02DE   70             MOV       X,A
+   \   02DF   AE19           MOV       A,[HL+0x19]
+   \   02E1   D6             MOVW      HL,AX
+   \   02E2   86             INCW      HL
+   \   02E3   891C           MOVW      AX,SP
+   \   02E5   E6             XCHW      AX,HL
+   \   02E6   BE19           MOV       [HL+0x19],A
+   \   02E8   60             MOV       A,X
+   \   02E9   BE18           MOV       [HL+0x18],A
+   \   02EB   AE1A           MOV       A,[HL+0x1A]
+   \   02ED   70             MOV       X,A
+   \   02EE   AE1B           MOV       A,[HL+0x1B]
+   \   02F0   D6             MOVW      HL,AX
+   \   02F1   86             INCW      HL
+   \   02F2   891C           MOVW      AX,SP
+   \   02F4   E6             XCHW      AX,HL
+   \   02F5   BE1B           MOV       [HL+0x1B],A
+   \   02F7   60             MOV       A,X
+   \   02F8   BE1A           MOV       [HL+0x1A],A
+   \   02FA   AE12           MOV       A,[HL+0x12]
+   \   02FC   70             MOV       X,A
+   \   02FD   AE13           MOV       A,[HL+0x13]
+   \   02FF   D6             MOVW      HL,AX
+   \   0300   86             INCW      HL
+   \   0301   891C           MOVW      AX,SP
+   \   0303   E6             XCHW      AX,HL
+   \   0304   BE13           MOV       [HL+0x13],A
+   \   0306   60             MOV       A,X
+   \   0307   BE12           MOV       [HL+0x12],A
+   \   0309   AE15           MOV       A,[HL+0x15]
+   \   030B   51             DEC       A
+   \   030C   BE15           MOV       [HL+0x15],A
+   \   030E   AD03           BZ        $+5
+   \   0310   9B....         BR        N:??Filter_0
+    259          #else
+    260                  Change = ((tDATDinWord*)DATDinInputBuffers.Filtered)[0];
+    261                  Change ^= ((tDATDinWord*)DATDinInputBuffers.NonFiltered)[0];
+    262                  Tmp1[0]      = ~Change;
+    263                  Tmp2[0]      = (Tmp1[0] & Memo2[0]) | (Change & Memo3[0]);
+    264                  Tmp3[0]      = (Tmp1[0] & Memo1[0]) | (Change & Memo4[0]);
+    265                  ConfChange  = Change & Memo2[0];
+    266                  Tmp4[0]      = ConfChange | (Tmp1[0] & Memo5[0]) | (Memo4[0] & ((tDATDinWord)~Tmp3[0]));
+    267          
+    268                  Memo4[0] = (Tmp1[0] & Memo3[0]) | (Change & Memo5[0]);
+    269                  Memo2[0] = Change & Memo1[0];
+    270                  Memo1[0] = Tmp2[0];
+    271                  Memo3[0] = Tmp3[0];
+    272                  Memo5[0] = Tmp4[0];
+    273          
+    274                  ((tDATDinWord*)DATDinInputBuffers.StateChange)[0] = ConfChange;
+    275                  ((tDATDinWord*)DATDinInputBuffers.Filtered)[0] ^= ConfChange;
+    276                  
+    277                  #ifdef WAKE_BY_DIN
+    278                  if( (Memo1[0] | Memo2[0] |Memo3[0] |Memo4[0]) != 0 )
+    279                  {
+    280                      IsFilterNotStable = cTrue;
+    281                  }
+    282                  #endif
+    283          
+    284          #endif
+    285          
+    286          #ifdef WAKE_BY_DIN
+    287              return(IsFilterNotStable);
+   \   0313   AE14           MOV       A,[HL+0x14]
+   \   0315   ..             CALLT     [__T_?FUNC_DEALL_L06]
+   \   0316   4000           DW        0x40
+   \   0318   B4             POP       DE
+   \   0319   B2             POP       BC
+   \   031A   AF             RET       
+   \   031B                  REQUIRE ?CL78K_V4_6_L00
+    288          #endif
+    289          }
+    290          
+    291          #else
+    292          //============================================================================
+    293          //  DESCRIPTION : Function's objectives : update the input counter. For each 
+    294          //                logical input, we look is the sample is different as the 
+    295          //                filtered input. In this case a counter is incremented. 
+    296          //                When the counter reach a specified value. The state of the 
+    297          //                filtered input change.
+    298          //  
+    299          //  PARAMETERS (Type,Name,Min,Max) :  none
+    300          //
+    301          //  RETURN VALUE :  none
+    302          // 
+    303          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    304          //============================================================================
+    305          #ifdef DATDIN_FAST_FILTER_X3
+    306          
+    307          #ifdef WAKE_BY_DIN
+    308          static BOOL Filter(void)
+    309          #else
+    310          static void Filter(void)
+    311          #endif
+    312          {
+    313              #ifdef WAKE_BY_DIN
+    314              U8 IsFilterNotStable = cFalse;
+    315              #endif
+    316              tDATDinWord OldB1,Chgt;
+    317          
+    318              // This algrithm is faster than the classical.
+    319              // The input bit are not filtered bit by bit 
+    320              // but word by word.
+    321          
+    322              // Each input is linked the filter output by a boolean expression.
+    323              // This expression use two state bit : B0 and B1
+    324              // B0 and B1 represent the value of the counter (see classical filter)
+    325              // B0=0, B1=0 => Cpt=0
+    326              // B0=1, B1=0 => Cpt=1
+    327              // B0=0, B1=1 => Cpt=2
+    328          
+    329              // Cpt is increase when IN != OUT
+    330              // Cpt is decrease when IN == OUT
+    331          
+    332              // OUT state change when CPT reach 3
+    333          
+    334          #ifdef SeveralWordToFilter
+    335          
+    336              U8 i;
+    337          
+    338              #ifdef WAKE_BY_DIN
+    339              #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    340              for( i=0; i < NumberOfWordToFilter ; i++ )
+    341              #else
+    342              for( i=0; i < cDATDinWordNbrToFilter ; i++ )
+    343              #endif
+    344              #else
+    345              for( i=0; i < cDATDinWordNbrToFilterInNormalMode ; i++ )
+    346              #endif
+    347              {
+    348                  Chgt = ((tDATDinWord*)DATDinInputBuffers.Filtered)[i];
+    349                  Chgt ^= ((tDATDinWord*)DATDinInputBuffers.NonFiltered)[i];
+    350                  OldB1 = B1[i];
+    351                  B1[i] = B0[i] & Chgt;
+    352                  B0[i] = B1[i] ^ Chgt ^ OldB1;
+    353                  Chgt &= OldB1;
+    354                  ((tDATDinWord*)DATDinInputBuffers.StateChange)[i] = Chgt;
+    355                  ((tDATDinWord*)DATDinInputBuffers.Filtered)[i] ^= Chgt;
+    356                  
+    357                  #ifdef WAKE_BY_DIN
+    358                  if( (B0[i] | B1[i] ) != 0 )
+    359                  {
+    360                      IsFilterNotStable = cTrue;
+    361                  }
+    362                  #endif
+    363              }
+    364          #else
+    365          
+    366              Chgt  = ((tDATDinWord*)DATDinInputBuffers.Filtered)[0];
+    367              Chgt ^= ((tDATDinWord*)DATDinInputBuffers.NonFiltered)[0];
+    368              OldB1 = B1[0];
+    369              B1[0] = B0[0] & Chgt;
+    370              B0[0] = B1[0] ^ Chgt ^ OldB1;
+    371              Chgt &= OldB1;
+    372              ((tDATDinWord*)DATDinInputBuffers.StateChange)[0] = Chgt;
+    373              ((tDATDinWord*)DATDinInputBuffers.Filtered)[0] ^= Chgt;
+    374          
+    375              #ifdef WAKE_BY_DIN
+    376              if( (B0[0] | B1[0] ) != 0 )
+    377              {
+    378                  IsFilterNotStable = cTrue;
+    379              }
+    380              #endif
+    381          
+    382          #endif
+    383          
+    384          #ifdef WAKE_BY_DIN
+    385              return(IsFilterNotStable);
+    386          #endif
+    387          }
+    388          
+    389          #else
+    390          
+    391          //============================================================================
+    392          //  DESCRIPTION : Function's objectives : update the input counter. For each 
+    393          //                logical input, we look is the sample is different as the 
+    394          //                filtered input. In this case a counter is incremented. 
+    395          //                When the counter reach a specified value. The state of the 
+    396          //                filtered input change.
+    397          //  
+    398          //  PARAMETERS (Type,Name,Min,Max) :  none
+    399          //
+    400          //  RETURN VALUE :  none
+    401          // 
+    402          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    403          //============================================================================
+    404          #ifdef WAKE_BY_DIN
+    405          static BOOL Filter(void)
+    406          #else
+    407          static void Filter(void)
+    408          #endif
+    409          {
+    410              U8 Input;
+    411              U8* pFilteredCurrentByte;
+    412              U8* pNonFilteredCurrentByte;
+    413              U8* pStateChangeCurrentByte;
+    414              U8 Mask;
+    415              U8 NbBytes;
+    416              BOOL FilterNotStabilized;
+    417          
+    418              pFilteredCurrentByte    = DATDinInputBuffers.Filtered;
+    419              pNonFilteredCurrentByte = DATDinInputBuffers.NonFiltered;
+    420              pStateChangeCurrentByte = DATDinInputBuffers.StateChange;
+    421              NbBytes=0;
+    422              Mask = ((U8)0x01UL);
+    423              FilterNotStabilized = cFalse;
+    424              
+    425              // Clear the state change buffer
+    426              mLIBmemset(mStateChangeBuffer(), 0, cDATDinBufferSize);
+    427          
+    428              #ifdef WAKE_BY_DIN
+    429              for (Input=0; Input <= PositionOfLastLogicalInput ; Input++)
+    430              #else
+    431              for (Input=0; Input <= cDATDinLastBitPosInNominalMode ; Input++)
+    432              #endif
+    433              { // loop for the input
+    434          
+    435                  if ( (pNonFilteredCurrentByte[NbBytes] & Mask ) == (pFilteredCurrentByte[NbBytes] & Mask ) )
+    436                  {//the filtered value is the same as the non filtered
+    437                      if (CptArray[Input] > 0 )
+    438                      {
+    439                          (CptArray[Input])--;
+    440                      }
+    441                  }
+    442                  else
+    443                  {
+    444                      (CptArray[Input])++;
+    445          
+    446                      if ( CptArray[Input] >= CptHigherLimit[Input] )
+    447                      {
+    448                          pFilteredCurrentByte[NbBytes] ^= Mask;
+    449                          pStateChangeCurrentByte[NbBytes] |= Mask;
+    450                          CptArray[Input] = ((U8)0x00UL);
+    451                      }
+    452                  } // if  ... Mask ...
+    453          
+    454                  if (Mask == ((U8)0x80UL))
+    455                  {
+    456                      Mask = ((U8)0x01UL);
+    457                      NbBytes ++;
+    458                  }
+    459                  else
+    460                  {
+    461                      Mask <<= 1;
+    462                  }
+    463                  
+    464                  if(CptArray[Input] != 0)
+    465                  {
+    466                      FilterNotStabilized = cTrue;
+    467                  }
+    468              }
+    469          #ifdef WAKE_BY_DIN
+    470              return(FilterNotStabilized);
+    471          #endif
+    472          }
+    473          #endif
+    474          #endif
+    475          //==============================================================================
+    476          //=========================== EXPORTED FUNCTIONS ===============================
+    477          //==============================================================================
+    478          //============================================================================
+    479          //  DESCRIPTION : Initialise DAT_Din component
+    480          //  
+    481          //  PARAMETERS (Type,Name,Min,Max) :  none
+    482          //
+    483          //  RETURN VALUE :  none
+    484          // 
+    485          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    486          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    487          MEM_TYPE void DATDinInit(const U8* pBuffer)
+   \                     DATDinInit:
+    488          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B1             PUSH      AX
+   \   0002                  ; Total Auto size: 2
+    489          #ifdef DATDIN_FAST_FILTER_X5
+    490              mLIBmemset(Memo1, 0, cDATDinWordNbrToFilterInNormalMode);
+   \   0002   10....         MOVW      AX,#S:Memo1
+   \   0005   140900         MOVW      DE,#9
+   \   0008   120000         MOVW      BC,#0
+   \   000B   9A....         CALL      memset
+    491              mLIBmemset(Memo2, 0, cDATDinWordNbrToFilterInNormalMode);
+   \   000E   10....         MOVW      AX,#S:Memo2
+   \   0011   140900         MOVW      DE,#9
+   \   0014   120000         MOVW      BC,#0
+   \   0017   9A....         CALL      memset
+    492              mLIBmemset(Memo3, 0, cDATDinWordNbrToFilterInNormalMode);
+   \   001A   10....         MOVW      AX,#S:Memo3
+   \   001D   140900         MOVW      DE,#9
+   \   0020   120000         MOVW      BC,#0
+   \   0023   9A....         CALL      memset
+    493              mLIBmemset(Memo4, 0, cDATDinWordNbrToFilterInNormalMode);
+   \   0026   10....         MOVW      AX,#S:Memo4
+   \   0029   140900         MOVW      DE,#9
+   \   002C   120000         MOVW      BC,#0
+   \   002F   9A....         CALL      memset
+    494              mLIBmemset(Memo5, ((U8)0xFFUL), cDATDinWordNbrToFilterInNormalMode);
+   \   0032   10....         MOVW      AX,#S:Memo5
+   \   0035   140900         MOVW      DE,#9
+   \   0038   12FF00         MOVW      BC,#255
+   \   003B   9A....         CALL      memset
+    495          
+    496              // Initialize unused byte of buffer
+    497              mLIBmemset(mFilteredBuffer(), 0, cDATDinBufferSize);
+   \   003E   10....         MOVW      AX,#S:DATDinInputBuffers
+   \   0041   140900         MOVW      DE,#9
+   \   0044   120000         MOVW      BC,#0
+   \   0047   9A....         CALL      memset
+    498              mLIBmemset(mNonFilteredBuffer(), 0, cDATDinBufferSize);
+   \   004A   10....         MOVW      AX,#S:DATDinInputBuffers+9
+   \   004D   140900         MOVW      DE,#9
+   \   0050   120000         MOVW      BC,#0
+   \   0053   9A....         CALL      memset
+    499              mLIBmemset(mStateChangeBuffer(), 0, cDATDinBufferSize);
+   \   0056   10....         MOVW      AX,#S:DATDinInputBuffers+18
+   \   0059   140900         MOVW      DE,#9
+   \   005C   120000         MOVW      BC,#0
+   \   005F   9A....         CALL      memset
+    500          #else
+    501          #ifdef DATDIN_FAST_FILTER_X3
+    502              mLIBmemset(B0, 0, cDATDinWordNbrToFilterInNormalMode);
+    503              mLIBmemset(B1, 0, cDATDinWordNbrToFilterInNormalMode);
+    504          
+    505              // Initialize unused byte of buffer
+    506              mLIBmemset(mFilteredBuffer(), 0, cDATDinBufferSize);
+    507              mLIBmemset(mNonFilteredBuffer(), 0, cDATDinBufferSize);
+    508              mLIBmemset(mStateChangeBuffer(), 0, cDATDinBufferSize);
+    509          #else
+    510              mLIBmemset(CptArray, 0, cDATDinLastBitPosInNominalMode);
+    511          #endif
+    512          #endif
+    513              mLIBmemcpy(mFilteredBuffer(), pBuffer, cDATDinBufferUseSize);
+   \   0062   891C           MOVW      AX,SP
+   \   0064   D6             MOVW      HL,AX
+   \   0065   87             MOV       A,[HL]
+   \   0066   70             MOV       X,A
+   \   0067   AE01           MOV       A,[HL+0x01]
+   \   0069   D4             MOVW      DE,AX
+   \   006A   16....         MOVW      HL,#S:DATDinInputBuffers
+   \   006D   A309           MOV       B,#9
+   \                     ??DATDinInit_0:
+   \   006F   85             MOV       A,[DE]
+   \   0070   97             MOV       [HL],A
+   \   0071   86             INCW      HL
+   \   0072   84             INCW      DE
+   \   0073   8BFA           DBNZ      B, ??DATDinInit_0
+    514              mLIBmemcpy(mNonFilteredBuffer(), pBuffer, cDATDinBufferUseSize);
+   \   0075   891C           MOVW      AX,SP
+   \   0077   D6             MOVW      HL,AX
+   \   0078   87             MOV       A,[HL]
+   \   0079   70             MOV       X,A
+   \   007A   AE01           MOV       A,[HL+0x01]
+   \   007C   D4             MOVW      DE,AX
+   \   007D   10....         MOVW      AX,#S:DATDinInputBuffers+9
+   \   0080   D6             MOVW      HL,AX
+   \   0081   A309           MOV       B,#9
+   \                     ??DATDinInit_1:
+   \   0083   85             MOV       A,[DE]
+   \   0084   97             MOV       [HL],A
+   \   0085   86             INCW      HL
+   \   0086   84             INCW      DE
+   \   0087   8BFA           DBNZ      B, ??DATDinInit_1
+    515              InputMsg.pBuffer = DATDinInputBuffers.NonFiltered;
+   \   0089   A1..           MOV       A,#HIGH(DATDinInputBuffers+9)
+   \   008B   03....         MOVW      InputMsg,AX
+    516              InputMsg.Lng    = cDATDinBufferUseSize;
+   \   008E   100900         MOVW      AX,#9
+   \   0091   03....         MOVW      InputMsg+2,AX
+    517          
+    518              
+    519              #ifdef WAKE_BY_DIN
+    520          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    521              #if (defined(DATDIN_FAST_FILTER_X3) || defined(DATDIN_FAST_FILTER_X5))
+    522              #ifdef SeveralWordToFilter
+    523                  NumberOfWordToFilter = cDATDinWordNbrToFilterInSleepMode;
+    524              #endif
+    525              #else
+    526                  PositionOfLastLogicalInput = cDATDinLastBitPosInSleepMode;
+    527              #endif
+    528          #endif
+    529          
+    530              State = cDATDinConfirmWakeUpMode;
+   \   0094   A101           MOV       A,#1
+   \   0096   9E....         MOV       State,A
+    531          
+    532              #else
+    533              State = cDATDinStopMode;
+    534              #endif
+    535              if(State){}//to avoid a warning in release mode
+    536          }
+   \   0099   B0             POP       AX
+   \   009A   B2             POP       BC
+   \   009B   AF             RET       
+   \   009C                  REQUIRE ?CL78K_V4_6_L00
+    537          
+    538          
+    539          #ifdef WAKE_BY_DIN
+    540          #ifndef WAKE_BY_DIN_INTERRUPT
+    541          //============================================================================
+    542          //  DESCRIPTION : Read the logical input. This task is activated 
+    543          //                periodicaly
+    544          //  
+    545          //  PARAMETERS (Type,Name,Min,Max) :  none
+    546          //
+    547          //  RETURN VALUE :  none
+    548          // 
+    549          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    550          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    551          void DATDinReadTask(void)
+   \                     DATDinReadTask:
+    552          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#InputMsg
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 2
+   \   0005   B7             PUSH      HL
+    553              // Reading
+    554              LDBReceiveWithoutAddr(cLDBChannelDin, &InputMsg);
+   \   0006   9A....         CALL      LDBDinReceiveWithoutAddr
+    555              // Invalidate some inputs
+    556              DATPinSelection(); 
+   \   0009   9A....         CALL      DATPinSelection
+    557          
+    558              switch(State)
+   \   000C   8E....         MOV       A,State
+   \   000F   4D00           CMP       A,#0
+   \   0011   AD0E           BZ        ??DATDinMaintainActiveSleepState_1
+   \   0013   4D01           CMP       A,#1
+   \   0015   AD61           BZ        ??DATDinMaintainActiveSleepState_2
+   \   0017   4D02           CMP       A,#2
+   \   0019   BD03           BNZ       $+5
+   \   001B   9B....         BR        N:??DATDinMaintainActiveSleepState_3
+   \   001E   9B....         BR        N:??DATDinMaintainActiveSleepState_4
+    559              {
+    560                case cDATDinSleepMode:
+    561                {
+    562                  BOOL FilterNotStabilized;
+    563                  U8 i;
+    564          
+    565                  FilterNotStabilized = cFalse;
+   \                     ??DATDinMaintainActiveSleepState_1:
+   \   0021   891C           MOVW      AX,SP
+   \   0023   D6             MOVW      HL,AX
+   \   0024   A100           MOV       A,#0
+   \   0026   97             MOV       [HL],A
+    566                  //Filtering is not active
+    567                  for(i=0; i<= cDATDinLastBytePosInSleepMode; i++)
+   \   0027   A109           MOV       A,#9
+   \   0029   12....         MOVW      BC,#S:DATDinInputBuffers
+   \   002C   14....         MOVW      DE,#S:DATDinInputBuffers
+   \   002F   86             INCW      HL
+   \   0030   97             MOV       [HL],A
+    568                  {
+    569                    if(DATDinInputBuffers.Filtered[i] != DATDinInputBuffers.NonFiltered[i])
+   \                     ??DATDinReadTask_0:
+   \   0031   C4             MOVW      AX,DE
+   \   0032   D6             MOVW      HL,AX
+   \   0033   AE09           MOV       A,[HL+0x09]
+   \   0035   70             MOV       X,A
+   \   0036   B3             PUSH      BC
+   \   0037   B6             POP       HL
+   \   0038   87             MOV       A,[HL]
+   \   0039   6148           CMP       A,X
+   \   003B   AD06           BZ        ??DATDinMaintainActiveSleepState_5
+    570                    {
+    571                      FilterNotStabilized = cTrue;
+   \   003D   891C           MOVW      AX,SP
+   \   003F   D6             MOVW      HL,AX
+   \   0040   A101           MOV       A,#1
+   \   0042   97             MOV       [HL],A
+    572                    }
+    573                  }
+   \                     ??DATDinMaintainActiveSleepState_5:
+   \   0043   84             INCW      DE
+   \   0044   82             INCW      BC
+   \   0045   891C           MOVW      AX,SP
+   \   0047   D6             MOVW      HL,AX
+   \   0048   AE01           MOV       A,[HL+0x01]
+   \   004A   51             DEC       A
+   \   004B   BE01           MOV       [HL+0x01],A
+   \   004D   BDE2           BNZ       ??DATDinReadTask_0
+    574          
+    575                  if(FilterNotStabilized != cFalse)
+   \   004F   87             MOV       A,[HL]
+   \   0050   4D00           CMP       A,#0
+   \   0052   AD51           BZ        ??DATDinMaintainActiveSleepState_4
+    576                  {
+    577                    TOSSendControl(cTOSControlActiveSleepRequest);
+   \   0054   A101           MOV       A,#1
+   \   0056   ..             CALLT     [__T_TOSSendControl]
+    578          
+    579                    TOSCancelAlarm(&PeriodicAlarm);
+   \   0057   10....         MOVW      AX,#PeriodicAlarm
+   \   005A   9A....         CALL      TOSCancelAlarm
+    580                    PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+   \   005D   100004         MOVW      AX,#1024
+   \   0060   03....         MOVW      PeriodicAlarm,AX
+    581                    TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+   \   0063   10....         MOVW      AX,#PeriodicAlarm
+   \   0066   A301           MOV       B,#1
+   \   0068   9A....         CALL      TOSSetRelAlarm_Interne
+    582          
+    583                    State = cDATDinConfirmWakeUpMode;
+   \   006B   A101           MOV       A,#1
+   \   006D   9E....         MOV       State,A
+    584          
+    585                    Filter();
+   \   0070   9A....         CALL      Filter
+    586                    DATPinStateChange();
+   \   0073   9A....         CALL      DATPinStateChange
+   \   0076   FA2D           BR        ??DATDinMaintainActiveSleepState_4
+    587                  }
+    588                  break;
+    589                }
+    590                case cDATDinConfirmWakeUpMode :
+    591                {
+    592                  BOOL FilterNotStabilized;
+    593                  //Filtering is active
+    594                  //DAT_DIN must not go to sleep mode before filtering counter are stabilized
+    595                  FilterNotStabilized = Filter();
+   \                     ??DATDinMaintainActiveSleepState_2:
+   \   0078   9A....         CALL      Filter
+   \   007B   72             MOV       C,A
+    596          
+    597                  DATPinStateChange();
+   \   007C   9A....         CALL      DATPinStateChange
+    598          
+    599                  if(FilterNotStabilized == cFalse)
+   \   007F   62             MOV       A,C
+   \   0080   4D00           CMP       A,#0
+   \   0082   BD21           BNZ       ??DATDinMaintainActiveSleepState_4
+    600                  {//The input change has not woke up the application and filtering is finished
+    601                      State = cDATDinSleepMode;
+   \   0084   A100           MOV       A,#0
+   \   0086   9E....         MOV       State,A
+    602          
+    603                      TOSCancelAlarm(&PeriodicAlarm);
+   \   0089   10....         MOVW      AX,#PeriodicAlarm
+   \   008C   9A....         CALL      TOSCancelAlarm
+    604                      PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+   \   008F   100004         MOVW      AX,#1024
+   \   0092   03....         MOVW      PeriodicAlarm,AX
+    605                      TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinSleepSamplingPeriodValueMs));
+   \   0095   10....         MOVW      AX,#PeriodicAlarm
+   \   0098   A308           MOV       B,#8
+   \   009A   9A....         CALL      TOSSetRelAlarm_Interne
+   \   009D   FA06           BR        ??DATDinMaintainActiveSleepState_4
+    606                  }
+    607          
+    608                  break;
+    609                }
+    610          
+    611                case cDATDinNormalMode ://nominal mode 
+    612                {
+    613                  Filter();
+   \                     ??DATDinMaintainActiveSleepState_3:
+   \   009F   9A....         CALL      Filter
+    614                  DATPinStateChange();
+   \   00A2   9A....         CALL      DATPinStateChange
+    615                  break;
+    616                }
+    617          
+    618                default:
+    619                      mLIBassert(cFalse);
+    620                break;
+    621            }
+    622          }
+   \                     ??DATDinMaintainActiveSleepState_4:
+   \   00A5   B0             POP       AX
+   \   00A6   B4             POP       DE
+   \   00A7   B2             POP       BC
+   \   00A8   AF             RET       
+   \   00A9                  REQUIRE ?CL78K_V4_6_L00
+    623          
+    624          #else
+    625          
+    626          //Wake up by interrupt mode
+    627          //============================================================================
+    628          //  DESCRIPTION : Read the logical input. This task is activated 
+    629          //                periodicaly
+    630          //  
+    631          //  PARAMETERS (Type,Name,Min,Max) :  none
+    632          //
+    633          //  RETURN VALUE :  none
+    634          // 
+    635          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    636          //============================================================================
+    637          void DATDinReadTask(void)
+    638          {
+    639              BOOL FilterNotStabilized;
+    640          
+    641              FilterNotStabilized = cFalse;
+    642          
+    643              switch(State)
+    644              {
+    645                case cDATDinSleepMode:
+    646                {
+    647                  //IT Wake up has occured
+    648                  TOSSendControl(cTOSControlActiveSleepRequest);
+    649          
+    650                  PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+    651                  TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+    652          
+    653                  State = cDATDinConfirmWakeUpMode;
+    654          
+    655                  break;
+    656                }
+    657                case cDATDinConfirmWakeUpMode :
+    658                {
+    659                  // Reading
+    660                  LDBReceiveWithoutAddr(cLDBChannelDin, &InputMsg);
+    661                  // Invalidate some inputs
+    662                  DATPinSelection(); 
+    663          
+    664                  //Filter
+    665                  FilterNotStabilized = Filter();
+    666                  //Inform PIN
+    667                  DATPinStateChange();
+    668                      
+    669                  if(  (FilterNotStabilized == cFalse)
+    670                    &&(State != cDATDinNormalMode))
+    671                  {//The input change has not woke up the application and filtering is finished
+    672          
+    673                    State = cDATDinSleepMode;
+    674          
+    675                    TOSCancelAlarm(&PeriodicAlarm);
+    676                    //To enable input interrupt in case of a return of a confirmation state 
+    677                    LDBControl(cLDBChannelDin,cLDBDinEnableWakeUpInterrupt);
+    678          
+    679                  }
+    680                  break;
+    681                }
+    682          
+    683                case cDATDinNormalMode ://Nominal mode
+    684                {
+    685                  // Reading
+    686                  LDBReceiveWithoutAddr(cLDBChannelDin, &InputMsg);
+    687                  // Invalidate some inputs
+    688                  DATPinSelection(); 
+    689          
+    690                  Filter();
+    691                  DATPinStateChange();
+    692                  break;
+    693                }
+    694                default:
+    695                    mLIBassert(cFalse);
+    696                break;
+    697            }
+    698          }
+    699          #endif
+    700          #else
+    701          //No wake up mode
+    702          //============================================================================
+    703          //  DESCRIPTION : Read the logical input. This task is activated 
+    704          //                periodicaly
+    705          //  
+    706          //  PARAMETERS (Type,Name,Min,Max) :  none
+    707          //
+    708          //  RETURN VALUE :  none
+    709          // 
+    710          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    711          //============================================================================
+    712          void DATDinReadTask(void)
+    713          {
+    714            // Reading
+    715            LDBReceiveWithoutAddr(cLDBChannelDin, &InputMsg);
+    716            // Invalidate some inputs
+    717            DATPinSelection();
+    718          
+    719            Filter();
+    720          
+    721            //Inform PIN
+    722            DATPinStateChange();
+    723          
+    724          }
+    725          #endif
+    726          
+    727          //============================================================================
+    728          //  DESCRIPTION : Define the call-back called by the LDB. This 
+    729          //                function is called when the On/Off input are copied
+    730          //  
+    731          //  PARAMETERS (Type,Name,Min,Max) :  none
+    732          //
+    733          //  RETURN VALUE :  none
+    734          // 
+    735          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    736          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    737          void DATDinCallBackRxWithoutAddr(tStatus Statut)
+   \                     DATDinCallBackRxWithoutAddr:
+    738          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    739              mLIBassert(Statut == cLDBCorrect);
+    740          
+    741              Statut = Statut; // to avoid compiler warning on target
+    742          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    743          
+    744          
+    745          #ifdef WAKE_BY_DIN
+    746          #ifndef WAKE_BY_DIN_INTERRUPT
+    747          //============================================================================
+    748          //  DESCRIPTION : Put the DAT_DIN in nominal mode
+    749          //
+    750          //  PARAMETERS (Type,Name,Min,Max) :  none
+    751          //
+    752          //  RETURN VALUE :  none
+    753          // 
+    754          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    755          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    756          void DATDinEnterActiveState(void)
+   \                     DATDinEnterActiveState:
+    757          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    758              LDBControl(cLDBChannelDin,cLDBDinEnterNominalMode);
+   \   0004   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   0007   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   0009   ..             CALLT     [__T_?FAR_CALL_L07]
+    759          
+    760              TOSCancelAlarm(&PeriodicAlarm);
+   \   000A   10....         MOVW      AX,#PeriodicAlarm
+   \   000D   9A....         CALL      TOSCancelAlarm
+    761              PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+   \   0010   100004         MOVW      AX,#1024
+   \   0013   03....         MOVW      PeriodicAlarm,AX
+    762              TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+   \   0016   10....         MOVW      AX,#PeriodicAlarm
+   \   0019   A301           MOV       B,#1
+   \   001B   9A....         CALL      TOSSetRelAlarm_Interne
+    763          
+    764          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    765          #ifdef DATDIN_FAST_FILTER_X5
+    766              mLIBmemset((U8*)Memo1 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize );
+    767              mLIBmemset((U8*)Memo2 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    768              mLIBmemset((U8*)Memo3 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    769              mLIBmemset((U8*)Memo4 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    770              mLIBmemset((U8*)Memo5 + cDATDinLastBytePosInSleepMode+1, ((U8)0xFFUL), cDATDinNormalModeInitByteSize);
+    771              #ifdef SeveralWordToFilter
+    772              NumberOfWordToFilter = cDATDinWordNbrToFilterInNormalMode;
+    773              #endif
+    774          #else
+    775              #ifdef DATDIN_FAST_FILTER_X3
+    776                  mLIBmemset(((U8*)B0) + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    777                  mLIBmemset(((U8*)B1) + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    778              #ifdef SeveralWordToFilter
+    779                  NumberOfWordToFilter = cDATDinWordNbrToFilterInNormalMode;
+    780              #endif
+    781              #else
+    782                  mLIBmemset(&CptArray[cDATDinLastBitPosInSleepMode+1], 0, ((U8)(cDATDinLastBitPosInNominalMode - cDATDinLastBitPosInSleepMode)));
+    783                  PositionOfLastLogicalInput = cDATDinLastBitPosInNominalMode;
+    784              #endif
+    785          #endif
+    786          #endif
+    787          
+    788              State = cDATDinNormalMode;
+   \   001E   A102           MOV       A,#2
+   \   0020   9E....         MOV       State,A
+    789          }
+   \   0023   B4             POP       DE
+   \   0024   B2             POP       BC
+   \   0025   AF             RET       
+   \   0026                  REQUIRE ?CL78K_V4_6_L00
+    790          
+    791          #else
+    792          //============================================================================
+    793          //  DESCRIPTION : Put the DAT_DIN in nominal mode
+    794          //
+    795          //  PARAMETERS (Type,Name,Min,Max) :  none
+    796          //
+    797          //  RETURN VALUE :  none
+    798          // 
+    799          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    800          //============================================================================
+    801          void DATDinEnterActiveState(void)
+    802          {
+    803              LDBControl(cLDBChannelDin,cLDBDinEnterNominalMode);
+    804          
+    805              TOSCancelAlarm(&PeriodicAlarm);
+    806              PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+    807              TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+    808          
+    809          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    810          #ifdef DATDIN_FAST_FILTER_X5
+    811              mLIBmemset((U8*)Memo1 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    812              mLIBmemset((U8*)Memo2 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    813              mLIBmemset((U8*)Memo3 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    814              mLIBmemset((U8*)Memo4 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    815              mLIBmemset((U8*)Memo5 + cDATDinLastBytePosInSleepMode+1, ((U8)0xFFUL), cDATDinNormalModeInitByteSize);
+    816              #ifdef SeveralWordToFilter
+    817              NumberOfWordToFilter = cDATDinWordNbrToFilterInNormalMode;
+    818              #endif
+    819          #else
+    820          #ifdef DATDIN_FAST_FILTER_X3
+    821              mLIBmemset((U8*)B0 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    822              mLIBmemset((U8*)B1 + cDATDinLastBytePosInSleepMode+1, 0, cDATDinNormalModeInitByteSize);
+    823              #ifdef SeveralWordToFilter
+    824              NumberOfWordToFilter = cDATDinWordNbrToFilterInNormalMode;
+    825              #endif
+    826          #else
+    827              mLIBmemset(&CptArray[cDATDinLastBitPosInSleepMode+1], 0, cDATDinNormalModeInitByteSize);
+    828              PositionOfLastLogicalInput = cDATDinLastBitPosInNominalMode;
+    829          #endif
+    830          #endif
+    831          
+    832          #endif
+    833          
+    834              State = cDATDinNormalMode;
+    835          }
+    836          #endif
+    837          #else
+    838          //============================================================================
+    839          //  DESCRIPTION : Put the DAT_DIN in nominal mode
+    840          //
+    841          //  PARAMETERS (Type,Name,Min,Max) :  none
+    842          //
+    843          //  RETURN VALUE :  none
+    844          // 
+    845          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    846          //============================================================================
+    847          void DATDinEnterActiveState(void)
+    848          {
+    849              mLIBassert(State != cDATDinNormalMode);
+    850          
+    851              LDBControl(cLDBChannelDin,cLDBDinEnterNominalMode);
+    852          
+    853              PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+    854              TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+    855          
+    856          #ifdef DATDIN_FAST_FILTER_X5
+    857              mLIBmemset((U8*)Memo1 , 0, cDATDinWordNbrToFilterInNormalMode);
+    858              mLIBmemset((U8*)Memo2 , 0, cDATDinWordNbrToFilterInNormalMode);
+    859              mLIBmemset((U8*)Memo3 , 0, cDATDinWordNbrToFilterInNormalMode);
+    860              mLIBmemset((U8*)Memo4 , 0, cDATDinWordNbrToFilterInNormalMode);
+    861              mLIBmemset((U8*)Memo5 , ((U8)0xFFUL), cDATDinWordNbrToFilterInNormalMode);
+    862          #else
+    863          #ifdef DATDIN_FAST_FILTER_X3
+    864              mLIBmemset((U8*)B0, 0, cDATDinWordNbrToFilterInNormalMode);
+    865              mLIBmemset((U8*)B1, 0, cDATDinWordNbrToFilterInNormalMode);
+    866          #else
+    867              mLIBmemset(CptArray, 0, cDATDinLastBitPosInNominalMode);
+    868          #endif
+    869          #endif
+    870          
+    871              State = cDATDinNormalMode;
+    872          }
+    873          #endif
+    874          
+    875          
+    876          #ifdef WAKE_BY_DIN
+    877          #ifndef WAKE_BY_DIN_INTERRUPT
+    878          //============================================================================
+    879          //  DESCRIPTION : Put the DAT_DIN in sleep mode
+    880          //
+    881          //  PARAMETERS (Type,Name,Min,Max) :  none
+    882          //
+    883          //  RETURN VALUE :  none
+    884          // 
+    885          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    886          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    887          void DATDinLeaveActiveState(void)
+   \                     DATDinLeaveActiveState:
+    888          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A102           MOV       A,#2
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    889              LDBControl(cLDBChannelDin,cLDBDinEnterSleepMode);
+   \   0003   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   0006   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   0008   ..             CALLT     [__T_?FAR_CALL_L07]
+    890          
+    891              //The counter must decrease before going into sleep mode
+    892              State = cDATDinConfirmWakeUpMode;
+   \   0009   A101           MOV       A,#1
+   \   000B   9E....         MOV       State,A
+    893          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    894              #if (defined(DATDIN_FAST_FILTER_X3)||defined(DATDIN_FAST_FILTER_X5))
+    895              #ifdef SeveralWordToFilter
+    896                  NumberOfWordToFilter = cDATDinWordNbrToFilterInSleepMode;
+    897              #endif
+    898              #else
+    899                  PositionOfLastLogicalInput = cDATDinLastBitPosInSleepMode;
+    900              #endif
+    901          #endif
+    902          }
+   \   000E   B4             POP       DE
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+    903          #else
+    904          //============================================================================
+    905          //  DESCRIPTION : Put the DAT_DIN in sleep mode
+    906          //
+    907          //  PARAMETERS (Type,Name,Min,Max) :  none
+    908          //
+    909          //  RETURN VALUE :  none
+    910          // 
+    911          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    912          //============================================================================
+    913          void DATDinLeaveActiveState(void)
+    914          {
+    915              LDBControl(cLDBChannelDin,cLDBDinEnterSleepMode);
+    916              //The counter must decrease before going into sleep mode
+    917              State = cDATDinConfirmWakeUpMode;
+    918          
+    919          #ifndef DATDIN_SAME_SLEEP_AND_NORMAL_INPUT
+    920              #if (defined(DATDIN_FAST_FILTER_X3)||defined(DATDIN_FAST_FILTER_X5))
+    921              #ifdef SeveralWordToFilter
+    922                  NumberOfWordToFilter = cDATDinWordNbrToFilterInSleepMode;
+    923              #endif
+    924              #else
+    925                  PositionOfLastLogicalInput = cDATDinLastBitPosInSleepMode;
+    926              #endif
+    927          #endif
+    928          }
+    929          #endif
+    930          #else
+    931          //============================================================================
+    932          //  DESCRIPTION : Put the DAT_DIN in sleep mode
+    933          //
+    934          //  PARAMETERS (Type,Name,Min,Max) :  none
+    935          //
+    936          //  RETURN VALUE :  none
+    937          // 
+    938          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    939          //============================================================================
+    940          void DATDinLeaveActiveState(void)
+    941          {
+    942              TOSCancelAlarm(&PeriodicAlarm);
+    943          
+    944              State = cDATDinStopMode;
+    945          
+    946              LDBControl(cLDBChannelDin,cLDBDinEnterSleepMode);
+    947          }
+    948          #endif
+    949          
+    950          #ifdef WAKE_BY_DIN
+    951          #ifndef WAKE_BY_DIN_INTERRUPT
+    952          //============================================================================
+    953          //  DESCRIPTION : Start DAT_DIN
+    954          //
+    955          //  PARAMETERS (Type,Name,Min,Max) :  none
+    956          //
+    957          //  RETURN VALUE :  none
+    958          // 
+    959          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    960          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    961          void DATDinLeaveStartingStepState(void)
+   \                     DATDinLeaveStartingStepState:
+    962          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100004         MOVW      AX,#1024
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    963              //To permit to the input to be stabilized before going into sleep mode,
+    964              //and avoid to miss a wake up condition
+    965              PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+   \   0004   03....         MOVW      PeriodicAlarm,AX
+    966              TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinSleepSamplingPeriodValueMs));
+   \   0007   10....         MOVW      AX,#PeriodicAlarm
+   \   000A   A308           MOV       B,#8
+   \   000C   9A....         CALL      TOSSetRelAlarm_Interne
+    967          }
+   \   000F   B2             POP       BC
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    968          #else
+    969          /*============================================================================
+    970            DESCRIPTION : Start DAT_DIN
+    971          
+    972            PARAMETERS (Type,Name,Min,Max) :  none
+    973          
+    974            RETURN VALUE :  none
+    975           
+    976            DESIGN INFORMATION :  refer to Detailed Design Document
+    977          ============================================================================*/
+    978          void DATDinLeaveStartingStepState(void)
+    979          {
+    980              //To permit to the input to be stabilized before going into sleep mode,
+    981              //and avoid to miss a wake up condition (IT are not authorized)
+    982              PeriodicAlarm.TaskID = cTOSTaskID_ReadLogical;
+    983              TOSSetRelAlarm(&PeriodicAlarm, 0, mTOSConvMsEnTickAlarm(cDATDinNominalSamplingPeriodValueMs));
+    984          }
+    985          #endif
+    986          #else
+    987          //============================================================================
+    988          //  DESCRIPTION : Start DAT_DIN
+    989          //
+    990          //  PARAMETERS (Type,Name,Min,Max) :  none
+    991          //
+    992          //  RETURN VALUE :  none
+    993          // 
+    994          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    995          //============================================================================
+    996          void DATDinLeaveStartingStepState(void)
+    997          {
+    998              State = cDATDinStopMode;
+    999              LDBControl(cLDBChannelDin,cLDBDinEnterSleepMode);
+   1000          }
+   1001          #endif
+   1002          
+   1003          //============================================================================
+   1004          //  DESCRIPTION : CallBack from the LDB layer after a DAT control
+   1005          //
+   1006          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1007          //
+   1008          //  RETURN VALUE :  none
+   1009          // 
+   1010          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1011          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1012          void DATDinCallBackEndCtrl(tCtrl Ctrl, tStatus Statut)
+   \                     DATDinCallBackEndCtrl:
+   1013          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1014              mLIBassert(Statut==cLDBCorrect);
+   1015              Statut = Statut;  // pour eviter un warning a la compilation sur cible
+   1016              Ctrl = Ctrl;      // pour eviter un warning a la compilation sur cible
+   1017          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+   1018          
+   1019          //============================================================================
+   1020          //  DESCRIPTION : Spontanous callback from the LDB (Interrupt context)
+   1021          //
+   1022          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1023          //
+   1024          //  RETURN VALUE :  none
+   1025          // 
+   1026          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1027          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1028          void DATDinCallBackCtrl(tCtrl Ctrl)
+   \                     DATDinCallBackCtrl:
+   1029          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1030          #ifdef WAKE_BY_DIN_INTERRUPT
+   1031              mLIBassert(Ctrl == cLDBDinWakeUp);
+   1032              //Wake up by digital input occurs
+   1033              //DAT_DIN task is active one time in order to exit IT wake up context before other treatements
+   1034              TOSActivateTask(cTOSTaskID_ReadLogical);
+   1035          
+   1036          #else
+   1037              Ctrl = Ctrl;
+   1038          #endif
+   1039          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+   1040          
+   1041          //============================================================================
+   1042          //  DESCRIPTION : Maintain the application in active sleep state if need
+   1043          //
+   1044          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1045          //
+   1046          //  RETURN VALUE :  none
+   1047          // 
+   1048          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1049          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1050          void DATDinMaintainActiveSleepState(void)
+   \                     DATDinMaintainActiveSleepState:
+   1051          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1052          #ifdef WAKE_BY_DIN
+   1053              if(State == cDATDinConfirmWakeUpMode)
+   \   0000   8E....         MOV       A,State
+   \   0003   51             DEC       A
+   \   0004   BD04           BNZ       ??DATDinMaintainActiveSleepState_6
+   1054              {
+   1055                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveSleepState);
+   \   0006   102800         MOVW      AX,#40
+   \   0009   ..             CALLT     [__T_TOSWriteSignal]
+   1056              }
+   1057          #endif
+   1058          }
+   \                     ??DATDinMaintainActiveSleepState_6:
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_ENTER_L06:
+   \   0000   ....           DW       ?FUNC_ENTER_L06
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_DEALL_L06:
+   \   0000   ....           DW       ?FUNC_DEALL_L06
+   1059          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     State                             1
+     Memo1                             9
+     Memo2                             9
+     Memo3                             9
+     Memo4                             9
+     Memo5                             9
+     PeriodicAlarm                     4
+     InputMsg                          4
+     DATDinInputBuffers               27
+     Filter                          795
+     DATDinInit                      156
+     DATDinReadTask                  169
+     DATDinCallBackRxWithoutAddr       1
+     DATDinEnterActiveState           38
+     DATDinLeaveActiveState           16
+     DATDinLeaveStartingStepState     17
+     DATDinCallBackEndCtrl             1
+     DATDinCallBackCtrl                1
+     DATDinMaintainActiveSleepState   11
+     __T_TOSSendControl                2
+     __T_?FAR_CALL_L07                 2
+     __T_TOSWriteSignal                2
+     __T_?FUNC_ENTER_L06               2
+     __T_?FUNC_DEALL_L06               2
+
+ 
+   156 bytes in segment BCODE
+    10 bytes in segment CLTVEC
+ 1 049 bytes in segment CODE
+     9 bytes in segment NEAR_Z
+    72 bytes in segment SADDR_Z
+ 
+ 1 205 bytes of CODE memory (+ 10 bytes shared)
+    81 bytes of DATA memory
+
+Errors: none
+Warnings: none

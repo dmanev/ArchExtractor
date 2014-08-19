@@ -1,0 +1,857 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:39 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_BUZ.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_BUZ.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_BUZ.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_BUZ.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_BUZ.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_BUZ.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_BUZ.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    This component's role is to manage the activation and
+     13          //               deactivation of forgotten lights and seatbelt buzzer signals.
+     14          //               The requests are passed to DAT_BUZ for further processing.
+     15          // -----------------------------------------------------------------------------
+     16          // $Date:   Mar 22 2010 14:24:10  $
+     17          // $Archive::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_BUZ/LAP_BUZ.c-arc  $
+     18          // $Revision:   1.9  $
+     19          // -----------------------------------------------------------------------------
+     20          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_BUZ/LAP_BUZ.c-arc  $
+     21          // 
+     22          //    Rev 1.9   Mar 22 2010 14:24:10   adzhelp
+     23          // Cm006814: Code review corrections
+     24          // 
+     25          //    Rev 1.8   Mar 02 2010 10:42:56   adzhelp
+     26          // Cm006814: MAX_NB_ALERT_SEQUENCES_TP, SBR_ACTIVE_SPEED_THRESH_TP normalized
+     27          // 
+     28          //    Rev 1.7   Dec 15 2009 10:14:58   adzhelp
+     29          // Cm006711: HIGH_LOW_BEAM removed
+     30          // 
+     31          //    Rev 1.6   Dec 04 2009 17:03:20   amarinm1
+     32          // Cm006711: FR_FOG input was removed.
+     33          // 
+     34          //    Rev 1.5   Nov 24 2009 15:26:34   amarinm1
+     35          // Cm006711: Activation of External Lights buzzer on Rear Fog request was added.
+     36          // 
+     37          //    Rev 1.4   May 08 2009 16:17:04   amanevd
+     38          // Cm004940 - Remind of the forgotten External Lights v2
+     39          // 
+     40          //    Rev 1.3   May 08 2009 13:07:26   amanevd
+     41          // Cm004940 - Remind of the forgotten External Lights
+     42          // 
+     43          //    Rev 1.2   Apr 29 2009 14:05:38   adzhelp
+     44          // Cm003273: Functions moved to banked memory area
+     45          //
+     46          //    Rev 1.1   Apr 24 2009 11:18:52   amarinm1
+     47          // Cm003273: The logic of the seatbelt switch was reversed.
+     48          // 
+     49          //    Rev 1.0   Feb 25 2009 11:03:14   amarinm1
+     50          // Initial revision.
+     51          //******************************************************************************
+     52          #endif
+     53          
+     54          //------------------------------------------------------------------------------
+     55          // Body Identification
+     56          //------------------------------------------------------------------------------
+     57          #define lap_buz   "lap_buz"
+     58          
+     59          //------------------------------------------------------------------------------
+     60          // Included files to resolve specific definitions in this file
+     61          //------------------------------------------------------------------------------
+     62          
+     63          // This is an example:
+     64          // #include <system_file_name.h>
+     65          // #include "project_file_name.h"
+     66          
+     67          
+     68          #include "deftypes.h" 
+     69          #include "tos.h"
+     70          #include "dat.h"
+     71          #include "lap_buz.h"
+     72          #include "lap_buz.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPBuzMainGraph[1]
+   \                     LAPBuzMainGraph:
+   \   0000   ........       DW TOSSeqTrueEval, LAPBuzManagement
+   \   0004   FF00           DB 255, 0
+     73          
+     74          
+     75          //------------------------------------------------------------------------------
+     76          // Local constants
+     77          //------------------------------------------------------------------------------
+     78          
+     79          #define cOverSpeedDetectionDurationInTimerTicks (mTOSConvMsInTimerTick(3000UL))
+     80          #define cOverSpeedWarningActivationThreshold    ((U8)  120)
+     81          #define cOverSpeedWarningDeactivationThreshold  ((U8)  118)
+     82          
+     83          //------------------------------------------------------------------------------
+     84          // Local macros
+     85          //------------------------------------------------------------------------------
+     86          #define mReadMaxNumberOfSeatBeltWarningActivations() \
+     87              /* //QACJ 3443: amarinm1: There is no recursion - concatenation is applied to the second macro. */ \
+     88              mDATRead(U8Bit, NEEP_MAX_NB_ALERT_SEQUENCES_TP, Default)
+     89          
+     90          #define mReadIsSeatBeltWarningEnabled() \
+     91              /* //QACJ 3443: amarinm1: There is no recursion - concatenation is applied to the second macro. */ \
+     92              (BOOL) mDATRead(U1Bit, EEP_OUBLICEINTURE, Default)
+     93          
+     94          #define mReadSeatBeltSpeedThreshold() \
+     95              /* //QACJ 3443: amarinm1: There is no recursion - concatenation is applied to the second macro. */ \
+     96              mDATRead(U8Bit, NEEP_SBR_ACTIVE_SPEED_THRESH_TP, Default)
+     97          
+     98          #define mReadCurrentSpeed() \
+     99              /* //QACJ 3443: amarinm1: There is no recursion - concatenation is applied to the second macro. */ \
+    100              mDATRead(U8Bit, VEH_SPEED, Default)
+    101          
+    102          #define mReadIsOverSpeedWarningEnabled() \
+    103              /* //QACJ 3443: amarinm1: There is no recursion - concatenation is applied to the second macro. */ \
+    104              (BOOL) mDATRead(U1Bit, EEP_DEM_SURVIT, Default)
+    105          
+    106          #define mIgnitionFallingEdgeIsDetected() \
+    107              (TOSReadSignal(cTOSSignalFalling_PWR_IGN_LAP_BUZ))
+    108          
+    109          
+    110          //------------------------------------------------------------------------------
+    111          // Local types
+    112          //------------------------------------------------------------------------------
+    113          
+    114          // This is an example:
+    115          // typedef Expression   tTypeName;
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Local data
+    119          //------------------------------------------------------------------------------
+    120          
+    121          // This is an example:
+    122          // static  tType   VariableName;
+    123          // static  tType*  pVariableName;
+    124          // static  U8      u8VariableName;
+    125          // static  U16*    pu16VariableName;
+    126          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    127          static tTOSTimer    OverSpeedTimer;
+   \                     OverSpeedTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    128          static U8           u8NumberOfSeatBeltWarningActivations;
+   \                     u8NumberOfSeatBeltWarningActivations:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    129          static BOOL         bSeatBeltWarningIsPresent;
+   \                     bSeatBeltWarningIsPresent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    130          static BOOL         bOverSpeedWarningIsPresent;
+   \                     bOverSpeedWarningIsPresent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    131          static BOOL         bOverSpeedConditionIsPresent;
+   \                     bOverSpeedConditionIsPresent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    132          static BOOL         bExtLightsWarningIsPresent;
+   \                     bExtLightsWarningIsPresent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    133          
+    134          //------------------------------------------------------------------------------
+    135          // Constant local data
+    136          //------------------------------------------------------------------------------
+    137          
+    138          // This is an example:
+    139          // static const tType  cConstantName;
+    140          
+    141          //------------------------------------------------------------------------------
+    142          // Exported data
+    143          //------------------------------------------------------------------------------
+    144          
+    145          // This is an example:
+    146          // Reduce to minimum the usage of extern data members!!!
+    147          // tType   LAYCmpVariableName;  //LAY: 3 characters to identify the layer
+    148          // tType*  pLAYCmpVariableName; //Cmp: 3-4 characters to identify the component
+    149          // U8      u8LAYCmpVariableName;
+    150          // U16*    pu16LAYCmpVariableName;
+    151          
+    152          //------------------------------------------------------------------------------
+    153          // Constant exported data
+    154          //------------------------------------------------------------------------------
+    155          
+    156          // This is an example:
+    157          // Reduce to minimum the usage of extern constant data members!!!
+    158          // extern const tType  cLAYCmpConstantName;
+    159          // extern const U32    cu32LAYCmpConstantName;
+    160          
+    161          //------------------------------------------------------------------------------
+    162          // Local function prototypes
+    163          //------------------------------------------------------------------------------
+    164          
+    165          static MEM_TYPE void ExternalLightsManagement( void );
+    166          static MEM_TYPE void SeatBeltManagement( void );
+    167          static MEM_TYPE void OverSpeedManagement( void );
+    168          static MEM_TYPE void CheckForOverSpeedConditionPresent( void );
+    169          
+    170          #ifdef X90_PROJECT
+    171          static MEM_TYPE void LAPBuzManagement_Static(void);
+    172          #endif
+    173          
+    174          
+    175          //==============================================================================
+    176          //=========================== LOCAL FUNCTIONS ==================================
+    177          //==============================================================================
+    178          
+    179          //==============================================================================
+    180          // DESCRIPTION:         < short description of the function >
+    181          //
+    182          // PARAMETERS:          < type,usage and constraints for all parameters >
+    183          //
+    184          // RETURN VALUE:        < type and usage >
+    185          //
+    186          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    187          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    188          static MEM_TYPE void ExternalLightsManagement( void )
+   \                     ExternalLightsManagement:
+    189          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    190              if ( bExtLightsWarningIsPresent == cFalse )
+   \   0001   8E....         MOV       A,bExtLightsWarningIsPresent
+   \   0004   4D00           CMP       A,#0
+   \   0006   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0008   BD21           BNZ       ??LAPBuzManagement_Static_0
+    191              {
+    192                  if (   (mDATRead(U1Bit, PWR_IGN, Default)     == cFalse)
+    193                      && (mDATRead(U1Bit, FR_DOORS_SW, Default) == cTrue)
+    194                      && (   (mDATRead(U1Bit, POSITION_LIGHTS, Default) == cTrue) 
+    195                          || (   (mDATRead(U1Bit, EEP_FEU_BROUILLARD, Default) == cTrue)
+    196                              && (mDATRead(U1Bit, RR_FOG_SW, Default)          == cTrue)
+    197                             )
+    198                         )
+    199                     )
+   \   000A   5D09           AND       A,#9
+   \   000C   4D08           CMP       A,#8
+   \   000E   BD39           BNZ       ??LAPBuzManagement_Static_1
+   \   0010   BC..0A         BT        S:DATDinInputBuffers+4.3, ??LAPBuzManagement_Static_2
+   \   0013   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0016   31A730         BF        [HL].2, ??LAPBuzManagement_Static_1
+   \   0019   3113..2C       BF        S:DATDinInputBuffers+5.1, ??LAPBuzManagement_Static_1
+    200                  {
+    201                      bExtLightsWarningIsPresent = cTrue;
+   \                     ??LAPBuzManagement_Static_2:
+   \   001D   A101           MOV       A,#1
+   \   001F   9E....         MOV       bExtLightsWarningIsPresent,A
+    202                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_ExtLights, cTrue, Default);
+   \   0022   A106           MOV       A,#6
+   \   0024   A301           MOV       B,#1
+   \   0026   9A....         CALL      DATBuzSetBuzzRequest
+   \   0029   FA1E           BR        ??LAPBuzManagement_Static_1
+    203                  }
+    204              }
+    205              else // bExtLightsWarningIsPresent == cTrue
+    206              {
+    207                  if (   (mDATRead(U1Bit, PWR_IGN, Default)     != cFalse)
+    208                      || (mDATRead(U1Bit, FR_DOORS_SW, Default) != cTrue)
+    209                      || (   (mDATRead(U1Bit, POSITION_LIGHTS, Default) != cTrue) 
+    210                          && (   (mDATRead(U1Bit, EEP_FEU_BROUILLARD, Default) != cTrue)
+    211                              || (mDATRead(U1Bit, RR_FOG_SW, Default)          != cTrue)
+    212                             )
+    213                         )
+    214                     )
+   \                     ??LAPBuzManagement_Static_0:
+   \   002B   5D09           AND       A,#9
+   \   002D   4D08           CMP       A,#8
+   \   002F   BD0C           BNZ       ??LAPBuzManagement_Static_3
+   \   0031   BC..15         BT        S:DATDinInputBuffers+4.3, ??LAPBuzManagement_Static_1
+   \   0034   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0037   31A703         BF        [HL].2, ??LAPBuzManagement_Static_3
+   \   003A   9C..0C         BT        S:DATDinInputBuffers+5.1, ??LAPBuzManagement_Static_1
+    215                  {
+    216                      bExtLightsWarningIsPresent = cFalse;
+   \                     ??LAPBuzManagement_Static_3:
+   \   003D   A100           MOV       A,#0
+   \   003F   9E....         MOV       bExtLightsWarningIsPresent,A
+    217                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_ExtLights, cFalse, Default);
+   \   0042   A106           MOV       A,#6
+   \   0044   A300           MOV       B,#0
+   \   0046   9A....         CALL      DATBuzSetBuzzRequest
+    218                  }
+    219              }
+    220          }
+   \                     ??LAPBuzManagement_Static_1:
+   \   0049   B2             POP       BC
+   \   004A   AF             RET       
+   \   004B                  REQUIRE ?CL78K_V4_6_L00
+    221          
+    222          
+    223          //==============================================================================
+    224          // DESCRIPTION:         < short description of the function >
+    225          //
+    226          // PARAMETERS:          < type,usage and constraints for all parameters >
+    227          //
+    228          // RETURN VALUE:        < type and usage >
+    229          //
+    230          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    231          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    232          static MEM_TYPE void SeatBeltManagement( void )
+   \                     SeatBeltManagement:
+    233          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    234              if ( bSeatBeltWarningIsPresent == cFalse )
+   \   0001   8E....         MOV       A,bSeatBeltWarningIsPresent
+   \   0004   4D00           CMP       A,#0
+   \   0006   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0009   BD30           BNZ       ??LAPBuzManagement_Static_4
+    235              {
+    236                  if (   (mReadIsSeatBeltWarningEnabled() == cTrue)
+    237                      && (mDATRead(U1Bit, PWR_IGN, Default) == 1)
+    238                      && (mReadCurrentSpeed() > mReadSeatBeltSpeedThreshold())
+    239                      && (mDATRead(U1Bit, SEATBELT_REMINDER_SW, Default) == 1)   
+    240                      && (u8NumberOfSeatBeltWarningActivations < 
+    241                              mReadMaxNumberOfSeatBeltWarningActivations())   )
+   \   000B   31E743         BF        [HL].6, ??LAPBuzManagement_Static_5
+   \   000E   3103..3F       BF        S:DATDinInputBuffers+6.0, ??LAPBuzManagement_Static_5
+   \   0012   8E....         MOV       A,DATPeeCalibrationData+20
+   \   0015   48....         CMP       A,u8DATSpdVEHICLE_SPEED
+   \   0018   9D37           BNC       ??LAPBuzManagement_Static_5
+   \   001A   3113..33       BF        S:DATDinInputBuffers+4.1, ??LAPBuzManagement_Static_5
+   \   001E   8E....         MOV       A,u8NumberOfSeatBeltWarningActivations
+   \   0021   48....         CMP       A,DATPeeCalibrationData+22
+   \   0024   9D2B           BNC       ??LAPBuzManagement_Static_5
+    242                  {
+    243                      bSeatBeltWarningIsPresent = cTrue;
+   \   0026   A101           MOV       A,#1
+   \   0028   9E....         MOV       bSeatBeltWarningIsPresent,A
+    244                      u8NumberOfSeatBeltWarningActivations++;
+   \   002B   8E....         MOV       A,u8NumberOfSeatBeltWarningActivations
+   \   002E   41             INC       A
+   \   002F   9E....         MOV       u8NumberOfSeatBeltWarningActivations,A
+    245                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_SeatBelt, cTrue, Default);
+   \   0032   A104           MOV       A,#4
+   \   0034   A301           MOV       B,#1
+   \   0036   9A....         CALL      DATBuzSetBuzzRequest
+   \   0039   FA16           BR        ??LAPBuzManagement_Static_5
+    246                  }
+    247              }
+    248              else // bSeatBeltWarningIsPresent == cTrue
+    249              {
+    250                  if (   (mReadIsSeatBeltWarningEnabled() == cFalse)
+    251                      || (mDATRead(U1Bit, SEATBELT_REMINDER_SW, Default) == 0)
+    252                      || (mDATRead(U1Bit, PWR_IGN, Default) == 0)   )
+   \                     ??LAPBuzManagement_Static_4:
+   \   003B   31E707         BF        [HL].6, ??LAPBuzManagement_Static_6
+   \   003E   3113..03       BF        S:DATDinInputBuffers+4.1, ??LAPBuzManagement_Static_6
+   \   0042   8C..0C         BT        S:DATDinInputBuffers+6.0, ??LAPBuzManagement_Static_5
+    253                  {
+    254                      bSeatBeltWarningIsPresent = cFalse;
+   \                     ??LAPBuzManagement_Static_6:
+   \   0045   A100           MOV       A,#0
+   \   0047   9E....         MOV       bSeatBeltWarningIsPresent,A
+    255                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_SeatBelt, cFalse, Default);
+   \   004A   A104           MOV       A,#4
+   \   004C   A300           MOV       B,#0
+   \   004E   9A....         CALL      DATBuzSetBuzzRequest
+    256                  }
+    257              }
+    258          }
+   \                     ??LAPBuzManagement_Static_5:
+   \   0051   B2             POP       BC
+   \   0052   AF             RET       
+   \   0053                  REQUIRE ?CL78K_V4_6_L00
+    259          
+    260          
+    261          //==============================================================================
+    262          // DESCRIPTION:         < short description of the function >
+    263          //
+    264          // PARAMETERS:          < type,usage and constraints for all parameters >
+    265          //
+    266          // RETURN VALUE:        < type and usage >
+    267          //
+    268          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    269          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    270          static MEM_TYPE void OverSpeedManagement( void )
+   \                     OverSpeedManagement:
+    271          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    272              if ( bOverSpeedWarningIsPresent == cFalse )
+   \   0001   8E....         MOV       A,bOverSpeedWarningIsPresent
+   \   0004   4D00           CMP       A,#0
+   \   0006   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0009   BD1B           BNZ       ??LAPBuzManagement_Static_7
+    273              {
+    274                  if (   (mReadIsOverSpeedWarningEnabled() == cTrue)
+    275                      && (mDATRead(U1Bit, PWR_IGN, Default) == 1)
+    276                      && (bOverSpeedConditionIsPresent == cTrue)   )
+   \   000B   318735         BF        [HL].0, ??LAPBuzManagement_Static_8
+   \   000E   3103..31       BF        S:DATDinInputBuffers+6.0, ??LAPBuzManagement_Static_8
+   \   0012   8E....         MOV       A,bOverSpeedConditionIsPresent
+   \   0015   51             DEC       A
+   \   0016   BD2B           BNZ       ??LAPBuzManagement_Static_8
+    277                  {
+    278                      bOverSpeedWarningIsPresent = cTrue;
+   \   0018   A101           MOV       A,#1
+   \   001A   9E....         MOV       bOverSpeedWarningIsPresent,A
+    279                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_OverSpeed, cTrue, Default);
+   \   001D   A105           MOV       A,#5
+   \   001F   A301           MOV       B,#1
+   \   0021   9A....         CALL      DATBuzSetBuzzRequest
+   \   0024   FA1D           BR        ??LAPBuzManagement_Static_8
+    280                  }
+    281              }
+    282              else // bOverSpeedWarningIsPresent == cTrue
+    283              {
+    284                  if (   (mReadIsOverSpeedWarningEnabled() == cFalse)
+    285                      || (mDATRead(U1Bit, PWR_IGN, Default) == 0)
+    286                      || (mReadCurrentSpeed() < cOverSpeedWarningDeactivationThreshold)  )
+   \                     ??LAPBuzManagement_Static_7:
+   \   0026   31870B         BF        [HL].0, ??LAPBuzManagement_Static_9
+   \   0029   3103..07       BF        S:DATDinInputBuffers+6.0, ??LAPBuzManagement_Static_9
+   \   002D   8E....         MOV       A,u8DATSpdVEHICLE_SPEED
+   \   0030   4D76           CMP       A,#118
+   \   0032   9D0F           BNC       ??LAPBuzManagement_Static_8
+    287                  {
+    288                      bOverSpeedWarningIsPresent = cFalse;
+   \                     ??LAPBuzManagement_Static_9:
+   \   0034   A100           MOV       A,#0
+   \   0036   9E....         MOV       bOverSpeedWarningIsPresent,A
+    289                      bOverSpeedConditionIsPresent = cFalse;
+   \   0039   9E....         MOV       bOverSpeedConditionIsPresent,A
+    290                      mDATWriteTable(U1Bit, BUZZER, eBUZZER_OverSpeed, cFalse, Default);
+   \   003C   A105           MOV       A,#5
+   \   003E   A300           MOV       B,#0
+   \   0040   9A....         CALL      DATBuzSetBuzzRequest
+    291                  }
+    292              }
+    293          }
+   \                     ??LAPBuzManagement_Static_8:
+   \   0043   B2             POP       BC
+   \   0044   AF             RET       
+   \   0045                  REQUIRE ?CL78K_V4_6_L00
+    294          
+    295          
+    296          //==============================================================================
+    297          // DESCRIPTION:         < short description of the function >
+    298          //
+    299          // PARAMETERS:          < type,usage and constraints for all parameters >
+    300          //
+    301          // RETURN VALUE:        < type and usage >
+    302          //
+    303          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    304          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    305          static MEM_TYPE void CheckForOverSpeedConditionPresent( void )
+   \                     CheckForOverSpeedConditionPresent:
+    306          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    307              BOOL bOverSpeedTimerIsStartedL;
+    308              BOOL bOverSpeedTimerIsElapsedL;
+    309          
+    310              if (mReadCurrentSpeed() > cOverSpeedWarningActivationThreshold)
+   \   0001   8E....         MOV       A,u8DATSpdVEHICLE_SPEED
+   \   0004   4D79           CMP       A,#121
+   \   0006   8D28           BC        ??LAPBuzManagement_Static_10
+    311              {
+    312                  bOverSpeedTimerIsStartedL = TOSIsTimerStarted(&OverSpeedTimer);
+    313          
+    314                  if ( bOverSpeedTimerIsStartedL == cFalse )
+   \   0008   10....         MOVW      AX,#OverSpeedTimer
+   \   000B   9A....         CALL      TOSIsTimerStarted
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD0D           BNZ       ??LAPBuzManagement_Static_11
+    315                  {
+    316                      if ( bOverSpeedConditionIsPresent == cFalse )
+   \   0012   8E....         MOV       A,bOverSpeedConditionIsPresent
+   \   0015   4D00           CMP       A,#0
+   \   0017   BD20           BNZ       ??LAPBuzManagement_Static_12
+    317                      {
+    318                          TOSStartTimer(&OverSpeedTimer);
+   \   0019   10....         MOVW      AX,#OverSpeedTimer
+   \   001C   ..             CALLT     [__T_TOSStartTimer]
+   \   001D   FA1A           BR        ??LAPBuzManagement_Static_12
+    319                      }
+    320                      else // bOverSpeedConditionIsPresent == cTrue
+    321                      {
+    322                          // Do nothing
+    323                      }
+    324                  }
+    325                  else // Timer is started
+    326                  {
+    327                      bOverSpeedTimerIsElapsedL = TOSIsTimerElapsed(&OverSpeedTimer, 
+    328                                                 cOverSpeedDetectionDurationInTimerTicks);
+    329                      if ( bOverSpeedTimerIsElapsedL == cTrue )
+   \                     ??LAPBuzManagement_Static_11:
+   \   001F   10....         MOVW      AX,#OverSpeedTimer
+   \   0022   122C01         MOVW      BC,#300
+   \   0025   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0026   51             DEC       A
+   \   0027   BD10           BNZ       ??LAPBuzManagement_Static_12
+    330                      {
+    331                          bOverSpeedConditionIsPresent = cTrue;
+   \   0029   A101           MOV       A,#1
+   \   002B   9E....         MOV       bOverSpeedConditionIsPresent,A
+   \   002E   FA09           BR        ??LAPBuzManagement_Static_12
+    332                      }
+    333                      else
+    334                      {
+    335                          // Do nothing
+    336                      }
+    337                  }
+    338              }
+    339              else
+    340              {
+    341                  bOverSpeedConditionIsPresent = cFalse;
+   \                     ??LAPBuzManagement_Static_10:
+   \   0030   A100           MOV       A,#0
+   \   0032   9E....         MOV       bOverSpeedConditionIsPresent,A
+    342                  TOSStopTimer(&OverSpeedTimer);
+   \   0035   10....         MOVW      AX,#OverSpeedTimer
+   \   0038   ..             CALLT     [__T_TOSStopTimer]
+    343              }
+    344          }
+   \                     ??LAPBuzManagement_Static_12:
+   \   0039   B2             POP       BC
+   \   003A   AF             RET       
+   \   003B                  REQUIRE ?CL78K_V4_6_L00
+    345          
+    346          //==============================================================================
+    347          //=========================== EXPORTED FUNCTIONS ===============================
+    348          //==============================================================================
+    349          
+    350          //==============================================================================
+    351          // DESCRIPTION:         < short description of the function >
+    352          //
+    353          // PARAMETERS:          < type,usage and constraints for all parameters >
+    354          //
+    355          // RETURN VALUE:        < type and usage >
+    356          //
+    357          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    358          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    359          void LAPBuzInitialize( void )
+   \                     LAPBuzInitialize:
+    360          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    361              u8NumberOfSeatBeltWarningActivations = 0;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       u8NumberOfSeatBeltWarningActivations,A
+    362              bSeatBeltWarningIsPresent = cFalse;
+   \   0005   9E....         MOV       bSeatBeltWarningIsPresent,A
+    363              bOverSpeedWarningIsPresent = cFalse;
+   \   0008   9E....         MOV       bOverSpeedWarningIsPresent,A
+    364              bOverSpeedConditionIsPresent = cFalse;
+   \   000B   9E....         MOV       bOverSpeedConditionIsPresent,A
+    365          }
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+    366          
+    367          
+    368          //==============================================================================
+    369          // DESCRIPTION:         < short description of the function >
+    370          //
+    371          // PARAMETERS:          < type,usage and constraints for all parameters >
+    372          //
+    373          // RETURN VALUE:        < type and usage >
+    374          //
+    375          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    376          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    377          void LAPBuzEnterActiveState( void )
+   \                     LAPBuzEnterActiveState:
+    378          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    379              TOSSeqActivateGraph( cTOSSeqGraphIdLAPBuzMainGraph );
+   \   0000   A10D           MOV       A,#13
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    380          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    381          
+    382          
+    383          //==============================================================================
+    384          // DESCRIPTION:         < short description of the function >
+    385          //
+    386          // PARAMETERS:          < type,usage and constraints for all parameters >
+    387          //
+    388          // RETURN VALUE:        < type and usage >
+    389          //
+    390          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    391          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    392          void LAPBuzLeaveActiveState( void )
+   \                     LAPBuzLeaveActiveState:
+    393          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A10D           MOV       A,#13
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+    394              TOSSeqDeactivateGraph( cTOSSeqGraphIdLAPBuzMainGraph );
+   \   0003   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    395              TOSStopTimer(&OverSpeedTimer);
+   \   0004   10....         MOVW      AX,#OverSpeedTimer
+   \   0007   ..             CALLT     [__T_TOSStopTimer]
+    396             
+    397              mDATWriteTable(U1Bit, BUZZER, eBUZZER_SeatBelt, cFalse, Default);
+   \   0008   A104           MOV       A,#4
+   \   000A   A300           MOV       B,#0
+   \   000C   9A....         CALL      DATBuzSetBuzzRequest
+    398              mDATWriteTable(U1Bit, BUZZER, eBUZZER_OverSpeed, cFalse, Default);
+   \   000F   A105           MOV       A,#5
+   \   0011   A300           MOV       B,#0
+   \   0013   9A....         CALL      DATBuzSetBuzzRequest
+    399              mDATWriteTable(U1Bit, BUZZER, eBUZZER_ExtLights, cFalse, Default);
+   \   0016   A106           MOV       A,#6
+   \   0018   A300           MOV       B,#0
+   \   001A   9A....         CALL      DATBuzSetBuzzRequest
+    400          
+    401              LAPBuzInitialize();
+   \   001D   A100           MOV       A,#0
+   \   001F   9E....         MOV       u8NumberOfSeatBeltWarningActivations,A
+   \   0022   9E....         MOV       bSeatBeltWarningIsPresent,A
+   \   0025   9E....         MOV       bOverSpeedWarningIsPresent,A
+   \   0028   9E....         MOV       bOverSpeedConditionIsPresent,A
+    402          }
+   \   002B   B2             POP       BC
+   \   002C   AF             RET       
+   \   002D                  REQUIRE ?CL78K_V4_6_L00
+    403          
+    404          
+    405          //==============================================================================
+    406          // DESCRIPTION:         < short description of the function >
+    407          //
+    408          // PARAMETERS:          < type,usage and constraints for all parameters >
+    409          //
+    410          // RETURN VALUE:        < type and usage >
+    411          //
+    412          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    413          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    414          void LAPBuzManagement( void )
+   \                     LAPBuzManagement:
+    415          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    416          #ifdef X90_PROJECT
+    417              LAPBuzManagement_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPBuzManagement_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPBuzManagement_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    418          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    419          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    420          static MEM_TYPE void LAPBuzManagement_Static(void)
+   \                     LAPBuzManagement_Static:
+    421          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    422          #endif
+    423          
+    424              BOOL bIgnitionFallingEdgeIsDetectedL;
+    425          
+    426              if (   (mReadIsOverSpeedWarningEnabled() == cTrue)
+    427                  && (bOverSpeedWarningIsPresent       == cFalse)   )
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0003   31870F         BF        [HL].0, ??LAPBuzManagement_Static_13
+   \   0006   8E....         MOV       A,bOverSpeedWarningIsPresent
+   \   0009   4D00           CMP       A,#0
+   \   000B   BD08           BNZ       ??LAPBuzManagement_Static_13
+    428              {
+    429                  CheckForOverSpeedConditionPresent();
+   \   000D   16....         MOVW      HL,#LWRD(CheckForOverSpeedConditionPresent)
+   \   0010   A4..           MOV       E,#BYTE3(CheckForOverSpeedConditionPresent)
+   \   0012   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0013   FA09           BR        ??LAPBuzManagement_Static_14
+    430              }
+    431              else
+    432              {
+    433                  bOverSpeedConditionIsPresent = cFalse;
+   \                     ??LAPBuzManagement_Static_13:
+   \   0015   A100           MOV       A,#0
+   \   0017   9E....         MOV       bOverSpeedConditionIsPresent,A
+    434                  TOSStopTimer(&OverSpeedTimer);
+   \   001A   10....         MOVW      AX,#OverSpeedTimer
+   \   001D   ..             CALLT     [__T_TOSStopTimer]
+    435              }
+    436          
+    437              ExternalLightsManagement();
+   \                     ??LAPBuzManagement_Static_14:
+   \   001E   16....         MOVW      HL,#LWRD(ExternalLightsManagement)
+   \   0021   A4..           MOV       E,#BYTE3(ExternalLightsManagement)
+   \   0023   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    438              SeatBeltManagement();
+   \   0024   16....         MOVW      HL,#LWRD(SeatBeltManagement)
+   \   0027   A4..           MOV       E,#BYTE3(SeatBeltManagement)
+   \   0029   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    439              OverSpeedManagement();
+   \   002A   16....         MOVW      HL,#LWRD(OverSpeedManagement)
+   \   002D   A4..           MOV       E,#BYTE3(OverSpeedManagement)
+   \   002F   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    440          
+    441              bIgnitionFallingEdgeIsDetectedL = mIgnitionFallingEdgeIsDetected();
+    442              
+    443              if ( bIgnitionFallingEdgeIsDetectedL == cTrue)
+   \   0030   100C00         MOVW      AX,#12
+   \   0033   ..             CALLT     [__T_TOSReadSignal]
+   \   0034   51             DEC       A
+   \   0035   BD05           BNZ       ??LAPBuzManagement_Static_15
+    444              {
+    445                  u8NumberOfSeatBeltWarningActivations = 0;
+   \   0037   A100           MOV       A,#0
+   \   0039   9E....         MOV       u8NumberOfSeatBeltWarningActivations,A
+    446              }
+    447          }
+   \                     ??LAPBuzManagement_Static_15:
+   \   003C   AF             RET       
+   \   003D                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSReadSignal:
+   \   0000   ....           DW       TOSReadSignal
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LAPBuzMainGraph                   6
+     OverSpeedTimer                    2
+     u8NumberOfSeatBeltWarningActivations
+                                       1
+     bSeatBeltWarningIsPresent         1
+     bOverSpeedWarningIsPresent        1
+     bOverSpeedConditionIsPresent      1
+     bExtLightsWarningIsPresent        1
+     ExternalLightsManagement         75
+     SeatBeltManagement               83
+     OverSpeedManagement              69
+     CheckForOverSpeedConditionPresent
+                                      59
+     LAPBuzInitialize                 15
+     LAPBuzEnterActiveState            4
+     LAPBuzLeaveActiveState           45
+     LAPBuzManagement                  9
+     LAPBuzManagement_Static          61
+     __T_TOSStartTimer                 2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStopTimer                  2
+     __T_TOSSeqActivateGraph           2
+     __T_TOSSeqDeactivateGraph         2
+     __T_?FAR_CALL_L07                 2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_TOSReadSignal                 2
+
+ 
+ 347 bytes in segment BCODE
+  16 bytes in segment CLTVEC
+  73 bytes in segment CODE
+   6 bytes in segment CONST
+   7 bytes in segment NEAR_Z
+ 
+ 420 bytes of CODE  memory (+ 16 bytes shared)
+   6 bytes of CONST memory
+   7 bytes of DATA  memory
+
+Errors: none
+Warnings: none

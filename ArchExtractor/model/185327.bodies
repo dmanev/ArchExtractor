@@ -1,0 +1,5 @@
+class BasePortCriteria
+!!!175087.python!!!	registerDataTypes(in self : )
+        pass
+!!!181999.python!!!	__init__(inout self : )
+        self.registerDataTypes()

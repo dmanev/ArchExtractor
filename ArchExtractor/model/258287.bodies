@@ -1,0 +1,20 @@
+class PortInterfaceFactory
+!!!252783.python!!!	getAbstractPortInterface(in self : , in inpNameIf : string, in inpClass : ) : IPortInterface
+        outIPortInterface = None
+        if(inpNameIf in self.itsIPortInterfaceMap.keys()):
+            outIPortInterface = self.itsIPortInterfaceMap[inpNameIf]
+        else:
+            outIPortInterface = inpClass()
+            outIPortInterface.setName(inpNameIf)            
+            self.itsIPortInterfaceMap[inpNameIf] = outIPortInterface
+        return outIPortInterface        
+!!!252143.python!!!	getSenderReceiverIf(in self : , in inpNameIf : string, in inpDataElementList : DataElement) : SenderReceiverInterface
+        outIPortInterface = self.getAbstractPortInterface(inpNameIf+'_If', 
+                                                          PortInterface.SenderReceiverInterface.SenderReceiverInterface)
+        if(len(outIPortInterface.itsDataElementList) == 0):
+            outIPortInterface.itsDataElementList = inpDataElementList
+        return outIPortInterface
+!!!252271.python!!!	getClientServerIf(in self : , in inpNameIf : string) : ClientServerInterface
+        outIPortInterface = self.getAbstractPortInterface(inpNameIf+'If', 
+                                                          PortInterface.ClientServerInterface.ClientServerInterface)
+        return outIPortInterface

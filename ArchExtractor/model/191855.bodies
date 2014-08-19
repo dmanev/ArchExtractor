@@ -1,0 +1,7 @@
+class StkJilComponentCriteria
+!!!195951.python!!!	execute(in self : , in inpTextContent : char, inout inoutIComponent : IComponent) : IComponent
+        componentNameList = re.findall(r'Component\s+(\w+)', inpTextContent, re.I)
+        if componentNameList:
+                if(inoutIComponent.getName() != componentNameList[0].lower()):
+                    #TODO: make it with error management system
+                    print 'ERR: ' + inoutIComponent.getName() + ' name differs in JIL file definition(' + componentNameList[0] + ')'

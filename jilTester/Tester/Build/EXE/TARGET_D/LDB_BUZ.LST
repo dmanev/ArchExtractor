@@ -1,0 +1,726 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:52 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_BUZ.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_BUZ.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_BUZ.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_BUZ.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_BUZ.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_BUZ.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_BUZ.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    <Name of the component and its variant number, if any>
+     13          //               <Comments about the component (role, algorithm, structure,
+     14          //               limitations, defined tasks and events...)>
+     15          // -----------------------------------------------------------------------------
+     16          // $Date:   Oct 19 2009 16:23:50  $
+     17          // $Archive::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_BUZ/LDB_BUZ.c-arc  $
+     18          // $Revision:   1.2  $
+     19          // -----------------------------------------------------------------------------
+     20          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_BUZ/LDB_BUZ.c-arc  $
+     21          // 
+     22          //    Rev 1.2   Oct 19 2009 16:23:50   amarinm1
+     23          // Cm005858: Code review corrections, binary code not affected.
+     24          // 
+     25          //    Rev 1.1   Sep 25 2009 09:13:34   adzhelp
+     26          // Cm005225, Cm004744, Cm003262: Move functions to banked area.
+     27          // 
+     28          //    Rev 1.0   Mar 18 2009 18:02:34   amarinm1
+     29          // Initial revision.
+     30          //******************************************************************************
+     31          #endif
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Body Identification
+     35          //------------------------------------------------------------------------------
+     36          #define ldb_buz   "ldb_buz"
+     37          
+     38          //------------------------------------------------------------------------------
+     39          // Included files to resolve specific definitions in this file
+     40          //------------------------------------------------------------------------------
+     41          
+     42          // This is an example:
+     43          // #include <system_file_name.h>
+     44          // #include "project_file_name.h"
+     45          
+     46          // This is an example:
+     47          // #include "deftypes.h"   // Mandatory layer inclusions should be described
+     48          // #include "lib.h"        // in Software Architecture Document
+     49          // #include "tos.h"        //
+     50          // #include "dat.h"        //
+     51          #include "ldb_reg.h"
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff17
+   \   union <unnamed> volatile __saddr _A_CR50
+   \                     _A_CR50:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff6a
+   \   union <unnamed> volatile __sfr _A_TCL50
+   \                     _A_TCL50:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff6b
+   \   union <unnamed> volatile __sfr _A_TMC50
+   \                     _A_TMC50:
+   \   0000                  DS 1
+     52          #include "ldb_har.h"
+     53          #include "ldb_buz.h"    
+     54          
+     55          
+     56          
+     57          //------------------------------------------------------------------------------
+     58          // Local constants
+     59          //------------------------------------------------------------------------------
+     60          
+     61          // Double the frequency because one cycle (Hz) needs two level inversions
+     62          #define cFrequencyMultiplier    2
+     63          
+     64          // length of DAT buffer to LDB in bytes
+     65          #define cDatBufferLength        ((U16)2)
+     66          
+     67          
+     68          #define cTOE50_BitNumber        0
+     69          #define cTMC501_BitNumber       1
+     70          #define cLVS50_BitNumber        2
+     71          #define cLVR50_BitNumber        3
+     72          #define cTMC506_BitNumber       6
+     73          #define cTCE50_BitNumber        7
+     74          
+     75          
+     76          // Doubled values of all hard-coded frequencies
+     77          #define cFreq1                  ((U16)1000)
+     78          #define cFreq2                  ((U16)1600)
+     79          #define cFreq3                  ((U16)1953)
+     80          #define cFreq4                  ((U16)2050)
+     81          #define cFreq5                  ((U16)2100)
+     82          #define cFreq6                  ((U16)2400)
+     83          #define cFreq7                  ((U16)2976)
+     84          #define cFreq8                  ((U16)4000)
+     85          #define cFreqMax                ((U16)8000)
+     86          
+     87          
+     88          // Predefined values for input clock selection (TCL50) for the above frequencies
+     89          // For more info see chapter 8 of NEC 78K0/KE2 User's Manual
+     90          // fPRS = 16Mhz
+     91          #define cInputClockForFreq1     ((U8)5) // fPRS/2^6 = 250Khz
+     92          #define cInputClockForFreq2     ((U8)5)
+     93          #define cInputClockForFreq3     ((U8)6) // fPRS/2^8 = 62.5Khz
+     94          #define cInputClockForFreq4     ((U8)5)
+     95          #define cInputClockForFreq5     ((U8)5)
+     96          #define cInputClockForFreq6     ((U8)5)
+     97          #define cInputClockForFreq7     ((U8)5)
+     98          #define cInputClockForFreq8     ((U8)5)
+     99          
+    100          #define cDefaultInputClock      ((U8)5)
+    101          #define cDefaultInputClockFrequency     ((U32)250000)
+    102          
+    103          
+    104          // Predefined values of CR50 for the above frequencies
+    105          #define cClockDivisorForFreq1   ((U8)125)
+    106          #define cClockDivisorForFreq2   ((U8)78)
+    107          #define cClockDivisorForFreq3   ((U8)16)
+    108          #define cClockDivisorForFreq4   ((U8)61)
+    109          #define cClockDivisorForFreq5   ((U8)59)
+    110          #define cClockDivisorForFreq6   ((U8)52)
+    111          #define cClockDivisorForFreq7   ((U8)42)
+    112          #define cClockDivisorForFreq8   ((U8)31)
+    113          
+    114          
+    115          
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Local macros
+    119          //------------------------------------------------------------------------------
+    120          
+    121          // This is an example:
+    122          // #define mMacroName       (MacroDefinition)
+    123          
+    124          //------------------------------------------------------------------------------
+    125          // Local types
+    126          //------------------------------------------------------------------------------
+    127          
+    128          // This is an example:
+    129          // typedef Expression   tTypeName;
+    130          
+    131          //------------------------------------------------------------------------------
+    132          // Local data
+    133          //------------------------------------------------------------------------------
+    134          
+    135          // This is an example:
+    136          // static  tType   VariableName;
+    137          // static  tType*  pVariableName;
+    138          // static  U8      u8VariableName;
+    139          // static  U16*    pu16VariableName;
+    140          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    141          static U16  u16Freq;
+   \                     u16Freq:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    142          static U8   u8CR50;
+   \                     u8CR50:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    143          static U8   u8TCL50;
+   \                     u8TCL50:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    144          static BOOL bLDBBuzIsEnabled;
+   \                     bLDBBuzIsEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    145          
+    146          
+    147          //------------------------------------------------------------------------------
+    148          // Constant local data
+    149          //------------------------------------------------------------------------------
+    150          
+    151          // This is an example:
+    152          // static const tType  cConstantName;
+    153          
+    154          //------------------------------------------------------------------------------
+    155          // Exported data
+    156          //------------------------------------------------------------------------------
+    157          
+    158          // This is an example:
+    159          // Reduce to minimum the usage of extern data members!!!
+    160          // tType   LAYCmpVariableName;  //LAY: 3 characters to identify the layer
+    161          // tType*  pLAYCmpVariableName; //Cmp: 3-4 characters to identify the component
+    162          // U8      u8LAYCmpVariableName;
+    163          // U16*    pu16LAYCmpVariableName;
+    164          
+    165          //------------------------------------------------------------------------------
+    166          // Constant exported data
+    167          //------------------------------------------------------------------------------
+    168          
+    169          // This is an example:
+    170          // Reduce to minimum the usage of extern constant data members!!!
+    171          // extern const tType  cLAYCmpConstantName;
+    172          // extern const U32    cu32LAYCmpConstantName;
+    173          
+    174          //------------------------------------------------------------------------------
+    175          // Local function prototypes
+    176          //------------------------------------------------------------------------------
+    177          static MEM_TYPE void ConvertFrequencyToRegisterValue( U16 u16LocalFreqP );
+    178          static MEM_TYPE void SetRegistersToCurrentFrequencySettings( void );
+    179          static MEM_TYPE void SetRegistersToSilenceSettings( void );
+    180          
+    181          
+    182          //==============================================================================
+    183          //=========================== LOCAL FUNCTIONS ==================================
+    184          //==============================================================================
+    185          
+    186          //==============================================================================
+    187          // DESCRIPTION:         < short description of the function >
+    188          //
+    189          // PARAMETERS:          < type,usage and constraints for all parameters >
+    190          //
+    191          // RETURN VALUE:        < type and usage >
+    192          //
+    193          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    194          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    195          static MEM_TYPE void ConvertFrequencyToRegisterValue( U16 u16LocalFreqP )
+   \                     ConvertFrequencyToRegisterValue:
+    196          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   D6             MOVW      HL,AX
+    197              switch( u16LocalFreqP )
+   \   0002   EA0000         CMPW      AX,#0
+   \   0005   BD03           BNZ       $+5
+   \   0007   9B....         BR        N:??LDBBuzSendWithoutAddr_0
+   \   000A   EAE803         CMPW      AX,#1000
+   \   000D   AD25           BZ        ??LDBBuzSendWithoutAddr_1
+   \   000F   EA4006         CMPW      AX,#1600
+   \   0012   AD29           BZ        ??LDBBuzSendWithoutAddr_2
+   \   0014   EAA107         CMPW      AX,#1953
+   \   0017   AD2D           BZ        ??LDBBuzSendWithoutAddr_3
+   \   0019   EA0208         CMPW      AX,#2050
+   \   001C   AD31           BZ        ??LDBBuzSendWithoutAddr_4
+   \   001E   EA3408         CMPW      AX,#2100
+   \   0021   AD35           BZ        ??LDBBuzSendWithoutAddr_5
+   \   0023   EA6009         CMPW      AX,#2400
+   \   0026   AD39           BZ        ??LDBBuzSendWithoutAddr_6
+   \   0028   EAA00B         CMPW      AX,#2976
+   \   002B   AD3D           BZ        ??LDBBuzSendWithoutAddr_7
+   \   002D   EAA00F         CMPW      AX,#4000
+   \   0030   AD41           BZ        ??LDBBuzSendWithoutAddr_8
+   \   0032   FA48           BR        ??LDBBuzSendWithoutAddr_9
+    198              {
+    199              case (U16)0:
+    200                  // Do nothing, register values won't be sent.
+    201                  break;
+    202              case cFreq1:
+    203                  u8TCL50 = cInputClockForFreq1;
+   \                     ??LDBBuzSendWithoutAddr_1:
+   \   0034   A105           MOV       A,#5
+   \   0036   9E....         MOV       u8TCL50,A
+    204                  u8CR50  = cClockDivisorForFreq1;
+   \   0039   A17D           MOV       A,#125
+   \   003B   FA60           BR        ??LDBBuzSendWithoutAddr_10
+    205                  break;
+    206              case cFreq2:
+    207                  u8TCL50 = cInputClockForFreq2;
+   \                     ??LDBBuzSendWithoutAddr_2:
+   \   003D   A105           MOV       A,#5
+   \   003F   9E....         MOV       u8TCL50,A
+    208                  u8CR50  = cClockDivisorForFreq2;
+   \   0042   A14E           MOV       A,#78
+   \   0044   FA57           BR        ??LDBBuzSendWithoutAddr_10
+    209                  break;
+    210              case cFreq3:
+    211                  u8TCL50 = cInputClockForFreq3;
+   \                     ??LDBBuzSendWithoutAddr_3:
+   \   0046   A106           MOV       A,#6
+   \   0048   9E....         MOV       u8TCL50,A
+    212                  u8CR50  = cClockDivisorForFreq3;
+   \   004B   A110           MOV       A,#16
+   \   004D   FA4E           BR        ??LDBBuzSendWithoutAddr_10
+    213                  break;
+    214              case cFreq4:
+    215                  u8TCL50 = cInputClockForFreq4;
+   \                     ??LDBBuzSendWithoutAddr_4:
+   \   004F   A105           MOV       A,#5
+   \   0051   9E....         MOV       u8TCL50,A
+    216                  u8CR50  = cClockDivisorForFreq4;
+   \   0054   A13D           MOV       A,#61
+   \   0056   FA45           BR        ??LDBBuzSendWithoutAddr_10
+    217                  break;
+    218              case cFreq5:
+    219                  u8TCL50 = cInputClockForFreq5;
+   \                     ??LDBBuzSendWithoutAddr_5:
+   \   0058   A105           MOV       A,#5
+   \   005A   9E....         MOV       u8TCL50,A
+    220                  u8CR50  = cClockDivisorForFreq5;
+   \   005D   A13B           MOV       A,#59
+   \   005F   FA3C           BR        ??LDBBuzSendWithoutAddr_10
+    221                  break;
+    222              case cFreq6:
+    223                  u8TCL50 = cInputClockForFreq6;
+   \                     ??LDBBuzSendWithoutAddr_6:
+   \   0061   A105           MOV       A,#5
+   \   0063   9E....         MOV       u8TCL50,A
+    224                  u8CR50  = cClockDivisorForFreq6;
+   \   0066   A134           MOV       A,#52
+   \   0068   FA33           BR        ??LDBBuzSendWithoutAddr_10
+    225                  break;
+    226              case cFreq7:
+    227                  u8TCL50 = cInputClockForFreq7;
+   \                     ??LDBBuzSendWithoutAddr_7:
+   \   006A   A105           MOV       A,#5
+   \   006C   9E....         MOV       u8TCL50,A
+    228                  u8CR50  = cClockDivisorForFreq7;
+   \   006F   A12A           MOV       A,#42
+   \   0071   FA2A           BR        ??LDBBuzSendWithoutAddr_10
+    229                  break;
+    230              case cFreq8:
+    231                  u8TCL50 = cInputClockForFreq8;
+   \                     ??LDBBuzSendWithoutAddr_8:
+   \   0073   A105           MOV       A,#5
+   \   0075   9E....         MOV       u8TCL50,A
+    232                  u8CR50  = cClockDivisorForFreq8;
+   \   0078   A11F           MOV       A,#31
+   \   007A   FA21           BR        ??LDBBuzSendWithoutAddr_10
+    233                  break;
+    234              default:
+    235                  if ( u16LocalFreqP > cFreqMax )
+   \                     ??LDBBuzSendWithoutAddr_9:
+   \   007C   EA411F         CMPW      AX,#8001
+   \   007F   8D03           BC        ??LDBBuzSendWithoutAddr_11
+    236                  {
+    237                      u16LocalFreqP = cFreqMax;
+   \   0081   16401F         MOVW      HL,#8000
+    238                  }
+    239                  // The following settings may be improved for better accuracy by adding
+    240                  // a rounding calculation and even an algorithm for finding the best
+    241                  // input clock!
+    242                  u8TCL50 = cDefaultInputClock;
+   \                     ??LDBBuzSendWithoutAddr_11:
+   \   0084   A105           MOV       A,#5
+   \   0086   9E....         MOV       u8TCL50,A
+    243                  u8CR50  = (U8)( cDefaultInputClockFrequency / (U32)(u16LocalFreqP * cFrequencyMultiplier) );
+   \   0089   C6             MOVW      AX,HL
+   \   008A   21             CLR1      CY
+   \   008B   30             XCH       A,X
+   \   008C   27             ROLC      A,0x1
+   \   008D   30             XCH       A,X
+   \   008E   27             ROLC      A,0x1
+   \   008F   D4             MOVW      DE,AX
+   \   0090   1090D0         MOVW      AX,#53392
+   \   0093   160000         MOVW      HL,#0
+   \   0096   B7             PUSH      HL
+   \   0097   B5             PUSH      DE
+   \   0098   120300         MOVW      BC,#3
+   \   009B   ..             CALLT     [__T_?UL_DIV_L03]
+   \   009C   60             MOV       A,X
+   \                     ??LDBBuzSendWithoutAddr_10:
+   \   009D   9E....         MOV       u8CR50,A
+    244              }
+    245          }
+   \                     ??LDBBuzSendWithoutAddr_0:
+   \   00A0   B2             POP       BC
+   \   00A1   AF             RET       
+   \   00A2                  REQUIRE ?CL78K_V4_6_L00
+    246          
+    247          
+    248          //==============================================================================
+    249          // DESCRIPTION:         < short description of the function >
+    250          //
+    251          // PARAMETERS:          < type,usage and constraints for all parameters >
+    252          //
+    253          // RETURN VALUE:        < type and usage >
+    254          //
+    255          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    256          //==============================================================================
+    257          static MEM_TYPE void SetRegistersToCurrentFrequencySettings( void )
+    258          {
+    259              // 1.Stop count operation before setting other registers (TCE50 = 0)
+    260              mLDBRegWrite1BitInRegister(TMC50, cTCE50_BitNumber, 0);
+    261          
+    262              // 2.Select input clock
+    263              mLDBRegWrite8BitRegister(TCL50, u8TCL50);
+    264              // 3.Set counter comparator value
+    265              mLDBRegWrite8BitRegister(CR50, (u8CR50 - (U8)1U)); // Compensation for real register value
+    266              // 4.Enable output inversion (TMC501 = 1)
+    267              mLDBRegWrite1BitInRegister(TMC50, cTMC501_BitNumber, 1);
+    268              // 5.Set 'Clear & Start' on (TCL50 == CR50) (TMC506 = 0)
+    269              mLDBRegWrite1BitInRegister(TMC50, cTMC506_BitNumber, 0);
+    270              // 6.Enable the output (TOE50 = 1)
+    271              mLDBRegWrite1BitInRegister(TMC50, cTOE50_BitNumber, 1);
+    272              // 7.Set timer output F/F default level to low (LVS50 = 0, LVR50 = 1)
+    273              mLDBRegWrite1BitInRegister(TMC50, cLVS50_BitNumber, 0);
+    274              mLDBRegWrite1BitInRegister(TMC50, cLVR50_BitNumber, 1);
+    275              // 8.Start count operation!
+    276              mLDBRegWrite1BitInRegister(TMC50, cTCE50_BitNumber, 1);
+    277          }
+    278          
+    279          
+    280          //==============================================================================
+    281          // DESCRIPTION:         < short description of the function >
+    282          //
+    283          // PARAMETERS:          < type,usage and constraints for all parameters >
+    284          //
+    285          // RETURN VALUE:        < type and usage >
+    286          //
+    287          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    288          //==============================================================================
+    289          static MEM_TYPE void SetRegistersToSilenceSettings( void )
+    290          {
+    291              // 1.Stop count operation before setting other registers (TCE50 = 0)
+    292              mLDBRegWrite1BitInRegister(TMC50, cTCE50_BitNumber, 0);
+    293          
+    294              // 2.Disable the output (TOE50 = 0)
+    295              mLDBRegWrite1BitInRegister(TMC50, cTOE50_BitNumber, 0);
+    296          }
+    297          
+    298          //==============================================================================
+    299          //=========================== EXPORTED FUNCTIONS ===============================
+    300          //==============================================================================
+    301          
+    302          //==============================================================================
+    303          // DESCRIPTION:         < short description of the function >
+    304          //
+    305          // PARAMETERS:          < type,usage and constraints for all parameters >
+    306          //
+    307          // RETURN VALUE:        < type and usage >
+    308          //
+    309          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    310          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    311          MEM_TYPE void LDBBuzInit (void)
+   \                     LDBBuzInit:
+    312          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    313              mLDBHarWrite(cLDBHarBuzzerOutput, 0);
+   \   0000   A100           MOV       A,#0
+   \   0002   7B01           CLR1      S:0xFF01.7
+    314              mLDBHarConfig(cLDBHarBuzzerOutput, cLDBHarOutput);
+   \   0004   717B21         CLR1      0xFF21.7
+    315          
+    316              SetRegistersToSilenceSettings();
+   \   0007   717B6B         CLR1      0xFF6B.7
+   \   000A   710B6B         CLR1      0xFF6B.0
+    317          
+    318              bLDBBuzIsEnabled = cFalse;
+   \   000D   9E....         MOV       bLDBBuzIsEnabled,A
+    319          }
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+   \   0011                  REQUIRE _A_P1
+   \   0011                  REQUIRE _A_PM1
+   \   0011                  REQUIRE _A_TMC50
+    320          
+    321          
+    322          //==============================================================================
+    323          // DESCRIPTION:         < short description of the function >
+    324          //
+    325          // PARAMETERS:          < type,usage and constraints for all parameters >
+    326          //
+    327          // RETURN VALUE:        < type and usage >
+    328          //
+    329          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    330          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    331          MEM_TYPE void LDBBuzControl( const tCtrl Ctrl )
+   \                     LDBBuzControl:
+    332          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    333              switch ( Ctrl )
+   \   0000   4D00           CMP       A,#0
+   \   0002   AD0E           BZ        ??LDBBuzSendWithoutAddr_12
+   \   0004   4D01           CMP       A,#1
+   \   0006   AD3F           BZ        ??LDBBuzSendWithoutAddr_13
+   \   0008   4D02           CMP       A,#2
+   \   000A   AD0C           BZ        ??LDBBuzSendWithoutAddr_14
+   \   000C   4D03           CMP       A,#3
+   \   000E   AD3C           BZ        ??LDBBuzSendWithoutAddr_15
+   \   0010   FA41           BR        ??LDBBuzSendWithoutAddr_16
+    334              {
+    335              case cLDBBuzEnable:
+    336                  bLDBBuzIsEnabled = cTrue;
+   \                     ??LDBBuzSendWithoutAddr_12:
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       bLDBBuzIsEnabled,A
+   \   0017   AF             RET       
+    337                  break;
+    338          
+    339              case cLDBBuzStartSound:
+    340                  // check if the driver is enabled
+    341                  if ( (bLDBBuzIsEnabled == cTrue) && (u16Freq != 0) )
+   \                     ??LDBBuzSendWithoutAddr_14:
+   \   0018   8E....         MOV       A,bLDBBuzIsEnabled
+   \   001B   51             DEC       A
+   \   001C   BD2E           BNZ       ??LDBBuzSendWithoutAddr_15
+   \   001E   02....         MOVW      AX,u16Freq
+   \   0021   6168           OR        A,X
+   \   0023   AD27           BZ        ??LDBBuzSendWithoutAddr_15
+    342                  {
+    343                      SetRegistersToCurrentFrequencySettings();
+   \   0025   717B6B         CLR1      0xFF6B.7
+   \   0028   8E....         MOV       A,u8TCL50
+   \   002B   F66A           MOV       0xFF6A,A
+   \   002D   A1FF           MOV       A,#255
+   \   002F   08....         ADD       A,u8CR50
+   \   0032   F217           MOV       S:0xFF17,A
+   \   0034   711A6B         SET1      0xFF6B.1
+   \   0037   716B6B         CLR1      0xFF6B.6
+   \   003A   710A6B         SET1      0xFF6B.0
+   \   003D   712B6B         CLR1      0xFF6B.2
+   \   0040   713A6B         SET1      0xFF6B.3
+   \   0043   717A6B         SET1      0xFF6B.7
+    344                  }
+   \   0046   AF             RET       
+    345                  else
+    346                  {
+    347                      SetRegistersToSilenceSettings();
+    348                  }
+    349                  break;
+    350          
+    351              case cLDBBuzDisable:
+    352                  bLDBBuzIsEnabled = cFalse;
+   \                     ??LDBBuzSendWithoutAddr_13:
+   \   0047   A100           MOV       A,#0
+   \   0049   9E....         MOV       bLDBBuzIsEnabled,A
+   \                     ??LDBBuzSendWithoutAddr_15:
+   \   004C   717B6B         CLR1      0xFF6B.7
+   \   004F   710B6B         CLR1      0xFF6B.0
+   \   0052   AF             RET       
+    353                  // pass-through to cLDBBuzCancelSound
+    354          
+    355              //QACJ 2003: amarinm1: It is intended that this case is always executed after the previous one.
+    356              case cLDBBuzCancelSound:
+    357                  // stop the sound currently playing 
+    358                  SetRegistersToSilenceSettings();
+    359                  break;
+    360          
+    361              default:
+    362                  mLIBassert (cFalse);
+   \                     ??LDBBuzSendWithoutAddr_16:
+   \   0053   9B....         BR        N:LIBAssertionFailed
+   \   0056                  REQUIRE ?CL78K_V4_6_L00
+   \   0056                  REQUIRE _A_TMC50
+   \   0056                  REQUIRE _A_CR50
+   \   0056                  REQUIRE _A_TCL50
+    363              }
+    364          }
+    365          
+    366          
+    367          //==============================================================================
+    368          // DESCRIPTION:         < short description of the function >
+    369          //
+    370          // PARAMETERS:          < type,usage and constraints for all parameters >
+    371          //
+    372          // RETURN VALUE:        < type and usage >
+    373          //
+    374          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    375          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    376          MEM_TYPE void LDBBuzSendWithoutAddr( const tMsg * const Msg )
+   \                     LDBBuzSendWithoutAddr:
+    377          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   D4             MOVW      DE,AX
+    378              if (   (Msg          == NULL)
+    379                  || (Msg->pBuffer == NULL)
+    380                  || (Msg->Lng     != cDatBufferLength)  )
+   \   0001   6168           OR        A,X
+   \   0003   AD14           BZ        ??LDBBuzSendWithoutAddr_17
+   \   0005   65             MOV       A,D
+   \   0006   D6             MOVW      HL,AX
+   \   0007   87             MOV       A,[HL]
+   \   0008   70             MOV       X,A
+   \   0009   AE01           MOV       A,[HL+0x01]
+   \   000B   6168           OR        A,X
+   \   000D   AD0A           BZ        ??LDBBuzSendWithoutAddr_17
+   \   000F   AE02           MOV       A,[HL+0x02]
+   \   0011   70             MOV       X,A
+   \   0012   AE03           MOV       A,[HL+0x03]
+   \   0014   EA0200         CMPW      AX,#2
+   \   0017   AD03           BZ        ??LDBBuzSendWithoutAddr_18
+    381              {
+    382                  mLIBassert( cFalse );
+   \                     ??LDBBuzSendWithoutAddr_17:
+   \   0019   9B....         BR        N:LIBAssertionFailed
+    383              }
+    384              else
+    385              {
+    386                  if ( bLDBBuzIsEnabled == cTrue ) 
+   \                     ??LDBBuzSendWithoutAddr_18:
+   \   001C   8E....         MOV       A,bLDBBuzIsEnabled
+   \   001F   51             DEC       A
+   \   0020   BD12           BNZ       ??LDBBuzSendWithoutAddr_19
+    387                  {
+    388                      // we come with correct buffer, enabled
+    389          
+    390                      //QACJ 0310: amarinm1: This is intentionally done as this is the original data type.
+    391                      //QACJ 3305: amarinm1: This is intentionally done as this is the original data type.
+    392                      u16Freq = *((U16 *)Msg->pBuffer);
+   \   0022   87             MOV       A,[HL]
+   \   0023   70             MOV       X,A
+   \   0024   AE01           MOV       A,[HL+0x01]
+   \   0026   D6             MOVW      HL,AX
+   \   0027   87             MOV       A,[HL]
+   \   0028   70             MOV       X,A
+   \   0029   AE01           MOV       A,[HL+0x01]
+   \   002B   03....         MOVW      u16Freq,AX
+    393          
+    394                      // Calculate HW register values for the given frequency
+    395                      ConvertFrequencyToRegisterValue(u16Freq);
+   \   002E   16....         MOVW      HL,#LWRD(ConvertFrequencyToRegisterValue)
+   \   0031   A4..           MOV       E,#BYTE3(ConvertFrequencyToRegisterValue)
+   \   0033   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    396                  }
+    397                  else
+    398                  {
+    399                      // Do nothing
+    400                  }
+    401          
+    402              }
+    403          }
+   \                     ??LDBBuzSendWithoutAddr_19:
+   \   0034   AF             RET       
+   \   0035                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?UL_DIV_L03:
+   \   0000   ....           DW       ?UL_DIV_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     _A_P1                             1
+     _A_CR50                           1
+     _A_PM1                            1
+     _A_TCL50                          1
+     _A_TMC50                          1
+     u16Freq                           2
+     u8CR50                            1
+     u8TCL50                           1
+     bLDBBuzIsEnabled                  1
+     ConvertFrequencyToRegisterValue
+                                     162
+     LDBBuzInit                       17
+     LDBBuzControl                    86
+     LDBBuzSendWithoutAddr            53
+     __T_?UL_DIV_L03                   2
+     __T_?FAR_FAST_CALL_L07            2
+
+ 
+ 318 bytes in segment BCODE
+   4 bytes in segment CLTVEC
+   3 bytes in segment NEAR_A
+   5 bytes in segment NEAR_Z
+   2 bytes in segment SADDR_A
+ 
+ 318 bytes of CODE memory (+ 4 bytes shared)
+   5 bytes of DATA memory (+ 5 bytes shared)
+
+Errors: none
+Warnings: none

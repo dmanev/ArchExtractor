@@ -1,0 +1,293 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      RSA_X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    LAP_ALA
+//               After sales alarm
+// -----------------------------------------------------------------------------
+// $Date:   Feb 23 2010 14:24:10  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_ALA/LAP_ALA.jil-arc  $
+// $Revision:   1.10  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_ALA/LAP_ALA.jil-arc  $
+// 
+//    Rev 1.10   Feb 23 2010 14:24:10   adzhelp
+// Cm007607: Active sleep state maintained after reset
+// 
+//    Rev 1.9   Sep 15 2009 17:11:02   aangovt
+// Cm005739, Cm005776, Cm005777: New graph is added for case of reset. Reading of EEP_CAR_SECURE flag in EnterActiveState is removed.
+// 
+//    Rev 1.8   09 Sep 2009 11:41:22   aangovt
+// Cm005820: After change of doors state door state command is sent, only  if car is secured.
+// 
+//    Rev 1.7   Aug 25 2009 18:07:18   aangovt
+// Cm005188: Code optimization - three controls, consumed by one function
+// 
+//    Rev 1.6   25 Aug 2009 12:28:34   aangovt
+// Cm005188: Checks for doors falling edges is added.
+// 
+//    Rev 1.5   Apr 25 2009 17:17:20   aangovt
+// Cm003271 Integration test corrections
+// 
+//    Rev 1.4   Apr 16 2009 10:57:00   aangovt
+// Cm003271 - EEP parameter CAR_SECURE is used instead controls
+// 
+//    Rev 1.3   14 Apr 2009 10:31:36   aangovt
+// Cm003271 - New template is added
+// 
+//    Rev 1.2   14 Apr 2009 09:46:26   aangovt
+// Cm003271 - checks for diagnostic session is added.
+// 
+//    Rev 1.1   Feb 20 2009 16:27:34   aangovt
+// Cm003271  Implementation of the Alarm functionality
+// 
+//    Rev 1.0   Feb 10 2009 13:59:12   aangovt
+// Initial revision.
+//
+//******************************************************************************
+ 
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_lap_ala_JIL
+#define I_lap_ala_JIL (1)
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_ALA 
+{
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+  Graph LAPAlarms
+  {
+	  Id = "cTOSSeqGraphIdLAPAlarms";
+  };
+
+  Graph AlarmAfterReset
+  {
+	  Id = "cTOSSeqGraphIdAlarmAfterReset";
+  };
+//------------------------------------------------------------------------------
+//    GraphGroup GraphGroupName                // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+ 
+	OnControl = CallBack  
+    {
+        Ctrl = "LAPInitialize";
+        Fct = "LAPAlaInitialize";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPEnterActiveState";
+        Fct = "LAPAlaEnterActiveState";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPLeaveActiveState";
+        Fct = "LAPAlaLeaveActiveState";
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "IsAnybodyMaintainActiveState";
+        Fct = "LAPAlaIsAnybodyMaintainActiveState";
+    };  
+
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainActiveSleepState";
+        Fct = "LAPAlaIsAnybodyMaintainActiveSleepState";
+    };
+
+	OnControl = CallBack 
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct = "LAPAlaLeaveStartingStepState";
+    };
+
+   OnControl = CallBack 
+   {
+    Ctrl = "KeyIsAuthenticated";
+    Fct = "LAPAlaKeyIsAuthenticated";
+   }; 
+
+   OnControl = CallBack 
+   {
+    Ctrl = "RfUnlockAllForAlarm";
+    Fct = "LAPAlaUnlockFromTheOutside";
+   }; 
+
+
+
+   OnControl = CallBack 
+   {
+    Ctrl = "RfLockAllForAlarm";
+    Fct = "LAPAlaLockFromTheOutside";
+   }; 
+
+ 
+    OnControl = CallBack
+    {
+    Ctrl = "AlaDiagEnable";
+    Fct = "LAPAlaDiagEnable";
+	};
+
+ 
+    OnControl = CallBack
+    {
+    Ctrl = "AlaDiagDisable";
+    Fct = "LAPAlaDiagDisable";
+	};
+
+
+     
+    OnControl = CallBack
+    {
+    Ctrl = "Falling_PWR_IGN";
+    Fct = "LAPAlaFallingEdgeForPWR_IGN";
+	};
+
+         
+    OnControl = CallBack
+    {
+    Ctrl = "Falling_FR_DOORS_SW";
+    Fct = "LAPAlaFallingEdgeForDS";
+	};
+ 
+
+         
+    OnControl = CallBack
+    {
+    Ctrl = "Falling_RR_DOORS_SW";
+    Fct = "LAPAlaFallingEdgeForDS";
+	};
+ 
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U3 2, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+
+
+};
+
+ 
+
+
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_LAP_ALA_JIL */
+
+

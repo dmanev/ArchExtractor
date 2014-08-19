@@ -1,0 +1,743 @@
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+    1    0000          ;-------------------------------------------------------
+                       -----------------------
+    2    0000          ;       CSTARTUP source for 78K
+    3    0000          ;
+    4    0000          ;       This module contains the code executed before
+                        the C/C++ "main"
+    5    0000          ;       function is called.
+    6    0000          ;
+    7    0000          ;       The code usually must be tailored to suit a
+                        specific hardware
+    8    0000          ;       configuration.
+    9    0000          ;
+   10    0000          ;       Assembler options:
+   11    0000          ;
+   12    0000          ;       -D__STANDARD_MODEL__    To assemble for use with
+                        compiler standard
+   13    0000          ;                               code model.
+   14    0000          ;
+   15    0000          ;       -D__BANKED_MODEL__      To assemble for use with
+                        compiler banked
+   16    0000          ;                               code model.
+   17    0000          ;
+   18    0000          ;       -D__NEAR_MODEL__        To assemble for use with
+                        compiler near
+   19    0000          ;                               code model.
+   20    0000          ;
+   21    0000          ;       -D__FAR_MODEL__         To assemble for use with
+                        compiler far
+   22    0000          ;                               code model.
+   23    0000          ;
+   24    0000          ;       Linker options:
+   25    0000          ;
+   26    0000          ;       -D_CODEBANK_REG=0       To link for use with
+                        "standard" code model,
+   27    0000          ;                               no banked functions.
+   28    0000          ;
+   29    0000          ;       -D_CODEBANK_REG='addr'  To link for use with
+                        "banked" code model or
+   30    0000          ;                               "standard" code model
+                        with banked functions.
+   31    0000          ;                               'addr' = bank switch
+                        register address.
+   32    0000          ;
+   33    0000          ;-------------------------------------------------------
+                       -----------------------
+   34    0000          ;       Copyright (c) 2003-2008 IAR Systems AB.
+   35    0000          ;       $Revision: 3577 $
+   36    0000          ;-------------------------------------------------------
+                       -----------------------
+   37    0000          
+   38    0000          #if !defined(__STANDARD_MODEL__) && !defined(__BANKED_MO
+                       DEL__) && !defined(__NEAR_MODEL__) && !defined(__FAR_MOD
+                       EL__)
+   39    0000            #error One of the macros __STANDARD_MODEL__,
+                        __BANKED_MODEL__, __NEAR_MODEL__ or __FAR_MODEL__ must
+                        be defined !
+   40    0000          #endif
+   41    0000          
+   42    0000          // Uncomment the following line to enable initialization
+                        of NEAR_Z
+   43    0000          //#define ENABLE_INIT_NEAR_Z
+   44    0000          
+   45    0000          ;-------------------------------------------------------
+                       -----------------------
+   46    0000          ;       The stack segment.
+   47    0000          ;       The stack size is defined in the linker command
+                        file
+   48    0000          ;-------------------------------------------------------
+                       -----------------------
+   49    0000          
+   50    0000                  MODULE  ?CSTARTUP
+   51    0000          
+   52    0000                  RSEG    CSTACK:DATA:ROOT(1)
+   53    0000          
+   54    0000          
+   55    0000          ;-------------------------------------------------------
+                       -----------------------
+   56    0000          ;       The interrupt vector segment.
+   57    0000          ;       Interrupt functions with defined vectors will
+                        reserve
+   58    0000          ;       space in this area as well as conformingly
+                        written assembly
+   59    0000          ;       language interrupt handlers
+   60    0000          ;-------------------------------------------------------
+                       -----------------------
+   61    0000          
+   62    0000                  COMMON  INTVEC:CODE:ROOT(1)
+   63    0000          
+   64    0000 ....             DC16    __program_start                 ; Reset
+                                                                        vector
+   65    0002          
+   66    0002          
+   67    0002          ;-------------------------------------------------------
+                       -----------------------
+   68    0002          ;       The actual startup code
+   69    0002          ;
+   70    0002          ;       Entry:  __program_start
+   71    0002          ;-------------------------------------------------------
+                       -----------------------
+   72    0002          
+   73    0000                  RSEG    RCODE:CODE:ROOT(0)
+   74    0000          
+   75    0000                  PUBLIC  ?C_STARTUP
+   76    0000                  PUBLIC  `@cstart`             ; NEC debugger
+                                                              specific
+   77    0000                  PUBLIC  __program_start
+   78    0000          
+   79    0000                  EXTERN  __low_level_init
+   80    0000                  EXTERN  __MAIN_CALL
+   81    0000          
+   82    0000          #if defined(__STANDARD_MODEL__) || defined(__BANKED_MODE
+                       L__)
+   83    0000                  EXTERN  _CODEBANK_REG
+   84    0000          #else
+   87    0000          #endif
+   88    0000          #if defined(__BANKED_MODEL__)
+   89    0000                  EXTERN  ?FAR_CALL_L07
+   90    0000          
+   91    0000                  SFRTYPE BANK_REG BYTE, READ, WRITE = _CODEBANK_R
+                       EG
+   92    0000          #endif
+   93    0000          
+   94    0000                  REQUIRE __MAIN_CALL
+   95    0000          
+   96    0000          
+   97    0000          ;-------------------------------------------------------
+                       -----------------------
+   98    0000          ;       Perform the run-time initialization.
+   99    0000          ;-------------------------------------------------------
+                       -----------------------
+  100    0000          
+  101    0000          ?C_STARTUP:
+  102    0000          `@cstart`:
+  103    0000          __program_start:
+  104    0000 7B1E             DI
+  105    0002          
+  106    0002          #if defined(__BANKED_MODEL__)
+  107    0002 13..00           MOV     BANK_REG, #0                    ;
+                                                  Banked, clear bank register
+  108    0005          #elif defined(__STANDARD_MODEL__)
+  116    0005          #else
+  120    0005          #endif
+  121    0005          
+  122    0005          #if __CORE__ != __78K0S__
+  123    0005 EE1C....         MOVW    SP, #sfe(CSTACK)
+  124    0009          #else
+  127    0009          #endif
+  128    0009          
+  129    0009          
+  130    0009                  ; Init stack segment for 78K0R, as the generated
+                        code may sometimes
+  131    0009                  ; access the 4th byte of a return address before
+                        it is initialized
+  132    0009          #if __CORE__ == __78K0R__
+  146    0009          #endif
+  147    0009          
+  148    0009          #if __CORE__ == __78K0R__
+  150    0009          #endif
+  151    0009          
+  152    0009          ;-------------------------------------------------------
+                       -----------------------
+  153    0009          ;       Here is the place to put user initializations.
+  154    0009          ;-------------------------------------------------------
+                       -----------------------
+  155    0009          
+  156    0009          ;       User initialization code
+  157    0009          
+  158    0009          ;-------------------------------------------------------
+                       -----------------------
+  159    0009          ;       Call __low_level_init to perform initialization
+                        before initializing
+  160    0009          ;       segments and calling main.
+  161    0009          ;       If the function returns 0, no segment initializa
+                       tion should take place.
+  162    0009          ;
+  163    0009          ;       Link with your own version of __low_level_init
+                        to override the
+  164    0009          ;       default action: to do nothing but return
+                        1.
+  165    0009          ;-------------------------------------------------------
+                       -----------------------
+  166    0009          
+  167    0009          #if defined(__FAR_MODEL__)
+  169    0009          #elif defined(__BANKED_MODEL__)
+  170    0009 A4..             MOV     E,  #byte3(__low_level_init)
+  171    000B 16....           MOVW    HL, #lwrd(__low_level_init)
+  172    000E 9A....           CALL    ?FAR_CALL_L07
+  173    0011          #else
+  175    0011          #endif
+  176    0011 6168             OR      A, X
+  177    0013          #if __CORE__ == __78K0R__
+  180    0013          #else
+  181    0013 AD..             BZ      __MAIN_CALL
+  182    0015          #endif
+  183    0015                  ENDMOD
+##############################
+#          CRC:DD30          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 23          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  184    0000          
+  185    0000          #if defined(__NEAR_MODEL__) || defined(__FAR_MODEL__)
+  227    0000          #endif
+  228    0000          
+  229    0000          
+  230    0000          ;-------------------------------------------------------
+                       -----------------------
+  231    0000          ;       Segment initialization
+  232    0000          ;
+  233    0000          ;       NEAR_Z  "uninitialized near data" are filled
+                        with zero
+  234    0000          ;-------------------------------------------------------
+                       -----------------------
+  235    0000          #ifdef ENABLE_INIT_NEAR_Z
+  245    0000          #if __CORE__ == __78K0R__
+  247    0000          #endif
+  250    0000          #if __CORE__ == __78K0R__
+  255    0000          #else
+  262    0000          #endif
+  266    0000          #if __CORE__ == __78K0R__
+  271    0000          #else
+  274    0000          #endif
+  277    0000          #endif // ENABLE_INIT_NEAR_Z
+  278    0000          
+  279    0000          ;-------------------------------------------------------
+                       -----------------------
+  280    0000          ;       Segment initialization
+  281    0000          ;
+  282    0000          ;       SADDR_Z "uninitialized saddr data" are filled
+                        with zero
+  283    0000          ;-------------------------------------------------------
+                       -----------------------
+  284    0000          
+  285    0000                  MODULE  ?__INIT_SADDR_Z
+  286    0000          
+  287    0000                  RSEG    SADDR_Z:DATA(0)
+  288    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  289    0000          
+  290    0000                  PUBLIC  __INIT_SADDR_Z
+  291    0000          
+  292    0000          __INIT_SADDR_Z:
+  293    0000          #if __CORE__ == __78K0R__
+  296    0000          #else
+  297    0000                  LIMIT   sfb(SADDR_Z),0xFE20,0xFF1F,"SADDR_Z not
+                                                    within saddr memory
+                                                    range"
+  298    0000                  LIMIT   sfe(SADDR_Z),0xFE20,0xFF1F,"SADDR_Z not
+                                                    within saddr memory
+                                                    range"
+  299    0000          #endif
+  300    0000 16....           MOVW    HL, #sfb(SADDR_Z)
+  301    0003 A3..             MOV     B, #sizeof(SADDR_Z)
+  302    0005          #if __CORE__ == __78K0R__
+  304    0005          #else
+  305    0005 6171             XOR     A, A
+  306    0007          #endif
+  307    0007          loop:
+  308    0007 97               MOV     [HL], A
+  309    0008 86               INCW    HL
+  310    0009          #if __CORE__ == __78K0R__
+  313    0009          #else
+  314    0009 8BFC             DBNZ    B, loop
+  315    000B          #endif
+  316    000B          
+  317    000B                  ENDMOD
+##############################
+#          CRC:A558          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 11          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  318    0000          
+  319    0000          
+  320    0000          ;-------------------------------------------------------
+                       -----------------------
+  321    0000          ;       Segment initialization
+  322    0000          ;
+  323    0000          ;       WRKSEG short address work area is filled with
+                        zero
+  324    0000          ;-------------------------------------------------------
+                       -----------------------
+  325    0000          
+  326    0000                  MODULE  ?__INIT_WRKSEG
+  327    0000          
+  328    0000                  RSEG    WRKSEG:DATA(0)
+  329    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  330    0000          
+  331    0000                  PUBLIC  __INIT_WRKSEG
+  332    0000          
+  333    0000          __INIT_WRKSEG:
+  334    0000          #if __CORE__ == __78K0R__
+  337    0000          #else
+  338    0000                  LIMIT   sfb(WRKSEG),0xFE20,0xFF1F,"WRKSEG not
+                                                   within saddr memory
+                                                   range"
+  339    0000                  LIMIT   sfe(WRKSEG),0xFE20,0xFF1F,"WRKSEG not
+                                                   within saddr memory
+                                                   range"
+  340    0000          #endif
+  341    0000 16....           MOVW    HL, #sfb(WRKSEG)
+  342    0003 A3..             MOV     B, #sizeof(WRKSEG)
+  343    0005          #if __CORE__ == __78K0R__
+  345    0005          #else
+  346    0005 6171             XOR     A, A
+  347    0007          #endif
+  348    0007          loop:
+  349    0007 97               MOV     [HL], A
+  350    0008 86               INCW    HL
+  351    0009          #if __CORE__ == __78K0R__
+  354    0009          #else
+  355    0009 8BFC             DBNZ    B, loop
+  356    000B          #endif
+  357    000B          
+  358    000B                  ENDMOD
+##############################
+#          CRC:270F          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 11          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  359    0000          
+  360    0000          
+  361    0000          #if defined(__NEAR_MODEL__) || defined(__FAR_MODEL__)
+  432    0000          #endif
+  433    0000          
+  434    0000          
+  435    0000          ;-------------------------------------------------------
+                       -----------------------
+  436    0000          ;       Segment initialization
+  437    0000          ;
+  438    0000          ;       NEAR_ID is copied to NEAR_I    "initialized near
+                        data"
+  439    0000          ;-------------------------------------------------------
+                       -----------------------
+  440    0000          
+  441    0000                  MODULE  ?__INIT_NEAR_I
+  442    0000          
+  443    0000                  RSEG    NEAR_I:DATA(0)
+  444    0000                  RSEG    NEAR_ID:CONST(0)
+  445    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  446    0000          
+  447    0000                  PUBLIC  __INIT_NEAR_I
+  448    0000          
+  449    0000          __INIT_NEAR_I:
+  450    0000          #if __CORE__ == __78K0R__
+  452    0000          #endif
+  453    0000                  LIMIT   sizeof(NEAR_I)-sizeof(NEAR_ID),0,0,"NEAR
+                                                     _I and NEAR_ID not same
+                                                      size"
+  454    0000          #if __CORE__ == __78K0R__
+  456    0000          #endif
+  457    0000 16....           MOVW    HL, #sfb(NEAR_ID)
+  458    0003 12....           MOVW    BC, #sizeof(NEAR_ID)
+  459    0006          #if __CORE__ == __78K0R__
+  463    0006          #else
+  464    0006 62               MOV     A, C
+  465    0007 6161             OR      A, A
+  466    0009 AD01             BZ      cont
+  467    000B 43               INC     B
+  468    000C          cont:
+  469    000C          #endif
+  470    000C 14....           MOVW    DE, #sfb(NEAR_I)
+  471    000F          loop:
+  472    000F          #if __CORE__ != __78K0R__
+  473    000F 87               MOV     A, [HL]
+  474    0010          #else
+  476    0010          #endif
+  477    0010 95               MOV     [DE], A
+  478    0011 86               INCW    HL
+  479    0012 84               INCW    DE
+  480    0013          #if __CORE__ == __78K0R__
+  485    0013          #else
+  486    0013 8AFA             DBNZ    C, loop
+  487    0015 8BF8             DBNZ    B, loop
+  488    0017          #endif
+  489    0017          
+  490    0017                  ENDMOD
+##############################
+#          CRC:7FD0          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 23          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  491    0000          
+  492    0000          
+  493    0000          ;-------------------------------------------------------
+                       -----------------------
+  494    0000          ;       Segment initialization
+  495    0000          ;
+  496    0000          ;       SADDR_ID is copied to SADDR_I  "initialized
+                        saddr data"
+  497    0000          ;-------------------------------------------------------
+                       -----------------------
+  498    0000          
+  499    0000                  MODULE  ?__INIT_SADDR_I
+  500    0000          
+  501    0000                  RSEG    SADDR_I:DATA(0)
+  502    0000                  RSEG    SADDR_ID:CONST(0)
+  503    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  504    0000          
+  505    0000                  PUBLIC  __INIT_SADDR_I
+  506    0000          
+  507    0000          __INIT_SADDR_I:
+  508    0000          #if __CORE__ == __78K0R__
+  511    0000          #else
+  512    0000                  LIMIT   sfb(SADDR_I),0xFE20,0xFF1F,"SADDR_I not
+                                                    within saddr memory
+                                                    range"
+  513    0000                  LIMIT   sfe(SADDR_I),0xFE20,0xFF1F,"SADDR_I not
+                                                    within saddr memory
+                                                    range"
+  514    0000          #endif
+  515    0000                  LIMIT   sizeof(SADDR_I)-sizeof(SADDR_ID),0,0,"SA
+                                                      DDR_I and SADDR_ID not
+                                                       same size"
+  516    0000          #if __CORE__ == __78K0R__
+  518    0000          #endif
+  519    0000 16....           MOVW    HL, #sfb(SADDR_ID)
+  520    0003 A3..             MOV     B, #sizeof(SADDR_ID)
+  521    0005 14....           MOVW    DE, #sfb(SADDR_I)
+  522    0008          loop:
+  523    0008          #if __CORE__ != __78K0R__
+  524    0008 87               MOV     A, [HL]
+  525    0009          #else
+  527    0009          #endif
+  528    0009 95               MOV     [DE], A
+  529    000A 86               INCW    HL
+  530    000B 84               INCW    DE
+  531    000C          #if __CORE__ == __78K0R__
+  534    000C          #else
+  535    000C 8BFA             DBNZ    B, loop
+  536    000E          #endif
+  537    000E          
+  538    000E                  ENDMOD
+##############################
+#          CRC:A3CA          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 14          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  539    0000          
+  540    0000          
+  541    0000          ;-------------------------------------------------------
+                       -----------------------
+  542    0000          ;       Initialize constructors
+  543    0000          ;
+  544    0000          ;       This segment part is required by the compiler
+                        when it is
+  545    0000          ;       necessary to call constructors of global
+                        objects.
+  546    0000          ;-------------------------------------------------------
+                       -----------------------
+  547    0000          
+  548    0000                  MODULE  ?__INIT_CTORS
+  549    0000          
+  550    0000                  RSEG    DIFUNCT(0)
+  551    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  552    0000          
+  553    0000                  PUBLIC  __INIT_CTORS
+  554    0000          
+  555    0000                  EXTERN  __call_ctors
+  556    0000          #if defined(__BANKED_MODEL__)
+  557    0000                  EXTERN  ?FAR_CALL_L07
+  558    0000          #endif
+  559    0000          
+  560    0000          __INIT_CTORS:
+  561    0000          #if __CORE__ == __78K0R__
+  571    0000          #elif defined(__BANKED_MODEL__)
+  572    0000 10....           MOVW    AX, #sfb(DIFUNCT)
+  573    0003 12....           MOVW    BC, #sfe(DIFUNCT)
+  574    0006 A4..             MOV     E,  #byte3(__call_ctors)
+  575    0008 16....           MOVW    HL, #lwrd(__call_ctors)
+  576    000B 9A....           CALL    ?FAR_CALL_L07
+  577    000E          #else
+  581    000E          #endif
+  582    000E          
+  583    000E                  ENDMOD
+##############################
+#          CRC:F26F          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 14          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  584    0000          
+  585    0000          
+  586    0000          ;-------------------------------------------------------
+                       -----------------------
+  587    0000          ;       Enter main
+  588    0000          ;
+  589    0000          ;       Call the actual "main" function
+  590    0000          ;-------------------------------------------------------
+                       -----------------------
+  591    0000          
+  592    0000                  MODULE  ?__MAIN_CALL
+  593    0000          
+  594    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  595    0000          
+  596    0000                  PUBLIC  __MAIN_CALL
+  597    0000                  PUBLIC  `@cend`             ; NEC debugger
+                                                            specific
+  598    0000          
+  599    0000                  EXTERN  main
+  600    0000                  EXTERN  exit
+  601    0000          #if defined(__BANKED_MODEL__)
+  602    0000                  EXTERN  ?FAR_CALL_L07
+  603    0000          #endif
+  604    0000          
+  605    0000          __MAIN_CALL:
+  606    0000          #if defined(__FAR_MODEL__)
+  609    0000          #elif defined(__BANKED_MODEL__)
+  610    0000 A4..             MOV     E,  #byte3(main)
+  611    0002 16....           MOVW    HL, #lwrd(main)
+  612    0005 9A....           CALL    ?FAR_CALL_L07
+  613    0008          
+  614    0008 A4..             MOV     E,  #byte3(exit)
+  615    000A 16....           MOVW    HL, #lwrd(exit)
+  616    000D 9A....           CALL    ?FAR_CALL_L07
+  617    0010          #else
+  620    0010          #endif
+  621    0010          
+  622    0010          `@cend`:
+  623    0010          
+  624    0010          ;       STOP                            ; Should not
+                        return
+  625    0010          
+  626    0010                  ENDMOD
+##############################
+#          CRC:30A9          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#         Bytes: 16          #
+##############################
+
+
+
+###############################################################################
+#                                                                             #
+#     IAR Assembler V4.61A/W32 for 78K0 and 78K0S 15/Feb/2011  13:26:01       #
+#     Copyright 1992-2008 IAR Systems AB.                                     #
+#                                                                             #
+#           Target option =  78K0                                             #
+#           Source file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_sup.s26#
+#           List file     =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.LST#
+#           Object file   =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_R\ldb_supa.R26#
+#           Command line  =  -v1 -r -D__BANKED_MODEL__ -l                     #
+#                            .\..\EXE\TARGET_R\ldb_supa.LST -o                #
+#                            .\..\EXE\TARGET_R\ldb_supa.R26                   #
+#                            .\LDB\ldb_sup.s26                                #
+#                                                                             #
+###############################################################################
+
+  627    0000          
+  628    0000          
+  629    0000          ;-------------------------------------------------------
+                       -----------------------
+  630    0000          ;       Low level initialization function
+  631    0000          ;
+  632    0000          ;       Entry:  __low_level_init
+  633    0000          ;
+  634    0000          ;       The only action of this default version of
+                        '__low_level_init' is to
+  635    0000          ;       return 1. By doing so it signals that normal
+                        initialization of data
+  636    0000          ;       segments should be done.
+  637    0000          ;
+  638    0000          ;       A customized version of '__low_level_init' may
+                        be created in order to
+  639    0000          ;       perform initialization before initializing
+                        segments and calling main
+  640    0000          ;       and/or to skip initialization of data segments
+                        under certain
+  641    0000          ;       circumstances.
+  642    0000          ;-------------------------------------------------------
+                       -----------------------
+  643    0000          
+  644    0000                  MODULE  ?__low_level_init_stub
+  645    0000          
+  646    0000                  RSEG    RCODE:CODE:NOROOT(0)
+  647    0000          
+  648    0000                  PUBLIC  __low_level_init
+  649    0000          
+  650    0000          __low_level_init:                       ; By returning 1
+                        this function
+  651    0000 100100           MOVW    AX, #1                  ; indicates that
+                                                                the normal
+  652    0003 AF               RET                             ; initialization
+                                                                should take
+                                                                place
+  653    0004          
+  654    0004                  ENDMOD
+##############################
+#          CRC:BD1D          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#          Bytes: 4          #
+##############################
+
+
+
+##############################
+#          CRC:BD1D          #
+#        Errors:   0         #
+#        Warnings: 0         #
+#          Bytes: 4          #
+#     Modules:        8      #
+#     Total errors:   0      #
+#     Total warnings: 0      #
+##############################
+
+
+
+

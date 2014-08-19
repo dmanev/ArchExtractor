@@ -1,0 +1,18 @@
+format 74
+
+artifactcanvas 128111 artifact_ref 134639 // BaseAnalyzer
+  xyz 37 179.5 2000
+end
+artifactcanvas 128239 artifact_ref 142319 // os
+  xyz 319 34.5 2005
+end
+artifactcanvas 128367 artifact_ref 135279 // IAnalyzer
+  xyz 37 38.5 2000
+end
+simplerelationcanvas 128495 simplerelation_ref 134767
+  from ref 128111 z 2001 to ref 128367
+end
+simplerelationcanvas 128623 simplerelation_ref 148847
+  from ref 128111 z 2006 to ref 128239
+end
+end

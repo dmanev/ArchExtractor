@@ -1,0 +1,18 @@
+format 74
+
+artifactcanvas 128111 artifact_ref 169711 // DataType
+  xyz 44 120 2000
+end
+artifactcanvas 128239 artifact_ref 177391 // CompositeDataType
+  xyz 274 119 2000
+end
+artifactcanvas 128367 artifact_ref 177519 // ArrayDataType
+  xyz 505 119 2000
+end
+simplerelationcanvas 128495 simplerelation_ref 176111
+  from ref 128239 z 2001 to ref 128111
+end
+simplerelationcanvas 128623 simplerelation_ref 176239
+  from ref 128367 z 2001 to ref 128239
+end
+end

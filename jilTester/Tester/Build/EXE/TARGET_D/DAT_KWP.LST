@@ -1,0 +1,1080 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:10 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_KWP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_KWP.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_KWP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_KWP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_KWP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_KWP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_KWP.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    DAT_KWP
+     13          // -----------------------------------------------------------------------------
+     14          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_KWP/DAT_KWP.C-arc  $
+     15          // 
+     16          //    Rev 1.6   Jan 21 2010 11:43:30   adzhelp
+     17          // Cm007210: HWP: Change the KLine inhibition duration to 5 s
+     18          // 
+     19          //    Rev 1.5   Dec 14 2009 12:14:46   adzhelp
+     20          // Cm005566: QAC changes
+     21          // 
+     22          //    Rev 1.4   Dec 14 2009 11:31:18   adzhelp
+     23          // Cm005566: SC detection of KLine
+     24          // 
+     25          //    Rev 1.3   May 26 2009 11:42:52   akodzhh
+     26          // Cm003128: Add //CCOV ... justification.
+     27          // 
+     28          //    Rev 1.2   Apr 29 2009 12:06:14   adzhelp
+     29          // Cm003128: Functions moved to banked memory area
+     30          // 
+     31          //    Rev 1.1   Mar 20 2009 09:45:58   adzhelp
+     32          // Cm003128: Old type tU16Bit corrected to U16
+     33          // 
+     34          //    Rev 1.0   Jan 12 2009 11:31:08   akodzhh
+     35          // Initial revision.
+     36          //
+     37          //******************************************************************************
+     38          #endif
+     39          
+     40          //--------------------------------------------------------------------------
+     41          //  Body Identification
+     42          //--------------------------------------------------------------------------
+     43          #define dat_kwp   "dat_kwp"
+     44          
+     45          //------------------------------------------------------------------------------
+     46          // Included files to resolve specific definitions in this file
+     47          //------------------------------------------------------------------------------
+     48          #include "lib.h"
+     49          #include "tos.h"
+     50          #include "dat.h"
+     51          #include "dat_kwp.h"
+     52          
+     53          
+     54          //------------------------------------------------------------------------------
+     55          // Local constants
+     56          //------------------------------------------------------------------------------
+     57          #define cStopMode         (tKwpMode)0x00
+     58          #define cRxMode           (tKwpMode)0x01
+     59          #define cTxMode           (tKwpMode)0x02
+     60          #define cWakeUpMode       (tKwpMode)0x03
+     61          
+     62          #define cKwpHeaderLgh     (U8)3
+     63          #define cKwpCksLgh        (U8)1
+     64          #define cKwpLghByte0x80   (U8)0x80
+     65          
+     66          // HW Protection
+     67          #define cRestoreTimeMs    5000UL
+     68          
+     69          //------------------------------------------------------------------------------
+     70          // Local macros
+     71          //------------------------------------------------------------------------------
+     72          #define mGetRxStartField        DATKwpRxBuffer[0]
+     73          #define mGetRxTargetId          DATKwpRxBuffer[1]
+     74          #define mGetRxSourceId          DATKwpRxBuffer[2]
+     75          #define mGetRxByte(Index)       DATKwpRxBuffer[Index]
+     76          
+     77          #define mSetTxStartField(Value) (DATKwpTxBuffer[0]     = (Value)) 
+     78          #define mSetTxTargetId(Value)   (DATKwpTxBuffer[1]     = (Value))
+     79          #define mSetTxSourceId(Value)   (DATKwpTxBuffer[2]     = (Value))
+     80          #define mSetTxByte(Index,Value) (DATKwpTxBuffer[Index] = (Value))
+     81          //------------------------------------------------------------------------------
+     82          // Local types
+     83          //------------------------------------------------------------------------------
+     84          typedef U8 tKwpMode;
+     85          
+     86          //------------------------------------------------------------------------------
+     87          // Local data
+     88          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     89          static tKwpMode   KwpMode;
+   \                     KwpMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     90          static BOOL       bDATKwpWakeUpIsRequested;
+   \                     bDATKwpWakeUpIsRequested:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     91          
+     92          //------------------------------------------------------------------------------
+     93          // Constant local data
+     94          //------------------------------------------------------------------------------
+     95          // HW Protection
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     96          static tTOSTimer KLineFaultTimer;
+   \                     KLineFaultTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+     97          
+     98          //------------------------------------------------------------------------------
+     99          // Exported data
+    100          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    101          U8    DATKwpRxBuffer[cDATKwpRxBufferSize];
+   \                     DATKwpRxBuffer:
+   \   0000                  DS 70
+   \   0046                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    102          U8    DATKwpTxBuffer[cDATKwpTxBufferSize];
+   \                     DATKwpTxBuffer:
+   \   0000                  DS 70
+   \   0046                  REQUIRE __INIT_NEAR_Z
+    103          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    104          tMsg  DATKwpTxMsg;
+   \                     DATKwpTxMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    105          U8    DATKwpRxFrameLgth;
+   \                     DATKwpRxFrameLgth:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    106          
+    107          //------------------------------------------------------------------------------
+    108          // Constant exported data
+    109          //------------------------------------------------------------------------------
+    110          
+    111          //------------------------------------------------------------------------------
+    112          // Local function prototypes
+    113          //------------------------------------------------------------------------------
+    114          static U8 CalcChecksum(const U8* const pu8FrameP, const U8 u8LengthP);
+    115          
+    116          #ifdef X90_PROJECT
+    117          static MEM_TYPE void DATKwpTaskControl_Static(void);
+    118          #endif
+    119          
+    120          //==============================================================================
+    121          //=========================== LOCAL FUNCTIONS ==================================
+    122          //==============================================================================
+    123          
+    124          //============================================================================
+    125          // DESCRIPTION:         CalcChecksum
+    126          //                This function calculate the checksum of the KWP frame
+    127          //  
+    128          // PARAMETERS:          
+    129          //          pFrame    : pointer to the beginning of the frame
+    130          //          Length    : length in byte of the frame
+    131          //
+    132          // RETURN VALUE:         checksum value
+    133          // 
+    134          // DESIGN INFORMATION:   refer to Detailed Design Document
+    135          //==========================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    136          static U8 CalcChecksum(const U8* const pu8FrameP, const U8 u8LengthP)
+   \                     CalcChecksum:
+    137          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D4             MOVW      DE,AX
+    138              U8 u8CksumL;
+    139              U8 u8IndexL;
+    140          
+    141              u8CksumL = 0;
+   \   0003   A200           MOV       C,#0
+    142          
+    143              //CCOV: akodzhh: can't be tested because of assert
+    144              if( pu8FrameP != NULL )
+   \   0005   6168           OR        A,X
+   \   0007   AD26           BZ        ??DATKwpIsMaintainActiveState_0
+    145              {
+    146                  mLIBassert(u8LengthP !=0 );
+   \   0009   63             MOV       A,B
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD03           BNZ       ??DATKwpIsMaintainActiveState_1
+   \   000E   9A....         CALL      LIBAssertionFailed
+    147                  for(u8IndexL=0;u8IndexL<(u8LengthP-1);u8IndexL++)
+   \                     ??DATKwpIsMaintainActiveState_1:
+   \   0011   63             MOV       A,B
+   \   0012   70             MOV       X,A
+   \   0013   A100           MOV       A,#0
+   \   0015   90             DECW      AX
+   \   0016   7D80           XOR       A,#128
+   \   0018   DA0180         SUBW      AX,#32769
+   \   001B   8D15           BC        ??DATKwpIsMaintainActiveState_2
+   \   001D   63             MOV       A,B
+   \   001E   76             MOV       L,A
+   \   001F   A700           MOV       H,#0
+   \   0021   96             DECW      HL
+    148                  {
+    149                      u8CksumL += pu8FrameP[u8IndexL];
+   \                     ??CalcChecksum_0:
+   \   0022   85             MOV       A,[DE]
+   \   0023   6102           ADD       C,A
+    150                  }
+   \   0025   C6             MOVW      AX,HL
+   \   0026   84             INCW      DE
+   \   0027   90             DECW      AX
+   \   0028   D6             MOVW      HL,AX
+   \   0029   6168           OR        A,X
+   \   002B   AD05           BZ        ??DATKwpIsMaintainActiveState_2
+   \   002D   FAF3           BR        ??CalcChecksum_0
+    151              }
+    152              else
+    153              {
+    154                  mLIBassert(cFalse);    // akodzhh: can't be tested
+   \                     ??DATKwpIsMaintainActiveState_0:
+   \   002F   9A....         CALL      LIBAssertionFailed
+    155              }
+    156          
+    157              return(u8CksumL);
+   \                     ??DATKwpIsMaintainActiveState_2:
+   \   0032   62             MOV       A,C
+   \   0033   B4             POP       DE
+   \   0034   B2             POP       BC
+   \   0035   AF             RET       
+   \   0036                  REQUIRE ?CL78K_V4_6_L00
+    158             
+    159          }
+    160          
+    161          //==============================================================================
+    162          //=========================== EXPORTED FUNCTIONS ===============================
+    163          //==============================================================================
+    164          
+    165          //============================================================================
+    166          // DESCRIPTION:         DATKwpInit
+    167          //        This function initialize DAT_KWP
+    168          //
+    169          // PARAMETERS:          none
+    170          //
+    171          // RETURN VALUE:        none
+    172          // 
+    173          // DESIGN INFORMATION:  refer to Detailed Design Document
+    174          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    175          void DATKwpInit(void)
+   \                     DATKwpInit:
+    176          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    177              KwpMode                 = cStopMode;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       KwpMode,A
+    178              bDATKwpWakeUpIsRequested = cFalse;
+   \   0005   9E....         MOV       bDATKwpWakeUpIsRequested,A
+    179              mSetTxTargetId(cDATKwpDiagToolsId);
+   \   0008   A1F1           MOV       A,#241
+   \   000A   9E....         MOV       DATKwpTxBuffer+1,A
+    180              mSetTxSourceId(cDATKwpECUId);
+   \   000D   A126           MOV       A,#38
+   \   000F   9E....         MOV       DATKwpTxBuffer+2,A
+    181          }
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    182          
+    183          //============================================================================
+    184          // DESCRIPTION:         DATKwpLeaveStartingStepState
+    185          //
+    186          // PARAMETERS:          none
+    187          //
+    188          // RETURN VALUE:        none
+    189          // 
+    190          // DESIGN INFORMATION:  refer to Detailed Design Document
+    191          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    192          void DATKwpLeaveStartingStepState(void)
+   \                     DATKwpLeaveStartingStepState:
+    193          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    194              mLIBassert(KwpMode == cStopMode);
+   \   0001   8E....         MOV       A,KwpMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD03           BZ        ??DATKwpIsMaintainActiveState_3
+   \   0008   9A....         CALL      LIBAssertionFailed
+    195              KwpMode = cWakeUpMode;
+   \                     ??DATKwpIsMaintainActiveState_3:
+   \   000B   A103           MOV       A,#3
+   \   000D   9E....         MOV       KwpMode,A
+    196              LDBControl(cLDBChannelKwp,cLDBKwpWaitForWakeUp);
+   \   0010   A100           MOV       A,#0
+   \   0012   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0015   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0017   ..             CALLT     [__T_?FAR_CALL_L07]
+    197          }
+   \   0018   B4             POP       DE
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    198          
+    199          //===========================================================================
+    200          // DESCRIPTION:         DATKwpReturnInRxMode
+    201          //        This function initialize the module in Rxmode after a bad frame received
+    202          //
+    203          // PARAMETERS:          none
+    204          //
+    205          // RETURN VALUE:        none
+    206          // 
+    207          // DESIGN INFORMATION:  refer to Detailed Design Document
+    208          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    209          void DATKwpReturnInRxMode(void)
+   \                     DATKwpReturnInRxMode:
+    210          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    211              mLIBassert(KwpMode == cTxMode);
+   \   0001   8E....         MOV       A,KwpMode
+   \   0004   4D02           CMP       A,#2
+   \   0006   AD03           BZ        ??DATKwpIsMaintainActiveState_4
+   \   0008   9A....         CALL      LIBAssertionFailed
+    212              if(bDATKwpWakeUpIsRequested == cFalse)
+   \                     ??DATKwpIsMaintainActiveState_4:
+   \   000B   8E....         MOV       A,bDATKwpWakeUpIsRequested
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD0D           BNZ       ??DATKwpIsMaintainActiveState_5
+    213              {
+    214                  KwpMode = cRxMode;
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       KwpMode,A
+    215                  LDBControl(cLDBChannelKwp,cLDBKwpEnableRx);
+   \   0017   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   001A   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   001C   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   001D   FA12           BR        ??DATKwpIsMaintainActiveState_6
+    216              }
+    217              else
+    218              {
+    219                  KwpMode = cWakeUpMode;
+   \                     ??DATKwpIsMaintainActiveState_5:
+   \   001F   A103           MOV       A,#3
+   \   0021   9E....         MOV       KwpMode,A
+    220                  LDBControl(cLDBChannelKwp,cLDBKwpWaitForWakeUp);
+   \   0024   A100           MOV       A,#0
+   \   0026   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0029   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   002B   ..             CALLT     [__T_?FAR_CALL_L07]
+    221                  bDATKwpWakeUpIsRequested = cFalse;
+   \   002C   A100           MOV       A,#0
+   \   002E   9E....         MOV       bDATKwpWakeUpIsRequested,A
+    222              }
+    223          
+    224          }
+   \                     ??DATKwpIsMaintainActiveState_6:
+   \   0031   B4             POP       DE
+   \   0032   AF             RET       
+   \   0033                  REQUIRE ?CL78K_V4_6_L00
+    225          
+    226          //============================================================================
+    227          // DESCRIPTION:         DATKwpCallBackRxSpontWithoutAddr
+    228          //        This function copy the frame in DATKwpRxFrameBuffer and activate
+    229          //        the task for the check of the frame
+    230          //
+    231          //        WARNING : this function is called under Interrupt         
+    232          //
+    233          // PARAMETERS:          
+    234          //        tStatus Statut  : Always cLDBCorrect
+    235          //        tMsg *pMsg      : contain the pointer to the received frame and its length
+    236          //
+    237          // RETURN VALUE:        none
+    238          // 
+    239          // DESIGN INFORMATION:  refer to Detailed Design Document
+    240          //============================================================================
+    241          //QACJ  3206: akodzhh: Standard JCI dat layer interface 
+    242          //QACJ  3227: akodzhh: Standard JCI dat layer interface - 'const' for 'pMsg' 
+    243          //QACJ  3673: akodzhh: Standard JCI dat layer interface - 'const' for the object pointed by 'pMsg'
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    244          void DATKwpCallBackRxSpontWithoutAddr(tStatus Statut,tMsg* pMsg)
+   \                     DATKwpCallBackRxSpontWithoutAddr:
+    245          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    246          
+    247              // Status is always correct because there aren't controls on the frame in LDB_KWP
+    248              mLIBassert(Statut==cLDBCorrect);
+   \   0001   4D00           CMP       A,#0
+   \   0003   AD03           BZ        ??DATKwpIsMaintainActiveState_7
+   \   0005   9A....         CALL      LIBAssertionFailed
+    249          
+    250              // the component must be in receive mode
+    251              mLIBassert(KwpMode == cRxMode);
+   \                     ??DATKwpIsMaintainActiveState_7:
+   \   0008   8E....         MOV       A,KwpMode
+   \   000B   51             DEC       A
+   \   000C   AD03           BZ        ??DATKwpIsMaintainActiveState_8
+   \   000E   9A....         CALL      LIBAssertionFailed
+    252          
+    253              //CCOV: akodzhh: can't be tested because of assert
+    254              if( (pMsg != NULL) && (pMsg->pBuffer != NULL) )
+   \                     ??DATKwpIsMaintainActiveState_8:
+   \   0011   C2             MOVW      AX,BC
+   \   0012   6168           OR        A,X
+   \   0014   AD3F           BZ        ??DATKwpIsMaintainActiveState_9
+   \   0016   63             MOV       A,B
+   \   0017   D6             MOVW      HL,AX
+   \   0018   87             MOV       A,[HL]
+   \   0019   70             MOV       X,A
+   \   001A   AE01           MOV       A,[HL+0x01]
+   \   001C   6168           OR        A,X
+   \   001E   AD35           BZ        ??DATKwpIsMaintainActiveState_9
+    255              {
+    256                  // verify the length of the message
+    257                  mLIBassert(pMsg->Lng <= cDATKwpRxBufferSize);
+   \   0020   AE02           MOV       A,[HL+0x02]
+   \   0022   70             MOV       X,A
+   \   0023   AE03           MOV       A,[HL+0x03]
+   \   0025   EA4700         CMPW      AX,#71
+   \   0028   8D03           BC        ??DATKwpIsMaintainActiveState_10
+   \   002A   9A....         CALL      LIBAssertionFailed
+    258          
+    259                  // Disable the reception
+    260                  LDBControl(cLDBChannelKwp,cLDBKwpDisableRx);
+   \                     ??DATKwpIsMaintainActiveState_10:
+   \   002D   A102           MOV       A,#2
+   \   002F   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0032   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0034   ..             CALLT     [__T_?FAR_CALL_L07]
+    261          
+    262                  DATKwpRxFrameLgth = (U8)pMsg->Lng;
+   \   0035   C2             MOVW      AX,BC
+   \   0036   D6             MOVW      HL,AX
+   \   0037   AE02           MOV       A,[HL+0x02]
+   \   0039   9E....         MOV       DATKwpRxFrameLgth,A
+    263              
+    264                  // copy KWP frame
+    265                  mLIBmemcpy(DATKwpRxBuffer,pMsg->pBuffer,pMsg->Lng);
+   \   003C   AE02           MOV       A,[HL+0x02]
+   \   003E   70             MOV       X,A
+   \   003F   AE03           MOV       A,[HL+0x03]
+   \   0041   D4             MOVW      DE,AX
+   \   0042   87             MOV       A,[HL]
+   \   0043   70             MOV       X,A
+   \   0044   AE01           MOV       A,[HL+0x01]
+   \   0046   D2             MOVW      BC,AX
+   \   0047   10....         MOVW      AX,#DATKwpRxBuffer
+   \   004A   9A....         CALL      memcpy
+    266          
+    267                  // active KWPManage task
+    268                  TOSActivateTask(cTOSTaskID_ControlKwp);
+   \   004D   100001         MOVW      AX,#256
+   \   0050   9A....         CALL      TOSActivateTask
+   \   0053   FA03           BR        ??DATKwpIsMaintainActiveState_11
+    269              }
+    270              else
+    271              {
+    272                  mLIBassert(cFalse);
+   \                     ??DATKwpIsMaintainActiveState_9:
+   \   0055   9A....         CALL      LIBAssertionFailed
+    273              }
+    274              
+    275          }
+   \                     ??DATKwpIsMaintainActiveState_11:
+   \   0058   B4             POP       DE
+   \   0059   AF             RET       
+   \   005A                  REQUIRE ?CL78K_V4_6_L00
+    276          //============================================================================
+    277          // DESCRIPTION:         DATKwpCallBackTxWithoutAddr
+    278          //        This function inform the dat layer that the transmit is done
+    279          //
+    280          //        WARNING : this function is called under Interrupt         
+    281          //
+    282          // PARAMETERS:          
+    283          //        tStatus Statut : always cLDBCorrect
+    284          //
+    285          // RETURN VALUE:        none
+    286          // 
+    287          // DESIGN INFORMATION:  refer to Detailed Design Document
+    288          //============================================================================
+    289          //QACJ 3227: akodzhh: Standard JCI dat layer interface
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    290          void DATKwpCallBackTxWithoutAddr(tStatus Status)
+   \                     DATKwpCallBackTxWithoutAddr:
+    291          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    292              if (Status == cLDBCorrect)
+   \   0001   4D00           CMP       A,#0
+   \   0003   BD32           BNZ       ??DATKwpIsMaintainActiveState_12
+    293              {
+    294                  DATKwpReturnInRxMode();
+   \   0005   8E....         MOV       A,KwpMode
+   \   0008   4D02           CMP       A,#2
+   \   000A   AD03           BZ        ??DATKwpIsMaintainActiveState_13
+   \   000C   9A....         CALL      LIBAssertionFailed
+   \                     ??DATKwpIsMaintainActiveState_13:
+   \   000F   8E....         MOV       A,bDATKwpWakeUpIsRequested
+   \   0012   4D00           CMP       A,#0
+   \   0014   BD0D           BNZ       ??DATKwpIsMaintainActiveState_14
+   \   0016   A101           MOV       A,#1
+   \   0018   9E....         MOV       KwpMode,A
+   \   001B   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   001E   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0020   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0021   FA33           BR        ??DATKwpIsMaintainActiveState_15
+   \                     ??DATKwpIsMaintainActiveState_14:
+   \   0023   A103           MOV       A,#3
+   \   0025   9E....         MOV       KwpMode,A
+   \   0028   A100           MOV       A,#0
+   \   002A   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   002D   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   002F   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0030   A100           MOV       A,#0
+   \   0032   9E....         MOV       bDATKwpWakeUpIsRequested,A
+   \   0035   FA1F           BR        ??DATKwpIsMaintainActiveState_15
+    295              }
+    296              else if (Status == cLDBError)
+   \                     ??DATKwpIsMaintainActiveState_12:
+   \   0037   51             DEC       A
+   \   0038   BD19           BNZ       ??DATKwpIsMaintainActiveState_16
+    297              {
+    298                  mDATWrite(U1Bit, DefKLineCC, cTrue, Default);
+   \   003A   A101           MOV       A,#1
+   \   003C   16....         MOVW      HL,#DATCmnData+20
+   \   003F   97             MOV       [HL],A
+    299                  mDATWrite(U1Bit, EEP_DefKLineCC, cTrue, Default);
+   \   0040   16....         MOVW      HL,#DATDbkMirrors+20
+   \   0043   31A607         BT        [HL].2, ??DATKwpIsMaintainActiveState_17
+   \   0046   A100           MOV       A,#0
+   \   0048   71A2           SET1      [HL].2
+   \   004A   9A....         CALL      DATDbkStartUpdate
+    300                  //TODO: increment counter in EEP
+    301                  TOSStartTimer(&KLineFaultTimer);
+   \                     ??DATKwpIsMaintainActiveState_17:
+   \   004D   10....         MOVW      AX,#KLineFaultTimer
+   \   0050   ..             CALLT     [__T_TOSStartTimer]
+   \   0051   FA03           BR        ??DATKwpIsMaintainActiveState_15
+    302                  // do not return to Rx mode
+    303              }
+    304              else
+    305              {
+    306                  mLIBassert(cFalse);
+   \                     ??DATKwpIsMaintainActiveState_16:
+   \   0053   9A....         CALL      LIBAssertionFailed
+    307              }
+    308          }
+   \                     ??DATKwpIsMaintainActiveState_15:
+   \   0056   B4             POP       DE
+   \   0057   AF             RET       
+   \   0058                  REQUIRE ?CL78K_V4_6_L00
+    309          //===========================================================================
+    310          //  DESCRIPTION : DATKwpTaskControl
+    311          //        Task for the managment of the frame
+    312          //      - in Rx mode      : this function control the validity of the KWP frame. if the frame is
+    313          //                        valid a signal is activate else the LDB layer return in Rx mode
+    314          //      - in Tx mode      : This function complete the header and the checksum of the frame and
+    315          //                        send it
+    316          //      - in WakeUp mode  : The signal EventIntKwpWakeUp and the control cTOSControlWakeUpRequest
+    317          //                        are activated
+    318          //
+    319          // PARAMETERS:          none
+    320          //
+    321          // RETURN VALUE:        none
+    322          // 
+    323          // DESIGN INFORMATION:  refer to Detailed Design Document
+    324          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    325          void DATKwpTaskControl(void)
+   \                     DATKwpTaskControl:
+    326          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    327          #ifdef X90_PROJECT
+    328              DATKwpTaskControl_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATKwpTaskControl_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATKwpTaskControl_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    329          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    330          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    331          static MEM_TYPE void DATKwpTaskControl_Static(void)
+   \                     DATKwpTaskControl_Static:
+    332          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    333          #endif
+    334          
+    335              switch(KwpMode)
+   \   0001   8E....         MOV       A,KwpMode
+   \   0004   4D01           CMP       A,#1
+   \   0006   AD0E           BZ        ??DATKwpIsMaintainActiveState_28
+   \   0008   4D02           CMP       A,#2
+   \   000A   AD58           BZ        ??DATKwpIsMaintainActiveState_29
+   \   000C   4D03           CMP       A,#3
+   \   000E   BD03           BNZ       $+5
+   \   0010   9B....         BR        N:??DATKwpIsMaintainActiveState_30
+   \   0013   9B....         BR        N:??DATKwpIsMaintainActiveState_31
+    336              {
+    337              case cRxMode:
+    338                  //QACJ 3415: akodzhh: Cause CalcChecksum : the length must be tested before calculate the checksum
+    339                  //QACJ 3416: akodzhh: Cause CalcChecksum : the length must be tested before calculate the checksum
+    340                  if((mGetRxStartField == (U8)(cKwpLghByte0x80 + (DATKwpRxFrameLgth - cKwpHeaderLgh - cKwpCksLgh)))
+    341                      && (DATKwpRxFrameLgth > (cKwpHeaderLgh + cKwpCksLgh))
+    342                      && ( mGetRxSourceId == cDATKwpDiagToolsId)
+    343                      && ( CalcChecksum(DATKwpRxBuffer,DATKwpRxFrameLgth) == mGetRxByte(DATKwpRxFrameLgth-1)))
+   \                     ??DATKwpIsMaintainActiveState_28:
+   \   0016   A17C           MOV       A,#124
+   \   0018   08....         ADD       A,DATKwpRxFrameLgth
+   \   001B   48....         CMP       A,DATKwpRxBuffer
+   \   001E   BD3A           BNZ       ??DATKwpIsMaintainActiveState_32
+   \   0020   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0023   4D05           CMP       A,#5
+   \   0025   8D33           BC        ??DATKwpIsMaintainActiveState_32
+   \   0027   8E....         MOV       A,DATKwpRxBuffer+2
+   \   002A   4DF1           CMP       A,#241
+   \   002C   BD2C           BNZ       ??DATKwpIsMaintainActiveState_32
+   \   002E   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0031   73             MOV       B,A
+   \   0032   10....         MOVW      AX,#DATKwpRxBuffer
+   \   0035   9A....         CALL      CalcChecksum
+   \   0038   72             MOV       C,A
+   \   0039   8E....         MOV       A,DATKwpRxFrameLgth
+   \   003C   73             MOV       B,A
+   \   003D   16....         MOVW      HL,#DATKwpRxBuffer-1
+   \   0040   AB             MOV       A,[HL+B]
+   \   0041   70             MOV       X,A
+   \   0042   62             MOV       A,C
+   \   0043   6148           CMP       A,X
+   \   0045   BD13           BNZ       ??DATKwpIsMaintainActiveState_32
+    344                  {
+    345                      // calculate the data length
+    346                      DATKwpRxFrameLgth = (U8)(DATKwpRxFrameLgth - cKwpHeaderLgh) - cKwpCksLgh;
+   \   0047   8E....         MOV       A,DATKwpRxFrameLgth
+   \   004A   0DFC           ADD       A,#252
+   \   004C   9E....         MOV       DATKwpRxFrameLgth,A
+    347                      // Inform LAP layer of the reception of new request
+    348                      TOSWriteSignal(cTOSSignalDiagnosticMessageIsReceived);
+   \   004F   101F00         MOVW      AX,#31
+   \   0052   ..             CALLT     [__T_TOSWriteSignal]
+    349                      KwpMode = cTxMode;
+   \   0053   A102           MOV       A,#2
+   \                     ??DATKwpTaskControl_Static_0:
+   \   0055   9E....         MOV       KwpMode,A
+   \   0058   FA5E           BR        ??DATKwpIsMaintainActiveState_33
+    350                  }
+    351                  else
+    352                  {
+    353                      // Return in receive mode
+    354                      LDBControl(cLDBChannelKwp,cLDBKwpEnableRx);
+   \                     ??DATKwpIsMaintainActiveState_32:
+   \   005A   A101           MOV       A,#1
+   \   005C   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   005F   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0061   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0062   FA54           BR        ??DATKwpIsMaintainActiveState_33
+    355                  }
+    356                  break;
+    357          
+    358              case cTxMode:
+    359                  mLIBassert(DATKwpTxMsg.Lng<=(cDATKwpTxBufferSize - cKwpHeaderLgh - cKwpCksLgh));
+   \                     ??DATKwpIsMaintainActiveState_29:
+   \   0064   02....         MOVW      AX,DATKwpTxMsg+2
+   \   0067   EA4300         CMPW      AX,#67
+   \   006A   8D03           BC        ??DATKwpIsMaintainActiveState_34
+   \   006C   9A....         CALL      LIBAssertionFailed
+    360                  // complete the frame
+    361                  mSetTxStartField(cKwpLghByte0x80  | (U8)DATKwpTxMsg.Lng);
+   \                     ??DATKwpIsMaintainActiveState_34:
+   \   006F   8E....         MOV       A,DATKwpTxMsg+2
+   \   0072   6D80           OR        A,#128
+   \   0074   9E....         MOV       DATKwpTxBuffer,A
+    362                  DATKwpTxMsg.Lng = DATKwpTxMsg.Lng + (U16)(cKwpHeaderLgh + cKwpCksLgh);
+   \   0077   100400         MOVW      AX,#4
+   \   007A   30             XCH       A,X
+   \   007B   08....         ADD       A,DATKwpTxMsg+2
+   \   007E   30             XCH       A,X
+   \   007F   28....         ADDC      A,DATKwpTxMsg+3
+   \   0082   03....         MOVW      DATKwpTxMsg+2,AX
+    363                  mSetTxByte(DATKwpTxMsg.Lng-1,CalcChecksum(DATKwpTxBuffer,(U8)DATKwpTxMsg.Lng));
+   \   0085   8E....         MOV       A,DATKwpTxMsg+2
+   \   0088   73             MOV       B,A
+   \   0089   10....         MOVW      AX,#DATKwpTxBuffer
+   \   008C   9A....         CALL      CalcChecksum
+   \   008F   72             MOV       C,A
+   \   0090   02....         MOVW      AX,DATKwpTxMsg+2
+   \   0093   CA....         ADDW      AX,#DATKwpTxBuffer-1
+   \   0096   D6             MOVW      HL,AX
+   \   0097   62             MOV       A,C
+   \   0098   97             MOV       [HL],A
+    364                  DATKwpTxMsg.pBuffer = DATKwpTxBuffer;
+   \   0099   10....         MOVW      AX,#DATKwpTxBuffer
+   \   009C   03....         MOVW      DATKwpTxMsg,AX
+    365                  // send the frame
+    366                  LDBSendWithoutAddr(cLDBChannelKwp,&DATKwpTxMsg);
+   \   009F   10....         MOVW      AX,#DATKwpTxMsg
+   \   00A2   16....         MOVW      HL,#LWRD(LDBKwpSendWithoutAddr)
+   \   00A5   A4..           MOV       E,#BYTE3(LDBKwpSendWithoutAddr)
+   \   00A7   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   00A8   FA0E           BR        ??DATKwpIsMaintainActiveState_33
+    367                  break;
+    368              case cWakeUpMode :
+    369                  // Wakeup must be always sent (In sleep and WakeUp mode)
+    370                  // It allow to re-start a minimum activation time
+    371                  TOSSendControl(cTOSControlWakeUpRequest);
+   \                     ??DATKwpIsMaintainActiveState_30:
+   \   00AA   A102           MOV       A,#2
+   \   00AC   ..             CALLT     [__T_TOSSendControl]
+    372                  TOSWriteSignal(cTOSSignalEventIntKwpWakeUp);
+   \   00AD   101E00         MOVW      AX,#30
+   \   00B0   ..             CALLT     [__T_TOSWriteSignal]
+    373                  // LDBKwp component is already in Rx mode because this mode is required to detect WakeUp.
+    374                  // Low state = 25 ms, High State = 25 ms, next message.
+    375                  KwpMode = cRxMode;
+   \   00B1   A101           MOV       A,#1
+   \   00B3   FAA0           BR        ??DATKwpTaskControl_Static_0
+    376                  break;
+    377              //CCOV: akodzhh: can't be tested because of assert
+    378              default:
+    379                  mLIBassert(cFalse);
+   \                     ??DATKwpIsMaintainActiveState_31:
+   \   00B5   9A....         CALL      LIBAssertionFailed
+    380                  break;
+    381              }
+    382          
+    383          }
+   \                     ??DATKwpIsMaintainActiveState_33:
+   \   00B8   B2             POP       BC
+   \   00B9   AF             RET       
+   \   00BA                  REQUIRE ?CL78K_V4_6_L00
+    384          //============================================================================
+    385          // DESCRIPTION:         DATKwpCallBackCtrl
+    386          //        This function inform the dat layer that a Wake up is request
+    387          //        by the Kwp channel
+    388          //
+    389          //        WARNING : this function is called under Interrupt         
+    390          //
+    391          // PARAMETERS:          tCtrl Ctrl : cLDBKwpWakeUp
+    392          //
+    393          // RETURN VALUE:        none
+    394          // 
+    395          // DESIGN INFORMATION:  refer to Detailed Design Document
+    396          //============================================================================
+    397          //QACJ 3206: akodzhh: The parameter 'Ctrl' is used in an assertion
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    398          void DATKwpCallBackCtrl(tCtrl Ctrl)
+   \                     DATKwpCallBackCtrl:
+    399          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    400              mLIBassert(Ctrl == cLDBKwpWakeUp);
+   \   0000   4D03           CMP       A,#3
+   \   0002   AD03           BZ        ??DATKwpIsMaintainActiveState_18
+   \   0004   9A....         CALL      LIBAssertionFailed
+    401              mLIBassert(KwpMode == cWakeUpMode);
+   \                     ??DATKwpIsMaintainActiveState_18:
+   \   0007   8E....         MOV       A,KwpMode
+   \   000A   4D03           CMP       A,#3
+   \   000C   AD03           BZ        ??DATKwpIsMaintainActiveState_19
+   \   000E   9A....         CALL      LIBAssertionFailed
+    402            
+    403              // active KWPManage task
+    404              TOSActivateTask(cTOSTaskID_ControlKwp);
+   \                     ??DATKwpIsMaintainActiveState_19:
+   \   0011   100001         MOVW      AX,#256
+   \   0014   9B....         BR        N:TOSActivateTask
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    405          }
+    406          
+    407          //============================================================================
+    408          // DESCRIPTION:         DATKwpCallBackEndCtrl
+    409          //                this function is just declare for E_CAR but isn't used
+    410          //
+    411          // PARAMETERS:          
+    412          //        tCtrl Ctrl      : cLDBKwpEnableRx,cLDBKwpDisableRx or cLDBKwpWaitForWakeUp
+    413          //        tStatus Statut  : Always cLDBCorrect
+    414          //
+    415          //
+    416          // RETURN VALUE:        none
+    417          // 
+    418          // DESIGN INFORMATION:  refer to Detailed Design Document
+    419          //============================================================================
+    420          //QACJ 3206: akodzhh: The parameter 'Ctrl' is used in an assertion
+    421          //QACJ 3206: akodzhh: The parameter 'Status' is used in an assertion
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    422          void DATKwpCallBackEndCtrl(tCtrl Ctrl, tStatus Status)
+   \                     DATKwpCallBackEndCtrl:
+    423          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   70             MOV       X,A
+    424              mLIBassert(  (Ctrl == cLDBKwpEnableRx)
+    425                         ||(Ctrl == cLDBKwpDisableRx)
+    426                         ||(Ctrl == cLDBKwpWaitForWakeUp));
+   \   0001   51             DEC       A
+   \   0002   AD0C           BZ        ??DATKwpIsMaintainActiveState_20
+   \   0004   60             MOV       A,X
+   \   0005   4D02           CMP       A,#2
+   \   0007   AD07           BZ        ??DATKwpIsMaintainActiveState_20
+   \   0009   4D00           CMP       A,#0
+   \   000B   AD03           BZ        ??DATKwpIsMaintainActiveState_20
+   \   000D   9A....         CALL      LIBAssertionFailed
+    427              mLIBassert(Status == cLDBCorrect);
+   \                     ??DATKwpIsMaintainActiveState_20:
+   \   0010   63             MOV       A,B
+   \   0011   4D00           CMP       A,#0
+   \   0013   AD03           BZ        ??DATKwpIsMaintainActiveState_21
+   \   0015   9A....         CALL      LIBAssertionFailed
+    428          }
+   \                     ??DATKwpIsMaintainActiveState_21:
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    429          //============================================================================
+    430          // DESCRIPTION:         DATKwpActivateWakeUpDetection
+    431          //
+    432          // PARAMETERS:          none
+    433          //
+    434          // RETURN VALUE:        none
+    435          // 
+    436          // DESIGN INFORMATION:  refer to Detailed Design Document
+    437          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    438          void DATKwpActivateWakeUpDetection(void)
+   \                     DATKwpActivateWakeUpDetection:
+    439          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    440              if (KwpMode != cRxMode)
+   \   0001   8E....         MOV       A,KwpMode
+   \   0004   51             DEC       A
+   \   0005   AD07           BZ        ??DATKwpIsMaintainActiveState_22
+    441              {
+    442                  bDATKwpWakeUpIsRequested = cTrue;
+   \   0007   A101           MOV       A,#1
+   \   0009   9E....         MOV       bDATKwpWakeUpIsRequested,A
+   \   000C   FA15           BR        ??DATKwpIsMaintainActiveState_23
+    443              }
+    444              else
+    445              {
+    446                  KwpMode = cWakeUpMode;
+   \                     ??DATKwpIsMaintainActiveState_22:
+   \   000E   A103           MOV       A,#3
+   \   0010   9E....         MOV       KwpMode,A
+    447                  LDBControl(cLDBChannelKwp,cLDBKwpDisableRx);
+   \   0013   A102           MOV       A,#2
+   \   0015   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0018   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   001A   ..             CALLT     [__T_?FAR_CALL_L07]
+    448                  LDBControl(cLDBChannelKwp,cLDBKwpWaitForWakeUp);
+   \   001B   A100           MOV       A,#0
+   \   001D   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0020   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0022   ..             CALLT     [__T_?FAR_CALL_L07]
+    449              }
+    450          }
+   \                     ??DATKwpIsMaintainActiveState_23:
+   \   0023   B4             POP       DE
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+    451          
+    452          //============================================================================
+    453          //  DESCRIPTION         : DATKwpIsMaintainActiveState
+    454          //
+    455          //  PARAMETERS          : None
+    456          //
+    457          //  RETURN VALUE        : None
+    458          //
+    459          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    460          //
+    461          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    462          void DATKwpIsMaintainActiveState(void)
+   \                     DATKwpIsMaintainActiveState:
+    463          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    464              if (KwpMode != cWakeUpMode)
+   \   0002   8E....         MOV       A,KwpMode
+   \   0005   4D03           CMP       A,#3
+   \   0007   AD04           BZ        ??DATKwpIsMaintainActiveState_24
+    465              {
+    466                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   0009   102900         MOVW      AX,#41
+   \   000C   ..             CALLT     [__T_TOSWriteSignal]
+    467              }
+    468              // HW Protection: timer refresh
+    469              //QACJ 3415: adzhelp: Standard TOS function used
+    470              //QACJ 3416: adzhelp: Standard TOS function used
+    471              if ((TOSIsTimerStarted(&KLineFaultTimer) != cFalse) &&
+    472                  (TOSIsTimerElapsed(&KLineFaultTimer, mTOSConvMsInTimerTick(cRestoreTimeMs)) != cFalse)
+    473                 )        
+   \                     ??DATKwpIsMaintainActiveState_24:
+   \   000D   10....         MOVW      AX,#KLineFaultTimer
+   \   0010   9A....         CALL      TOSIsTimerStarted
+   \   0013   4D00           CMP       A,#0
+   \   0015   AD45           BZ        ??DATKwpIsMaintainActiveState_25
+   \   0017   10....         MOVW      AX,#KLineFaultTimer
+   \   001A   12F401         MOVW      BC,#500
+   \   001D   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   001E   4D00           CMP       A,#0
+   \   0020   AD3A           BZ        ??DATKwpIsMaintainActiveState_25
+    474              {
+    475                  TOSStopTimer(&KLineFaultTimer);
+   \   0022   10....         MOVW      AX,#KLineFaultTimer
+   \   0025   ..             CALLT     [__T_TOSStopTimer]
+    476                  mDATWrite(U1Bit, DefKLineCC, cFalse, Default);
+   \   0026   A100           MOV       A,#0
+   \   0028   16....         MOVW      HL,#DATCmnData+20
+   \   002B   97             MOV       [HL],A
+    477                  DATKwpReturnInRxMode();
+   \   002C   8E....         MOV       A,KwpMode
+   \   002F   4D02           CMP       A,#2
+   \   0031   AD03           BZ        ??DATKwpIsMaintainActiveState_26
+   \   0033   9A....         CALL      LIBAssertionFailed
+   \                     ??DATKwpIsMaintainActiveState_26:
+   \   0036   8E....         MOV       A,bDATKwpWakeUpIsRequested
+   \   0039   4D00           CMP       A,#0
+   \   003B   BD0D           BNZ       ??DATKwpIsMaintainActiveState_27
+   \   003D   A101           MOV       A,#1
+   \   003F   9E....         MOV       KwpMode,A
+   \   0042   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0045   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0047   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0048   FA12           BR        ??DATKwpIsMaintainActiveState_25
+   \                     ??DATKwpIsMaintainActiveState_27:
+   \   004A   A103           MOV       A,#3
+   \   004C   9E....         MOV       KwpMode,A
+   \   004F   A100           MOV       A,#0
+   \   0051   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0054   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0056   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0057   A100           MOV       A,#0
+   \   0059   9E....         MOV       bDATKwpWakeUpIsRequested,A
+    478              }
+    479          }
+   \                     ??DATKwpIsMaintainActiveState_25:
+   \   005C   B4             POP       DE
+   \   005D   B2             POP       BC
+   \   005E   AF             RET       
+   \   005F                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     KwpMode                           1
+     bDATKwpWakeUpIsRequested          1
+     KLineFaultTimer                   2
+     DATKwpRxBuffer                   70
+     DATKwpTxBuffer                   70
+     DATKwpTxMsg                       4
+     DATKwpRxFrameLgth                 1
+     CalcChecksum                     54
+     DATKwpInit                       19
+     DATKwpLeaveStartingStepState     26
+     DATKwpReturnInRxMode             51
+     DATKwpCallBackRxSpontWithoutAddr
+                                      90
+     DATKwpCallBackTxWithoutAddr      88
+     DATKwpTaskControl                 9
+     DATKwpTaskControl_Static        186
+     DATKwpCallBackCtrl               23
+     DATKwpCallBackEndCtrl            25
+     DATKwpActivateWakeUpDetection    37
+     DATKwpIsMaintainActiveState      95
+     __T_?FAR_CALL_L07                 2
+     __T_TOSStartTimer                 2
+     __T_TOSWriteSignal                2
+     __T_TOSSendControl                2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStopTimer                  2
+
+ 
+ 186 bytes in segment BCODE
+  12 bytes in segment CLTVEC
+ 517 bytes in segment CODE
+ 149 bytes in segment NEAR_Z
+ 
+ 703 bytes of CODE memory (+ 12 bytes shared)
+ 149 bytes of DATA memory
+
+Errors: none
+Warnings: none

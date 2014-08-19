@@ -1,0 +1,1015 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:08 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SUP.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_SUP.LST -o                           #
+#                    ..\EXE\TARGET_R\LDB_SUP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SUP.C                                                  #
+#    List file    =  ..\EXE\TARGET_R\LDB_SUP.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LDB_SUP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SUP.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_SUP
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Feb 10 2010 09:18:16  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SUP/LDB_SUP.C-arc  $
+     15          // $Revision:   1.6  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SUP/LDB_SUP.C-arc   $
+     18          // 
+     19          //    Rev 1.6   Feb 10 2010 09:18:16   adzhelp
+     20          // Cm006219: Check for solder control mode entry
+     21          // 
+     22          //    Rev 1.5   Apr 27 2009 15:45:02   adzhelp
+     23          // Cm003265: Implementaion of sleep mode management for RF
+     24          // 
+     25          //    Rev 1.4   Apr 17 2009 15:26:54   adzhelp
+     26          // Cm003276: Corrections after target integration test:
+     27          // Memory configuration registers inited at the beginning
+     28          // 
+     29          //    Rev 1.3   Apr 16 2009 14:27:56   adzhelp
+     30          // Cm003276: Integration test changes
+     31          // 
+     32          //    Rev 1.2   Apr 16 2009 10:47:54   adzhelp
+     33          // Cm003276: Implementation of sleep mode management
+     34          // 
+     35          //    Rev 1.1   Mar 20 2009 14:48:48   adzhelp
+     36          // Cm003619: Parameterization of LDB_SUP according to HSI and MCU 78F0536
+     37          // 
+     38          //    Rev 1.0   04 Feb 2009 17:03:18   adzhelp
+     39          // Initial revision.
+     40          //******************************************************************************
+     41          
+     42          /*--------------------------------------------------------------------------
+     43            Body Identification
+     44            --------------------------------------------------------------------------*/
+     45          
+     46          #define LDB_SUP   "LDB_SUP"
+     47          
+     48          /*-------------------------------------------------------------------------
+     49            Included files
+     50          
+     51            #include <system_file_name.h>
+     52            #include "project_file_name.h"
+     53            --------------------------------------------------------------------------*/
+     54          
+     55          #include "lib.h"
+     56          #include "TOS.h"
+
+   \                                 In  segment NEAR_A, at 0xff99
+   \   unsigned char volatile __sfr __no_bit_access WDTE
+   \                     WDTE:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff9f
+   \   union <unnamed> volatile __sfr _A_OSCCTL
+   \                     _A_OSCCTL:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffa0
+   \   union <unnamed> volatile __sfr _A_RCM
+   \                     _A_RCM:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffa1
+   \   union <unnamed> volatile __sfr _A_MCM
+   \                     _A_MCM:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffa2
+   \   union <unnamed> volatile __sfr _A_MOC
+   \                     _A_MOC:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffa3
+   \   union <unnamed> const volatile __sfr _A_OSTC
+   \                     _A_OSTC:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffa4
+   \   union <unnamed> volatile __sfr _A_OSTS
+   \                     _A_OSTS:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff0
+   \   unsigned char volatile __sfr __no_bit_access IMS
+   \                     IMS:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xfff4
+   \   unsigned char volatile __sfr __no_bit_access IXS
+   \                     IXS:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xfffb
+   \   union <unnamed> volatile __sfr _A_PCC
+   \                     _A_PCC:
+   \   0000                  DS 1
+     57          #include "ldb_tos.h"
+     58          #include "ldb_reg.h"
+     59          #include "ldb_int.h"
+     60          #include "ldb_tim.h"
+     61          #include "ldb_rf.h"
+     62          #include "ldb_sld.h"
+     63          #include "ldb_sup.h"
+     64          
+     65          
+     66          /*--------------------------------------------------------------------------
+     67            Local constants
+     68          
+     69            #define cConstantName   ((tType) ConstantValue)
+     70            --------------------------------------------------------------------------*/
+     71          #define cRefreshWatchdogValue       (U8)0xACU
+     72          
+     73          // External RAM parameters
+     74          #define cExtRamAddressBegin         (U16)0xE800U // value for 78K0_F0536
+     75          #define cExtRamAddressEnd           (U16)0xF7FFU
+     76          #pragma segment="NEAR_Z" // last segment in Ext RAM that needs to be initialized
+     77          #define cExtRamAddressRealEnd       (U16)(__segment_end("NEAR_Z")) // end address + 1
+     78          
+     79          #define cIMSRegInit                 (U8)0xCCU  // value for 78K0_F0536
+     80          #define cIXSRegInit                 (U8)0x04U  // value for 78K0_F0536
+     81          
+     82          #define cOSTSRegInit                (U8)0x01U  // 128 uS oscillator stabilization time
+     83                                                         // (T = 2^13/fx)
+     84          #define cOSTCRegCompare             (U8)0x10U  // Compare value corresponding to cOSTSRegInit
+     85          
+     86          // Sleep refresh period in LDB ticks
+     87          #define cSleepRefreshPeriod         (U8)2U // 40 ms
+     88          
+     89          /*--------------------------------------------------------------------------
+     90            Local macros
+     91          
+     92            #define mMacroName   (MacroDefinition)
+     93            --------------------------------------------------------------------------*/
+     94          #define mHalt() _ASM("HALT"); \
+     95                          _ASM("NOP" ); \
+     96                          _ASM("NOP" )  
+     97          #define mStop() _ASM("STOP"); \
+     98                          _ASM("NOP" ); \
+     99                          _ASM("NOP" )  
+    100          
+    101          // Disable active HW modules in MCU requiring peripheral clock
+    102          #define mDisableActiveHw() \
+    103              { \
+    104                  mLIBassert(bClockForActiveModeSelected != cFalse); \
+    105                  bLDBSupActivatedHw = cFalse; \
+    106                  LDBAnaControl(cLDBAnaStopHW); \
+    107                  /* mDisableRfHw(); */ \
+    108              }
+    109          
+    110          // Enable HW modules in MCU requiring peripheral clock
+    111          #define mEnableActiveHw() \
+    112              { \
+    113                  mLIBassert(bClockForActiveModeSelected != cFalse); \
+    114                  bLDBSupActivatedHw = cTrue; \
+    115                  LDBAnaControl(cLDBAnaStartHW); \
+    116              }
+    117          // Enable RF HW
+    118          #ifdef MEASURE_RF_STROBE_DURATION
+    119          #define mEnableRfHw() \
+    120              mLDBHarWrite(cLDBHarPort1_3, 1); \
+    121              LDBRfControl(cLDBRfActivateStrobe)
+    122          #else
+    123          #define mEnableRfHw() \
+    124              LDBRfControl(cLDBRfActivateStrobe)
+    125          #endif
+    126          // Disable RF HW
+    127          #define mDisableRfHw() LDBRfControl(cLDBRfDeactivateStrobe)
+    128          
+    129          
+    130          // Specific wake-up conditions
+    131          #define mIsKLineWakeUp() (mLDBHarRead(cLDBHarRxKwp) == 0) // possible K-Line wake-up
+    132          
+    133          #define mIsWakeupDetectionStarted() (bWakeUpDetectionPinStarted != cFalse)
+    134          #define mInformWakeupDetectionStarted() \
+    135              /* clear flag for wakeup detection */ \
+    136              bWakeUpDetectionPinStarted = cFalse; \
+    137              /* allow DAT layer to use ADC converter */ \
+    138              bAnalogConversionAllowed = cTrue;
+    139          #define mInformWakeupDetectionStopped() \
+    140              /* forbid DAT layer to use ADC converter */ \
+    141              bAnalogConversionAllowed = cFalse;
+    142          
+    143          // Uncomment following line to enable integration test of sleep mode
+    144          //#define TEST_INTEGRATION_SLEEP_MODE
+    145          
+    146          #ifdef TEST_INTEGRATION_SLEEP_MODE
+    147          // Connect an oscilloscope to PIN#44
+    148          #define mStartWakeupScopeTrace() mLDBHarWrite(cLDBHarPort1_2, 1)
+    149          #define mStopWakeupScopeTrace()  mLDBHarWrite(cLDBHarPort1_2, 0)
+    150          #else
+    151          #define mStartWakeupScopeTrace()
+    152          #define mStopWakeupScopeTrace()
+    153          #endif
+    154          
+    155          /*--------------------------------------------------------------------------
+    156            Local types
+    157          
+    158            struct  sStructureName { ... };
+    159            union   uUnionName { ... };
+    160            enum    eEnumerationName { ... };
+    161            typedef Expression tTypeName;
+    162            --------------------------------------------------------------------------*/
+    163          
+    164          
+    165          /*--------------------------------------------------------------------------
+    166            Local data
+    167          
+    168            static  tType   VariableName;
+    169            static  tType*  pVariableName; 
+    170            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    171          static BOOL bSleepMode;
+   \                     bSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    172          static volatile tDelay SleepTimerDelay;
+   \                     SleepTimerDelay:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    173          static BOOL bWakeUpDetectionPinStarted;
+   \                     bWakeUpDetectionPinStarted:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    174          static BOOL bClockForActiveModeSelected;
+   \                     bClockForActiveModeSelected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    175          static BOOL bAnalogConversionAllowed;
+   \                     bAnalogConversionAllowed:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    176          
+    177          /*--------------------------------------------------------------------------
+    178            Constant local data
+    179          
+    180            static const tType  VariableName;
+    181            --------------------------------------------------------------------------*/
+    182          
+    183          
+    184          /*--------------------------------------------------------------------------
+    185            Exported data
+    186          
+    187            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    188            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    189            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    190          BOOL bLDBSupActivatedHw;
+   \                     bLDBSupActivatedHw:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    191          
+    192          /*--------------------------------------------------------------------------
+    193            Constant exported data
+    194           
+    195            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    196            --------------------------------------------------------------------------*/
+    197          // OPTION BYTE
+    198          #pragma constseg=OPTBYTE
+
+   \                                 In  segment OPTBYTE, align 1, root
+    199          __root const U8 LDBHarOptionBytes[5]= 
+   \                     LDBHarOptionBytes:
+   \   0000   7B000000       DB 123, 0, 0, 0, 0
+   \          00      
+    200          { 
+    201              /* @0080 */ 0x7BU, // Window 100%, watchdog enabled, T = 124.12 ms, oscillator cannot be stopped
+    202              /* @0081 */ 0x00U, // default POC mode
+    203              /* @0082 */ 0x00U, // reserved
+    204              /* @0083 */ 0x00U, // reserved
+    205              /* @0084 */ 0x00U  // no on-chip debug
+    206          };
+    207          #pragma constseg=default
+    208          
+    209          
+    210          /*--------------------------------------------------------------------------
+    211            Local function prototypes
+    212            
+    213            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    214            --------------------------------------------------------------------------*/
+    215          static void ConfigureClockForActiveMode(void);
+    216          static void ConfigureClockForSleepMode(void);
+    217          
+    218          /*============================================================================
+    219            =========================== LOCAL FUNCTIONS ================================
+    220            ==========================================================================*/
+    221          
+    222          /*============================================================================
+    223            DESCRIPTION :
+    224            
+    225            PARAMETERS (Type,Name,Min,Max) :   none
+    226          
+    227            RETURN VALUE :   none
+    228           
+    229            DESIGN INFORMATION :   refer to Detailed Design Document
+    230            ==========================================================================*/
+    231          static void ConfigureClockForActiveMode(void)
+    232          {
+    233              bClockForActiveModeSelected = cTrue;
+    234          
+    235              /* Operation Mode Select */
+    236              mLIBassert(mLDBRegRead1BitInRegister(MOC, 7) == 1U); /* X1 should be stopped */
+    237              mLDBRegWrite8BitRegister(OSCCTL, (U8)0x41U); /* X1 oscillator enabled, fxh > 10 MHz */
+    238              /* Main OSC control - high system clock X1 */
+    239              mLDBRegWrite1BitInRegister(MOC, 7, 0); /* X1 oscillator operating (@16 MHz) */
+    240          
+    241              while (mLDBRegRead8BitRegister(OSTC) < cOSTCRegCompare)
+    242              {
+    243                  /* Wait for X1 oscillator stabilization */
+    244              }
+    245              /* Main clock mode */
+    246              mLDBRegWrite8BitRegister(MCM, (U8)0x07U); /* main clock and peripheral clock set to high-speed clock */
+    247              /* Internal oscillation */
+    248              mLDBRegWrite8BitRegister(RCM, (U8)0x01U);  /* Internal oscillators: low-speed enabled; high speed disabled */
+    249          }
+    250          
+    251          /*============================================================================
+    252            DESCRIPTION :
+    253            
+    254            PARAMETERS (Type,Name,Min,Max) :   none
+    255          
+    256            RETURN VALUE :   none
+    257           
+    258            DESIGN INFORMATION :   refer to Detailed Design Document
+    259            ==========================================================================*/
+    260          static void ConfigureClockForSleepMode(void)
+    261          {
+    262              bClockForActiveModeSelected = cFalse;
+    263          
+    264              /* Internal oscillation */
+    265              mLDBRegWrite8BitRegister(RCM, (U8)0x00U);  /*  Internal oscillators: low-speed enabled; high speed enabed */
+    266          
+    267              while (mLDBRegRead1BitInRegister(RCM, 7) == 0)
+    268              {
+    269                  /* Wait for internal high speed oscillator stabilization */
+    270              }
+    271              /* Main clock mode */
+    272              mLDBRegWrite8BitRegister(MCM, (U8)0x00U); /* main clock and peripheral clock set to internal high-speed clock */
+    273              /* Main OSC control - high system clock X1 */
+    274              mLDBRegWrite1BitInRegister(MOC, 7, 1); /* X1 oscillator stopped */
+    275              /* Operation Mode Select */
+    276              mLDBRegWrite8BitRegister(OSCCTL, (U8)0x00U); /* X1 oscillator disabled */
+    277          }
+    278          
+    279          /*============================================================================
+    280            =========================== EXPORTED FUNCTIONS =============================
+    281            ==========================================================================*/
+    282          
+    283          /*============================================================================
+    284            DESCRIPTION :
+    285            
+    286            PARAMETERS (Type,Name,Min,Max) :  none
+    287          
+    288            RETURN VALUE :  none
+    289           
+    290            DESIGN INFORMATION :  refer to Detailed Design Document
+    291          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    292          void LDBRefreshWatchDog(void)
+   \                     LDBRefreshWatchDog:
+    293          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    294              mLDBRegWrite8BitRegister(WDTE, cRefreshWatchdogValue);
+   \   0000   1399AC         MOV       0xFF99,#172
+    295          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+   \   0004                  REQUIRE WDTE
+    296          
+    297          /*============================================================================
+    298            DESCRIPTION :
+    299            
+    300            PARAMETERS (Type,Name,Min,Max) :  none
+    301          
+    302            RETURN VALUE :  none
+    303           
+    304            DESIGN INFORMATION :  refer to Detailed Design Document
+    305          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    306          void LDBReset(void)
+   \                     LDBReset:
+    307          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    308              _DI();
+   \   0000   7B1E           DI
+    309              while(1) {}
+   \                     ??LDBReset_0:
+   \   0002   FAFE           BR        ??LDBReset_0
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    310          }
+    311          
+    312          /*============================================================================
+    313            DESCRIPTION :
+    314            
+    315            PARAMETERS (Type,Name,Min,Max) :  none
+    316          
+    317            RETURN VALUE :  none
+    318           
+    319            DESIGN INFORMATION :  refer to Detailed Design Document
+    320          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    321          void main(void)
+   \                     main:
+    322          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    323              // Initialisation du CPU
+    324              //----------------------
+    325          
+    326              // Memory configuration: must be confured first!
+    327              mLDBRegWrite8BitRegister(IMS, cIMSRegInit);   // Memory size switching register
+   \   0004   13F0CC         MOV       0xFFF0,#204
+    328              mLDBRegWrite8BitRegister(IXS, cIXSRegInit);   // Expansion RAM switching register
+   \   0007   13F404         MOV       0xFFF4,#4
+    329            
+    330              // Clock configuration
+    331              
+    332              // Select oscillation stabilization time
+    333              mLDBRegWrite8BitRegister(OSTS, cOSTSRegInit);
+   \   000A   13A401         MOV       0xFFA4,#1
+    334              // Processor clock control
+    335              mLDBRegWrite8BitRegister(PCC, (U8)0x00U);   // Set fcpu = fxp, main system clock
+   \   000D   13FB00         MOV       0xFFFB,#0
+    336          
+    337              // Set configuration for active mode
+    338              ConfigureClockForActiveMode();
+   \   0010   9E....         MOV       bClockForActiveModeSelected,A
+   \   0013   139F41         MOV       0xFF9F,#65
+   \   0016   717BA2         CLR1      0xFFA2.7
+   \                     ??main_0:
+   \   0019   F4A3           MOV       A,0xFFA3
+   \   001B   4D10           CMP       A,#16
+   \   001D   8DFA           BC        ??main_0
+   \   001F   10....         MOVW      AX,#SFE(NEAR_Z)
+   \   0022   13A107         MOV       0xFFA1,#7
+   \   0025   13A001         MOV       0xFFA0,#1
+    339          
+    340              //Uncomment following lines if CLKOUT pin has to be enabled:
+    341              //mLDBHarConfig(cLDBHarPort14_0, cLDBHarOutput); 
+    342              //CLOE = 1;
+    343            
+    344              // Initialisation du WatchDog Timer
+    345              //---------------------------------
+    346            
+    347              // Watchdog of 78K0_F0536 can generate reset only
+    348              // There is no dedicated watchdog interrupt
+    349              // Configuration of watchdog is done in option byte in LDB_HAR
+    350          
+    351              
+    352          	// initialize internal expansion RAM: only occupied segments
+    353              mLIBmemset((U16*)cExtRamAddressBegin, 0,
+    354                  (cExtRamAddressRealEnd - cExtRamAddressBegin));
+   \   0028   CA0018         ADDW      AX,#6144
+   \   002B   D4             MOVW      DE,AX
+   \   002C   1000E8         MOVW      AX,#59392
+   \   002F   120000         MOVW      BC,#0
+   \   0032   9A....         CALL      memset
+    355              
+    356              // Internal Init
+    357              // initialize variables
+    358              bSleepMode = cFalse;
+   \   0035   A100           MOV       A,#0
+   \   0037   9E....         MOV       bSleepMode,A
+    359              bClockForActiveModeSelected = cTrue;
+   \   003A   A101           MOV       A,#1
+   \   003C   9E....         MOV       bClockForActiveModeSelected,A
+    360          
+    361              LDBSldEnterSolderTest();
+   \   003F   16....         MOVW      HL,#LWRD(LDBSldEnterSolderTest)
+   \   0042   A4..           MOV       E,#BYTE3(LDBSldEnterSolderTest)
+   \   0044   ..             CALLT     [__T_?FAR_CALL_L07]
+    362          
+    363              TOSStart(0); 
+   \   0045   9A....         CALL      TOSInternalStart
+    364          }
+   \   0048   B4             POP       DE
+   \   0049   B2             POP       BC
+   \   004A   AF             RET       
+   \   004B                  REQUIRE ?CL78K_V4_6_L00
+   \   004B                  REQUIRE _A_OSTS
+   \   004B                  REQUIRE IMS
+   \   004B                  REQUIRE IXS
+   \   004B                  REQUIRE _A_PCC
+   \   004B                  REQUIRE _A_OSCCTL
+   \   004B                  REQUIRE _A_RCM
+   \   004B                  REQUIRE _A_MCM
+   \   004B                  REQUIRE _A_MOC
+   \   004B                  REQUIRE _A_OSTC
+    365          
+    366          /*============================================================================
+    367            DESCRIPTION :
+    368            
+    369            PARAMETERS (Type,Name,Min,Max) :  none
+    370          
+    371            RETURN VALUE :  none
+    372           
+    373            DESIGN INFORMATION :  refer to Detailed Design Document
+    374          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    375          void LDBWaitForCallBack( void )
+   \                     LDBWaitForCallBack:
+    376          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    377              if (bSleepMode != cFalse)
+   \   0001   8E....         MOV       A,bSleepMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD40           BZ        ??LDBSupControl_0
+    378              {
+    379                  if (mLDBRfIsWakeUpDetectionFinished())
+   \   0008   8E....         MOV       A,bLDBRfIsWakeUpDetectionFinished
+   \   000B   4D00           CMP       A,#0
+   \   000D   AD39           BZ        ??LDBSupControl_0
+    380                  {
+    381                      if (bClockForActiveModeSelected != cFalse) 
+   \   000F   8E....         MOV       A,bClockForActiveModeSelected
+   \   0012   4D00           CMP       A,#0
+   \   0014   AD22           BZ        ??LDBSupControl_1
+    382                      {
+    383                          // Idle task can be called before tasks detecting wake-up
+    384                          // therefore check if detection is started
+    385                          mDisableActiveHw();
+   \   0016   A100           MOV       A,#0
+   \   0018   9E....         MOV       bLDBSupActivatedHw,A
+   \   001B   A101           MOV       A,#1
+   \   001D   16....         MOVW      HL,#LWRD(LDBAnaControl)
+   \   0020   A4..           MOV       E,#BYTE3(LDBAnaControl)
+   \   0022   ..             CALLT     [__T_?FAR_CALL_L07]
+    386                          ConfigureClockForSleepMode();
+   \   0023   A100           MOV       A,#0
+   \   0025   9E....         MOV       bClockForActiveModeSelected,A
+   \   0028   13A000         MOV       0xFFA0,#0
+   \                     ??LDBWaitForCallBack_0:
+   \   002B   3177A0FC       BF        0xFFA0.7, ??LDBWaitForCallBack_0
+   \   002F   13A100         MOV       0xFFA1,#0
+   \   0032   717AA2         SET1      0xFFA2.7
+   \   0035   139F00         MOV       0xFF9F,#0
+    387                      } 
+    388                      if (mIsWakeupDetectionStarted())
+   \                     ??LDBSupControl_1:
+   \   0038   8E....         MOV       A,bWakeUpDetectionPinStarted
+   \   003B   4D00           CMP       A,#0
+   \   003D   AD09           BZ        ??LDBSupControl_0
+    389                      {
+    390                          mInformWakeupDetectionStopped();
+   \   003F   A100           MOV       A,#0
+   \   0041   9E....         MOV       bAnalogConversionAllowed,A
+    391                          mStopWakeupScopeTrace();
+    392                          mStop();
+   \   0044   7100           STOP
+   \   0046   00             NOP
+   \   0047   00             NOP
+    393                          mStartWakeupScopeTrace();
+    394                      }
+    395                  }
+    396              }
+    397          }
+   \                     ??LDBSupControl_0:
+   \   0048   B4             POP       DE
+   \   0049   AF             RET       
+   \   004A                  REQUIRE ?CL78K_V4_6_L00
+   \   004A                  REQUIRE _A_OSCCTL
+   \   004A                  REQUIRE _A_RCM
+   \   004A                  REQUIRE _A_MCM
+   \   004A                  REQUIRE _A_MOC
+    398          
+    399          /*============================================================================
+    400            DESCRIPTION :
+    401            
+    402            PARAMETERS (Type,Name,Min,Max) :  none
+    403          
+    404            RETURN VALUE :  none
+    405           
+    406            DESIGN INFORMATION :  refer to Detailed Design Document
+    407          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    408          void LDBSupEnterSleepMode( void )
+   \                     LDBSupEnterSleepMode:
+    409          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    410              if (bSleepMode == cFalse)
+   \   0001   8E....         MOV       A,bSleepMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   BD44           BNZ       ??LDBSupControl_2
+    411              {
+    412                  bSleepMode = cTrue;
+   \   0008   A101           MOV       A,#1
+   \   000A   9E....         MOV       bSleepMode,A
+    413                  mLDBTimStopFastTimer();
+   \   000D   9A....         CALL      LDBTimStop
+    414                  SleepTimerDelay = (tDelay)cSleepRefreshPeriod;            
+   \   0010   A102           MOV       A,#2
+   \   0012   9E....         MOV       SleepTimerDelay,A
+    415                  mDisableActiveHw();
+   \   0015   A100           MOV       A,#0
+   \   0017   9E....         MOV       bLDBSupActivatedHw,A
+   \   001A   A101           MOV       A,#1
+   \   001C   16....         MOVW      HL,#LWRD(LDBAnaControl)
+   \   001F   A4..           MOV       E,#BYTE3(LDBAnaControl)
+   \   0021   ..             CALLT     [__T_?FAR_CALL_L07]
+    416                  LDBDinControl(cLDBDinInitiateKLineWakeupConditions);
+   \   0022   A105           MOV       A,#5
+   \   0024   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   0027   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   0029   ..             CALLT     [__T_?FAR_CALL_L07]
+    417                  mInformWakeupDetectionStarted();
+   \   002A   A100           MOV       A,#0
+   \   002C   9E....         MOV       bWakeUpDetectionPinStarted,A
+   \   002F   A101           MOV       A,#1
+   \   0031   9E....         MOV       bAnalogConversionAllowed,A
+    418                  ConfigureClockForSleepMode();
+   \   0034   A100           MOV       A,#0
+   \   0036   9E....         MOV       bClockForActiveModeSelected,A
+   \   0039   13A000         MOV       0xFFA0,#0
+   \                     ??LDBSupEnterSleepMode_0:
+   \   003C   3177A0FC       BF        0xFFA0.7, ??LDBSupEnterSleepMode_0
+   \   0040   13A100         MOV       0xFFA1,#0
+   \   0043   717AA2         SET1      0xFFA2.7
+   \   0046   139F00         MOV       0xFF9F,#0
+    419                  mLDBTimStartSlowTimer();
+   \   0049   9A....         CALL      LDBTimStartSlowTimer
+    420              }
+    421          }
+   \                     ??LDBSupControl_2:
+   \   004C   B4             POP       DE
+   \   004D   AF             RET       
+   \   004E                  REQUIRE ?CL78K_V4_6_L00
+   \   004E                  REQUIRE _A_OSCCTL
+   \   004E                  REQUIRE _A_RCM
+   \   004E                  REQUIRE _A_MCM
+   \   004E                  REQUIRE _A_MOC
+    422          
+    423          /*============================================================================
+    424            DESCRIPTION :
+    425            
+    426            PARAMETERS (Type,Name,Min,Max) :  none
+    427          
+    428            RETURN VALUE :  none
+    429           
+    430            DESIGN INFORMATION :  refer to Detailed Design Document
+    431          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    432          void LDBSupLeaveSleepMode( void )
+   \                     LDBSupLeaveSleepMode:
+    433          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    434              if (bSleepMode != cFalse)
+   \   0001   8E....         MOV       A,bSleepMode
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD39           BZ        ??LDBSupControl_3
+    435              {
+    436                  bSleepMode = cFalse;
+   \   0008   A100           MOV       A,#0
+   \   000A   9E....         MOV       bSleepMode,A
+    437                  SleepTimerDelay = 0;
+   \   000D   9E....         MOV       SleepTimerDelay,A
+    438                  LDBTimStopSlowTimer();
+   \   0010   9A....         CALL      LDBTimStopSlowTimer
+    439                  if (bClockForActiveModeSelected == cFalse)
+   \   0013   8E....         MOV       A,bClockForActiveModeSelected
+   \   0016   4D00           CMP       A,#0
+   \   0018   BD24           BNZ       ??LDBSupControl_4
+    440                  {
+    441                      ConfigureClockForActiveMode();
+   \   001A   A101           MOV       A,#1
+   \   001C   9E....         MOV       bClockForActiveModeSelected,A
+   \   001F   139F41         MOV       0xFF9F,#65
+   \   0022   717BA2         CLR1      0xFFA2.7
+   \                     ??LDBSupLeaveSleepMode_0:
+   \   0025   F4A3           MOV       A,0xFFA3
+   \   0027   4D10           CMP       A,#16
+   \   0029   8DFA           BC        ??LDBSupLeaveSleepMode_0
+   \   002B   A101           MOV       A,#1
+   \   002D   13A107         MOV       0xFFA1,#7
+   \   0030   13A001         MOV       0xFFA0,#1
+    442                      mEnableActiveHw();
+   \   0033   9E....         MOV       bLDBSupActivatedHw,A
+   \   0036   A100           MOV       A,#0
+   \   0038   16....         MOVW      HL,#LWRD(LDBAnaControl)
+   \   003B   A4..           MOV       E,#BYTE3(LDBAnaControl)
+   \   003D   ..             CALLT     [__T_?FAR_CALL_L07]
+    443                  }
+    444                  mLDBTimStartFastTimer();
+   \                     ??LDBSupControl_4:
+   \   003E   9A....         CALL      LDBTimStart
+    445              }
+    446          }
+   \                     ??LDBSupControl_3:
+   \   0041   B4             POP       DE
+   \   0042   AF             RET       
+   \   0043                  REQUIRE ?CL78K_V4_6_L00
+   \   0043                  REQUIRE _A_OSCCTL
+   \   0043                  REQUIRE _A_RCM
+   \   0043                  REQUIRE _A_MCM
+   \   0043                  REQUIRE _A_MOC
+   \   0043                  REQUIRE _A_OSTC
+    447          
+    448          /*============================================================================
+    449            DESCRIPTION :
+    450            
+    451            PARAMETERS (Type,Name,Min,Max) :  none
+    452          
+    453            RETURN VALUE :  none
+    454           
+    455            DESIGN INFORMATION :  refer to Detailed Design Document
+    456          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    457          void LDBSupCallBackSleepTimer(void)
+   \                     LDBSupCallBackSleepTimer:
+    458          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    459              if (SleepTimerDelay > 0)
+   \   0001   8E....         MOV       A,SleepTimerDelay
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD58           BZ        ??LDBSupControl_5
+    460              {
+    461                  LDBDinControl(cLDBDinCheckKLineWakeupConditions);
+   \   0008   A104           MOV       A,#4
+   \   000A   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   000D   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   000F   ..             CALLT     [__T_?FAR_CALL_L07]
+    462          
+    463                  SleepTimerDelay--;        
+   \   0010   8E....         MOV       A,SleepTimerDelay
+   \   0013   51             DEC       A
+   \   0014   9E....         MOV       SleepTimerDelay,A
+    464                  if (SleepTimerDelay == 0)
+   \   0017   8E....         MOV       A,SleepTimerDelay
+   \   001A   4D00           CMP       A,#0
+   \   001C   BD42           BNZ       ??LDBSupControl_5
+    465                  {
+    466                      // Start of periodical wakeup detection procedure
+    467                      SleepTimerDelay = (tDelay)cSleepRefreshPeriod;
+   \   001E   A102           MOV       A,#2
+   \   0020   9E....         MOV       SleepTimerDelay,A
+    468                      if (mLDBRfIsWakeUpDetectionFinished() != cFalse)
+   \   0023   8E....         MOV       A,bLDBRfIsWakeUpDetectionFinished
+   \   0026   4D00           CMP       A,#0
+   \   0028   AD2C           BZ        ??LDBSupControl_6
+    469                      {
+    470                          mEnableRfHw(); // RF HW can be enabled without peripheral clock
+   \   002A   A104           MOV       A,#4
+   \   002C   16....         MOVW      HL,#LWRD(LDBRfControl)
+   \   002F   A4..           MOV       E,#BYTE3(LDBRfControl)
+   \   0031   ..             CALLT     [__T_?FAR_CALL_L07]
+    471                          ConfigureClockForActiveMode();
+   \   0032   A101           MOV       A,#1
+   \   0034   9E....         MOV       bClockForActiveModeSelected,A
+   \   0037   139F41         MOV       0xFF9F,#65
+   \   003A   717BA2         CLR1      0xFFA2.7
+   \                     ??LDBSupCallBackSleepTimer_0:
+   \   003D   F4A3           MOV       A,0xFFA3
+   \   003F   4D10           CMP       A,#16
+   \   0041   8DFA           BC        ??LDBSupCallBackSleepTimer_0
+   \   0043   A101           MOV       A,#1
+   \   0045   13A107         MOV       0xFFA1,#7
+   \   0048   13A001         MOV       0xFFA0,#1
+    472                          mEnableActiveHw();
+   \   004B   9E....         MOV       bLDBSupActivatedHw,A
+   \   004E   A100           MOV       A,#0
+   \   0050   16....         MOVW      HL,#LWRD(LDBAnaControl)
+   \   0053   A4..           MOV       E,#BYTE3(LDBAnaControl)
+   \   0055   ..             CALLT     [__T_?FAR_CALL_L07]
+    473                      }
+    474                      else
+    475                      {
+    476                          // RF has not yet finished detection 
+    477                      }
+    478                      mInformWakeupDetectionStarted();
+   \                     ??LDBSupControl_6:
+   \   0056   A100           MOV       A,#0
+   \   0058   9E....         MOV       bWakeUpDetectionPinStarted,A
+   \   005B   A101           MOV       A,#1
+   \   005D   9E....         MOV       bAnalogConversionAllowed,A
+    479                  }
+    480              }
+    481          }
+   \                     ??LDBSupControl_5:
+   \   0060   B4             POP       DE
+   \   0061   AF             RET       
+   \   0062                  REQUIRE ?CL78K_V4_6_L00
+   \   0062                  REQUIRE _A_OSCCTL
+   \   0062                  REQUIRE _A_RCM
+   \   0062                  REQUIRE _A_MCM
+   \   0062                  REQUIRE _A_MOC
+   \   0062                  REQUIRE _A_OSTC
+    482          
+    483          /*============================================================================
+    484            DESCRIPTION :
+    485            
+    486            PARAMETERS (Type,Name,Min,Max) :  none
+    487          
+    488            RETURN VALUE :  none
+    489           
+    490            DESIGN INFORMATION :  refer to Detailed Design Document
+    491          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    492          void LDBSupReceiveWithoutAddr(tMsg * const Msg)
+   \                     LDBSupReceiveWithoutAddr:
+    493          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D4             MOVW      DE,AX
+    494              if (Msg != NULL)
+   \   0003   6168           OR        A,X
+   \   0005   AD1B           BZ        ??LDBSupControl_7
+    495              {
+    496                  mLIBassert(Msg->Lng == cLDBSupMessageLength);
+    497          
+    498                  Msg->pBuffer[cLDBSupClockForActiveModeSelectedIndex] = 
+    499                      bClockForActiveModeSelected;
+   \   0007   8E....         MOV       A,bClockForActiveModeSelected
+   \   000A   72             MOV       C,A
+   \   000B   65             MOV       A,D
+   \   000C   D6             MOVW      HL,AX
+   \   000D   87             MOV       A,[HL]
+   \   000E   70             MOV       X,A
+   \   000F   AE01           MOV       A,[HL+0x01]
+   \   0011   D6             MOVW      HL,AX
+   \   0012   62             MOV       A,C
+   \   0013   97             MOV       [HL],A
+    500                  Msg->pBuffer[cLDBSupAnalogConversionAllowedIndex] = 
+    501                      bAnalogConversionAllowed;
+   \   0014   8E....         MOV       A,bAnalogConversionAllowed
+   \   0017   72             MOV       C,A
+   \   0018   C4             MOVW      AX,DE
+   \   0019   D6             MOVW      HL,AX
+   \   001A   87             MOV       A,[HL]
+   \   001B   70             MOV       X,A
+   \   001C   AE01           MOV       A,[HL+0x01]
+   \   001E   D6             MOVW      HL,AX
+   \   001F   62             MOV       A,C
+   \   0020   86             INCW      HL
+   \   0021   97             MOV       [HL],A
+    502              }    
+    503          }
+   \                     ??LDBSupControl_7:
+   \   0022   B4             POP       DE
+   \   0023   B2             POP       BC
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+    504          
+    505          /*============================================================================
+    506            DESCRIPTION :
+    507            
+    508            PARAMETERS (Type,Name,Min,Max) :  none
+    509          
+    510            RETURN VALUE :  none
+    511           
+    512            DESIGN INFORMATION :  refer to Detailed Design Document
+    513          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    514          void LDBSupControl(const tCtrl Ctrl)
+   \                     LDBSupControl:
+    515          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    516              switch (Ctrl)
+   \   0000   4D01           CMP       A,#1
+   \   0002   AD05           BZ        ??LDBSupControl_8
+   \   0004   4D02           CMP       A,#2
+   \   0006   AD07           BZ        ??LDBSupControl_9
+   \   0008   AF             RET       
+    517              {
+    518              case cLDBSupWakeUpDetectionPinStarted:
+    519                  bWakeUpDetectionPinStarted = cTrue;
+   \                     ??LDBSupControl_8:
+   \   0009   A101           MOV       A,#1
+   \   000B   9E....         MOV       bWakeUpDetectionPinStarted,A
+   \   000E   AF             RET       
+    520                  break;
+    521              case cLDBSupSynchronizeSleepTimer:
+    522                  SleepTimerDelay = (tDelay)cSleepRefreshPeriod;
+   \                     ??LDBSupControl_9:
+   \   000F   A102           MOV       A,#2
+   \   0011   9E....         MOV       SleepTimerDelay,A
+    523                  break;
+    524              default:
+    525                  mLIBassert(cFalse);
+    526              }
+    527          }
+   \   0014   AF             RET       
+   \   0015                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   Segment part sizes:
+
+     Function/Label              Bytes
+     --------------              -----
+     WDTE                           1
+     _A_OSCCTL                      1
+     _A_RCM                         1
+     _A_MCM                         1
+     _A_MOC                         1
+     _A_OSTC                        1
+     _A_OSTS                        1
+     IMS                            1
+     IXS                            1
+     _A_PCC                         1
+     bSleepMode                     1
+     SleepTimerDelay                1
+     bWakeUpDetectionPinStarted     1
+     bClockForActiveModeSelected    1
+     bAnalogConversionAllowed       1
+     bLDBSupActivatedHw             1
+     LDBHarOptionBytes              5
+     LDBRefreshWatchDog             4
+     LDBReset                       4
+     main                          75
+     LDBWaitForCallBack            74
+     LDBSupEnterSleepMode          78
+     LDBSupLeaveSleepMode          67
+     LDBSupCallBackSleepTimer      98
+     LDBSupReceiveWithoutAddr      37
+     LDBSupControl                 21
+     __T_?FAR_CALL_L07              2
+
+ 
+   2 bytes in segment CLTVEC
+ 458 bytes in segment CODE
+  10 bytes in segment NEAR_A
+   6 bytes in segment NEAR_Z
+   5 bytes in segment OPTBYTE
+ 
+ 458 bytes of CODE  memory (+  2 bytes shared)
+   5 bytes of CONST memory
+   6 bytes of DATA  memory (+ 10 bytes shared)
+
+Errors: none
+Warnings: none

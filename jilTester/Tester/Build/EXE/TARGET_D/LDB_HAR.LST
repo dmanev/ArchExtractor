@@ -1,0 +1,241 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:49 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_HAR.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_HAR.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_HAR.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_HAR.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_HAR.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_HAR.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_HAR.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_HAR
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Apr 27 2009 10:10:50  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_HAR/LDB_HAR.C-arc  $
+     15          // $Revision:   1.3  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_HAR/LDB_HAR.C-arc   $
+     18          // 
+     19          //    Rev 1.3   Apr 27 2009 10:10:50   adzhelp
+     20          // Cm003619: Configuration of TrpOut pin removed
+     21          // 
+     22          //    Rev 1.2   Mar 20 2009 14:36:02   adzhelp
+     23          // Cm003619: Configure as outputs pins for components not yet integrated
+     24          // 
+     25          //    Rev 1.1   Mar 10 2009 15:47:30   adzhelp
+     26          // Cm003619: Real timer prescaler value updated
+     27          // 
+     28          //    Rev 1.0   10 Nov 2008 15:22:18   ailievb
+     29          // Initial revision.
+     30          //******************************************************************************
+     31          
+     32          /*--------------------------------------------------------------------------
+     33            Body Identification
+     34            --------------------------------------------------------------------------*/
+     35          
+     36          #define ldb_har   "ldb_har"
+     37          
+     38          /*-------------------------------------------------------------------------
+     39            Included files
+     40          
+     41            #include <system_file_name.h>
+     42            #include "project_file_name.h"
+     43            --------------------------------------------------------------------------*/
+     44          
+     45          #include "ldb_har.h"
+
+   \                                 In  segment NEAR_A, at 0xff69
+   \   union <unnamed> volatile __sfr _A_TMHMD0
+   \                     _A_TMHMD0:
+   \   0000                  DS 1
+     46          #include "ldb_ioc.h"
+     47          /*--------------------------------------------------------------------------
+     48            Local constants
+     49          
+     50            #define cConstantName   ((tType) ConstantValue)
+     51            --------------------------------------------------------------------------*/
+     52          
+     53          
+     54          /*--------------------------------------------------------------------------
+     55            Local macros
+     56          
+     57            #define mMacroName   (MacroDefinition)
+     58            --------------------------------------------------------------------------*/
+     59          
+     60          
+     61          /*--------------------------------------------------------------------------
+     62            Local types
+     63          
+     64            struct  sStructureName { ... };
+     65            union   uUnionName { ... };
+     66            enum    eEnumerationName { ... };
+     67            typedef Expression tTypeName;
+     68            --------------------------------------------------------------------------*/
+     69          
+     70          
+     71          /*--------------------------------------------------------------------------
+     72            Local data
+     73          
+     74            static  tType   VariableName;
+     75            static  tType*  pVariableName; 
+     76            --------------------------------------------------------------------------*/
+     77          
+     78          
+     79          /*--------------------------------------------------------------------------
+     80            Constant local data
+     81          
+     82            static const tType  VariableName;
+     83            --------------------------------------------------------------------------*/
+     84          
+     85          
+     86          /*--------------------------------------------------------------------------
+     87            Exported data
+     88          
+     89            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     90            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     91            --------------------------------------------------------------------------*/
+     92          
+     93          
+     94          /*--------------------------------------------------------------------------
+     95            Constant exported data
+     96           
+     97            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+     98            --------------------------------------------------------------------------*/
+     99          
+    100          /*--------------------------------------------------------------------------
+    101            Local function prototypes
+    102            
+    103            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    104            --------------------------------------------------------------------------*/
+    105          
+    106          
+    107          /*============================================================================
+    108            =========================== LOCAL FUNCTIONS ================================
+    109            ==========================================================================*/
+    110          
+    111          /*============================================================================
+    112            DESCRIPTION :
+    113            
+    114            PARAMETERS (Type,Name,Min,Max) :   none
+    115          
+    116            RETURN VALUE :   none
+    117           
+    118            DESIGN INFORMATION :   refer to Detailed Design Document
+    119            ==========================================================================*/
+    120          //static type FunctionName(...)
+    121          
+    122          
+    123          /*============================================================================
+    124            =========================== EXPORTED FUNCTIONS =============================
+    125            ==========================================================================*/
+    126          
+    127          /*============================================================================
+    128            DESCRIPTION :
+    129            
+    130            PARAMETERS (Type,Name,Min,Max) :  none
+    131          
+    132            RETURN VALUE :  none
+    133           
+    134            DESIGN INFORMATION :  refer to Detailed Design Document
+    135          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    136          void LDBHarInit(void)
+   \                     LDBHarInit:
+    137          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    138             mLDBIocSelectClock(cLDBHarRealTimeTimer, cLDBHarRealTimeTimerPrescaler);
+   \   0000   716A69         SET1      0xFF69.6
+   \   0003   715B69         CLR1      0xFF69.5
+   \   0006   714B69         CLR1      0xFF69.4
+    139          }
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   \   000A                  REQUIRE _A_TMHMD0
+    140          
+    141          /*============================================================================
+    142            DESCRIPTION :
+    143            
+    144            PARAMETERS (Type,Name,Min,Max) :   none
+    145          
+    146            RETURN VALUE :   none
+    147           
+    148            DESIGN INFORMATION :   refer to Detailed Design Document
+    149            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    150          void LDBHarActiveWaitUs(U16 NbCycle)
+   \                     LDBHarActiveWaitUs:
+    151          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   D6             MOVW      HL,AX
+   \   0001   6168           OR        A,X
+   \   0003   AD07           BZ        ??LDBHarActiveWaitUs_0
+    152              while(NbCycle != 0)
+    153              {
+    154                  NbCycle--;
+   \                     ??LDBHarActiveWaitUs_1:
+   \   0005   C6             MOVW      AX,HL
+   \   0006   90             DECW      AX
+   \   0007   D6             MOVW      HL,AX
+   \   0008   6168           OR        A,X
+   \   000A   BDF9           BNZ       ??LDBHarActiveWaitUs_1
+    155              }
+    156          }
+   \                     ??LDBHarActiveWaitUs_0:
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    157          
+
+   Segment part sizes:
+
+     Function/Label     Bytes
+     --------------     -----
+     _A_TMHMD0             1
+     LDBHarInit           10
+     LDBHarActiveWaitUs   13
+
+ 
+ 23 bytes in segment CODE
+  1 byte  in segment NEAR_A
+ 
+ 23 bytes of CODE memory
+  0 bytes of DATA memory (+ 1 byte shared)
+
+Errors: none
+Warnings: none

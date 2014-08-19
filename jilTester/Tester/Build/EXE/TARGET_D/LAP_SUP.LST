@@ -1,0 +1,773 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:25 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_SUP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_SUP.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_SUP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_SUP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_SUP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_SUP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_SUP.C
+      1          /*============================================================================
+      2            Project ......................... STANDARD
+      3            Component ....................... Lap_sup
+      4            File revision.................... :   1.1  $
+      5            Last modification date .......... $Modtime:   04 Feb 2009 16:32:18  $
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19          
+     20            - Role : Supervisor of STK project
+     21            
+     22            -------------------------------------------------------------------------
+     23            Lap_sup.c file review : 
+     24          
+     25          
+     26            ==========================================================================*/
+     27          
+     28          /*--------------------------------------------------------------------------
+     29            Body Identification
+     30            --------------------------------------------------------------------------*/
+     31          
+     32          #define lap_sup  "lap_sup"
+     33          
+     34          
+     35          /*-------------------------------------------------------------------------
+     36            Included files
+     37          
+     38            #include <system_file_name.h>
+     39            #include "project_file_name.h"
+     40            --------------------------------------------------------------------------*/
+     41          
+     42          #include "lib.h"
+     43          #include "tos.h"
+     44          #include "dat.h"
+     45          #include "lap_sup.h"
+     46          #include "lap_sup.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near Supervisor[12]
+   \                     Supervisor:
+   \   0000   ........       DW TOSSeqTrueEval, LAPSupControlEnterStartingStepState
+   \   0004   FF01           DB 255, 1
+   \   0006   ....           DW LAPSupNobodyMaintainStartingStepState
+   \   0008   ....           DW LAPSupControlLeaveStartingStepState
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPSupWakeUpRequested, LAPSupControlDATEnterActiveState
+   \   0010   0903           DB 9, 3
+   \   0012   ........       DW TOSSeqTrueEval, LAPSupControlLAPEnterActiveState
+   \   0016   FF04           DB 255, 4
+   \   0018   ........       DW TOSSeqTrueEval, LAPSupMinimumActiveTime
+   \   001C   FF05           DB 255, 5
+   \   001E   ........       DW LAPSupWakeUpRequested, LAPSupMinimumActiveTime
+   \   0022   0605           DB 6, 5
+   \   0024   ........       DW LAPSupMinimumActiveTimeIsElapsed, TOSSeqNoAction
+   \   0028   FF07           DB 255, 7
+   \   002A   ........       DW LAPSupWakeUpRequested, LAPSupMinimumActiveTime
+   \   002E   0805           DB 8, 5
+   \   0030   ........       DW LAPSupNobodyMaintainActiveState, LAPSupControlLeaveActiveState
+   \   0034   FF02           DB 255, 2
+   \   0036   ........       DW LAPSupNobodyMaintainActiveSleepState, LAPSupEnterSleep
+   \   003A   FF0A           DB 255, 10
+   \   003C   ........       DW LAPSupActiveSleepRequested, TOSSeqNoAction
+   \   0040   0B02           DB 11, 2
+   \   0042   ........       DW LAPSupWakeUpRequested, LAPSupControlDATEnterActiveState
+   \   0046   FF03           DB 255, 3
+     47          #include "lap_supp.h"
+     48          
+     49          /*--------------------------------------------------------------------------
+     50            Local constants
+     51          
+     52            #define cConstantName   ((tType) ConstantValue)
+     53            --------------------------------------------------------------------------*/
+     54          
+     55          
+     56          /*--------------------------------------------------------------------------
+     57            Local macros
+     58          
+     59            #define mMacroName   (MacroDefinition)
+     60            --------------------------------------------------------------------------*/
+     61          
+     62          
+     63          /*--------------------------------------------------------------------------
+     64            Local types
+     65          
+     66            struct  sStructureName { ... };
+     67            union   uUnionName { ... };
+     68            enum    eEnumerationName { ... };
+     69            typedef Expression tTypeName;
+     70            --------------------------------------------------------------------------*/
+     71          
+     72          
+     73          /*--------------------------------------------------------------------------
+     74            Local data
+     75          
+     76            static  tType   VariableName;
+     77            static  tType*  pVariableName; 
+     78            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     79          static  BOOL  SleepMode;
+   \                     SleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     80          static tTOSTimer  MinActiveTimer;
+   \                     MinActiveTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+     81          
+     82          
+     83          /*--------------------------------------------------------------------------
+     84            Constant local data
+     85          
+     86            static const tType  VariableName;
+     87            --------------------------------------------------------------------------*/
+     88          
+     89          
+     90          /*--------------------------------------------------------------------------
+     91            Exported data
+     92          
+     93            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     94            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     95            --------------------------------------------------------------------------*/
+     96          
+     97          
+     98          /*--------------------------------------------------------------------------
+     99            Constant exported data
+    100           
+    101            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    102            --------------------------------------------------------------------------*/
+    103          
+    104          
+    105          /*--------------------------------------------------------------------------
+    106            Local function prototypes
+    107            
+    108            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    109            --------------------------------------------------------------------------*/
+    110          
+    111          /*============================================================================
+    112            =========================== LOCAL FUNCTIONS ================================
+    113            ==========================================================================*/
+    114          
+    115          /*============================================================================
+    116            DESCRIPTION : Send a Control to Enter in Starting step State.
+    117            
+    118            PARAMETERS (Type,Name,Min,Max) :  none
+    119          
+    120            RETURN VALUE :  none
+    121           
+    122            DESIGN INFORMATION :  refer to Detailed Design Document
+    123          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    124          void LAPSupControlEnterStartingStepState( void )
+   \                     LAPSupControlEnterStartingStepState:
+    125          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    126              TOSSendControl(cTOSControlEnterStartingStepState);
+   \   0000   A12F           MOV       A,#47
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    127          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    128          
+    129          /*============================================================================
+    130            DESCRIPTION : Send a Control Leave from the Starting Step State
+    131            
+    132            PARAMETERS (Type,Name,Min,Max) :  none
+    133          
+    134            RETURN VALUE :  none
+    135           
+    136            DESIGN INFORMATION :  refer to Detailed Design Document
+    137          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    138          void LAPSupControlLeaveStartingStepState( void )
+   \                     LAPSupControlLeaveStartingStepState:
+    139          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    140              TOSSendControl(cTOSControlLeaveStartingStepState);
+   \   0000   A130           MOV       A,#48
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    141          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    142          
+    143          /*============================================================================
+    144            DESCRIPTION : Send a Control to enter in DAT Active State.
+    145            
+    146            PARAMETERS (Type,Name,Min,Max) :  none
+    147          
+    148            RETURN VALUE :  none
+    149           
+    150            DESIGN INFORMATION :  refer to Detailed Design Document
+    151          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    152          void LAPSupControlDATEnterActiveState( void )
+   \                     LAPSupControlDATEnterActiveState:
+    153          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    154              TOSSendControl(cTOSControlDATEnterActiveState);
+   \   0000   A131           MOV       A,#49
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    155          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    156          
+    157          /*============================================================================
+    158            DESCRIPTION : Send a Control to enter in LAP Active State.
+    159            
+    160            PARAMETERS (Type,Name,Min,Max) :  none
+    161          
+    162            RETURN VALUE :  none
+    163           
+    164            DESIGN INFORMATION :  refer to Detailed Design Document
+    165          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    166          void LAPSupControlLAPEnterActiveState( void )
+   \                     LAPSupControlLAPEnterActiveState:
+    167          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    168              TOSSendControl(cTOSControlLAPEnterActiveState);
+   \   0000   A132           MOV       A,#50
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    169          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    170          
+    171          /*============================================================================
+    172            DESCRIPTION : Send Controls to leave LAP and DAT Active State.
+    173          
+    174            PARAMETERS (Type,Name,Min,Max) :  none
+    175          
+    176            RETURN VALUE :  none
+    177           
+    178            DESIGN INFORMATION :  refer to Detailed Design Document
+    179          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    180          void LAPSupControlLeaveActiveState( void )
+   \                     LAPSupControlLeaveActiveState:
+    181          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    182              TOSSendControl(cTOSControlLAPLeaveActiveState);
+   \   0000   A133           MOV       A,#51
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    183              TOSSendControl(cTOSControlDATLeaveActiveState);
+   \   0003   A134           MOV       A,#52
+   \   0005   ..             CALLT     [__T_TOSSendControl]
+    184          }
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    185          
+    186          
+    187          /*============================================================================
+    188            DESCRIPTION : Read the Signal to check if an Active Sleep is Requested.
+    189            
+    190            PARAMETERS (Type,Name,Min,Max) :   none
+    191          
+    192            RETURN VALUE : retrun cTrue if somebody send a cTOSSignalActiveSleepRequested
+    193                           signal, otherwise cFalse.
+    194           
+    195            DESIGN INFORMATION :   refer to Detailed Design Document
+    196            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    197          BOOL LAPSupActiveSleepRequested( void )
+   \                     LAPSupActiveSleepRequested:
+    198          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    199              return(TOSReadSignal(cTOSSignalActiveSleepRequested));
+   \   0000   102500         MOVW      AX,#37
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    200          }
+    201          
+    202          /*============================================================================
+    203            DESCRIPTION : Read the Signal to check if an wake up is Requested.
+    204            
+    205            PARAMETERS (Type,Name,Min,Max) :   none
+    206          
+    207            RETURN VALUE : retrun cTrue if somebody send a cTOSSignalWakeUpRequested
+    208                           signal, otherwise cFalse.
+    209           
+    210            DESIGN INFORMATION :   refer to Detailed Design Document
+    211            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    212          BOOL LAPSupWakeUpRequested( void )
+   \                     LAPSupWakeUpRequested:
+    213          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    214              return(TOSReadSignal(cTOSSignalWakeUpRequested));
+   \   0000   102600         MOVW      AX,#38
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    215          }
+    216          
+    217          /*============================================================================
+    218            DESCRIPTION : Ask to the subscriber components if anyone maintain 
+    219                          the starting step.
+    220            
+    221            PARAMETERS (Type,Name,Min,Max) :   none
+    222          
+    223            RETURN VALUE :   none
+    224           
+    225            DESIGN INFORMATION :   refer to Detailed Design Document
+    226            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    227          BOOL LAPSupNobodyMaintainStartingStepState( void )
+   \                     LAPSupNobodyMaintainStartingStepState:
+    228          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    229              TOSSendControl(cTOSControlIsAnybodyMaintainStartingStepState);
+   \   0000   A135           MOV       A,#53
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    230          
+    231              return(TOSReadSignal(cTOSSignalSomebodyMaintainStartingStepState) == cFalse);
+   \   0003   102700         MOVW      AX,#39
+   \   0006   ..             CALLT     [__T_TOSReadSignal]
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD03           BNZ       ??LAPStartupHook_0
+   \   000B   A101           MOV       A,#1
+   \   000D   AF             RET       
+   \                     ??LAPStartupHook_0:
+   \   000E   A100           MOV       A,#0
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    232          }
+    233          
+    234          /*============================================================================
+    235            DESCRIPTION : Ask to the subscriber components if anyone maintain 
+    236                          the ActiveSleep State.
+    237            
+    238            PARAMETERS (Type,Name,Min,Max) :   none
+    239          
+    240            RETURN VALUE :   none
+    241           
+    242            DESIGN INFORMATION :   refer to Detailed Design Document
+    243            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    244          BOOL LAPSupNobodyMaintainActiveSleepState( void )
+   \                     LAPSupNobodyMaintainActiveSleepState:
+    245          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    246              TOSSendControl(cTOSControlIsAnybodyMaintainActiveSleepState);
+   \   0000   A136           MOV       A,#54
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    247          
+    248              return(TOSReadSignal(cTOSSignalSomebodyMaintainActiveSleepState) == cFalse);
+   \   0003   102800         MOVW      AX,#40
+   \   0006   ..             CALLT     [__T_TOSReadSignal]
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD03           BNZ       ??LAPStartupHook_1
+   \   000B   A101           MOV       A,#1
+   \   000D   AF             RET       
+   \                     ??LAPStartupHook_1:
+   \   000E   A100           MOV       A,#0
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    249          }
+    250          
+    251          /*============================================================================
+    252            DESCRIPTION : Ask to the subscriber components if anyone maintain 
+    253                          the Active State.
+    254            
+    255            PARAMETERS (Type,Name,Min,Max) :   none
+    256          
+    257            RETURN VALUE :   none
+    258           
+    259            DESIGN INFORMATION :   refer to Detailed Design Document
+    260            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    261          BOOL LAPSupNobodyMaintainActiveState( void )
+   \                     LAPSupNobodyMaintainActiveState:
+    262          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    263              TOSSendControl(cTOSControlIsAnybodyMaintainActiveState);
+   \   0000   A137           MOV       A,#55
+   \   0002   ..             CALLT     [__T_TOSSendControl]
+    264          
+    265              return(TOSReadSignal(cTOSSignalSomebodyMaintainActiveState) == cFalse);
+   \   0003   102900         MOVW      AX,#41
+   \   0006   ..             CALLT     [__T_TOSReadSignal]
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD03           BNZ       ??LAPStartupHook_2
+   \   000B   A101           MOV       A,#1
+   \   000D   AF             RET       
+   \                     ??LAPStartupHook_2:
+   \   000E   A100           MOV       A,#0
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    266          }
+    267          
+    268          /*============================================================================
+    269            =========================== EXPORTED FUNCTIONS =============================
+    270            ==========================================================================*/
+    271          
+    272          /*============================================================================
+    273            DESCRIPTION : Request an Active Sleep State.
+    274            
+    275            PARAMETERS (Type,Name,Min,Max) :  none
+    276          
+    277            RETURN VALUE :  none
+    278           
+    279            DESIGN INFORMATION :  refer to Detailed Design Document
+    280          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    281          void LAPSupActiveSleepRequest( void )
+   \                     LAPSupActiveSleepRequest:
+    282          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    283              if(SleepMode)
+   \   0000   8E....         MOV       A,SleepMode
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD08           BZ        ??LAPStartupHook_3
+    284              {
+    285                  mDATControl( Cpu, Start );
+   \   0007   9A....         CALL      DATCpuLeaveSleep
+    286                  SleepMode = cFalse;
+   \   000A   A100           MOV       A,#0
+   \   000C   9E....         MOV       SleepMode,A
+    287              }
+    288              TOSWriteSignal(cTOSSignalActiveSleepRequested);
+   \                     ??LAPStartupHook_3:
+   \   000F   102500         MOVW      AX,#37
+   \   0012   ..             CALLT     [__T_TOSWriteSignal]
+    289          }
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    290          
+    291          /*============================================================================
+    292            DESCRIPTION : Request a Wake Up.
+    293            
+    294            PARAMETERS (Type,Name,Min,Max) :  none
+    295          
+    296            RETURN VALUE :  none
+    297           
+    298            DESIGN INFORMATION :  refer to Detailed Design Document
+    299          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    300          void LAPSupWakeUpRequest( void )
+   \                     LAPSupWakeUpRequest:
+    301          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    302              if(SleepMode)
+   \   0000   8E....         MOV       A,SleepMode
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD08           BZ        ??LAPStartupHook_4
+    303              {
+    304                  mDATControl( Cpu, Start );
+   \   0007   9A....         CALL      DATCpuLeaveSleep
+    305                  SleepMode = cFalse;
+   \   000A   A100           MOV       A,#0
+   \   000C   9E....         MOV       SleepMode,A
+    306              }
+    307              TOSWriteSignal(cTOSSignalWakeUpRequested);
+   \                     ??LAPStartupHook_4:
+   \   000F   102600         MOVW      AX,#38
+   \   0012   ..             CALLT     [__T_TOSWriteSignal]
+    308          }
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    309          
+    310          /*============================================================================
+    311            DESCRIPTION : Enter in sleep state.
+    312            
+    313            PARAMETERS (Type,Name,Min,Max) :  none
+    314          
+    315            RETURN VALUE :  none
+    316           
+    317            DESIGN INFORMATION :  refer to Detailed Design Document
+    318          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    319          void LAPSupEnterSleep( void )
+   \                     LAPSupEnterSleep:
+    320          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    321              /* PON URD42 DEV 1104 / PON URD42 BODY_SW 338 */
+    322              TOSReadSignal(cTOSSignalActiveSleepRequested);
+   \   0000   102500         MOVW      AX,#37
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+    323          
+    324              SleepMode = cTrue;
+   \   0004   A101           MOV       A,#1
+   \   0006   9E....         MOV       SleepMode,A
+    325              mDATControl( Cpu, Stop );
+   \   0009   9B....         BR        N:DATCpuEnterSleep
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    326          }
+    327          
+    328          /*============================================================================
+    329            DESCRIPTION : Check if the minimun time to stay in active state is elapse.
+    330            
+    331            PARAMETERS (Type,Name,Min,Max) :  none
+    332          
+    333            RETURN VALUE :  none
+    334           
+    335            DESIGN INFORMATION :  refer to Detailed Design Document
+    336          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    337          BOOL LAPSupMinimumActiveTimeIsElapsed( void )
+   \                     LAPSupMinimumActiveTimeIsElapsed:
+    338          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#MinActiveTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    339              return(TOSIsTimerElapsed(&MinActiveTimer, 
+    340                                            cLAPSupMinActiveTimerMs / cTOSTimerTickMs));
+   \   0004   123200         MOVW      BC,#50
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    341          }
+    342          
+    343          /****************************************************************************
+    344            DESCRIPTION         : Stay Active during cLAPSupMinActiveTimerMs ms after 
+    345                                  a entering in active state or a wake up Request. 
+    346            PARAMETERS          : None
+    347            (Type,Name,Min,Max) 
+    348          
+    349            RETURN VALUE        : None
+    350          
+    351            DESIGN INFORMATION  : Refer to Detailed Design Document
+    352          
+    353          *****************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    354          void LAPSupMinimumActiveTime(void)
+   \                     LAPSupMinimumActiveTime:
+    355          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    356              TOSStartTimer(&MinActiveTimer);
+   \   0000   10....         MOVW      AX,#MinActiveTimer
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+    357          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    358          
+    359          /*============================================================================
+    360            DESCRIPTION : The Application stop.
+    361            
+    362            PARAMETERS (Type,Name,Min,Max) :  none
+    363          
+    364            RETURN VALUE :  none
+    365           
+    366            DESIGN INFORMATION :  refer to Detailed Design Document
+    367          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    368          void LAPShutdownHook(U16 CodeErreur)
+   \                     LAPShutdownHook:
+    369          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    370              // We enter this function only for target test.
+    371              // Place a breackpoint on this function. Coderreur parameter indicates
+    372              // errors number detected during the test.
+    373          
+    374              LDBReset();
+   \   0000   9B....         BR        N:LDBReset
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    375          }
+    376          
+    377          /*============================================================================
+    378            DESCRIPTION : The Application start.
+    379          
+    380            PARAMETERS (Type,Name,Min,Max) :  none
+    381          
+    382            RETURN VALUE :  none
+    383           
+    384            DESIGN INFORMATION :  refer to Detailed Design Document
+    385          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    386          void LAPStartupHook( void )
+   \                     LAPStartupHook:
+    387          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    388              // Components init
+    389              LDBInit();
+   \   0000   9A....         CALL      LDBInit
+    390              TOSInit();
+   \   0003   A100           MOV       A,#0
+   \   0005   ..             CALLT     [__T_TOSSendControl]
+    391          
+    392              // TODO : Component init calls
+    393              TOSSendControl(cTOSControlDATInitialize);
+   \   0006   A12D           MOV       A,#45
+   \   0008   ..             CALLT     [__T_TOSSendControl]
+    394              TOSSendControl(cTOSControlLAPInitialize);
+   \   0009   A12E           MOV       A,#46
+   \   000B   ..             CALLT     [__T_TOSSendControl]
+    395          
+    396              // Alarm authorization
+    397              TOSStartAlarm();
+   \   000C   9A....         CALL      TOSStartAlarm
+    398          
+    399              mDATControl( Cpu, Start );
+   \   000F   9A....         CALL      DATCpuLeaveSleep
+    400              SleepMode = cFalse;
+   \   0012   A100           MOV       A,#0
+   \   0014   9E....         MOV       SleepMode,A
+    401          
+    402              TOSSeqActivateGraph( cTOSSeqGraphIdSupervisor );
+   \   0017   A12E           MOV       A,#46
+   \   0019   ..             CALLT     [__T_TOSSeqActivateGraph]
+    403          }
+   \   001A   AF             RET       
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSReadSignal:
+   \   0000   ....           DW       TOSReadSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     Supervisor                       72
+     SleepMode                         1
+     MinActiveTimer                    2
+     LAPSupControlEnterStartingStepState
+                                       4
+     LAPSupControlLeaveStartingStepState
+                                       4
+     LAPSupControlDATEnterActiveState
+                                       4
+     LAPSupControlLAPEnterActiveState
+                                       4
+     LAPSupControlLeaveActiveState     7
+     LAPSupActiveSleepRequested        5
+     LAPSupWakeUpRequested             5
+     LAPSupNobodyMaintainStartingStepState
+                                      17
+     LAPSupNobodyMaintainActiveSleepState
+                                      17
+     LAPSupNobodyMaintainActiveState
+                                      17
+     LAPSupActiveSleepRequest         20
+     LAPSupWakeUpRequest              20
+     LAPSupEnterSleep                 12
+     LAPSupMinimumActiveTimeIsElapsed
+                                      10
+     LAPSupMinimumActiveTime           5
+     LAPShutdownHook                   3
+     LAPStartupHook                   27
+     __T_TOSSendControl                2
+     __T_TOSReadSignal                 2
+     __T_TOSWriteSignal                2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStartTimer                 2
+     __T_TOSSeqActivateGraph           2
+
+ 
+  12 bytes in segment CLTVEC
+ 181 bytes in segment CODE
+  72 bytes in segment CONST
+   3 bytes in segment NEAR_Z
+ 
+ 181 bytes of CODE  memory (+ 12 bytes shared)
+  72 bytes of CONST memory
+   3 bytes of DATA  memory
+
+Errors: none
+Warnings: none

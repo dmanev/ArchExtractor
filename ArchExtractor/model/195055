@@ -1,0 +1,740 @@
+format 74
+"StkCFileCriteria" // EA_Model::System::Specific::STK::StkParser::StkCFileCriteria
+  revision 13
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Specific/STK/StkParser/StkCFileCriteria/"
+  python_package "StkCFileCriteria"
+  classview 187503 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 241519 "StkCHeaderProvReadDataCriteria class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 228207 "StkCHeaderProvWriteDataCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 241647 "StkCHeaderProvDATControlCriteria class diagram"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 241903 "StkCFileReqReadDataCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 242031 "StkCFileReqWriteDataCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 242159 "StkCFileReqDATControlCriteria class diagram"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 255215 "StkCFileReqReadTOSSignalCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 255343 "StkCFileReqWriteTOSSignalCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 224879 "StkCHeaderProvReadDataCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 236527 // <dependency>
+	relation 236143 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 236527 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 236655 // <dependency>
+	relation 236271 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 236655 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      classrelation 236783 // <dependency>
+	relation 236399 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 236783 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 236911 // <dependency>
+	relation 236527 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 236911 // <dependency>
+	  b parent class_ref 164335 // DataElement
+      end
+
+      classrelation 237167 // <dependency>
+	relation 236783 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 237167 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      operation 224623 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 243823 // <generalisation>
+	relation 243439 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 243823 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+    end
+
+    class 237935 "StkCHeaderProvWriteDataCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 250863 // <generalisation>
+	relation 250479 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 250863 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 250991 // <dependency>
+	relation 250607 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 250991 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 251119 // <dependency>
+	relation 250735 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251119 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      classrelation 251247 // <dependency>
+	relation 250863 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251247 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      classrelation 251375 // <dependency>
+	relation 250991 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251375 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 251503 // <dependency>
+	relation 251119 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251503 // <dependency>
+	  b parent class_ref 164335 // DataElement
+      end
+
+      operation 231663 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 238191 "StkCHeaderProvDATControlCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 252143 // <generalisation>
+	relation 251759 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 252143 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 252271 // <dependency>
+	relation 251887 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252271 // <dependency>
+	  b parent class_ref 238063 // StkDATControlIf
+      end
+
+      classrelation 252399 // <dependency>
+	relation 252015 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252399 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      classrelation 252527 // <dependency>
+	relation 252143 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252527 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      operation 231919 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 238319 "StkCFileReqReadDataCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 252655 // <generalisation>
+	relation 252271 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 252655 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 252783 // <dependency>
+	relation 252399 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252783 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 252911 // <dependency>
+	relation 252527 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252911 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      classrelation 253039 // <dependency>
+	relation 252655 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253039 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 253167 // <dependency>
+	relation 252783 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253167 // <dependency>
+	  b parent class_ref 164335 // DataElement
+      end
+
+      classrelation 253295 // <dependency>
+	relation 252911 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253295 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      operation 232047 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 238447 "StkCFileReqWriteDataCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 253423 // <generalisation>
+	relation 253039 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 253423 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 253551 // <dependency>
+	relation 253167 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253551 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      classrelation 253679 // <dependency>
+	relation 253295 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253679 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 253807 // <dependency>
+	relation 253423 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253807 // <dependency>
+	  b parent class_ref 164335 // DataElement
+      end
+
+      classrelation 253935 // <dependency>
+	relation 253551 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 253935 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      operation 232175 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 254063 // <dependency>
+	relation 253679 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 254063 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+    end
+
+    class 238575 "StkCFileReqDATControlCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 254191 // <generalisation>
+	relation 253807 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 254191 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 254319 // <dependency>
+	relation 253935 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 254319 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 254447 // <dependency>
+	relation 254063 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 254447 // <dependency>
+	  b parent class_ref 238063 // StkDATControlIf
+      end
+
+      classrelation 254703 // <dependency>
+	relation 254319 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 254703 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      operation 232303 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 251631 "StkCFileReqReadTOSSignalCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 267887 // <generalisation>
+	relation 267503 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 267887 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
+      classrelation 268015 // <dependency>
+	relation 267631 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268015 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 268143 // <dependency>
+	relation 267759 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268143 // <dependency>
+	  b parent class_ref 211695 // StkTOSSignalIf
+      end
+
+      classrelation 268271 // <dependency>
+	relation 267887 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268271 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      operation 245487 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 251759 "StkCFileReqWriteTOSSignalCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 268399 // <generalisation>
+	relation 268015 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 268399 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
+      classrelation 268527 // <dependency>
+	relation 268143 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268527 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 268655 // <dependency>
+	relation 268271 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268655 // <dependency>
+	  b parent class_ref 211695 // StkTOSSignalIf
+      end
+
+      classrelation 268783 // <dependency>
+	relation 268399 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 268783 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      operation 245615 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+  end
+
+  deploymentview 161647 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 217199 "StkCHeaderProvReadDataCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 224879 // StkCHeaderProvReadDataCriteria
+      end
+    end
+
+    artifact 230255 "StkCHeaderProvWriteDataCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 237935 // StkCHeaderProvWriteDataCriteria
+      end
+    end
+
+    artifact 230511 "StkCHeaderProvDATControlCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 238191 // StkCHeaderProvDATControlCriteria
+      end
+    end
+
+    artifact 230639 "StkCFileReqReadDataCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 238319 // StkCFileReqReadDataCriteria
+      end
+    end
+
+    artifact 230767 "StkCFileReqWriteDataCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 238447 // StkCFileReqWriteDataCriteria
+      end
+    end
+
+    artifact 230895 "StkCFileReqDATControlCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 238575 // StkCFileReqDATControlCriteria
+      end
+    end
+
+    artifact 243951 "StkCFileReqReadTOSSignalCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 251631 // StkCFileReqReadTOSSignalCriteria
+      end
+    end
+
+    artifact 244079 "StkCFileReqWriteTOSSignalCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 251759 // StkCFileReqWriteTOSSignalCriteria
+      end
+    end
+  end
+end

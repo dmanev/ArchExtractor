@@ -1,0 +1,94 @@
+/****************************************************************************
+  Project ......................... STANDARD
+  Component ....................... DAT_DBK
+  File revision.................... $Revision:   1.0  $
+  Last modification date .......... $Modtime:   04 Feb 2009 16:32:22  $
+  -------------------------------------------------------------------------
+  Copyright ... This software is JCI property. Duplication or
+                disclosure is prohibited without JCI written permission
+  ------------------------------------------------------------------------- 
+    
+  - This file defines the interaction of components with TOS services and
+    other component
+
+	See NT 02 0994 for language utilisation
+
+  -------------------------------------------------------------------------
+  dat_dbk.jil file review :
+  
+  $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/DAT_DBK.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:02:46   adzhelp
+// Initial revision.
+
+*****************************************************************************/
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_DBK_JIL 
+#define I_DAT_DBK_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_DBK 
+{
+    
+
+
+
+
+// Init component
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATDbkInit";
+    };
+
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_DBK_JIL */ /*cLIBStkScc2_Used*/

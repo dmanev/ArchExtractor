@@ -1,0 +1,683 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:51 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_ANA.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_ANA.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_ANA.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_ANA.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_ANA.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_ANA.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_ANA.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_ANA
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Mar 09 2010 09:50:58  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_ANA/LDB_ANA.C-arc  $
+     15          // $Revision:   1.7  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_ANA/LDB_ANA.C-arc   $
+     18          // 
+     19          //    Rev 1.7   Mar 09 2010 09:50:58   adzhelp
+     20          // Cm007644: DIAG ULQ not converted  when Doorlock LED active
+     21          // 
+     22          //    Rev 1.6   Feb 25 2010 17:24:00   adzhelp
+     23          // Cm007212: DIAG ULQ converted  when Doorlock LED or Verlog LED active
+     24          // 
+     25          //    Rev 1.5   Feb 24 2010 15:56:46   adzhelp
+     26          // Cm007212:  In sleep mode convert DIAG ULQ when Doorlock LED active
+     27          // 
+     28          //    Rev 1.4   Oct 07 2009 09:00:04   adzhelp
+     29          // Cm005497: Disabled pins are removed from conversion
+     30          // 
+     31          //    Rev 1.3   Apr 13 2009 15:53:18   adzhelp
+     32          // Cm003619: Conversion mode set to 10 bit 
+     33          // 
+     34          //    Rev 1.2   Apr 07 2009 14:19:24   adzhelp
+     35          // Cm003276: Voltage comparator control implemented. 
+     36          // In sleep mode convert only certain inputs.
+     37          // 
+     38          //    Rev 1.1   Mar 10 2009 09:53:20   adzhelp
+     39          // Cm003619: Parameterization of LDB_ANA for NEC K0 and project specifics
+     40          // 
+     41          //    Rev 1.0   20 Nov 2008 15:17:18   ailievb
+     42          // Initial revision.
+     43          //******************************************************************************
+     44          
+     45          /*--------------------------------------------------------------------------
+     46          Body Identification
+     47          --------------------------------------------------------------------------*/
+     48          
+     49          #define ldb_ana "ldb_ana"
+     50          
+     51          /*-------------------------------------------------------------------------
+     52          Included files
+     53          
+     54            #include <system_file_name.h>
+     55            #include "project_file_name.h"
+     56          --------------------------------------------------------------------------*/
+     57          
+     58          #include "ldbtypes.h"
+     59          #include "ldb.h"
+     60          #include "ldb_reg.h"
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff08
+   \   union <unnamed> volatile __saddr __no_bit_access _A_ADCR
+   \                     _A_ADCR:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xff28
+   \   union <unnamed> volatile __sfr _A_ADM
+   \                     _A_ADM:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff29
+   \   union <unnamed> volatile __sfr _A_ADS
+   \                     _A_ADS:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2f
+   \   union <unnamed> volatile __sfr _A_ADPC
+   \                     _A_ADPC:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   0000                  DS 2
+     61          
+     62          #include "ldb_ana.h"
+     63          
+     64          /*--------------------------------------------------------------------------
+     65          Local constants
+     66          
+     67            #define cConstantName   ((tType) ConstantValue)
+     68          --------------------------------------------------------------------------*/
+     69          // Wake-up inputs definitions
+     70          #define cAI_RR_DOORS_SW     cLDBHarAnaChannel1
+     71          #define cAI_DOOR_UNLOCK_SW  cLDBHarAnaChannel2
+     72          
+     73          // HW protection input definition
+     74          #define cDIAG_DRIVER_ULQ    cLDBHarAnaChannel5
+     75          
+     76          #define cMaxConvResult      1023U
+     77          
+     78          /*--------------------------------------------------------------------------
+     79          Local macros
+     80          
+     81            #define mMacroName   (MacroDefinition)
+     82          --------------------------------------------------------------------------*/
+     83          #define mSetEnableComparator(Value)     mLDBRegWrite1BitInRegister(ADM, 0, Value)
+     84          #define mSetFrequency()                 (ADM = (cLdbAnaFrequency << 1U))
+     85          #define mSetChannelSelection(Valeur)    (ADS = Valeur)
+     86          #define mSetEnableConversion(Valeur)    mLDBRegWrite1BitInRegister(ADM, 7, Valeur)
+     87          #define mReadConvertedValue()           (ADCR >> 6U) // 10-bit result
+     88          
+     89          #define mIsChannelActive(Channel)       (mLDBRegRead8BitRegister(ADPC) <= (U8)(Channel))
+     90          
+     91          // HW protection LED verlog
+     92          #define mIsLEDVerlogEnabled()           (mLDBHarRead(cLDBHarVerlogLed) != cFalse)
+     93          
+     94          /*--------------------------------------------------------------------------
+     95          Local types
+     96          
+     97            struct  sStructureName { ... };
+     98            union   uUnionName { ... };
+     99            enum    eEnumerationName { ... };
+    100            typedef Expression tTypeName;
+    101          --------------------------------------------------------------------------*/
+    102          typedef U16 tConversionSize;
+    103          
+    104          /*--------------------------------------------------------------------------
+    105          Local data
+    106          
+    107            static  tType   VariableName;
+    108            static  tType*  pVariableName; 
+    109          --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    110          static tConversionSize ConvResult;
+   \                     ConvResult:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    111          
+    112          /*--------------------------------------------------------------------------
+    113          Constant local data
+    114          
+    115            static const tType  VariableName;
+    116          --------------------------------------------------------------------------*/
+    117          // Enter here the different entries used
+
+   \                                 In  segment CONST, align 1
+    118          static const U8   AnalogInputs[cNumberAnalog] = mListAnalogInputs();
+   \                     AnalogInputs:
+   \   0000   00010203       DB 0, 1, 2, 3, 4, 5, 6, 7
+   \          04050607
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    119          static BOOL bSleepMode = cTrue;
+   \                     bSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bSleepMode>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    120          
+    121          /*--------------------------------------------------------------------------
+    122          Exported data
+    123          
+    124            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    125            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    126          --------------------------------------------------------------------------*/
+    127          
+    128          /*--------------------------------------------------------------------------
+    129          Constant exported data
+    130          
+    131            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    132          --------------------------------------------------------------------------*/
+    133          
+    134          /*--------------------------------------------------------------------------
+    135          Local function prototypes
+    136          
+    137            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    138          --------------------------------------------------------------------------*/
+    139          static MEM_TYPE void LDBAnaAcquire(U8 IndexAna);
+    140          
+    141          /*============================================================================
+    142          =========================== LOCAL FUNCTIONS ================================
+    143          ==========================================================================*/
+    144          
+    145          /*============================================================================
+    146            DESCRIPTION         : Acquire one analog input
+    147          
+    148            PARAMETERS          : None
+    149            (Type,Name,Min,Max) 
+    150            
+    151            RETURN VALUE        : None
+    152              
+    153            DESIGN INFORMATION  : Refer to Detailed Design Document
+    154          ============================================================================*/
+    155          
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    156          static MEM_TYPE void LDBAnaAcquire(U8 IndexAna)
+   \                     LDBAnaAcquire:
+    157          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   73             MOV       B,A
+    158              U8 u8ChannelL = AnalogInputs[IndexAna];
+   \   0002   16....         MOVW      HL,#AnalogInputs
+   \   0005   AB             MOV       A,[HL+B]
+   \   0006   72             MOV       C,A
+    159          
+    160              if (mIsChannelActive(u8ChannelL))
+   \   0007   F42F           MOV       A,0xFF2F
+   \   0009   70             MOV       X,A
+   \   000A   62             MOV       A,C
+   \   000B   6148           CMP       A,X
+   \   000D   8D34           BC        ??LDBAnaEnterSleepMode_0
+    161              {
+    162                  // Selects A/D channel
+    163                  mSetChannelSelection(u8ChannelL);
+   \   000F   F629           MOV       0xFF29,A
+    164                  // Starts the A/D Converter
+    165                  mSetEnableConversion(1);
+   \   0011   717A28         SET1      0xFF28.7
+    166                  // Clear the peinding flag of the interrupt
+    167                  mLDBIntClearIsrRequestFlag(INTAD);
+   \   0014   710BE2         CLR1      0xFFE2.0
+    168                  // Waits the pending flag of the interrupt to be up
+    169                  while (mLDBIntGetIsrRequestFlag(INTAD) == 0);
+   \                     ??LDBAnaAcquire_0:
+   \   0017   3107E2FC       BF        0xFFE2.0, ??LDBAnaAcquire_0
+    170                  // Reads the value converted
+    171                  ConvResult = mReadConvertedValue();
+   \   001B   8908           MOVW      AX,S:0xFF08
+   \   001D   21             CLR1      CY
+   \   001E   25             RORC      A,0x1
+   \   001F   30             XCH       A,X
+   \   0020   25             RORC      A,0x1
+   \   0021   30             XCH       A,X
+   \   0022   21             CLR1      CY
+   \   0023   25             RORC      A,0x1
+   \   0024   30             XCH       A,X
+   \   0025   25             RORC      A,0x1
+   \   0026   30             XCH       A,X
+   \   0027   21             CLR1      CY
+   \   0028   25             RORC      A,0x1
+   \   0029   30             XCH       A,X
+   \   002A   25             RORC      A,0x1
+   \   002B   30             XCH       A,X
+   \   002C   21             CLR1      CY
+   \   002D   25             RORC      A,0x1
+   \   002E   30             XCH       A,X
+   \   002F   25             RORC      A,0x1
+   \   0030   30             XCH       A,X
+   \   0031   21             CLR1      CY
+   \   0032   25             RORC      A,0x1
+   \   0033   30             XCH       A,X
+   \   0034   25             RORC      A,0x1
+   \   0035   30             XCH       A,X
+   \   0036   21             CLR1      CY
+   \   0037   25             RORC      A,0x1
+   \   0038   30             XCH       A,X
+   \   0039   25             RORC      A,0x1
+   \   003A   30             XCH       A,X
+   \   003B   03....         MOVW      ConvResult,AX
+    172                  // Stops the A/D converter
+    173                  mSetEnableConversion(0);
+   \   003E   717B28         CLR1      0xFF28.7
+   \   0041   FA14           BR        ??LDBAnaEnterSleepMode_1
+    174              }
+    175              else
+    176              {
+    177                  // Disabled inputs
+    178                  if ((IndexAna == cAI_RR_DOORS_SW) || (IndexAna == cAI_DOOR_UNLOCK_SW))
+   \                     ??LDBAnaEnterSleepMode_0:
+   \   0043   63             MOV       A,B
+   \   0044   51             DEC       A
+   \   0045   AD05           BZ        ??LDBAnaEnterSleepMode_2
+   \   0047   63             MOV       A,B
+   \   0048   4D02           CMP       A,#2
+   \   004A   BD05           BNZ       ??LDBAnaEnterSleepMode_3
+    179                  {
+    180                      ConvResult = cMaxConvResult; // inputs are inverted
+   \                     ??LDBAnaEnterSleepMode_2:
+   \   004C   10FF03         MOVW      AX,#1023
+   \   004F   FA03           BR        ??LDBAnaEnterSleepMode_4
+    181                  }
+    182                  else
+    183                  {
+    184                      ConvResult = 0;
+   \                     ??LDBAnaEnterSleepMode_3:
+   \   0051   100000         MOVW      AX,#0
+   \                     ??LDBAnaEnterSleepMode_4:
+   \   0054   03....         MOVW      ConvResult,AX
+    185                  }
+    186              }
+    187          }
+   \                     ??LDBAnaEnterSleepMode_1:
+   \   0057   B2             POP       BC
+   \   0058   AF             RET       
+   \   0059                  REQUIRE ?CL78K_V4_6_L00
+   \   0059                  REQUIRE _A_ADCR
+   \   0059                  REQUIRE _A_ADM
+   \   0059                  REQUIRE _A_ADS
+   \   0059                  REQUIRE _A_ADPC
+   \   0059                  REQUIRE _A_IF1
+    188          
+    189          /*============================================================================
+    190          =========================== EXPORTED FUNCTIONS =============================
+    191          ==========================================================================*/
+    192          
+    193          /*============================================================================
+    194            DESCRIPTION         : Acquires all the analog inputs
+    195          
+    196            PARAMETERS          : None
+    197            (Type,Name,Min,Max) 
+    198            
+    199            RETURN VALUE        : None
+    200              
+    201            DESIGN INFORMATION  : Refer to Detailed Design Document
+    202          ============================================================================*/
+    203          
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    204          MEM_TYPE void LDBAnaReceiveWithoutAddr(tMsg* pMsg)
+   \                     LDBAnaReceiveWithoutAddr:
+    205          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+   \   0002   D4             MOVW      DE,AX
+    206              if (pMsg != NULL)
+   \   0003   6168           OR        A,X
+   \   0005   BD03           BNZ       $+5
+   \   0007   9B....         BR        N:??LDBAnaEnterSleepMode_5
+    207              {
+    208                  U16* pu16Buffer = (U16*)(pMsg->pBuffer);
+   \   000A   65             MOV       A,D
+   \   000B   D6             MOVW      HL,AX
+   \   000C   87             MOV       A,[HL]
+   \   000D   70             MOV       X,A
+   \   000E   AE01           MOV       A,[HL+0x01]
+   \   0010   D2             MOVW      BC,AX
+    209                  mLIBassert(pMsg->Lng == cNumberAnalog * 2);
+   \   0011   AE02           MOV       A,[HL+0x02]
+   \   0013   70             MOV       X,A
+   \   0014   AE03           MOV       A,[HL+0x03]
+   \   0016   EA1000         CMPW      AX,#16
+   \   0019   AD03           BZ        ??LDBAnaEnterSleepMode_6
+   \   001B   9A....         CALL      LIBAssertionFailed
+    210                  
+    211                  if (bSleepMode == cFalse)
+   \                     ??LDBAnaEnterSleepMode_6:
+   \   001E   8E....         MOV       A,bSleepMode
+   \   0021   4D00           CMP       A,#0
+   \   0023   BD2C           BNZ       ??LDBAnaEnterSleepMode_7
+    212                  {
+    213                      U8 i;
+    214                      for (i = 0; i < cNumberAnalog; ++i)
+   \   0025   891C           MOVW      AX,SP
+   \   0027   D6             MOVW      HL,AX
+   \   0028   A100           MOV       A,#0
+   \   002A   97             MOV       [HL],A
+    215                      {
+    216                          // Acquisition of the analog input
+    217                          LDBAnaAcquire(i);
+   \                     ??LDBAnaReceiveWithoutAddr_0:
+   \   002B   87             MOV       A,[HL]
+   \   002C   16....         MOVW      HL,#LWRD(LDBAnaAcquire)
+   \   002F   A4..           MOV       E,#BYTE3(LDBAnaAcquire)
+   \   0031   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    218                          // Sends the result to the DAT layer
+    219                          pu16Buffer[i] = ConvResult;
+   \   0032   C2             MOVW      AX,BC
+   \   0033   D6             MOVW      HL,AX
+   \   0034   02....         MOVW      AX,ConvResult
+   \   0037   BE01           MOV       [HL+0x01],A
+   \   0039   60             MOV       A,X
+   \   003A   97             MOV       [HL],A
+    220                      }
+   \   003B   891C           MOVW      AX,SP
+   \   003D   D6             MOVW      HL,AX
+   \   003E   87             MOV       A,[HL]
+   \   003F   41             INC       A
+   \   0040   97             MOV       [HL],A
+   \   0041   B3             PUSH      BC
+   \   0042   B6             POP       HL
+   \   0043   86             INCW      HL
+   \   0044   86             INCW      HL
+   \   0045   B7             PUSH      HL
+   \   0046   B2             POP       BC
+   \   0047   891C           MOVW      AX,SP
+   \   0049   D6             MOVW      HL,AX
+   \   004A   87             MOV       A,[HL]
+   \   004B   4D08           CMP       A,#8
+   \   004D   9D47           BNC       ??LDBAnaEnterSleepMode_8
+   \   004F   FADA           BR        ??LDBAnaReceiveWithoutAddr_0
+    221                  }
+    222                  else
+    223                  {
+    224                      // Only wake-up inputs are read to spare time
+    225                      LDBAnaAcquire(cAI_RR_DOORS_SW);
+   \                     ??LDBAnaEnterSleepMode_7:
+   \   0051   A101           MOV       A,#1
+   \   0053   16....         MOVW      HL,#LWRD(LDBAnaAcquire)
+   \   0056   A4..           MOV       E,#BYTE3(LDBAnaAcquire)
+   \   0058   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    226                      pu16Buffer[cAI_RR_DOORS_SW] = ConvResult;
+   \   0059   02....         MOVW      AX,ConvResult
+   \   005C   D4             MOVW      DE,AX
+   \   005D   C2             MOVW      AX,BC
+   \   005E   D6             MOVW      HL,AX
+   \   005F   C4             MOVW      AX,DE
+   \   0060   BE03           MOV       [HL+0x03],A
+   \   0062   60             MOV       A,X
+   \   0063   BE02           MOV       [HL+0x02],A
+    227                      LDBAnaAcquire(cAI_DOOR_UNLOCK_SW);
+   \   0065   A102           MOV       A,#2
+   \   0067   16....         MOVW      HL,#LWRD(LDBAnaAcquire)
+   \   006A   A4..           MOV       E,#BYTE3(LDBAnaAcquire)
+   \   006C   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    228                      pu16Buffer[cAI_DOOR_UNLOCK_SW] = ConvResult;
+   \   006D   02....         MOVW      AX,ConvResult
+   \   0070   D4             MOVW      DE,AX
+   \   0071   C2             MOVW      AX,BC
+   \   0072   D6             MOVW      HL,AX
+   \   0073   C4             MOVW      AX,DE
+   \   0074   BE05           MOV       [HL+0x05],A
+   \   0076   60             MOV       A,X
+   \   0077   BE04           MOV       [HL+0x04],A
+    229          
+    230                      // HWP of LED Verlog in sleep mode
+    231                      // Convert diag input only when output is enabled
+    232                      if (mIsLEDVerlogEnabled())
+   \   0079   31230119       BF        S:0xFF01.2, ??LDBAnaEnterSleepMode_8
+    233                      {
+    234                          LDBAnaAcquire(cDIAG_DRIVER_ULQ);
+   \   007D   A105           MOV       A,#5
+   \   007F   16....         MOVW      HL,#LWRD(LDBAnaAcquire)
+   \   0082   A4..           MOV       E,#BYTE3(LDBAnaAcquire)
+   \   0084   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    235                          pu16Buffer[cDIAG_DRIVER_ULQ] = ConvResult;
+   \   0085   02....         MOVW      AX,ConvResult
+   \   0088   D4             MOVW      DE,AX
+   \   0089   C2             MOVW      AX,BC
+   \   008A   D6             MOVW      HL,AX
+   \   008B   C4             MOVW      AX,DE
+   \   008C   BE0B           MOV       [HL+0x0B],A
+   \   008E   60             MOV       A,X
+   \   008F   BE0A           MOV       [HL+0x0A],A
+   \   0091   FA03           BR        ??LDBAnaEnterSleepMode_8
+    236                      }
+    237                  }
+    238              }
+    239              else
+    240              {
+    241                    mLIBassert(cFalse);
+   \                     ??LDBAnaEnterSleepMode_5:
+   \   0093   9A....         CALL      LIBAssertionFailed
+    242              }
+    243          }
+   \                     ??LDBAnaEnterSleepMode_8:
+   \   0096   B0             POP       AX
+   \   0097   B2             POP       BC
+   \   0098   AF             RET       
+   \   0099                  REQUIRE ?CL78K_V4_6_L00
+   \   0099                  REQUIRE _A_P1
+    244          
+    245          /*============================================================================
+    246            DESCRIPTION         : Initialize the component
+    247          
+    248            PARAMETERS          : None
+    249            (Type,Name,Min,Max) 
+    250            
+    251            RETURN VALUE        : None
+    252              
+    253            DESIGN INFORMATION  : Refer to Detailed Design Document
+    254          ============================================================================*/
+    255          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    256          void LDBAnaInit(void)
+   \                     LDBAnaInit:
+    257          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    258              // Sets of the frequency
+    259              mSetFrequency();
+   \   0000   132810         MOV       0xFF28,#16
+    260              // Enable voltage comparator 
+    261              mSetEnableComparator(1);
+   \   0003   710A28         SET1      0xFF28.0
+    262          }
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+   \   0007                  REQUIRE _A_ADM
+    263          
+    264          /*============================================================================
+    265            DESCRIPTION         : Control the component
+    266          
+    267            PARAMETERS          : None
+    268            (Type,Name,Min,Max) 
+    269            
+    270            RETURN VALUE        : None
+    271              
+    272            DESIGN INFORMATION  : Refer to Detailed Design Document
+    273          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    274          MEM_TYPE void LDBAnaControl(tCtrl Ctrl)
+   \                     LDBAnaControl:
+    275          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    276              switch (Ctrl)
+   \   0000   4D00           CMP       A,#0
+   \   0002   AD05           BZ        ??LDBAnaEnterSleepMode_9
+   \   0004   51             DEC       A
+   \   0005   AD06           BZ        ??LDBAnaEnterSleepMode_10
+   \   0007   FA08           BR        ??LDBAnaEnterSleepMode_11
+    277              {
+    278              case cLDBAnaStartHW:
+    279                  // Enable voltage comparator 
+    280                  mSetEnableComparator(1);
+   \                     ??LDBAnaEnterSleepMode_9:
+   \   0009   710A28         SET1      0xFF28.0
+   \   000C   AF             RET       
+    281                  break;
+    282              case cLDBAnaStopHW:
+    283                  // Disable voltage comparator 
+    284                  mSetEnableComparator(0);
+   \                     ??LDBAnaEnterSleepMode_10:
+   \   000D   710B28         CLR1      0xFF28.0
+   \   0010   AF             RET       
+    285                  break;
+    286              default:
+    287                  mLIBassert(cFalse);
+   \                     ??LDBAnaEnterSleepMode_11:
+   \   0011   9B....         BR        N:LIBAssertionFailed
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+   \   0014                  REQUIRE _A_ADM
+    288                  break;
+    289              }
+    290          }
+    291          
+    292          /*============================================================================
+    293            DESCRIPTION         : Enter sleep mode
+    294          
+    295            PARAMETERS          : None
+    296            (Type,Name,Min,Max) 
+    297            
+    298            RETURN VALUE        : None
+    299              
+    300            DESIGN INFORMATION  : Refer to Detailed Design Document
+    301          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    302          void LDBAnaLeaveSleepMode(void)
+   \                     LDBAnaLeaveSleepMode:
+    303          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    304              bSleepMode = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bSleepMode,A
+    305          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    306          
+    307          /*============================================================================
+    308            DESCRIPTION         : Enter sleep mode
+    309          
+    310            PARAMETERS          : None
+    311            (Type,Name,Min,Max) 
+    312            
+    313            RETURN VALUE        : None
+    314              
+    315            DESIGN INFORMATION  : Refer to Detailed Design Document
+    316          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    317          void LDBAnaEnterSleepMode(void)
+   \                     LDBAnaEnterSleepMode:
+    318          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    319              bSleepMode = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bSleepMode,A
+    320          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bSleepMode>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+    321          
+
+   Segment part sizes:
+
+     Function/Label                Bytes
+     --------------                -----
+     _A_P1                            1
+     _A_ADCR                          2
+     _A_ADM                           1
+     _A_ADS                           1
+     _A_ADPC                          1
+     _A_IF1                           2
+     ConvResult                       2
+     AnalogInputs                     8
+     bSleepMode                       1
+     LDBAnaAcquire                   89
+     LDBAnaReceiveWithoutAddr       153
+     LDBAnaInit                       7
+     LDBAnaControl                   20
+     LDBAnaLeaveSleepMode             6
+     LDBAnaEnterSleepMode             6
+     ?<Initializer for bSleepMode>    1
+     __T_?FAR_FAST_CALL_L07           2
+
+ 
+ 262 bytes in segment BCODE
+   2 bytes in segment CLTVEC
+  19 bytes in segment CODE
+   8 bytes in segment CONST
+   5 bytes in segment NEAR_A
+   1 byte  in segment NEAR_I
+   1 byte  in segment NEAR_ID
+   2 bytes in segment NEAR_Z
+   3 bytes in segment SADDR_A
+ 
+ 281 bytes of CODE  memory (+ 2 bytes shared)
+   9 bytes of CONST memory
+   3 bytes of DATA  memory (+ 8 bytes shared)
+
+Errors: none
+Warnings: none

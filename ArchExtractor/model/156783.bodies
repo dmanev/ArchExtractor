@@ -1,0 +1,58 @@
+class StkFileParser
+!!!196207.python!!!	__init__(inout self : , in inpIPortCriteriaList : IPortCriteria)
+        pass
+!!!164591.python!!!	getComponentNameList(in self : , in fileName : )
+        sResult = ''
+        fileName = re.findall(r'^(\w+)\.\w+$', os.path.basename(fileName), re.I)[0]
+        fileName = fileName.lower()
+        sResult = fileName
+        if re.match(r'^\w+[x|p|j]$', fileName, re.I):
+            supposed_component = fileName[0:len(fileName)-1]
+            CompFactory = self.getComponentFactory()
+            tmpCmp = None            
+            if  CompFactory.findComponent(supposed_component, tmpCmp):
+                sResult = supposed_component
+        
+        return [sResult]
+!!!189295.python!!!	updateComponent(in self : any, in inpName : string, in filePath : string, out outIComponent : IComponent) : IComponent
+        CompFactory = self.getComponentFactory()
+        if(CompFactory):
+            outIComponent = CompFactory.getBaseComponent(inpName, outIComponent)
+            outIComponent.addFileList([filePath])
+            InfrastructFactory = self.getInfrastructureFactory()
+            if(InfrastructFactory):
+                packPath = os.path.split(filePath)[0]
+                package = InfrastructFactory.getAEPackage(packPath)
+                package.addElement(outIComponent)
+        
+        return outIComponent
+!!!196335.python!!!	removeComment(in self : )
+        i = 0
+        withoutComment = ''
+        wc_lines = re.split(r'\\\n', self.fileContent)
+        self.fileContent = ''.join(wc_lines)
+        wc_lines = re.split('\n', self.fileContent)
+        new_wc_lines = []
+        for str in wc_lines:
+            if str!='':
+                line = re.sub(r'/\*.*\*/', '', str)
+                line = re.sub(r'//.*$', '', line)
+                if line != '':
+                    new_wc_lines.append(line)
+        self.fileContent = '\n'.join(new_wc_lines)        
+        comment = False
+        while i < len(self.fileContent):
+            if comment:
+                if self.fileContent[i] == '*' and self.fileContent[i+1] == '/':  
+                    comment = False
+                    i = i + 2
+                else:
+                    i = i + 1                    
+            else:
+                if self.fileContent[i] == '/' and self.fileContent[i+1] == '*':
+                    comment = True
+                    i = i + 2
+                else:
+                    withoutComment = withoutComment + self.fileContent[i]                    
+                    i = i + 1
+        self.fileContent = withoutComment

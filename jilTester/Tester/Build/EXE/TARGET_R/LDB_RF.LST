@@ -1,0 +1,2246 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:14 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_RF.C                                                   #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_RF.LST -o                            #
+#                    ..\EXE\TARGET_R\LDB_RF.R26 D:\X90_BCM\DEVELOPMENT\X90_BC #
+#                    M\K0\L7\BUILD\TARGET\LDB\LDB_RF.C                        #
+#    List file    =  ..\EXE\TARGET_R\LDB_RF.LST                               #
+#    Object file  =  ..\EXE\TARGET_R\LDB_RF.R26                               #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_RF.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LDB_RF
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Feb 22 2010 15:31:56  $
+     15          // $Archive::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_RF/LDB_RF.c-arc  $
+     16          // $Revision:   1.12  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_RF/LDB_RF.c-arc  $
+     19          // 
+     20          //    Rev 1.12   Feb 22 2010 15:31:56   adzhelp
+     21          // Cm005818: Code review corrections
+     22          // 
+     23          //    Rev 1.11   Feb 12 2010 17:16:56   adzhelp
+     24          // Cm005818: Timeout for M pattern scanning sequence removed
+     25          // 
+     26          //    Rev 1.10   Feb 08 2010 11:10:38   adzhelp
+     27          // Cm005818: Corrections according to JML issues
+     28          // 
+     29          //    Rev 1.9   Oct 06 2009 17:40:38   adzhelp
+     30          // Cm005818: Function moved to banked area
+     31          // 
+     32          //    Rev 1.8   Oct 06 2009 12:38:00   ailievb
+     33          // Cm005818: All SI blocks should be received and send to dat layer
+     34          // 
+     35          //    Rev 1.7   Sep 23 2009 10:43:42   ailievb
+     36          // Cm005818:RKE: Update RFchannel according to issues identified in AW1092 project
+     37          // 
+     38          //    Rev 1.6   Sep 21 2009 13:27:06   adzhelp
+     39          // Cm005180: Flag for STROBE control added
+     40          // 
+     41          //    Rev 1.5   Sep 07 2009 10:24:34   ailievb
+     42          // Cm005100: QAC and code review fix.
+     43          // 
+     44          //    Rev 1.4   Jul 10 2009 17:15:46   ailievb
+     45          // Cm005100:Writing mistake:char ":" at line 797 is changed to ";"
+     46          // 
+     47          //    Rev 1.3   Jul 10 2009 14:31:22   ailievb
+     48          // Cm004983:  W&S: The consumption in Sleep Mode is above 2.35 mA
+     49          // 
+     50          //    Rev 1.2   Jul 10 2009 13:55:28   ailievb
+     51          // Cm005100: Integration: some robust requirements are not respected in SW,1 SAD.ROB.OUT.01.R01
+     52          // 
+     53          //    Rev 1.1   Apr 28 2009 10:42:56   adzhelp
+     54          // Cm003276: Implementation of RF sleep mode management
+     55          // 
+     56          //    Rev 1.0   Apr 17 2009 09:40:42   ailievb
+     57          // Initial revision.
+     58          // 
+     59          //******************************************************************************
+     60          #endif
+     61          
+     62          //--------------------------------------------------------------------------
+     63          //  Body Identification
+     64          //--------------------------------------------------------------------------
+     65          
+     66          #define ldb_rf   "ldb_rf"
+     67          
+     68          //-------------------------------------------------------------------------
+     69          //  Included files
+     70          //
+     71          //  #include <system_file_name.h>
+     72          //  #include "project_file_name.h"
+     73          //--------------------------------------------------------------------------
+     74          
+     75          #include "lib.h"
+     76          #include "ldb.h"
+     77          #include "ldb_ioc.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0e
+   \   union <unnamed> volatile __saddr _A_P14
+   \                     _A_P14:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff10
+   \   unsigned short const volatile __saddr __no_bit_access TM00
+   \                     TM00:
+   \   0000                  DS 2
+
+   \                                 In  segment SADDR_A, at 0xff12
+   \   unsigned short volatile __saddr __no_bit_access CR000
+   \                     CR000:
+   \   0000                  DS 2
+
+   \                                 In  segment SADDR_A, at 0xff14
+   \   unsigned short volatile __saddr __no_bit_access CR010
+   \                     CR010:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2e
+   \   union <unnamed> volatile __sfr _A_PM14
+   \                     _A_PM14:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb2
+   \   unsigned short volatile __sfr __no_bit_access CR001
+   \                     CR001:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffb6
+   \   union <unnamed> volatile __sfr _A_TMC01
+   \                     _A_TMC01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb7
+   \   union <unnamed> volatile __sfr _A_PRM01
+   \                     _A_PRM01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffba
+   \   union <unnamed> volatile __sfr _A_TMC00
+   \                     _A_TMC00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffbb
+   \   union <unnamed> volatile __sfr _A_PRM00
+   \                     _A_PRM00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffbc
+   \   union <unnamed> volatile __sfr _A_CRC00
+   \                     _A_CRC00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     78          #include "ldb_int.h"
+     79          #include "ldb_tim.h"
+     80          #include "ldb_har.h"
+     81          #include "ldb_rf.h"
+     82          
+     83          //--------------------------------------------------------------------------
+     84          //  Local constants
+     85          //
+     86          //  #define cConstantName   ((tType) ConstantValue)
+     87          //--------------------------------------------------------------------------
+     88          #define cNextByteMask             ((U8)7U)
+     89          #define cRCBlockIndex             ((U8)0U)
+     90          #define cSIBlockIndex             ((U8)1U)
+     91          #define cMaxU16                   ((U16)0xFFFFU)
+     92          #define cNbBytesInRCBlockToBeRead (U8)(cLDBRfNbBitsInRCBlockToBeRead/8)
+     93          
+     94          
+     95          #define cTBitMaxIC                                                             \
+     96                   (U16)(mConvUsInTickRfTimerIC((cLDBRfTBitInUs + cLDBRfWakeUpBitToleranceInUs)))
+     97          #define cTBitMinIC                                                                                                          \
+     98                   (U16)(mConvUsInTickRfTimerIC(cLDBRfTBitInUs                            \
+     99                                                    - cLDBRfWakeUpBitToleranceInUs      \
+    100                                                    - cLDBRfMaxInterruptDurationInUs    \
+    101                                                    - cLDBRfLDBRegWaitDelay))
+    102          
+    103          #define cTBitMaxOC                                                             \
+    104                   (U16)(mConvUsInTickRfTimerOC((cLDBRfTBitInUs + cLDBRfWakeUpBitToleranceInUs)))
+    105          #define cTBitMinOC                                                                                                          \
+    106                   (U16)(mConvUsInTickRfTimerOC(cLDBRfTBitInUs                            \
+    107                                                    - cLDBRfWakeUpBitToleranceInUs      \
+    108                                                    - cLDBRfMaxInterruptDurationInUs    \
+    109                                                    - cLDBRfLDBRegWaitDelay))
+    110          
+    111          #define cTBitMinWithoutMaxInterruptDuration                                                                                                          \
+    112                   (U16)(mConvUsInTickRfTimerOC(cLDBRfTBitInUs                            \
+    113                                                    - cLDBRfWakeUpBitToleranceInUs      \
+    114                                                    - cLDBRfLDBRegWaitDelay))
+    115          // TimeOuts
+    116          #define cRfHardwareActivationTime                                            \
+    117                   mConvUsInTickRfTimerOC(cLDBRfRfHardwareActivationTimeInUs)
+    118          #define cRfHardwareActivationTimeSleep                                       \
+    119                   mConvUsInTickRfTimerOC(cLDBRfRfHardwareActivationTimeSleepInUs)
+    120          #define cWakeUpDetectionTimeOut                                              \
+    121                   ((cLDBRfMinNbWakeUpBits + cLDBRfMaxNbErrorWakeUpBits) * cTBitMaxOC) 
+    122          #define cWaitPreambleBitsTime                                                \
+    123                   (U16)(cLDBRfNbPreambleBitsTimeOut * cTBitMinOC)
+    124          #define cStartBitWindowClosingTime                                           \
+    125                    ( ((U16)(3*cTBitMaxOC/2)) - cTBitMinOC ) 
+    126          #define cSIBlockEndTime                                                      \
+    127                   mConvUsInTickRfTimerOC(cLDBRfNbBitsInSpaceOfSIBlock * cLDBRfTBitInUs)
+    128          //(10+1)*256 should be Tmax                 
+    129          #define cTOneAndAHalfBitMax       ((U16)((3*cTBitMaxIC)/2)) //=1.5*TBitMax=T1+T2+T2p
+    130          
+    131          //--------------------------------------------------------------------------
+    132          //  Local macros
+    133          //
+    134          //  #define mMacroName   (MacroDefinition)
+    135          //--------------------------------------------------------------------------
+    136          #ifdef _DEBUG_WITH_GENERATOR_
+    137              #define mActivateRfHardware()     mLDBHarWrite(cLDBHarRfStrobe,0)
+    138          #else
+    139              #define mActivateRfHardware()     mLDBHarWrite(cLDBHarRfStrobe,1)
+    140          #endif
+    141          
+    142          #define mDeactivateRfHardware()       mLDBHarWrite(cLDBHarRfStrobe,0)
+    143          #define mReadRfInput()                (U8)mLDBHarRead(cLDBHarRfInput)
+    144          
+    145          #define mConvUsInTickRfTimerIC(Tps)                                            \
+    146                   (U16)(( (U32)((Tps) * (U32)1000U)/cLDBHarTickInNsRfTimerIC ) - (U32)1U)
+    147          
+    148          #define mConvUsInTickRfTimerOC(Tps)                                            \
+    149                   (U16)(( (U32)((Tps) * (U32)1000U)/cLDBHarTickInNsRfTimerOC ) - (U32)1U)
+    150          
+    151          #define mWakeUpEdgeInValidDataRange(Time)                                      \
+    152                    (BOOL)((  (( (U16)(Time) >= (U16)(2*cTBitMinIC))   && ( (U16)(Time) <= (U16)(2*cTBitMaxIC)))      \
+    153                    /*//QACJ 3435: ailievb: there is no side effect*/                    \
+    154                    /*//QACJ 3456: ailievb: there is no side effect*/                    \
+    155                    || (( (U16)(Time) >= (U16)((3*cTBitMinIC)/2)) && ( (Time) <= (U16)((3*cTBitMaxIC)/2)))  ))
+    156          #define mReadTimeCaptureValue()   \
+    157                    (mLDBIocReadTrigger(cLDBHarRfTriggerIC))
+    158          
+    159          
+    160          #ifndef _QAC_
+    161          #define mStartAcquistion()                                                     \
+    162                    mLDBIocStopTimer(cLDBHarRfTimerIC);                                  \
+    163                    mLDBIocSelectClock(cLDBHarRfTimerIC, cLDBHarSelectClockRfTimeCaptureTimer); \
+    164                    mLDBIocSelectCaptureMode(cLDBHarRfTimerIC, cLDBHarModeRfTimeCaptureTimer);  \
+    165                    mLDBIocWriteTrigger(cLDBHarRfTriggerIC2,cMaxU16-1);                  \
+    166                    mLDBIocSetEdgeDetection(cLDBHarRfTimerIC, cLDBRfWakeUpEdge);         \
+    167                    mLDBIocFreeRunningModeStartTimer(cLDBHarRfTimerIC)
+    168          
+    169          
+    170          #define mStartScanning(Trigger)                                                \
+    171                    mLDBIocStopTimer(cLDBHarRfTimerIC);                                  \
+    172                    mLDBIocSelectClock(cLDBHarRfTimerIC, cLDBHarSelectClockRfTimeCaptureTimer);  \
+    173                    mLDBIocSelectCaptureMode(cLDBHarRfTimerIC, cLDBHarModeRfTimeDoubleInterval); \
+    174                    mLDBIocWriteTrigger(cLDBHarRfTriggerIC, ((Trigger)-1));              \
+    175                    mLDBIocWriteTrigger(cLDBHarRfTriggerIC2, ((Trigger)-1));             \
+    176                    mLDBIocStartTimer(cLDBHarRfTimerIC)
+    177          
+    178          //Output Capture Timer to be defined in ldb_harp.h
+    179          #define mStartTimeOut(Trigger)                                                 \
+    180                    mLDBIocStopTimer(cLDBHarRfTimerOC);                                  \
+    181                    mLDBIocSelectClock(cLDBHarRfTimerOC, cLDBHarCounterSourceRfTimerOC); \
+    182                    mLDBIocWriteTrigger(cLDBHarRfTriggerOC, ((Trigger)-1));              \
+    183                    mLDBIocStartTimer(cLDBHarRfTimerOC)
+    184          
+    185          #define mStopTimeOut()                                                         \
+    186                    mLDBIocStopTimer(cLDBHarRfTimerOC);                                  \
+    187                    mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfOCIt)
+    188          #else
+    189          // QAC configuration
+    190            #define mStartAcquistion() NOP()
+    191            #define mRestartAcquistion() NOP()                                                 
+    192            #define mStartScanning(Trigger) NOP()
+    193            #define mStartTimeOut(Trigger) NOP()
+    194            #define mStopTimeOut() NOP()
+    195          #endif
+    196          
+    197          //--------------------------------------------------------------------------
+    198          //  Local types
+    199          //
+    200          //  struct  sStructureName { ... };
+    201          //  union   uUnionName { ... };
+    202          //  enum    eEnumerationName { ... };
+    203          //  typedef Expression tTypeName;
+    204          //--------------------------------------------------------------------------
+    205          typedef enum
+    206          { 
+    207              cEndActivationTime, //"false enum" to avoid 16Bit constants
+    208              cDetectWakeUp,
+    209              cMPatternScanning,
+    210              cTempoPreamble,
+    211              cScan0,
+    212              cScan1,
+    213              cFirstPreambleEdgeDetection,
+    214              cOpenWindowStartBit,
+    215              cCloseWindowStartBit,
+    216              cOpenWindowData,
+    217              cDecoding,
+    218              cTempoSIBlock,
+    219              cStop
+    220          }tStateMachine;
+    221          //--------------------------------------------------------------------------
+    222          //  Local data
+    223          //
+    224          //  static  tType   VariableName;
+    225          //  static  tType*  pVariableName; 
+    226          //--------------------------------------------------------------------------
+    227          
+    228          //counts the number of bits detected in block (WakeUp, Synchro and Data )
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    229          static U8   u8NbBitOk;
+   \                     u8NbBitOk:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    230          static U8   u8NbErrors;
+   \                     u8NbErrors:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    231          static BOOL bLastEdgeSynchronized;
+   \                     bLastEdgeSynchronized:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    232          static U8   u8ReceivedBits;
+   \                     u8ReceivedBits:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    233          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    234          static U16  u16Time;
+   \                     u16Time:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    235          //State machine variable
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    236          static tStateMachine u8DecodingState;
+   \                     u8DecodingState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    237          
+    238          //message sent to DAT layer
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    239          static U8   u8ReceptionBuffer[cNbBytesInRCBlockToBeRead]; 
+   \                     u8ReceptionBuffer:
+   \   0000                  DS 11
+   \   000B                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    240          static U8*  pu8ReceptionBuffer;
+   \                     pu8ReceptionBuffer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    241          static tMsg Msg;
+   \                     Msg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    242          static U16 u16TimeMeasuredOld;
+   \                     u16TimeMeasuredOld:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    243          
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    244          static BOOL bSleepMode = cTrue;
+   \                     bSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bSleepMode>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    245          static BOOL bRfChannelDeactivated = cFalse;
+   \                     bRfChannelDeactivated:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    246          
+    247          #ifdef _DEBUG_LDBRF_ //debug  
+    248              U8  i;
+    249              U8  j;
+    250              U16 u16NbLDBControlSearchWUP;
+    251              U16 u16NbWUPTimeOut;
+    252              U16 u16NbWUPBlocksSeen;
+    253              U16 u16NbMPatternsSeen;
+    254              U16 u16Nb1stPreambleDetectionSeen;
+    255              U16 u16NbStartBitSeen;
+    256              U16 u16NbMissedRC_WindowWasClosed;
+    257              U16 u16NbRCBlocksSeen;
+    258              U16 u16NbSIBlocksSeen;
+    259          #endif
+    260          //--------------------------------------------------------------------------
+    261          //  Constant local data
+    262          //
+    263          //  static const tType  VariableName;
+    264          //--------------------------------------------------------------------------
+    265          
+    266          
+    267          //--------------------------------------------------------------------------
+    268          //  Exported data
+    269          //
+    270          //  tType   CNLVariableName;      (CNL: 3 characters to identify this component)
+    271          //  tType*  pCNLVariableName;     (CNL: 3 characters to identify this component)
+    272          //--------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    273          BOOL bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \                     bLDBRfIsWakeUpDetectionFinished:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bLDBRfIsWakeUpDetectionFinis`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    274          
+    275          //--------------------------------------------------------------------------
+    276          //  Constant exported data
+    277          // 
+    278          //  const tType   CNLVariableName;(CNL: 3 characters to identify this component)
+    279          //--------------------------------------------------------------------------
+    280          
+    281          
+    282          //--------------------------------------------------------------------------
+    283          //  Local function prototypes
+    284          //  
+    285          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    286          //--------------------------------------------------------------------------
+    287          static void InitializeReceiving(void);
+    288          static void StoreBit(U1 u8Bit);
+    289          
+    290          //============================================================================
+    291          //=========================== LOCAL FUNCTIONS ================================
+    292          //==========================================================================
+    293          
+    294          //==========================================================================
+    295          //  DESCRIPTION : StoreBit
+    296          //  
+    297          //  PARAMETERS (Type,Name,Min,Max) :   none
+    298          //
+    299          //  RETURN VALUE :   none
+    300          // 
+    301          //  DESIGN INFORMATION : 
+    302          //==========================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    303          static void StoreBit(const U1 u8Bit)
+   \                     StoreBit:
+    304          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    305              if(u8ReceivedBits < cLDBRfNbBitsInRCBlockToBeRead)
+   \   0002   8E....         MOV       A,u8ReceivedBits
+   \   0005   4D58           CMP       A,#88
+   \   0007   9D3B           BNC       ??LDBRfCallBackSleepTick_0
+    306              {
+    307                  if (u8ReceivedBits == 0)
+   \   0009   4D00           CMP       A,#0
+   \   000B   BD0C           BNZ       ??LDBRfCallBackSleepTick_1
+    308                  {
+    309                      pu8ReceptionBuffer = &u8ReceptionBuffer[0]; 
+   \   000D   10....         MOVW      AX,#u8ReceptionBuffer
+   \   0010   03....         MOVW      pu8ReceptionBuffer,AX
+    310                      *pu8ReceptionBuffer = u8Bit;
+   \   0013   62             MOV       A,C
+   \   0014   9E....         MOV       u8ReceptionBuffer,A
+   \   0017   FA24           BR        ??LDBRfCallBackSleepTick_2
+    311                      
+    312          #ifdef _DEBUG_LDBRF_
+    313                      i = 0;
+    314          #endif
+    315                  }
+    316                  else
+    317                  {
+    318                      //QACJ 0490: ailievb: This is intentionally done and works correctly.
+    319                      //QACJ 3683: ailievb: This is intentionally done and works correctly.
+    320                      //QACJ 3892: ailievb: This is intentionally done and works correctly.
+    321                      if( (pu8ReceptionBuffer < &u8ReceptionBuffer[cNbBytesInRCBlockToBeRead]) &&
+    322                          (pu8ReceptionBuffer >= &u8ReceptionBuffer[0]) )
+   \                     ??LDBRfCallBackSleepTick_1:
+   \   0019   02....         MOVW      AX,pu8ReceptionBuffer
+   \   001C   EA....         CMPW      AX,#u8ReceptionBuffer+11
+   \   001F   9D1C           BNC       ??LDBRfCallBackSleepTick_2
+   \   0021   EA....         CMPW      AX,#u8ReceptionBuffer
+   \   0024   8D17           BC        ??LDBRfCallBackSleepTick_2
+    323                      {
+    324                          //QACJ 0506: ailievb: This is intentionally done and works correctly.
+    325                          *pu8ReceptionBuffer = (*pu8ReceptionBuffer << 1) + u8Bit;
+   \   0026   D6             MOVW      HL,AX
+   \   0027   87             MOV       A,[HL]
+   \   0028   21             CLR1      CY
+   \   0029   27             ROLC      A,0x1
+   \   002A   610A           ADD       A,C
+   \   002C   97             MOV       [HL],A
+    326                          if((U8)(u8ReceivedBits & cNextByteMask) == cNextByteMask)
+   \   002D   8E....         MOV       A,u8ReceivedBits
+   \   0030   5D07           AND       A,#7
+   \   0032   4D07           CMP       A,#7
+   \   0034   BD07           BNZ       ??LDBRfCallBackSleepTick_2
+    327                          {
+    328                              //QACJ 0489: ailievb: This is intentionally done and works correctly.
+    329                              pu8ReceptionBuffer++;
+   \   0036   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0039   80             INCW      AX
+   \   003A   03....         MOVW      pu8ReceptionBuffer,AX
+    330                          }
+    331                      }
+    332                  }
+    333                  u8ReceivedBits++;
+   \                     ??LDBRfCallBackSleepTick_2:
+   \   003D   8E....         MOV       A,u8ReceivedBits
+   \   0040   41             INC       A
+   \   0041   9E....         MOV       u8ReceivedBits,A
+    334                  
+    335          #ifdef _DEBUG_LDBRF_ //shows n° of data seen last time an RC was detected
+    336                  i = u8ReceivedBits;
+    337          #endif
+    338              }
+    339          }
+   \                     ??LDBRfCallBackSleepTick_0:
+   \   0044   B2             POP       BC
+   \   0045   AF             RET       
+   \   0046                  REQUIRE ?CL78K_V4_6_L00
+    340          
+    341          //==========================================================================
+    342          //  DESCRIPTION : InitializeReceiving
+    343          //  
+    344          //  PARAMETERS (Type,Name,Min,Max) :   none
+    345          //
+    346          //  RETURN VALUE :   none
+    347          // 
+    348          //  DESIGN INFORMATION : Initialization of state machine
+    349          //==========================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    350          static void InitializeReceiving( void )
+   \                     InitializeReceiving:
+    351          { 
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    352              mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \   0004   717AE5         SET1      0xFFE5.7
+    353              mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);
+   \   0007   712AE7         SET1      0xFFE7.2
+    354              //clear timers
+    355              //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    356              mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   000A   712BBA         CLR1      0xFFBA.2
+   \   000D   713BBA         CLR1      0xFFBA.3
+    357              //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    358              mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   0010   712BB6         CLR1      0xFFB6.2
+   \   0013   713BB6         CLR1      0xFFB6.3
+    359              
+    360              //init all variables
+    361              u8NbBitOk  = 0;                         
+   \   0016   9E....         MOV       u8NbBitOk,A
+    362              u8NbErrors = 0;
+   \   0019   9E....         MOV       u8NbErrors,A
+    363              bLastEdgeSynchronized = 0;
+   \   001C   9E....         MOV       bLastEdgeSynchronized,A
+    364              u8ReceivedBits = 0;
+   \   001F   9E....         MOV       u8ReceivedBits,A
+    365              u16Time = 0;
+   \   0022   70             MOV       X,A
+   \   0023   03....         MOVW      u16Time,AX
+    366              mLIBmemset (u8ReceptionBuffer,0,cNbBytesInRCBlockToBeRead); 
+   \   0026   10....         MOVW      AX,#u8ReceptionBuffer
+   \   0029   140B00         MOVW      DE,#11
+   \   002C   120000         MOVW      BC,#0
+   \   002F   9A....         CALL      memset
+    367              Msg.Lng = 0;        
+   \   0032   100000         MOVW      AX,#0
+   \   0035   03....         MOVW      Msg+2,AX
+    368              Msg.pBuffer = u8ReceptionBuffer;
+   \   0038   10....         MOVW      AX,#u8ReceptionBuffer
+   \   003B   03....         MOVW      Msg,AX
+    369              pu8ReceptionBuffer = &u8ReceptionBuffer[0]; 
+   \   003E   03....         MOVW      pu8ReceptionBuffer,AX
+    370          }
+   \   0041   B4             POP       DE
+   \   0042   B2             POP       BC
+   \   0043   AF             RET       
+   \   0044                  REQUIRE ?CL78K_V4_6_L00
+   \   0044                  REQUIRE _A_TMC01
+   \   0044                  REQUIRE _A_TMC00
+   \   0044                  REQUIRE _A_MK0
+   \   0044                  REQUIRE _A_MK1
+    371          
+    372          //============================================================================
+    373          //=========================== EXPORTED FUNCTIONS =============================
+    374          //============================================================================
+    375          
+    376          //============================================================================
+    377          //  DESCRIPTION :InputCaptureIt (void)
+    378          //  
+    379          //  PARAMETERS (Type,Name,Min,Max) : none 
+    380          //
+    381          //  RETURN VALUE : none
+    382          // 
+    383          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    384          //============================================================================
+    385          #ifdef UTEST
+    386          mLDBIntDeclareIsr(cLDBHarInterruptRfICIt)
+    387          {
+    388              mLDBIntEnterIsr(cLDBHarInterruptRfICIt);
+    389          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    390          void LDBRfInterruptRfICIt(void)
+   \                     LDBRfInterruptRfICIt:
+    391          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    392          #endif
+    393              U16 u16TimeMeasured;
+    394              BOOL bDecodingProblem;
+    395              
+    396              //QACJ 0434: ailievb: CR010 is a MCU register identifier   
+    397              u16TimeMeasured = (U16)mReadTimeCaptureValue();
+   \   0002   8914           MOVW      AX,S:0xFF14
+   \   0004   D4             MOVW      DE,AX
+    398              mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt); 
+   \   0005   717BE1         CLR1      0xFFE1.7
+    399              switch(u8DecodingState)
+   \   0008   8E....         MOV       A,u8DecodingState
+   \   000B   4D01           CMP       A,#1
+   \   000D   AD2D           BZ        ??LDBRfCallBackSleepTick_3
+   \   000F   4D02           CMP       A,#2
+   \   0011   BD03           BNZ       $+5
+   \   0013   9B....         BR        N:??LDBRfCallBackSleepTick_4
+   \   0016   4D04           CMP       A,#4
+   \   0018   BD03           BNZ       $+5
+   \   001A   9B....         BR        N:??LDBRfCallBackSleepTick_5
+   \   001D   4D05           CMP       A,#5
+   \   001F   BD03           BNZ       $+5
+   \   0021   9B....         BR        N:??LDBRfCallBackSleepTick_6
+   \   0024   4D06           CMP       A,#6
+   \   0026   BD03           BNZ       $+5
+   \   0028   9B....         BR        N:??LDBRfCallBackSleepTick_7
+   \   002B   4D08           CMP       A,#8
+   \   002D   BD03           BNZ       $+5
+   \   002F   9B....         BR        N:??LDBRfCallBackSleepTick_8
+   \   0032   4D0A           CMP       A,#10
+   \   0034   BD03           BNZ       $+5
+   \   0036   9B....         BR        N:??LDBRfCallBackSleepTick_9
+   \   0039   9B....         BR        N:??LDBRfCallBackSleepTick_10
+    400              {
+    401              case cDetectWakeUp:
+    402                  //read IC timer value in timer ticks (U16)
+    403                  //QACJ 0434: ailievb: TM00 is a MCU register identifier
+    404                  u16TimeMeasured = (U16)mReadTimeCaptureValue();
+   \                     ??LDBRfCallBackSleepTick_3:
+   \   003C   8914           MOVW      AX,S:0xFF14
+   \   003E   D4             MOVW      DE,AX
+    405                  u16Time = u16TimeMeasured - u16TimeMeasuredOld; 
+   \   003F   30             XCH       A,X
+   \   0040   18....         SUB       A,u16TimeMeasuredOld
+   \   0043   30             XCH       A,X
+   \   0044   38....         SUBC      A,u16TimeMeasuredOld+1
+   \   0047   03....         MOVW      u16Time,AX
+    406                  u16TimeMeasuredOld = u16TimeMeasured;
+   \   004A   C4             MOVW      AX,DE
+   \   004B   03....         MOVW      u16TimeMeasuredOld,AX
+    407          
+    408          #ifdef _DEBUG_LDBRF_
+    409                  j++;
+    410          #endif
+    411                  if(( u16Time >= cTBitMinIC) && ( u16Time <= cTBitMaxIC))
+   \   004E   02....         MOVW      AX,u16Time
+   \   0051   EAE108         CMPW      AX,#2273
+   \   0054   8D52           BC        ??LDBRfCallBackSleepTick_11
+   \   0056   EA5512         CMPW      AX,#4693
+   \   0059   9D4D           BNC       ??LDBRfCallBackSleepTick_11
+    412                  {
+    413                      u8NbBitOk+= cLDBRfWakeUpIncrement; //+1 for X90
+   \   005B   8E....         MOV       A,u8NbBitOk
+   \   005E   41             INC       A
+   \   005F   9E....         MOV       u8NbBitOk,A
+    414                      if(u8NbBitOk >= cLDBRfMinNbWakeUpBits)
+   \   0062   4D08           CMP       A,#8
+   \   0064   9D03           BNC       $+5
+   \   0066   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    415                      {
+    416                          mStopTimeOut();   //WakeUp timeout  
+   \   0069   A100           MOV       A,#0
+   \   006B   712BB6         CLR1      0xFFB6.2
+   \   006E   713BB6         CLR1      0xFFB6.3
+   \   0071   712BE3         CLR1      0xFFE3.2
+    417                          mLDBIntDisableIsr(cLDBHarInterruptRfOCIt); // PONAEHNT084532.003 Step 3b: OC INT has to be disabled 
+   \   0074   712AE7         SET1      0xFFE7.2
+    418                          u8NbBitOk = 0;
+   \   0077   9E....         MOV       u8NbBitOk,A
+    419                          mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   007A   A102           MOV       A,#2
+   \   007C   712BBA         CLR1      0xFFBA.2
+   \   007F   713BBA         CLR1      0xFFBA.3
+   \   0082   711BBB         CLR1      0xFFBB.1
+   \   0085   710BBB         CLR1      0xFFBB.0
+   \   0088   710BBC         CLR1      0xFFBC.0
+   \   008B   711BBC         CLR1      0xFFBC.1
+   \   008E   712BBC         CLR1      0xFFBC.2
+   \   0091   EE146F04       MOVW      S:0xFF14,#1135
+   \   0095   EE126F04       MOVW      S:0xFF12,#1135
+   \   0099   712ABA         SET1      0xFFBA.2
+   \   009C   713ABA         SET1      0xFFBA.3
+    420                          u8DecodingState = cMPatternScanning;
+   \   009F   9E....         MOV       u8DecodingState,A
+    421                          DATRfCallBackCtrl(cLDBRfWakeUpReceived);
+   \   00A2   9A....         CALL      DATRfCallBackCtrl
+   \   00A5   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    422          #ifdef _DEBUG_LDBRF_
+    423                          u16NbWUPBlocksSeen++;
+    424          #endif
+    425                      }
+    426                      else
+    427                      {
+    428                      } //nothing to do
+    429                  }
+    430                  //edges that have timings corresponding to data frames timings
+    431                  //or maximum number of errors accepted has been reached
+    432                  //QACJ 3356: The 'if' expression is not analyzed correctly
+    433                  else if(  (  (mWakeUpEdgeInValidDataRange(u16Time) == cTrue)
+    434                          || (u8NbErrors >= cLDBRfMaxNbErrorWakeUpBits)   )
+    435                         /* && (u8NbBitOk > 1) */ )  // PONAEHNT084532.003 Step 3b
+   \                     ??LDBRfCallBackSleepTick_11:
+   \   00A8   EAC211         CMPW      AX,#4546
+   \   00AB   8D05           BC        ??LDBRfCallBackSleepTick_13
+   \   00AD   EAA924         CMPW      AX,#9385
+   \   00B0   8D11           BC        ??LDBRfCallBackSleepTick_14
+   \                     ??LDBRfCallBackSleepTick_13:
+   \   00B2   EA510D         CMPW      AX,#3409
+   \   00B5   8D05           BC        ??LDBRfCallBackSleepTick_15
+   \   00B7   EA7F1B         CMPW      AX,#7039
+   \   00BA   8D07           BC        ??LDBRfCallBackSleepTick_14
+   \                     ??LDBRfCallBackSleepTick_15:
+   \   00BC   8E....         MOV       A,u8NbErrors
+   \   00BF   4D02           CMP       A,#2
+   \   00C1   8D23           BC        ??LDBRfCallBackSleepTick_16
+    436                  { 
+    437                      mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_14:
+   \   00C3   A10C           MOV       A,#12
+   \   00C5   717AE5         SET1      0xFFE5.7
+    438                      mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);
+   \   00C8   712AE7         SET1      0xFFE7.2
+    439                      //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    440                      mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   00CB   712BBA         CLR1      0xFFBA.2
+   \   00CE   713BBA         CLR1      0xFFBA.3
+    441                      //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    442                      mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   00D1   712BB6         CLR1      0xFFB6.2
+   \   00D4   713BB6         CLR1      0xFFB6.3
+    443                      mDeactivateRfHardware();
+   \   00D7   1B0E           CLR1      S:0xFF0E.1
+    444                      u8DecodingState = cStop;
+   \   00D9   9E....         MOV       u8DecodingState,A
+    445          #ifdef _DEBUG_LDBRF_
+    446                      u16NbWUPTimeOut++;
+    447          #endif
+    448                      DATRfCallBackCtrl(cLDBRfWakeUpNotReceived); // Enable sleep mode
+   \   00DC   A103           MOV       A,#3
+   \   00DE   9A....         CALL      DATRfCallBackCtrl
+    449                      bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \   00E1   A101           MOV       A,#1
+   \   00E3   9B....         BR        N:??LDBRfCallBackSleepTick_17
+    450                  }
+    451                  else //count "errors", edges not accepted as part of WakeUp
+    452                  {
+    453                      u8NbErrors++;
+   \                     ??LDBRfCallBackSleepTick_16:
+   \   00E6   41             INC       A
+   \   00E7   9E....         MOV       u8NbErrors,A
+   \   00EA   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    454                  } 
+    455                  break;
+    456                      
+    457              case cMPatternScanning://detects, through sampling, the M sequence (X consecutive samples = 1)
+    458                  //then waits TimeOut shorter than preamble duration
+    459                  //then detects 0 + 1: StartBit
+    460                  //QACJ 3346: ailievb: a register value is checked here
+    461                  if(mReadRfInput() == cLDBRfMPatternBit)
+   \                     ??LDBRfCallBackSleepTick_4:
+   \   00ED   8C0043         BT        S:0xFF00.0, ??LDBRfCallBackSleepTick_18
+    462                  {
+    463                      u8NbBitOk++;
+   \   00F0   8E....         MOV       A,u8NbBitOk
+   \   00F3   41             INC       A
+   \   00F4   9E....         MOV       u8NbBitOk,A
+    464                      u8NbErrors = 0; // PONAEHNT084532.003, Step 4 : u8NbErrors is reinitialized to manage timeout
+   \   00F7   A100           MOV       A,#0
+   \   00F9   9E....         MOV       u8NbErrors,A
+    465                      if(u8NbBitOk >= cLDBRfMinNbMPatternBits)
+   \   00FC   8E....         MOV       A,u8NbBitOk
+   \   00FF   4D05           CMP       A,#5
+   \   0101   9D03           BNC       $+5
+   \   0103   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    466                      {
+    467                          //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    468                          mLDBIocStopTimer(cLDBHarRfTimerIC); //stop interval timer
+   \   0106   A103           MOV       A,#3
+   \   0108   712BBA         CLR1      0xFFBA.2
+   \   010B   713BBA         CLR1      0xFFBA.3
+    469                          mLDBIntDisableIsr(cLDBHarInterruptRfICIt); // PONAEHNT084532.003, Step 4
+   \   010E   717AE5         SET1      0xFFE5.7
+    470                          u8DecodingState = cTempoPreamble;
+   \   0111   9E....         MOV       u8DecodingState,A
+    471                          mStartTimeOut(cWaitPreambleBitsTime); 
+   \   0114   712BB6         CLR1      0xFFB6.2
+   \   0117   713BB6         CLR1      0xFFB6.3
+   \   011A   711BB7         CLR1      0xFFB7.1
+   \   011D   710BB7         CLR1      0xFFB7.0
+   \   0120   FEB28B6A       MOVW      0xFFB2,#27275
+   \                     ??LDBRfInterruptRfICIt_0:
+   \   0124   712AB6         SET1      0xFFB6.2
+   \   0127   713AB6         SET1      0xFFB6.3
+    472                          // PONAEHNT084532.003 Step 3b 
+    473                          mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfOCIt);
+   \   012A   712BE3         CLR1      0xFFE3.2
+    474                          mLDBIntEnableIsr(cLDBHarInterruptRfOCIt); 
+   \   012D   712BE7         CLR1      0xFFE7.2
+   \   0130   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    475          #ifdef _DEBUG_LDBRF_
+    476                          u16NbMPatternsSeen++;
+    477          #endif
+    478                      }
+    479                      else
+    480                      {
+    481                      } //nothing to do, wait next IC It
+    482                  }
+    483                  else
+    484                  //QACJ 3201: ailievb: This statement is reachable when mReadRfInput is 1
+    485                  { //not yet in M sequence zone, wait next IC It
+    486                      u8NbBitOk = 0;
+   \                     ??LDBRfCallBackSleepTick_18:
+   \   0133   A100           MOV       A,#0
+   \   0135   9E....         MOV       u8NbBitOk,A
+   \   0138   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    487                  }
+    488                  break;
+    489                      
+    490              case cScan0:
+    491                  //QACJ 3325: ailievb: This control expression is true when mReadRfInput <> 0
+    492                  if(mReadRfInput() != cLDBRfMPatternBit) //Scan0 detected
+   \                     ??LDBRfCallBackSleepTick_5:
+   \   013B   3103000D       BF        S:0xFF00.0, ??LDBRfCallBackSleepTick_19
+    493                  //QACJ 3201: ailievb: This statement is reachable when mReadRfInput is 1
+    494                  {
+    495                      u8NbErrors = 0; // PONAEHNT084532.003, Step 4 : u8NbErrors is reinitialized to manage timeout
+   \   013F   A100           MOV       A,#0
+   \   0141   9E....         MOV       u8NbErrors,A
+    496                      u8DecodingState = cScan1;
+   \   0144   A105           MOV       A,#5
+   \                     ??LDBRfInterruptRfICIt_1:
+   \   0146   9E....         MOV       u8DecodingState,A
+   \   0149   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    497                  }
+    498                  else
+    499                  {
+    500                      u8NbErrors++;
+   \                     ??LDBRfCallBackSleepTick_19:
+   \   014C   8E....         MOV       A,u8NbErrors
+   \   014F   41             INC       A
+   \   0150   9E....         MOV       u8NbErrors,A
+    501                      if(u8NbErrors >= cLDBRfMaxNbPreambleErrorBits) //too many non Scan0 detected
+   \   0153   4D03           CMP       A,#3
+   \   0155   9D03           BNC       $+5
+   \   0157   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    502                      {
+    503                          mStopTimeOut();
+   \   015A   A100           MOV       A,#0
+   \   015C   712BB6         CLR1      0xFFB6.2
+   \   015F   713BB6         CLR1      0xFFB6.3
+   \   0162   712BE3         CLR1      0xFFE3.2
+    504                          u8NbBitOk = 0;
+   \   0165   9E....         MOV       u8NbBitOk,A
+    505                          mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   0168   A102           MOV       A,#2
+   \                     ??LDBRfInterruptRfICIt_2:
+   \   016A   712BBA         CLR1      0xFFBA.2
+   \   016D   713BBA         CLR1      0xFFBA.3
+   \   0170   711BBB         CLR1      0xFFBB.1
+   \   0173   710BBB         CLR1      0xFFBB.0
+   \   0176   710BBC         CLR1      0xFFBC.0
+   \   0179   711BBC         CLR1      0xFFBC.1
+   \   017C   712BBC         CLR1      0xFFBC.2
+   \   017F   EE146F04       MOVW      S:0xFF14,#1135
+   \   0183   EE126F04       MOVW      S:0xFF12,#1135
+   \   0187   712ABA         SET1      0xFFBA.2
+   \   018A   713ABA         SET1      0xFFBA.3
+    506                          u8DecodingState = cMPatternScanning;
+   \   018D   FAB7           BR        ??LDBRfInterruptRfICIt_1
+    507                      }
+    508                      else
+    509                      {} //nothing to do, wait for next sample
+    510                  }
+    511                  break;
+    512                      
+    513                      
+    514              case cScan1:
+    515                  //QACJ 3346: ailievb: a register value is checked here
+    516                  if(mReadRfInput() == cLDBRfMPatternBit) //Scan1 detected
+   \                     ??LDBRfCallBackSleepTick_6:
+   \   018F   8C00BA         BT        S:0xFF00.0, ??LDBRfCallBackSleepTick_19
+    517                  {
+    518                      //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    519                      mLDBIocStopTimer(cLDBHarRfTimerIC); //stop interval timer
+   \   0192   A106           MOV       A,#6
+   \   0194   712BBA         CLR1      0xFFBA.2
+   \   0197   713BBA         CLR1      0xFFBA.3
+    520                      u8DecodingState = cFirstPreambleEdgeDetection;
+   \   019A   9E....         MOV       u8DecodingState,A
+    521                      mStartAcquistion(); //Input capture
+   \   019D   712BBA         CLR1      0xFFBA.2
+   \   01A0   713BBA         CLR1      0xFFBA.3
+   \   01A3   711BBB         CLR1      0xFFBB.1
+   \   01A6   710BBB         CLR1      0xFFBB.0
+   \   01A9   710BBC         CLR1      0xFFBC.0
+   \   01AC   711ABC         SET1      0xFFBC.1
+   \   01AF   712ABC         SET1      0xFFBC.2
+   \   01B2   EE12FEFF       MOVW      S:0xFF12,#65534
+   \   01B6   714ABB         SET1      0xFFBB.4
+   \   01B9   715BBB         CLR1      0xFFBB.5
+   \   01BC   712ABA         SET1      0xFFBA.2
+   \   01BF   713BBA         CLR1      0xFFBA.3
+    522                      mStartTimeOut(3*(cTBitMaxOC/2)); //start TimeOut 1st PreambleEdge
+   \   01C2   712BB6         CLR1      0xFFB6.2
+   \   01C5   713BB6         CLR1      0xFFB6.3
+   \   01C8   711BB7         CLR1      0xFFB7.1
+   \   01CB   710BB7         CLR1      0xFFB7.0
+   \   01CE   FEB27D1B       MOVW      0xFFB2,#7037
+   \   01D2   9B....         BR        N:??LDBRfInterruptRfICIt_0
+    523                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfOCIt);
+    524                      mLDBIntEnableIsr(cLDBHarInterruptRfOCIt);  // PONAEHNT084532.003, Step 5,7
+    525                  }
+    526                  else
+    527                  //QACJ 3201: ailievb: This statement is reachable when mReadRfInput is 1
+    528                  {
+    529                      u8NbErrors++;
+    530                      if(u8NbErrors >= cLDBRfMaxNbPreambleErrorBits)
+    531                      {
+    532                          mStopTimeOut();
+    533                          u8NbBitOk = 0;
+    534                          mStartScanning(cTBitMinIC/2); //TBitMin/2
+    535                          u8DecodingState = cMPatternScanning;
+    536                      }
+    537                      else
+    538                      {} //nothing to do, wait for next sample
+    539                  }
+    540                  break;
+    541                      
+    542              case cFirstPreambleEdgeDetection: //edge detected
+    543                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);  // PONAEHNT084532.003, Step 8
+   \                     ??LDBRfCallBackSleepTick_7:
+   \   01D5   65             MOV       A,D
+   \   01D6   717AE5         SET1      0xFFE5.7
+    544                  mStartTimeOut(cTBitMinWithoutMaxInterruptDuration - (mLDBIocReadCounter(cLDBHarRfTimerIC) - u16TimeMeasured)); // wait time(T1) to open window
+   \   01D9   712BB6         CLR1      0xFFB6.2
+   \   01DC   713BB6         CLR1      0xFFB6.3
+   \   01DF   711BB7         CLR1      0xFFB7.1
+   \   01E2   710BB7         CLR1      0xFFB7.0
+   \   01E5   30             XCH       A,X
+   \   01E6   1E10           SUB       A,S:0xFF10
+   \   01E8   30             XCH       A,X
+   \   01E9   3E11           SUBC      A,S:0xFF11
+   \   01EB   CA220A         ADDW      AX,#2594
+   \   01EE   B9B2           MOVW      0xFFB2,AX
+   \   01F0   C4             MOVW      AX,DE
+   \   01F1   712AB6         SET1      0xFFB6.2
+   \   01F4   713AB6         SET1      0xFFB6.3
+    545                  u16TimeMeasuredOld = u16TimeMeasured;
+   \   01F7   03....         MOVW      u16TimeMeasuredOld,AX
+    546                  u8NbBitOk = 0;
+   \   01FA   A100           MOV       A,#0
+   \   01FC   9E....         MOV       u8NbBitOk,A
+    547                  u8DecodingState = cOpenWindowStartBit;
+   \   01FF   A107           MOV       A,#7
+   \   0201   9B....         BR        N:??LDBRfInterruptRfICIt_1
+    548          #ifdef _DEBUG_LDBRF_
+    549                  u16Nb1stPreambleDetectionSeen++;
+    550          #endif
+    551                  break;
+    552                      
+    553              case cCloseWindowStartBit: //StartBit edge maybe detected
+    554                  u16TimeMeasured = (U16)mReadTimeCaptureValue(); 
+   \                     ??LDBRfCallBackSleepTick_8:
+   \   0204   8914           MOVW      AX,S:0xFF14
+   \   0206   D4             MOVW      DE,AX
+    555                  u16Time = u16TimeMeasured - u16TimeMeasuredOld;
+   \   0207   30             XCH       A,X
+   \   0208   18....         SUB       A,u16TimeMeasuredOld
+   \   020B   30             XCH       A,X
+   \   020C   38....         SUBC      A,u16TimeMeasuredOld+1
+   \   020F   03....         MOVW      u16Time,AX
+    556                  u16TimeMeasuredOld = u16TimeMeasured;
+   \   0212   C4             MOVW      AX,DE
+   \   0213   03....         MOVW      u16TimeMeasuredOld,AX
+    557                  if(u16Time > cTBitMaxIC) //StartBit found
+   \   0216   02....         MOVW      AX,u16Time
+   \   0219   EA5512         CMPW      AX,#4693
+   \   021C   8D30           BC        ??LDBRfCallBackSleepTick_20
+    558                  { 
+    559                      mLDBIntDisableIsr(cLDBHarInterruptRfICIt);  // PONAEHNT084532.003, Step 10
+   \   021E   A109           MOV       A,#9
+   \   0220   717AE5         SET1      0xFFE5.7
+    560                      u8DecodingState = cOpenWindowData;        
+   \   0223   9E....         MOV       u8DecodingState,A
+    561                      u8ReceivedBits = 0; 
+   \   0226   A100           MOV       A,#0
+   \   0228   9E....         MOV       u8ReceivedBits,A
+    562                      bLastEdgeSynchronized = cFalse; 
+   \   022B   9E....         MOV       bLastEdgeSynchronized,A
+    563                      mStartTimeOut(cTBitMinWithoutMaxInterruptDuration - (mLDBIocReadCounter(cLDBHarRfTimerIC) - u16TimeMeasured));   // PONAEHNT084532.003, Step 10
+   \   022E   C4             MOVW      AX,DE
+   \   022F   712BB6         CLR1      0xFFB6.2
+   \   0232   713BB6         CLR1      0xFFB6.3
+   \   0235   711BB7         CLR1      0xFFB7.1
+   \   0238   710BB7         CLR1      0xFFB7.0
+   \   023B   30             XCH       A,X
+   \   023C   1E10           SUB       A,S:0xFF10
+   \   023E   30             XCH       A,X
+   \   023F   3E11           SUBC      A,S:0xFF11
+   \   0241   CA220A         ADDW      AX,#2594
+   \   0244   B9B2           MOVW      0xFFB2,AX
+   \   0246   712AB6         SET1      0xFFB6.2
+   \   0249   713AB6         SET1      0xFFB6.3
+   \   024C   FA66           BR        ??LDBRfCallBackSleepTick_21
+    564          #ifdef _DEBUG_LDBRF_
+    565                      u16NbStartBitSeen++; 
+    566          #endif
+    567                  }
+    568                  else
+    569                  { 
+    570                      u8NbBitOk++;
+   \                     ??LDBRfCallBackSleepTick_20:
+   \   024E   8E....         MOV       A,u8NbBitOk
+   \   0251   41             INC       A
+   \   0252   9E....         MOV       u8NbBitOk,A
+    571                      if(u8NbBitOk >= cLDBRfNbBitsInPreamble)
+   \   0255   4D0E           CMP       A,#14
+   \   0257   8D35           BC        ??LDBRfCallBackSleepTick_22
+    572                      {
+    573                          mStopTimeOut();
+   \   0259   A100           MOV       A,#0
+   \   025B   712BB6         CLR1      0xFFB6.2
+   \   025E   713BB6         CLR1      0xFFB6.3
+   \   0261   712BE3         CLR1      0xFFE3.2
+    574                          u8NbBitOk = 0;
+   \                     ??LDBRfInterruptRfICIt_3:
+   \   0264   9E....         MOV       u8NbBitOk,A
+    575                          mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   0267   A102           MOV       A,#2
+   \   0269   712BBA         CLR1      0xFFBA.2
+   \   026C   713BBA         CLR1      0xFFBA.3
+   \   026F   711BBB         CLR1      0xFFBB.1
+   \   0272   710BBB         CLR1      0xFFBB.0
+   \   0275   710BBC         CLR1      0xFFBC.0
+   \   0278   711BBC         CLR1      0xFFBC.1
+   \   027B   712BBC         CLR1      0xFFBC.2
+   \   027E   EE146F04       MOVW      S:0xFF14,#1135
+   \   0282   EE126F04       MOVW      S:0xFF12,#1135
+   \   0286   712ABA         SET1      0xFFBA.2
+   \   0289   713ABA         SET1      0xFFBA.3
+    576                          u8DecodingState = cMPatternScanning;
+   \   028C   FA23           BR        ??LDBRfCallBackSleepTick_23
+    577                      }
+    578                      else //noise or preamble bit, nothing to do, waiting for StartBit
+    579                      {
+    580                          mStartTimeOut(cTBitMinWithoutMaxInterruptDuration - (mLDBIocReadCounter(cLDBHarRfTimerIC) - u16TimeMeasured));
+   \                     ??LDBRfCallBackSleepTick_22:
+   \   028E   C4             MOVW      AX,DE
+   \   028F   712BB6         CLR1      0xFFB6.2
+   \   0292   713BB6         CLR1      0xFFB6.3
+   \   0295   711BB7         CLR1      0xFFB7.1
+   \   0298   710BB7         CLR1      0xFFB7.0
+   \   029B   30             XCH       A,X
+   \   029C   1E10           SUB       A,S:0xFF10
+   \   029E   30             XCH       A,X
+   \   029F   3E11           SUBC      A,S:0xFF11
+   \   02A1   CA220A         ADDW      AX,#2594
+   \   02A4   B9B2           MOVW      0xFFB2,AX
+   \   02A6   A107           MOV       A,#7
+   \                     ??LDBRfInterruptRfICIt_4:
+   \   02A8   712AB6         SET1      0xFFB6.2
+   \   02AB   713AB6         SET1      0xFFB6.3
+    581                          mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \   02AE   717AE5         SET1      0xFFE5.7
+    582                          u8DecodingState = cOpenWindowStartBit;
+   \                     ??LDBRfCallBackSleepTick_23:
+   \   02B1   9E....         MOV       u8DecodingState,A
+    583                      }
+    584                  }
+    585                  u16Time = 0;
+   \                     ??LDBRfCallBackSleepTick_21:
+   \   02B4   100000         MOVW      AX,#0
+   \   02B7   03....         MOVW      u16Time,AX
+   \   02BA   9B....         BR        N:??LDBRfCallBackSleepTick_12
+    586                  break;
+    587                      
+    588              case cDecoding:
+    589                  u16TimeMeasured = (U16)mReadTimeCaptureValue(); 
+   \                     ??LDBRfCallBackSleepTick_9:
+   \   02BD   8914           MOVW      AX,S:0xFF14
+   \   02BF   D4             MOVW      DE,AX
+    590                  u16Time = u16TimeMeasured - u16TimeMeasuredOld;
+   \   02C0   30             XCH       A,X
+   \   02C1   18....         SUB       A,u16TimeMeasuredOld
+   \   02C4   30             XCH       A,X
+   \   02C5   38....         SUBC      A,u16TimeMeasuredOld+1
+   \   02C8   03....         MOVW      u16Time,AX
+    591                  u16TimeMeasuredOld = u16TimeMeasured;
+   \   02CB   C4             MOVW      AX,DE
+   \   02CC   03....         MOVW      u16TimeMeasuredOld,AX
+    592                  
+    593                  bDecodingProblem = cFalse;
+    594                  if(u16Time <= cTBitMaxIC) //in window TBit
+   \   02CF   02....         MOVW      AX,u16Time
+   \   02D2   EA5512         CMPW      AX,#4693
+   \   02D5   9D48           BNC       ??LDBRfCallBackSleepTick_24
+    595                  {            
+    596                      if(bLastEdgeSynchronized == cFalse)
+   \   02D7   8E....         MOV       A,bLastEdgeSynchronized
+   \   02DA   4D00           CMP       A,#0
+   \   02DC   BD3A           BNZ       ??LDBRfCallBackSleepTick_25
+    597                      {
+    598                          StoreBit(1);
+   \   02DE   A101           MOV       A,#1
+   \   02E0   9A....         CALL      StoreBit
+    599                      }
+    600                      else
+    601                      {
+    602                          StoreBit(0); 
+    603                      }
+    604                  }
+    605                  else if(u16Time <= cTOneAndAHalfBitMax) //in window T1.5Bit
+    606                  {
+    607                      if(bLastEdgeSynchronized == cFalse)
+    608                      {
+    609                          StoreBit(0);
+    610                          if(u8ReceivedBits < cLDBRfNbBitsInRCBlockToBeRead) 
+    611                          {
+    612                              bLastEdgeSynchronized = cTrue;
+    613                          }
+    614                          else
+    615                          {} //nothing to do
+    616                      }
+    617                      else
+    618                      {
+    619                          StoreBit(0);
+    620                          StoreBit(1);
+    621                          if(u8ReceivedBits < cLDBRfNbBitsInRCBlockToBeRead) 
+    622                          {
+    623                              bLastEdgeSynchronized = cFalse;
+    624                          }
+    625                          else
+    626                          {} //nothing to do
+    627                      }
+    628                  }
+    629                  else //in window T2Bit or end of data
+    630                  {
+    631                      if(bLastEdgeSynchronized == cFalse)
+    632                      {
+    633                          StoreBit(0);
+    634                          StoreBit(1);
+    635                      }
+    636                      else // PONAEH084532 step 12 - text in yellow in standard algorithm in addition to §5.2
+    637                      {
+    638                          bDecodingProblem = cTrue;
+    639          
+    640                          if(u8ReceivedBits == cLDBRfNbBitsInSIBlockToBeRead)
+    641                          {
+    642                              //stop IC timer
+    643                              mLDBIocStopTimer(cLDBHarRfTimerIC);
+    644                              mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt); 
+    645                              mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+    646          
+    647                              Msg.Lng = (U16)cLDBRfNbBitsInSIBlockToBeRead;
+    648                              DATRfRxSpontTable[cSIBlockIndex].pCallBackRx(0x0000, cTrue, &Msg);
+    649          
+    650                              mStartTimeOut(cSIBlockEndTime);
+    651                              u8DecodingState = cTempoSIBlock;
+    652          #ifdef _DEBUG_LDBRF_
+    653                              NbSIBlocksSeen++;
+    654          #endif
+    655                          }
+    656                          else //look for a new block
+    657                          {
+    658          #ifdef _DEBUG_LDBRF_
+    659                              u16NbMissedRC_WindowWasClosed++;
+    660          #endif
+    661                              mStopTimeOut();
+    662                              u8NbBitOk = 0;
+    663                              mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+    664                              mStartScanning(cTBitMinIC/2); //TBitMin/2
+    665                              u8DecodingState = cMPatternScanning;
+    666                          }
+    667                      }  
+    668                  }   
+    669          
+    670                  if (bDecodingProblem == cFalse)
+    671                  {
+    672                      if(u8ReceivedBits >= cLDBRfNbBitsInRCBlockToBeRead)
+   \                     ??LDBRfInterruptRfICIt_5:
+   \   02E3   8E....         MOV       A,u8ReceivedBits
+   \   02E6   4D58           CMP       A,#88
+   \   02E8   8D52           BC        ??LDBRfCallBackSleepTick_26
+    673                      { //14 doc JM.L
+    674                          //stop all timers
+    675                          #ifdef DEBUG_SPECIFIED_KEY
+    676                          if (mLDBRfIsKeyMatch())
+    677                          #endif
+    678                          {
+    679                              Msg.Lng = (U16)cLDBRfNbBitsInRCBlockToBeRead;   
+   \   02EA   105800         MOVW      AX,#88
+   \   02ED   03....         MOVW      Msg+2,AX
+    680                              DATRfRxSpontTable[cRCBlockIndex].pCallBackRx(0x0000, cTrue, &Msg);
+   \   02F0   70             MOV       X,A
+   \   02F1   14....         MOVW      DE,#Msg
+   \   02F4   A301           MOV       B,#1
+   \   02F6   B5             PUSH      DE
+   \   02F7   D4             MOVW      DE,AX
+   \   02F8   02....         MOVW      AX,DATRfRxSpontTable
+   \   02FB   D6             MOVW      HL,AX
+   \   02FC   C4             MOVW      AX,DE
+   \   02FD   B4             POP       DE
+   \   02FE   9A....         CALL      ?IND_CALL_L06
+    681                          }
+    682                          //stop all timers
+    683                          //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    684                          mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   0301   A100           MOV       A,#0
+   \   0303   712BBA         CLR1      0xFFBA.2
+   \   0306   713BBA         CLR1      0xFFBA.3
+    685                          mStopTimeOut();
+   \   0309   712BB6         CLR1      0xFFB6.2
+   \   030C   713BB6         CLR1      0xFFB6.3
+   \   030F   712BE3         CLR1      0xFFE3.2
+    686                          mLDBIntDisableIsr(cLDBHarInterruptRfOCIt); // PONAEHNT084532.003, Step 11
+   \   0312   712AE7         SET1      0xFFE7.2
+    687                          u8NbBitOk = 0;
+   \   0315   9B....         BR        N:??LDBRfInterruptRfICIt_3
+    688                          mStartScanning(cTBitMinIC/2); 
+    689                          u8DecodingState = cMPatternScanning;
+    690              #ifdef _DEBUG_LDBRF_
+    691                          u16NbRCBlocksSeen++;
+    692              #endif
+    693                      }
+   \                     ??LDBRfCallBackSleepTick_25:
+   \   0318   A100           MOV       A,#0
+   \   031A   9A....         CALL      StoreBit
+   \   031D   FAC4           BR        ??LDBRfInterruptRfICIt_5
+   \                     ??LDBRfCallBackSleepTick_24:
+   \   031F   EA7F1B         CMPW      AX,#7039
+   \   0322   8E....         MOV       A,bLastEdgeSynchronized
+   \   0325   9D48           BNC       ??LDBRfCallBackSleepTick_27
+   \   0327   4D00           CMP       A,#0
+   \   0329   A100           MOV       A,#0
+   \   032B   BD2C           BNZ       ??LDBRfCallBackSleepTick_28
+   \   032D   9A....         CALL      StoreBit
+   \   0330   8E....         MOV       A,u8ReceivedBits
+   \   0333   4D58           CMP       A,#88
+   \   0335   9DAC           BNC       ??LDBRfInterruptRfICIt_5
+   \   0337   A101           MOV       A,#1
+   \                     ??LDBRfInterruptRfICIt_6:
+   \   0339   9E....         MOV       bLastEdgeSynchronized,A
+    694                      else
+    695                      { 
+    696                          // PONAEHNT084532.003, Step 12
+    697                          // When starting the timeout for cOpenWindowData, 
+    698                          // the timeout has to be set from Input Capture timing and not from INT processing (as latency may lead to open the window too late)
+    699                          mStartTimeOut(cTBitMinWithoutMaxInterruptDuration - (mLDBIocReadCounter(cLDBHarRfTimerIC) - u16TimeMeasured));   // PONAEHNT084532.003, Step 12
+   \                     ??LDBRfCallBackSleepTick_26:
+   \   033C   C4             MOVW      AX,DE
+   \   033D   712BB6         CLR1      0xFFB6.2
+   \   0340   713BB6         CLR1      0xFFB6.3
+   \   0343   711BB7         CLR1      0xFFB7.1
+   \   0346   710BB7         CLR1      0xFFB7.0
+   \   0349   30             XCH       A,X
+   \   034A   1E10           SUB       A,S:0xFF10
+   \   034C   30             XCH       A,X
+   \   034D   3E11           SUBC      A,S:0xFF11
+   \   034F   CA220A         ADDW      AX,#2594
+   \   0352   B9B2           MOVW      0xFFB2,AX
+   \   0354   A109           MOV       A,#9
+   \   0356   9B....         BR        N:??LDBRfInterruptRfICIt_4
+    700                          mLDBIntDisableIsr(cLDBHarInterruptRfICIt); 
+    701                          u8DecodingState = cOpenWindowData;
+    702                      }
+   \                     ??LDBRfCallBackSleepTick_28:
+   \   0359   9A....         CALL      StoreBit
+   \   035C   A101           MOV       A,#1
+   \   035E   9A....         CALL      StoreBit
+   \   0361   8E....         MOV       A,u8ReceivedBits
+   \   0364   4D58           CMP       A,#88
+   \   0366   8D03           BC        $+5
+   \   0368   9B....         BR        N:??LDBRfInterruptRfICIt_5
+   \   036B   A100           MOV       A,#0
+   \   036D   FACA           BR        ??LDBRfInterruptRfICIt_6
+    703                      u16Time = 0; 
+    704                  }
+   \                     ??LDBRfCallBackSleepTick_27:
+   \   036F   4D00           CMP       A,#0
+   \   0371   BD0D           BNZ       ??LDBRfCallBackSleepTick_29
+   \   0373   A100           MOV       A,#0
+   \   0375   9A....         CALL      StoreBit
+   \   0378   A101           MOV       A,#1
+   \   037A   9A....         CALL      StoreBit
+   \   037D   9B....         BR        N:??LDBRfInterruptRfICIt_5
+   \                     ??LDBRfCallBackSleepTick_29:
+   \   0380   8E....         MOV       A,u8ReceivedBits
+   \   0383   4D0A           CMP       A,#10
+   \   0385   BD3E           BNZ       ??LDBRfCallBackSleepTick_30
+   \   0387   100A00         MOVW      AX,#10
+   \   038A   712BBA         CLR1      0xFFBA.2
+   \   038D   713BBA         CLR1      0xFFBA.3
+   \   0390   717BE1         CLR1      0xFFE1.7
+   \   0393   717AE5         SET1      0xFFE5.7
+   \   0396   03....         MOVW      Msg+2,AX
+   \   0399   70             MOV       X,A
+   \   039A   14....         MOVW      DE,#Msg
+   \   039D   A301           MOV       B,#1
+   \   039F   B5             PUSH      DE
+   \   03A0   D4             MOVW      DE,AX
+   \   03A1   02....         MOVW      AX,DATRfRxSpontTable+4
+   \   03A4   D6             MOVW      HL,AX
+   \   03A5   C4             MOVW      AX,DE
+   \   03A6   B4             POP       DE
+   \   03A7   9A....         CALL      ?IND_CALL_L06
+   \   03AA   A10B           MOV       A,#11
+   \   03AC   712BB6         CLR1      0xFFB6.2
+   \   03AF   713BB6         CLR1      0xFFB6.3
+   \   03B2   711BB7         CLR1      0xFFB7.1
+   \   03B5   710BB7         CLR1      0xFFB7.0
+   \   03B8   FEB20EEA       MOVW      0xFFB2,#59918
+   \   03BC   712AB6         SET1      0xFFB6.2
+   \   03BF   713AB6         SET1      0xFFB6.3
+   \   03C2   9B....         BR        N:??LDBRfInterruptRfICIt_1
+   \                     ??LDBRfCallBackSleepTick_30:
+   \   03C5   A100           MOV       A,#0
+   \   03C7   712BB6         CLR1      0xFFB6.2
+   \   03CA   713BB6         CLR1      0xFFB6.3
+   \   03CD   712BE3         CLR1      0xFFE3.2
+   \   03D0   9E....         MOV       u8NbBitOk,A
+   \   03D3   A102           MOV       A,#2
+   \   03D5   717BE1         CLR1      0xFFE1.7
+   \   03D8   9B....         BR        N:??LDBRfInterruptRfICIt_2
+    705                  break;
+    706                      
+    707              default :
+    708                  mLIBassert(0);
+    709                  // stop LDB_RF
+    710                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_10:
+   \   03DB   A101           MOV       A,#1
+   \   03DD   717AE5         SET1      0xFFE5.7
+    711                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt );
+   \   03E0   712AE7         SET1      0xFFE7.2
+    712                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    713                  mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   03E3   712BBA         CLR1      0xFFBA.2
+   \   03E6   713BBA         CLR1      0xFFBA.3
+    714                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    715                  mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   03E9   712BB6         CLR1      0xFFB6.2
+   \   03EC   713BB6         CLR1      0xFFB6.3
+    716                  mDeactivateRfHardware();
+   \   03EF   1B0E           CLR1      S:0xFF0E.1
+    717                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \                     ??LDBRfCallBackSleepTick_17:
+   \   03F1   9E....         MOV       bLDBRfIsWakeUpDetectionFinished,A
+    718                  break;
+    719              }
+    720          #ifdef UTEST
+    721              mLDBIntLeaveIsr(cLDBHarInterruptRfICIt);
+    722          #endif
+    723          }
+   \                     ??LDBRfCallBackSleepTick_12:
+   \   03F4   B4             POP       DE
+   \   03F5   B2             POP       BC
+   \   03F6   AF             RET       
+   \   03F7                  REQUIRE ?CL78K_V4_6_L00
+   \   03F7                  REQUIRE CR001
+   \   03F7                  REQUIRE _A_TMC01
+   \   03F7                  REQUIRE _A_PRM01
+   \   03F7                  REQUIRE _A_TMC00
+   \   03F7                  REQUIRE _A_PRM00
+   \   03F7                  REQUIRE _A_CRC00
+   \   03F7                  REQUIRE _A_IF0
+   \   03F7                  REQUIRE _A_IF1
+   \   03F7                  REQUIRE _A_MK0
+   \   03F7                  REQUIRE _A_MK1
+   \   03F7                  REQUIRE _A_P0
+   \   03F7                  REQUIRE _A_P14
+   \   03F7                  REQUIRE TM00
+   \   03F7                  REQUIRE CR000
+   \   03F7                  REQUIRE CR010
+    724          
+    725          //============================================================================
+    726          //  DESCRIPTION :OutputCompareIt (void)
+    727          //  
+    728          //  PARAMETERS (Type,Name,Min,Max) : none 
+    729          //
+    730          //  RETURN VALUE : none
+    731          // 
+    732          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    733          //============================================================================
+    734          #ifdef UTEST
+    735          mLDBIntDeclareIsr(cLDBHarInterruptRfOCIt)
+    736          {
+    737              mLDBIntEnterIsr(cLDBHarInterruptRfOCIt);
+    738          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    739          void LDBRfInterruptRfOCIt(void)
+   \                     LDBRfInterruptRfOCIt:
+    740          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    741          #endif
+    742              switch(u8DecodingState)
+   \   0002   8E....         MOV       A,u8DecodingState
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD3B           BZ        ??LDBRfCallBackSleepTick_31
+   \   0009   4D01           CMP       A,#1
+   \   000B   BD03           BNZ       $+5
+   \   000D   9B....         BR        N:??LDBRfCallBackSleepTick_32
+   \   0010   4D03           CMP       A,#3
+   \   0012   BD03           BNZ       $+5
+   \   0014   9B....         BR        N:??LDBRfCallBackSleepTick_33
+   \   0017   4D06           CMP       A,#6
+   \   0019   BD03           BNZ       $+5
+   \   001B   9B....         BR        N:??LDBRfCallBackSleepTick_34
+   \   001E   4D07           CMP       A,#7
+   \   0020   BD03           BNZ       $+5
+   \   0022   9B....         BR        N:??LDBRfCallBackSleepTick_35
+   \   0025   4D08           CMP       A,#8
+   \   0027   BD03           BNZ       $+5
+   \   0029   9B....         BR        N:??LDBRfCallBackSleepTick_36
+   \   002C   4D09           CMP       A,#9
+   \   002E   BD03           BNZ       $+5
+   \   0030   9B....         BR        N:??LDBRfCallBackSleepTick_37
+   \   0033   4D0A           CMP       A,#10
+   \   0035   BD03           BNZ       $+5
+   \   0037   9B....         BR        N:??LDBRfCallBackSleepTick_38
+   \   003A   4D0B           CMP       A,#11
+   \   003C   BD03           BNZ       $+5
+   \   003E   9B....         BR        N:??LDBRfCallBackSleepTick_39
+   \   0041   9B....         BR        N:??LDBRfCallBackSleepTick_40
+    743              {
+    744              case cEndActivationTime:
+    745                  mStartTimeOut(cWakeUpDetectionTimeOut); //start WakeUp detection timeout
+   \                     ??LDBRfCallBackSleepTick_31:
+   \   0044   100000         MOVW      AX,#0
+   \   0047   712BB6         CLR1      0xFFB6.2
+   \   004A   713BB6         CLR1      0xFFB6.3
+   \   004D   711BB7         CLR1      0xFFB7.1
+   \   0050   710BB7         CLR1      0xFFB7.0
+   \   0053   FEB247B7       MOVW      0xFFB2,#46919
+   \   0057   712AB6         SET1      0xFFB6.2
+   \   005A   713AB6         SET1      0xFFB6.3
+    746                  //Setup in Edge detection to wait for WakeUp block
+    747                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);  // PONAEHNT084532.003, Step 1       
+   \   005D   717BE1         CLR1      0xFFE1.7
+    748                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt);            // PONAEHNT084532.003, Step 1       
+   \   0060   717BE5         CLR1      0xFFE5.7
+    749                  mStartAcquistion();
+   \   0063   712BBA         CLR1      0xFFBA.2
+   \   0066   713BBA         CLR1      0xFFBA.3
+   \   0069   711BBB         CLR1      0xFFBB.1
+   \   006C   710BBB         CLR1      0xFFBB.0
+   \   006F   710BBC         CLR1      0xFFBC.0
+   \   0072   711ABC         SET1      0xFFBC.1
+   \   0075   712ABC         SET1      0xFFBC.2
+   \   0078   EE12FEFF       MOVW      S:0xFF12,#65534
+   \   007C   714ABB         SET1      0xFFBB.4
+   \   007F   715BBB         CLR1      0xFFBB.5
+   \   0082   712ABA         SET1      0xFFBA.2
+   \   0085   713BBA         CLR1      0xFFBA.3
+    750                  u16TimeMeasuredOld = 0;  
+   \   0088   03....         MOVW      u16TimeMeasuredOld,AX
+    751          #ifndef DISABLE_RECEPTION
+    752                  u8DecodingState = cDetectWakeUp;
+   \   008B   A101           MOV       A,#1
+   \                     ??LDBRfInterruptRfOCIt_0:
+   \   008D   9E....         MOV       u8DecodingState,A
+   \   0090   9B....         BR        N:??LDBRfCallBackSleepTick_41
+    753          #else   // perform the same actions as in cDetectWakeUp when detection timeout ended
+    754                  u8DecodingState = cStop;
+    755                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+    756                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);
+    757                  mLDBIocStopTimer(cLDBHarRfTimerIC);
+    758                  mLDBIocStopTimer(cLDBHarRfTimerOC);
+    759              #ifdef MEASURE_RF_STROBE_DURATION
+    760                  mLDBHarWrite(cLDBHarPort1_3, 0);
+    761              #endif
+    762                  mDeactivateRfHardware(); 
+    763                  u8DecodingState = cStop;
+    764                  DATRfCallBackCtrl(cLDBRfWakeUpNotReceived);   // Enable sleep mode
+    765                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+    766          #endif
+    767          
+    768                  break;
+    769                      
+    770              case cDetectWakeUp: //WakeUp detection timeout is ended
+    771                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_32:
+   \   0093   A10C           MOV       A,#12
+   \   0095   717AE5         SET1      0xFFE5.7
+    772                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);
+   \   0098   712AE7         SET1      0xFFE7.2
+    773                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    774                  mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   009B   712BBA         CLR1      0xFFBA.2
+   \   009E   713BBA         CLR1      0xFFBA.3
+    775                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    776                  mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   00A1   712BB6         CLR1      0xFFB6.2
+   \   00A4   713BB6         CLR1      0xFFB6.3
+    777          #ifdef MEASURE_RF_STROBE_DURATION
+    778                  mLDBHarWrite(cLDBHarPort1_3, 0);
+    779          #endif
+    780                  mDeactivateRfHardware(); 
+   \   00A7   1B0E           CLR1      S:0xFF0E.1
+    781                  u8DecodingState = cStop;
+   \   00A9   9E....         MOV       u8DecodingState,A
+    782          #ifdef _DEBUG_LDBRF_
+    783                  u16NbWUPTimeOut++;
+    784          #endif
+    785                  DATRfCallBackCtrl(cLDBRfWakeUpNotReceived);   // Enable sleep mode
+   \   00AC   A103           MOV       A,#3
+   \   00AE   9A....         CALL      DATRfCallBackCtrl
+    786                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \   00B1   A101           MOV       A,#1
+   \   00B3   9B....         BR        N:??LDBRfCallBackSleepTick_42
+    787                  break;
+    788                      
+    789                      
+    790              case cTempoPreamble:
+    791                  mStopTimeOut();    
+   \                     ??LDBRfCallBackSleepTick_33:
+   \   00B6   A100           MOV       A,#0
+   \   00B8   712BB6         CLR1      0xFFB6.2
+   \   00BB   713BB6         CLR1      0xFFB6.3
+   \   00BE   712BE3         CLR1      0xFFE3.2
+    792                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);  // PONAEHNT084532.003, Step 5
+   \   00C1   712AE7         SET1      0xFFE7.2
+    793                  u8NbErrors = 0; // PONAEHNT084532.003, Step 4 : u8NbErrors is reinitialized to manage timeout
+   \   00C4   9E....         MOV       u8NbErrors,A
+    794                  mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   00C7   A104           MOV       A,#4
+   \   00C9   712BBA         CLR1      0xFFBA.2
+   \   00CC   713BBA         CLR1      0xFFBA.3
+   \   00CF   711BBB         CLR1      0xFFBB.1
+   \   00D2   710BBB         CLR1      0xFFBB.0
+   \   00D5   710BBC         CLR1      0xFFBC.0
+   \   00D8   711BBC         CLR1      0xFFBC.1
+   \   00DB   712BBC         CLR1      0xFFBC.2
+   \   00DE   EE146F04       MOVW      S:0xFF14,#1135
+   \   00E2   EE126F04       MOVW      S:0xFF12,#1135
+   \   00E6   712ABA         SET1      0xFFBA.2
+   \   00E9   713ABA         SET1      0xFFBA.3
+    795                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);  
+   \   00EC   717BE1         CLR1      0xFFE1.7
+    796                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt); // PONAEHNT084532.003, Step 4
+   \   00EF   717BE5         CLR1      0xFFE5.7
+    797                  u8DecodingState = cScan0;
+   \   00F2   FA99           BR        ??LDBRfInterruptRfOCIt_0
+    798                  break;
+    799                      
+    800                      
+    801              case cFirstPreambleEdgeDetection: //no edge was detected
+    802                  mStopTimeOut();                     //stop all timers
+   \                     ??LDBRfCallBackSleepTick_34:
+   \   00F4   A100           MOV       A,#0
+   \   00F6   712BB6         CLR1      0xFFB6.2
+   \   00F9   713BB6         CLR1      0xFFB6.3
+   \   00FC   712BE3         CLR1      0xFFE3.2
+    803                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt); // PONAEHNT084532.003 Step 8_Error
+   \   00FF   712AE7         SET1      0xFFE7.2
+    804                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    805                  mLDBIocStopTimer(cLDBHarRfTimerIC); 
+   \   0102   712BBA         CLR1      0xFFBA.2
+   \   0105   713BBA         CLR1      0xFFBA.3
+    806                  u8NbBitOk = 0;
+   \   0108   9E....         MOV       u8NbBitOk,A
+    807                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+   \   010B   A102           MOV       A,#2
+   \   010D   717BE1         CLR1      0xFFE1.7
+    808                  mStartScanning(cTBitMinIC/2); 
+   \                     ??LDBRfInterruptRfOCIt_1:
+   \   0110   712BBA         CLR1      0xFFBA.2
+   \   0113   713BBA         CLR1      0xFFBA.3
+   \   0116   711BBB         CLR1      0xFFBB.1
+   \   0119   710BBB         CLR1      0xFFBB.0
+   \   011C   710BBC         CLR1      0xFFBC.0
+   \   011F   711BBC         CLR1      0xFFBC.1
+   \   0122   712BBC         CLR1      0xFFBC.2
+   \   0125   EE146F04       MOVW      S:0xFF14,#1135
+   \   0129   EE126F04       MOVW      S:0xFF12,#1135
+   \   012D   712ABA         SET1      0xFFBA.2
+   \   0130   713ABA         SET1      0xFFBA.3
+    809                  u8DecodingState = cMPatternScanning;
+   \   0133   9B....         BR        N:??LDBRfInterruptRfOCIt_0
+    810                  break;
+    811                      
+    812                      
+    813              case cOpenWindowStartBit: 
+    814                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_35:
+   \   0136   A108           MOV       A,#8
+   \   0138   717BE1         CLR1      0xFFE1.7
+    815                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt);  
+   \   013B   717BE5         CLR1      0xFFE5.7
+    816                  mStopTimeOut();
+   \   013E   712BB6         CLR1      0xFFB6.2
+   \   0141   713BB6         CLR1      0xFFB6.3
+   \   0144   712BE3         CLR1      0xFFE3.2
+    817                  mStartTimeOut(cStartBitWindowClosingTime);  //StartBitWindow ClosingTime
+   \   0147   712BB6         CLR1      0xFFB6.2
+   \   014A   713BB6         CLR1      0xFFB6.3
+   \   014D   711BB7         CLR1      0xFFB7.1
+   \   0150   710BB7         CLR1      0xFFB7.0
+   \   0153   FEB29C12       MOVW      0xFFB2,#4764
+   \                     ??LDBRfInterruptRfOCIt_2:
+   \   0157   712AB6         SET1      0xFFB6.2
+   \   015A   713AB6         SET1      0xFFB6.3
+    818                  u8DecodingState = cCloseWindowStartBit;
+   \   015D   9B....         BR        N:??LDBRfInterruptRfOCIt_0
+    819          #ifdef _DEBUG_LDBRF_ //Toggles when window is opened
+    820                  u16NbWUPBlocksSeen++;
+    821          #endif
+    822                  break;
+    823                      
+    824                      
+    825              case cCloseWindowStartBit: //didn't find StartBit, wait for mext RCBlock
+    826                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);      // PONAEHNT084532.003, Step 10_Error 
+   \                     ??LDBRfCallBackSleepTick_36:
+   \   0160   A100           MOV       A,#0
+   \   0162   717AE5         SET1      0xFFE5.7
+    827                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);      // PONAEHNT084532.003, Step 10_Error 
+   \                     ??LDBRfInterruptRfOCIt_3:
+   \   0165   712AE7         SET1      0xFFE7.2
+    828                  u8NbBitOk = 0;
+   \   0168   9E....         MOV       u8NbBitOk,A
+    829                  mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   016B   A102           MOV       A,#2
+   \   016D   712BBA         CLR1      0xFFBA.2
+   \   0170   713BBA         CLR1      0xFFBA.3
+   \   0173   711BBB         CLR1      0xFFBB.1
+   \   0176   710BBB         CLR1      0xFFBB.0
+   \   0179   710BBC         CLR1      0xFFBC.0
+   \   017C   711BBC         CLR1      0xFFBC.1
+   \   017F   712BBC         CLR1      0xFFBC.2
+   \   0182   EE146F04       MOVW      S:0xFF14,#1135
+   \   0186   EE126F04       MOVW      S:0xFF12,#1135
+   \   018A   712ABA         SET1      0xFFBA.2
+   \   018D   713ABA         SET1      0xFFBA.3
+    830                  u8DecodingState = cMPatternScanning;
+   \                     ??LDBRfInterruptRfOCIt_4:
+   \   0190   9E....         MOV       u8DecodingState,A
+    831                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+   \   0193   717BE1         CLR1      0xFFE1.7
+    832                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt);      // PONAEHNT084532.003, Step 10_Error 
+   \   0196   717BE5         CLR1      0xFFE5.7
+   \   0199   9B....         BR        N:??LDBRfCallBackSleepTick_41
+    833                  break;
+    834                      
+    835                      
+    836                 //Start RC decoding and stocking
+    837              case cOpenWindowData:
+    838                  mStartTimeOut( ((U16)(2*cTBitMaxOC)) - cTBitMinOC ) ; //WindowClosingTime
+   \                     ??LDBRfCallBackSleepTick_37:
+   \   019C   A10A           MOV       A,#10
+   \   019E   712BB6         CLR1      0xFFB6.2
+   \   01A1   713BB6         CLR1      0xFFB6.3
+   \   01A4   711BB7         CLR1      0xFFB7.1
+   \   01A7   710BB7         CLR1      0xFFB7.0
+   \   01AA   FEB2C61B       MOVW      0xFFB2,#7110
+   \   01AE   712AB6         SET1      0xFFB6.2
+   \   01B1   713AB6         SET1      0xFFB6.3
+    839                  u8DecodingState = cDecoding;
+   \   01B4   FADA           BR        ??LDBRfInterruptRfOCIt_4
+    840                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt); // PONAEHNT084532.003, Step 10,11
+    841                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt);           // PONAEHNT084532.003, Step 10,11
+    842          #ifdef _DEBUG_LDBRF_ //Toggles when window is opened
+    843                  u16NbWUPBlocksSeen++;
+    844          #endif
+    845                  break;
+    846                      
+    847                      
+    848              case cDecoding: //window closed before any ICIt was detected!
+    849                  mStopTimeOut();
+   \                     ??LDBRfCallBackSleepTick_38:
+   \   01B6   712BB6         CLR1      0xFFB6.2
+   \   01B9   713BB6         CLR1      0xFFB6.3
+   \   01BC   712BE3         CLR1      0xFFE3.2
+    850                   
+    851                  if(u8ReceivedBits == cLDBRfNbBitsInSIBlockToBeRead)
+   \   01BF   8E....         MOV       A,u8ReceivedBits
+   \   01C2   4D0A           CMP       A,#10
+   \   01C4   BD38           BNZ       ??LDBRfCallBackSleepTick_43
+    852                  {
+    853                      //stop IC timer
+    854                      //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    855                      mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   01C6   100A00         MOVW      AX,#10
+   \   01C9   712BBA         CLR1      0xFFBA.2
+   \   01CC   713BBA         CLR1      0xFFBA.3
+    856                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt); 
+   \   01CF   717BE1         CLR1      0xFFE1.7
+    857                      mLDBIntDisableIsr(cLDBHarInterruptRfICIt);  // PONAEHNT084532.003, 12_Error
+   \   01D2   717AE5         SET1      0xFFE5.7
+    858                      Msg.Lng = (U16)cLDBRfNbBitsInSIBlockToBeRead;
+   \   01D5   03....         MOVW      Msg+2,AX
+    859                      DATRfRxSpontTable[cSIBlockIndex].pCallBackRx(0x0000, cTrue, &Msg);
+   \   01D8   70             MOV       X,A
+   \   01D9   14....         MOVW      DE,#Msg
+   \   01DC   A301           MOV       B,#1
+   \   01DE   B5             PUSH      DE
+   \   01DF   D4             MOVW      DE,AX
+   \   01E0   02....         MOVW      AX,DATRfRxSpontTable+4
+   \   01E3   D6             MOVW      HL,AX
+   \   01E4   C4             MOVW      AX,DE
+   \   01E5   B4             POP       DE
+   \   01E6   9A....         CALL      ?IND_CALL_L06
+    860                          
+    861                      mStartTimeOut(cSIBlockEndTime);
+   \   01E9   A10B           MOV       A,#11
+   \   01EB   712BB6         CLR1      0xFFB6.2
+   \   01EE   713BB6         CLR1      0xFFB6.3
+   \   01F1   711BB7         CLR1      0xFFB7.1
+   \   01F4   710BB7         CLR1      0xFFB7.0
+   \   01F7   FEB20EEA       MOVW      0xFFB2,#59918
+   \   01FB   9B....         BR        N:??LDBRfInterruptRfOCIt_2
+    862                      u8DecodingState = cTempoSIBlock;
+    863          #ifdef _DEBUG_LDBRF_
+    864                      u16NbSIBlocksSeen++;
+    865          #endif
+    866                  }
+    867                  else //look for a new block
+    868                  {
+    869          #ifdef _DEBUG_LDBRF_
+    870                      u16NbMissedRC_WindowWasClosed++;
+    871          #endif
+    872                      u8NbBitOk = 0;
+   \                     ??LDBRfCallBackSleepTick_43:
+   \   01FE   A100           MOV       A,#0
+   \   0200   9E....         MOV       u8NbBitOk,A
+    873                      mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);  // PONAEHNT084532.003, 12_Error
+   \   0203   A102           MOV       A,#2
+   \   0205   712AE7         SET1      0xFFE7.2
+    874                      mStartScanning(cTBitMinIC/2); //TBitMin/2
+   \   0208   9B....         BR        N:??LDBRfInterruptRfOCIt_1
+    875                      u8DecodingState = cMPatternScanning;
+    876                  }
+    877                  break;
+    878                      
+    879                      
+    880              case cTempoSIBlock:
+    881                  mStopTimeOut();
+   \                     ??LDBRfCallBackSleepTick_39:
+   \   020B   A100           MOV       A,#0
+   \   020D   712BB6         CLR1      0xFFB6.2
+   \   0210   713BB6         CLR1      0xFFB6.3
+   \   0213   712BE3         CLR1      0xFFE3.2
+    882                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt);     // PONAEHNT084532.003, 12_Error
+   \   0216   9B....         BR        N:??LDBRfInterruptRfOCIt_3
+    883                  u8NbBitOk = 0;
+    884                  mStartScanning(cTBitMinIC/2); //TBitMin/2
+    885                  u8DecodingState = cMPatternScanning;
+    886                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+    887                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt); 
+    888                  break;
+    889                      
+    890              default :
+    891                  mLIBassert(0);
+    892                  // stop LDB_RF
+    893                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_40:
+   \   0219   A101           MOV       A,#1
+   \   021B   717AE5         SET1      0xFFE5.7
+    894                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt );
+   \   021E   712AE7         SET1      0xFFE7.2
+    895                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    896                  mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   0221   712BBA         CLR1      0xFFBA.2
+   \   0224   713BBA         CLR1      0xFFBA.3
+    897                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+    898                  mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   0227   712BB6         CLR1      0xFFB6.2
+   \   022A   713BB6         CLR1      0xFFB6.3
+    899                  mDeactivateRfHardware();
+   \   022D   1B0E           CLR1      S:0xFF0E.1
+    900                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \                     ??LDBRfCallBackSleepTick_42:
+   \   022F   9E....         MOV       bLDBRfIsWakeUpDetectionFinished,A
+    901          
+    902                  break;
+    903              }
+    904          #ifdef UTEST
+    905              mLDBIntLeaveIsr(cLDBHarInterruptRfOCIt);
+    906          #endif
+    907          }
+   \                     ??LDBRfCallBackSleepTick_41:
+   \   0232   B4             POP       DE
+   \   0233   B2             POP       BC
+   \   0234   AF             RET       
+   \   0235                  REQUIRE ?CL78K_V4_6_L00
+   \   0235                  REQUIRE CR001
+   \   0235                  REQUIRE _A_TMC01
+   \   0235                  REQUIRE _A_PRM01
+   \   0235                  REQUIRE _A_TMC00
+   \   0235                  REQUIRE _A_PRM00
+   \   0235                  REQUIRE _A_CRC00
+   \   0235                  REQUIRE _A_IF0
+   \   0235                  REQUIRE _A_IF1
+   \   0235                  REQUIRE _A_MK0
+   \   0235                  REQUIRE _A_MK1
+   \   0235                  REQUIRE _A_P14
+   \   0235                  REQUIRE CR000
+   \   0235                  REQUIRE CR010
+    908          
+    909          //============================================================================
+    910          //  DESCRIPTION :void LDBRfInit(void)
+    911          //                Init of the LDB layer
+    912          //  
+    913          //  PARAMETERS (Type,Name,Min,Max) :  none
+    914          //
+    915          //  RETURN VALUE :  none
+    916          // 
+    917          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    918          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    919          MEM_TYPE void LDBRfInit(void)
+   \                     LDBRfInit:
+    920          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    921              mLDBHarWrite(cLDBHarRfStrobe, 0);
+   \   0000   1B0E           CLR1      S:0xFF0E.1
+    922              mLDBHarConfig(cLDBHarRfStrobe,cLDBHarOutput);
+   \   0002   711B2E         CLR1      0xFF2E.1
+    923          
+    924              mLDBHarConfig(cLDBHarRfInput,cLDBHarInput);
+   \   0005   710A20         SET1      0xFF20.0
+    925              
+    926              InitializeReceiving(); //Init all variables and stop timers
+   \   0008   9A....         CALL      InitializeReceiving
+    927              mDeactivateRfHardware();  
+   \   000B   A10C           MOV       A,#12
+   \   000D   1B0E           CLR1      S:0xFF0E.1
+    928              u8DecodingState = cStop;
+   \   000F   9E....         MOV       u8DecodingState,A
+    929              
+    930          #ifdef _DEBUG_LDBRF_ //Init debug variables
+    931              i = 0;
+    932              j = 0;
+    933              u16NbLDBControlSearchWUP = 0;
+    934              u16NbWUPTimeOut = 0;
+    935              u16NbWUPBlocksSeen = 0;
+    936              u16NbMPatternsSeen = 0;
+    937              u16Nb1stPreambleDetectionSeen = 0;
+    938              u16NbStartBitSeen = 0;
+    939              u16NbMissedRC_WindowWasClosed = 0;
+    940              u16NbRCBlocksSeen = 0;
+    941              u16NbSIBlocksSeen = 0;
+    942          #endif
+    943          }
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+   \   0013                  REQUIRE _A_P14
+   \   0013                  REQUIRE _A_PM0
+   \   0013                  REQUIRE _A_PM14
+    944          
+    945          //============================================================================
+    946          //  DESCRIPTION :void LDBRfControl (tCtrl Ctrl)
+    947          //                Switching of the control access
+    948          //  
+    949          //  PARAMETERS (Type,Name,Min,Max) :  
+    950          //      - Channel: cLDBChannelRf
+    951          //      - Ctrl:    cLDBRfSearchFrame or cLDBRfStop
+    952          //
+    953          //  RETURN VALUE : none
+    954          // 
+    955          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    956          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    957          MEM_TYPE void LDBRfControl(const tCtrl Ctrl)
+   \                     LDBRfControl:
+    958          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    959              switch(Ctrl)
+   \   0002   4D00           CMP       A,#0
+   \   0004   AD26           BZ        ??LDBRfCallBackSleepTick_44
+   \   0006   4D01           CMP       A,#1
+   \   0008   BD03           BNZ       $+5
+   \   000A   9B....         BR        N:??LDBRfCallBackSleepTick_45
+   \   000D   4D04           CMP       A,#4
+   \   000F   BD03           BNZ       $+5
+   \   0011   9B....         BR        N:??LDBRfCallBackSleepTick_46
+   \   0014   4D05           CMP       A,#5
+   \   0016   BD03           BNZ       $+5
+   \   0018   9B....         BR        N:??LDBRfCallBackSleepTick_47
+   \   001B   4D07           CMP       A,#7
+   \   001D   BD03           BNZ       $+5
+   \   001F   9B....         BR        N:??LDBRfCallBackSleepTick_48
+   \   0022   4D08           CMP       A,#8
+   \   0024   BD03           BNZ       $+5
+   \   0026   9B....         BR        N:??LDBRfCallBackSleepTick_49
+   \   0029   9B....         BR        N:??LDBRfCallBackSleepTick_50
+    960              {
+    961              case(cLDBRfSearchFrame):
+    962          #ifdef UTEST 
+    963                  InitializeReceiving();                //Init all variables and stop timers
+    964                  u8DecodingState = cEndActivationTime;
+    965                  mActivateRfHardware();
+    966                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfICIt);
+    967                  mLDBIntEnableIsr(cLDBHarInterruptRfICIt);          
+    968                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfOCIt);        
+    969                  mLDBIntEnableIsr(cLDBHarInterruptRfOCIt);        
+    970                  mStartTimeOut(cRfHardwareActivationTime); //timer 1 ms
+    971          #else
+    972                  bRfChannelDeactivated = cFalse;
+   \                     ??LDBRfCallBackSleepTick_44:
+   \   002C   A100           MOV       A,#0
+   \   002E   9E....         MOV       bRfChannelDeactivated,A
+    973                  mLDBIntGetInterruptTM00TM01(cLDBIntRfOwnerTM00TM01);
+   \   0031   A102           MOV       A,#2
+   \   0033   9E....         MOV       LDBIntInterruptOwnerTM00TM01,A
+    974                  if (bSleepMode == cFalse)
+   \   0036   8E....         MOV       A,bSleepMode
+   \   0039   4D00           CMP       A,#0
+   \   003B   BD29           BNZ       ??LDBRfCallBackSleepTick_51
+    975                  {
+    976                      #ifdef MEASURE_RF_STROBE_DURATION
+    977                          mLDBHarWrite(cLDBHarPort1_3, 1);
+    978                      #endif
+    979                      mActivateRfHardware();
+   \   003D   1A0E           SET1      S:0xFF0E.1
+    980                  }
+    981          
+    982                  if ((bSleepMode != cFalse) && ((BOOL)mLDBSupIsHwActivated() == cFalse))
+    983                  {
+    984                      // wait next clock cycle when HW will be activated by LDB_SUP
+    985                      DATRfCallBackCtrl(cLDBRfDecrementTempoSearchFrame);
+    986                  }
+    987                  else
+    988                  {
+    989                      InitializeReceiving(); //Init all variables and stop timers
+   \                     ??LDBRfControl_0:
+   \   003F   9A....         CALL      InitializeReceiving
+    990                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptRfOCIt);        
+   \   0042   A100           MOV       A,#0
+   \   0044   712BE3         CLR1      0xFFE3.2
+    991                      mLDBIntEnableIsr(cLDBHarInterruptRfOCIt);        
+   \   0047   712BE7         CLR1      0xFFE7.2
+    992                      //Setup to wait end of hardware TDA activation time
+    993                      u8DecodingState = cEndActivationTime;
+   \   004A   9E....         MOV       u8DecodingState,A
+    994          
+    995                      if (bSleepMode == cFalse)
+   \   004D   8E....         MOV       A,bSleepMode
+   \   0050   4D00           CMP       A,#0
+   \   0052   BD20           BNZ       ??LDBRfCallBackSleepTick_52
+    996                      {
+    997                          mStartTimeOut(cRfHardwareActivationTime); //timer 1 ms
+   \   0054   712BB6         CLR1      0xFFB6.2
+   \   0057   713BB6         CLR1      0xFFB6.3
+   \   005A   711BB7         CLR1      0xFFB7.1
+   \   005D   710BB7         CLR1      0xFFB7.0
+   \   0060   FEB2FF3E       MOVW      0xFFB2,#16127
+   \   0064   FA1E           BR        ??LDBRfCallBackSleepTick_53
+    998                      }
+   \                     ??LDBRfCallBackSleepTick_51:
+   \   0066   8E....         MOV       A,bLDBSupActivatedHw
+   \   0069   4D00           CMP       A,#0
+   \   006B   BDD2           BNZ       ??LDBRfControl_0
+   \   006D   A109           MOV       A,#9
+   \   006F   9A....         CALL      DATRfCallBackCtrl
+   \   0072   FA5A           BR        ??LDBRfCallBackSleepTick_50
+    999                      else
+   1000                      {
+   1001                          // in sleep mode strobe is activated earlier by LDB_SUP
+   1002                          mStartTimeOut(cRfHardwareActivationTimeSleep); //timer 
+   \                     ??LDBRfCallBackSleepTick_52:
+   \   0074   712BB6         CLR1      0xFFB6.2
+   \   0077   713BB6         CLR1      0xFFB6.3
+   \   007A   711BB7         CLR1      0xFFB7.1
+   \   007D   710BB7         CLR1      0xFFB7.0
+   \   0080   FEB24A06       MOVW      0xFFB2,#1610
+   \                     ??LDBRfCallBackSleepTick_53:
+   \   0084   A100           MOV       A,#0
+   \   0086   712AB6         SET1      0xFFB6.2
+   \   0089   713AB6         SET1      0xFFB6.3
+   1003                      }
+   1004                      bLDBRfIsWakeUpDetectionFinished = cFalse;
+   \   008C   FA3D           BR        ??LDBRfCallBackSleepTick_54
+   1005          #ifdef _DEBUG_LDBRF_
+   1006                      u16NbLDBControlSearchWUP++;
+   1007          #endif
+   1008                  }
+   1009          #endif
+   1010                  break;
+   1011                  
+   1012              case(cLDBRfStop):  
+   1013                  mLDBIntDisableIsr(cLDBHarInterruptRfICIt);
+   \                     ??LDBRfCallBackSleepTick_45:
+   \   008E   A100           MOV       A,#0
+   \   0090   717AE5         SET1      0xFFE5.7
+   1014                  mLDBIntDisableIsr(cLDBHarInterruptRfOCIt );
+   \   0093   712AE7         SET1      0xFFE7.2
+   1015                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+   1016                  mLDBIocStopTimer(cLDBHarRfTimerIC);
+   \   0096   712BBA         CLR1      0xFFBA.2
+   \   0099   713BBA         CLR1      0xFFBA.3
+   1017                  //QACJ 3109: ailievb: Empty statement due to macro implementation in ldb_ioc.h
+   1018                  mLDBIocStopTimer(cLDBHarRfTimerOC);
+   \   009C   712BB6         CLR1      0xFFB6.2
+   \   009F   713BB6         CLR1      0xFFB6.3
+   1019                  mLDBIntReleaseInterruptTM00TM01(cLDBIntRfOwnerTM00TM01);
+   \   00A2   9E....         MOV       LDBIntInterruptOwnerTM00TM01,A
+   1020                  mDeactivateRfHardware();
+   \   00A5   A101           MOV       A,#1
+   \   00A7   1B0E           CLR1      S:0xFF0E.1
+   1021                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \   00A9   FA20           BR        ??LDBRfCallBackSleepTick_54
+   1022                  break;
+   1023                  
+   1024              case cLDBRfActivateStrobe:
+   1025                  if (bRfChannelDeactivated == cFalse)
+   \                     ??LDBRfCallBackSleepTick_46:
+   \   00AB   8E....         MOV       A,bRfChannelDeactivated
+   \   00AE   4D00           CMP       A,#0
+   \   00B0   BD1C           BNZ       ??LDBRfCallBackSleepTick_50
+   1026                  {
+   1027                      mActivateRfHardware();
+   \   00B2   1A0E           SET1      S:0xFF0E.1
+   \   00B4   FA18           BR        ??LDBRfCallBackSleepTick_50
+   1028                  }
+   1029                  break;
+   1030                  
+   1031              case cLDBRfDeactivateStrobe:  // Called when RF is disabled in EEPROM
+   1032                  mDeactivateRfHardware();             // Frame in course can be lost but it's not a problem
+   \                     ??LDBRfCallBackSleepTick_47:
+   \   00B6   A101           MOV       A,#1
+   \   00B8   1B0E           CLR1      S:0xFF0E.1
+   1033                  bRfChannelDeactivated = cTrue;
+   \   00BA   9E....         MOV       bRfChannelDeactivated,A
+   \   00BD   FA0F           BR        ??LDBRfCallBackSleepTick_50
+   1034                  break;
+   1035              
+   1036              case cLDBRfEnterNominalMode:
+   1037                  bSleepMode = cFalse;
+   \                     ??LDBRfCallBackSleepTick_48:
+   \   00BF   A100           MOV       A,#0
+   \   00C1   9E....         MOV       bSleepMode,A
+   \   00C4   FA08           BR        ??LDBRfCallBackSleepTick_50
+   1038                  break;
+   1039              
+   1040              case cLDBRfEnterSleepMode:
+   1041                  bSleepMode = cTrue;
+   \                     ??LDBRfCallBackSleepTick_49:
+   \   00C6   A101           MOV       A,#1
+   \   00C8   9E....         MOV       bSleepMode,A
+   1042                  bLDBRfIsWakeUpDetectionFinished = cTrue;
+   \                     ??LDBRfCallBackSleepTick_54:
+   \   00CB   9E....         MOV       bLDBRfIsWakeUpDetectionFinished,A
+   1043                  break;
+   1044                  
+   1045              default:
+   1046                  mLIBassert(cFalse);
+   1047                  break;
+   1048              }
+   1049              
+   1050              DATRfCallBackEndCtrl(Ctrl, cLDBCorrect);
+   \                     ??LDBRfCallBackSleepTick_50:
+   \   00CE   62             MOV       A,C
+   \   00CF   A300           MOV       B,#0
+   \   00D1   9A....         CALL      DATRfCallBackEndCtrl
+   1051          }
+   \   00D4   B2             POP       BC
+   \   00D5   AF             RET       
+   \   00D6                  REQUIRE ?CL78K_V4_6_L00
+   \   00D6                  REQUIRE CR001
+   \   00D6                  REQUIRE _A_TMC01
+   \   00D6                  REQUIRE _A_PRM01
+   \   00D6                  REQUIRE _A_TMC00
+   \   00D6                  REQUIRE _A_IF1
+   \   00D6                  REQUIRE _A_MK0
+   \   00D6                  REQUIRE _A_MK1
+   \   00D6                  REQUIRE _A_P14
+   1052          
+   1053          //============================================================================
+   1054          //  DESCRIPTION :void LDBRfCallBackSleepTick (void)
+   1055          //               Callback from sleep system timer
+   1056          //  
+   1057          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1058          //
+   1059          //  RETURN VALUE : none
+   1060          // 
+   1061          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1062          //============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1063          void LDBRfCallBackSleepTick(void)
+   \                     LDBRfCallBackSleepTick:
+   1064          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1065              DATRfCallBackCtrl(cLDBRfControlSleepTick);
+   \   0000   A106           MOV       A,#6
+   \   0002   9B....         BR        N:DATRfCallBackCtrl
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+   1066          }
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bSleepMode>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bLDBRfIsWakeUpDetectionFinis`:
+   \   0000   01             DB 1
+   1067          
+
+   Segment part sizes:
+
+     Function/Label                                 Bytes
+     --------------                                 -----
+     _A_P0                                             1
+     _A_P14                                            1
+     TM00                                              2
+     CR000                                             2
+     CR010                                             2
+     _A_PM0                                            1
+     _A_PM14                                           1
+     CR001                                             2
+     _A_TMC01                                          1
+     _A_PRM01                                          1
+     _A_TMC00                                          1
+     _A_PRM00                                          1
+     _A_CRC00                                          1
+     _A_IF0                                            2
+     _A_IF1                                            2
+     _A_MK0                                            2
+     _A_MK1                                            2
+     u8NbBitOk                                         1
+     u8NbErrors                                        1
+     bLastEdgeSynchronized                             1
+     u8ReceivedBits                                    1
+     u16Time                                           2
+     u8DecodingState                                   1
+     u8ReceptionBuffer                                11
+     pu8ReceptionBuffer                                2
+     Msg                                               4
+     u16TimeMeasuredOld                                2
+     bSleepMode                                        1
+     bRfChannelDeactivated                             1
+     bLDBRfIsWakeUpDetectionFinished
+                                                       1
+     StoreBit                                         70
+     InitializeReceiving                              68
+     LDBRfInterruptRfICIt                           1015
+     LDBRfInterruptRfOCIt                            565
+     LDBRfInit                                        19
+     LDBRfControl                                    214
+     LDBRfCallBackSleepTick                            5
+     ?<Initializer for bSleepMode>                     1
+     ?<Initializer for bLDBRfIsWakeUpDetectionFinis    1
+
+ 
+   233 bytes in segment BCODE
+ 1 723 bytes in segment CODE
+    17 bytes in segment NEAR_A
+     2 bytes in segment NEAR_I
+     2 bytes in segment NEAR_ID
+    27 bytes in segment NEAR_Z
+     8 bytes in segment SADDR_A
+ 
+ 1 956 bytes of CODE  memory
+     2 bytes of CONST memory
+    29 bytes of DATA  memory (+ 25 bytes shared)
+
+Errors: none
+Warnings: none

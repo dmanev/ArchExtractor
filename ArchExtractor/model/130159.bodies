@@ -1,0 +1,9 @@
+class IFileParser
+!!!188783.python!!!	updateComponent(in self : any, in inpName : string, in filePath : string, out outIComponent : IComponent) : IComponent
+        pass
+!!!129391.python!!!	getComponentNameList(in self : , in fileName : )
+        pass
+!!!149359.python!!!	fulfillComponentData(in self : any, in cmpName : string, in filePath : string, inout inoutIComponent : IComponent)
+        pass
+!!!149999.python!!!	fileFilter(in self : , in fileName : string)
+        pass

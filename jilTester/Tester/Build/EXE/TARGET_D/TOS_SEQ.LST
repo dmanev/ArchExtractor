@@ -1,0 +1,880 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:43 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_SEQ.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\TOS_SEQ.LST -o                        #
+#                    ..\EXE\TARGET_D\TOS_SEQ.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_SEQ.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\TOS_SEQ.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\TOS_SEQ.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\TOS_SEQ.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      STK
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    TOS_SEQ
+     12          //               The graph engine management
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Sep 17 2009 10:27:10  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SEQ.C-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SEQ.C-arc  $
+     19          // 
+     20          //    Rev 1.1   Sep 17 2009 10:27:10   adzhelp
+     21          // Cm003277: Functions defined as CALLT_TYPE
+     22          // 
+     23          //    Rev 1.0   04 Feb 2009 17:03:06   adzhelp
+     24          // Initial revision.
+     25          */
+     26          //******************************************************************************
+     27          
+     28          //------------------------------------------------------------------------------
+     29          // Body Identification
+     30          //------------------------------------------------------------------------------
+     31          #define TOS_SEQ "TOS_SEQ"
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Included files to resolve specific definitions in this file
+     35          //------------------------------------------------------------------------------
+     36          #include "tos_seq.h"
+     37          #include "tos_ord.h"
+     38          #include "lib.h"
+     39          #ifdef COMPILATION_NATIVE
+     40            #include <windows.h>
+     41            #include <winbase.h>
+     42          #endif
+     43          
+     44          //------------------------------------------------------------------------------
+     45          // Local constants
+     46          //------------------------------------------------------------------------------
+     47          
+     48          //------------------------------------------------------------------------------
+     49          // Local macros
+     50          //------------------------------------------------------------------------------
+     51          #ifdef COMPILATION_NATIVE
+     52              #define mDbgInit() DbgInit()
+     53          
+     54              #define mDbgSeqMotor()\
+     55                  if( pfDbgSeqMotor!=NULL) pfDbgSeqMotor()
+     56          
+     57              #define mDbgActivateGraph(ID)                   \
+     58                  if(pfDbgActivateGraph!=NULL)                \
+     59                  {                                           \
+     60                      if( pfDbgActivateGraph(ID) )            \
+     61                      {                                       \
+     62                          DbgDebugBreak();                    \
+     63                      }                                       \
+     64                  }
+     65          
+     66              #define mDbgDeactivateGraph(ID)                 \
+     67                  if(pfDbgDeactivateGraph!=NULL)              \
+     68                  {                                           \
+     69                      if( pfDbgDeactivateGraph(ID) )          \
+     70                      {                                       \
+     71                          DbgDebugBreak();                    \
+     72                      }                                       \
+     73                  }
+     74          
+     75              #define mDbgFreezeGraph(ID)                     \
+     76                  if(pfDbgFreezeGraph!=NULL)                  \
+     77                  {                                           \
+     78                      if( pfDbgFreezeGraph(ID) )              \
+     79                      {                                       \
+     80                          DbgDebugBreak();                    \
+     81                      }                                       \
+     82                  }
+     83          
+     84              #define mDbgUnfreezeGraph(ID)                   \
+     85                  if(pfDbgUnfreezeGraph!=NULL)                \
+     86                  {                                           \
+     87                      if( pfDbgUnfreezeGraph(ID) )            \
+     88                      {                                       \
+     89                          DbgDebugBreak();                    \
+     90                      }                                       \
+     91                  }
+     92          
+     93              #define mDbgChangeGrapheRule(ID,Rule)           \
+     94                  if(pfDbgChangeGrapheRule!=NULL)             \
+     95                  {                                           \
+     96                      if( pfDbgChangeGrapheRule(ID,Rule) )    \
+     97                      {                                       \
+     98                          DbgDebugBreak();                    \
+     99                      }                                       \
+    100                  }
+    101          #elif defined (_QAC_)
+    102          extern void NOP(void);
+    103              #define mDbgInit()                          NOP()
+    104              #define mDbgSeqMotor()                      NOP()
+    105              #define mDbgActivateGraph(ID)               NOP()
+    106              #define mDbgDeactivateGraph(ID)             NOP()
+    107              #define mDbgFreezeGraph(ID)                 NOP()
+    108              #define mDbgUnfreezeGraph(ID)               NOP()
+    109              #define mDbgChangeGrapheRule(ID,Rule)       NOP()
+    110          #else
+    111              #define mDbgInit()
+    112              #define mDbgSeqMotor()
+    113              #define mDbgActivateGraph(ID)
+    114              #define mDbgDeactivateGraph(ID)
+    115              #define mDbgFreezeGraph(ID)
+    116              #define mDbgUnfreezeGraph(ID)
+    117              #define mDbgChangeGrapheRule(ID,Rule)
+    118          #endif
+    119          
+    120          //------------------------------------------------------------------------------
+    121          // Local types
+    122          //------------------------------------------------------------------------------
+    123          
+    124          // -----------------------------------------------------------------------------
+    125          // Local data
+    126          //------------------------------------------------------------------------------
+    127          #ifdef COMPILATION_NATIVE
+    128          BOOL  (*pfDbgInit)(U32 u32NbGr,const tTOSSeqGraphListType*);
+    129          void  (*pfDbgSeqMotor)(void);
+    130          BOOL  (*pfDbgActivateGraph)(U32 u32ID);
+    131          BOOL  (*pfDbgDeactivateGraph)(U32 u32ID);
+    132          BOOL  (*pfDbgFreezeGraph)(U32 u32ID);
+    133          BOOL  (*pfDbgUnfreezeGraph)(U32 u32ID);
+    134          BOOL  (*pfDbgChangeGrapheRule)(U32 u32ID,U32 u32Rule);
+    135          HINSTANCE hDbgGraphDll = NULL;
+    136          #endif
+    137          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    138          static tTOSSeqGraphContextType TOSSeqGraphContext[cTOSSeqGraphNumber];
+   \                     TOSSeqGraphContext:
+   \   0000                  DS 94
+   \   005E                  REQUIRE __INIT_NEAR_Z
+    139          
+    140          //------------------------------------------------------------------------------
+    141          // Constant local data
+    142          //------------------------------------------------------------------------------
+    143          
+    144          //------------------------------------------------------------------------------
+    145          // Exported data
+    146          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    147          tTOSSeqGraphId TOSSeqGraphNumber;
+   \                     TOSSeqGraphNumber:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    148          
+    149          //------------------------------------------------------------------------------
+    150          // Constant exported data
+    151          //------------------------------------------------------------------------------
+    152          
+    153          //------------------------------------------------------------------------------
+    154          // Local function prototypes
+    155          //------------------------------------------------------------------------------
+    156          #ifdef COMPILATION_NATIVE
+    157          //==============================================================================
+    158          // DESCRIPTION:         Initializes the debug mode in COMPILATION_NATIVE
+    159          //
+    160          // PARAMETERS:          None
+    161          //
+    162          // RETURN VALUE:        None
+    163          //
+    164          // DESIGN INFORMATION:  Initializes the debug variables.
+    165          //                      Refer to Detailed Design Document
+    166          //==============================================================================
+    167          static void DbgInit(void);
+    168          
+    169          //==============================================================================
+    170          // DESCRIPTION:         Avoids masking of the last function by the debugbreak 
+    171          //                      execution.
+    172          //
+    173          // PARAMETERS:          None
+    174          //
+    175          // RETURN VALUE:        None
+    176          //
+    177          // DESIGN INFORMATION:  Calls debugbreak function.
+    178          //                      Refer to Detailed Design Document
+    179          //==============================================================================
+    180          static void DbgDebugBreak(void);
+    181          #endif
+    182          
+    183          //==============================================================================
+    184          // DESCRIPTION:         Tests all sister's transitions of the graph and executes
+    185          //                      corresponding actions.
+    186          //
+    187          // PARAMETERS:          None
+    188          //
+    189          // RETURN VALUE:        None
+    190          //
+    191          // DESIGN INFORMATION:  Tests all sister's transitions of the current graph one
+    192          //                      after the other. When one returns TRUE executes the
+    193          //                      corresponding action and stops testing the other sister's
+    194          //                      rules. If there is no daughter's rule, deactivates the graph.
+    195          //                      Refer to Detailed Design Document
+    196          //==============================================================================
+    197          static void ScanGraph(void);
+    198          
+    199          //==============================================================================
+    200          //=========================== LOCAL FUNCTIONS ==================================
+    201          //==============================================================================
+    202          
+    203          #ifdef COMPILATION_NATIVE
+    204          static void DbgInit(void)
+    205          {
+    206              if( hDbgGraphDll == NULL )
+    207              {
+    208                  hDbgGraphDll = LoadLibrary("DBGSEQ.DLL");
+    209              }
+    210          
+    211              if ( hDbgGraphDll != NULL )
+    212              {
+    213                  pfDbgInit = (void*)GetProcAddress(hDbgGraphDll, "DbgInit");
+    214          
+    215                  if( pfDbgInit != NULL )
+    216                  {
+    217                      if( pfDbgInit(cTOSSeqGraphNumber, &TOSSeqGraphList) )
+    218                      {
+    219                          pfDbgSeqMotor         = (void*)GetProcAddress(hDbgGraphDll, "DbgSeqMoteur");
+    220                          pfDbgActivateGraph    = (void*)GetProcAddress(hDbgGraphDll, "DbgActiverGraphe");
+    221                          pfDbgDeactivateGraph  = (void*)GetProcAddress(hDbgGraphDll, "DbgDesactiverGraphe");
+    222                          pfDbgFreezeGraph       = (void*)GetProcAddress(hDbgGraphDll, "DbgGelerGraphe");
+    223                          pfDbgUnfreezeGraph     = (void*)GetProcAddress(hDbgGraphDll, "DbgDegelerGraphe");
+    224                          pfDbgChangeGrapheRule = (void*)GetProcAddress(hDbgGraphDll, "DbgChangerRegleGraphe");
+    225                      }
+    226                      else
+    227                      {
+    228                          pfDbgInit = NULL;
+    229                      }
+    230                  }
+    231              }
+    232              else
+    233              {
+    234                  pfDbgInit               = NULL;
+    235                  pfDbgSeqMotor           = NULL;
+    236                  pfDbgActivateGraph      = NULL;
+    237                  pfDbgDeactivateGraph    = NULL;
+    238                  pfDbgFreezeGraph        = NULL;
+    239                  pfDbgUnfreezeGraph      = NULL;
+    240                  pfDbgChangeGrapheRule   = NULL;
+    241              }
+    242          }
+    243          
+    244          static void DbgDebugBreak(void)
+    245          {
+    246              DebugBreak();
+    247          }
+    248          #endif
+    249          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    250          static void ScanGraph(void)
+   \                     ScanGraph:
+    251          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    252              const tTOSSeqRuleType* pRule;
+    253          #ifdef COMPILATION_NATIVE         // For debug mode, save the rule number
+    254              tTOSSeqRuleId RuleNumber;
+    255          #endif
+    256          
+    257              mLIBassert(TOSSeqGraphNumber < cTOSSeqGraphNumber);
+   \   0002   8E....         MOV       A,TOSSeqGraphNumber
+   \   0005   4D2F           CMP       A,#47
+   \   0007   8D03           BC        ??TOSSeqMotor_0
+   \   0009   9A....         CALL      LIBAssertionFailed
+    258          
+    259          #ifdef COMPILATION_NATIVE
+    260              RuleNumber = TOSSeqGraphContext[TOSSeqGraphNumber].RuleNumber;
+    261              pRule = TOSSeqGraphList[TOSSeqGraphNumber]->Rules
+    262                      + TOSSeqGraphContext[TOSSeqGraphNumber].RuleNumber;
+    263          #else
+    264              pRule = *TOSSeqGraphList[TOSSeqGraphNumber]
+    265                      + TOSSeqGraphContext[TOSSeqGraphNumber].RuleNumber;
+   \                     ??TOSSeqMotor_0:
+   \   000C   8E....         MOV       A,TOSSeqGraphNumber
+   \   000F   A002           MOV       X,#2
+   \   0011   3188           MULU      X
+   \   0013   CA....         ADDW      AX,#TOSSeqGraphContext+1
+   \   0016   D6             MOVW      HL,AX
+   \   0017   87             MOV       A,[HL]
+   \   0018   A006           MOV       X,#6
+   \   001A   3188           MULU      X
+   \   001C   D4             MOVW      DE,AX
+   \   001D   8E....         MOV       A,TOSSeqGraphNumber
+   \   0020   A002           MOV       X,#2
+   \   0022   3188           MULU      X
+   \   0024   CA....         ADDW      AX,#TOSSeqGraphList
+   \   0027   D6             MOVW      HL,AX
+   \   0028   87             MOV       A,[HL]
+   \   0029   70             MOV       X,A
+   \   002A   AE01           MOV       A,[HL+0x01]
+   \   002C   E4             XCHW      AX,DE
+   \   002D   30             XCH       A,X
+   \   002E   610C           ADD       A,E
+   \   0030   30             XCH       A,X
+   \   0031   612D           ADDC      A,D
+   \   0033   D4             MOVW      DE,AX
+    266          #endif
+    267              do
+    268              {
+    269                  if ((*pRule->pTransition)() != cFalse)
+   \                     ??ScanGraph_0:
+   \   0034   C4             MOVW      AX,DE
+   \   0035   D6             MOVW      HL,AX
+   \   0036   87             MOV       A,[HL]
+   \   0037   70             MOV       X,A
+   \   0038   AE01           MOV       A,[HL+0x01]
+   \   003A   D6             MOVW      HL,AX
+   \   003B   9A....         CALL      ?IND_CALL_L06
+   \   003E   4D00           CMP       A,#0
+   \   0040   AD45           BZ        ??TOSSeqMotor_1
+    270                  {
+    271          #ifdef COMPILATION_NATIVE
+    272                      mDbgChangeGrapheRule(TOSSeqGraphNumber,RuleNumber);
+    273                      // When GraphDesigner break the application, you are in the DLL
+    274                      // For exit to the DLL, place a breakpoint in front of (*ptRegle->ptAction)();
+    275                      // and continue the application by 'F5' key press.
+    276                      // Now you can debug your application just before execute the action.
+    277          #endif
+    278                      (*pRule->pAction)();
+   \   0042   C4             MOVW      AX,DE
+   \   0043   D6             MOVW      HL,AX
+   \   0044   AE02           MOV       A,[HL+0x02]
+   \   0046   70             MOV       X,A
+   \   0047   AE03           MOV       A,[HL+0x03]
+   \   0049   D6             MOVW      HL,AX
+   \   004A   9A....         CALL      ?IND_CALL_L06
+    279          
+    280                      if (pRule->DaughterRuleNumber != cTOSSeqInvalidRule)
+   \   004D   B5             PUSH      DE
+   \   004E   B6             POP       HL
+   \   004F   AE05           MOV       A,[HL+0x05]
+   \   0051   41             INC       A
+   \   0052   AD15           BZ        ??TOSSeqMotor_2
+    281                      {
+    282                          TOSSeqGraphContext[TOSSeqGraphNumber].RuleNumber = pRule->DaughterRuleNumber;
+   \   0054   84             INCW      DE
+   \   0055   84             INCW      DE
+   \   0056   84             INCW      DE
+   \   0057   84             INCW      DE
+   \   0058   84             INCW      DE
+   \   0059   85             MOV       A,[DE]
+   \   005A   72             MOV       C,A
+   \   005B   8E....         MOV       A,TOSSeqGraphNumber
+   \   005E   A002           MOV       X,#2
+   \   0060   3188           MULU      X
+   \   0062   CA....         ADDW      AX,#TOSSeqGraphContext+1
+   \   0065   D6             MOVW      HL,AX
+   \   0066   62             MOV       A,C
+   \   0067   FA1B           BR        ??TOSSeqMotor_3
+    283                      }
+    284                      else    // End of graph
+    285                      {
+    286                          mDbgDeactivateGraph(TOSSeqGraphNumber);
+    287                          TOSSeqGraphContext[TOSSeqGraphNumber].GraphState  = cTOSSeqInactiveGraph;
+   \                     ??TOSSeqMotor_2:
+   \   0069   8E....         MOV       A,TOSSeqGraphNumber
+   \   006C   A002           MOV       X,#2
+   \   006E   3188           MULU      X
+   \   0070   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0073   D6             MOVW      HL,AX
+   \   0074   A100           MOV       A,#0
+   \   0076   97             MOV       [HL],A
+    288                          TOSSeqGraphContext[TOSSeqGraphNumber].RuleNumber  = 0 ;
+   \   0077   8E....         MOV       A,TOSSeqGraphNumber
+   \   007A   A002           MOV       X,#2
+   \   007C   3188           MULU      X
+   \   007E   CA....         ADDW      AX,#TOSSeqGraphContext+1
+   \   0081   D6             MOVW      HL,AX
+   \   0082   A100           MOV       A,#0
+   \                     ??TOSSeqMotor_3:
+   \   0084   97             MOV       [HL],A
+    289                      }
+    290                      pRule = NULL;     // Condition for exit loop
+   \   0085   FA2C           BR        ??TOSSeqMotor_4
+    291                  }
+    292                  else if ( pRule->SisterRuleNumber != cTOSSeqInvalidRule )
+   \                     ??TOSSeqMotor_1:
+   \   0087   B5             PUSH      DE
+   \   0088   B6             POP       HL
+   \   0089   AE04           MOV       A,[HL+0x04]
+   \   008B   41             INC       A
+   \   008C   AD25           BZ        ??TOSSeqMotor_4
+    293                  {
+    294          #ifdef COMPILATION_NATIVE                   // For debug mode, save the rule number
+    295                      RuleNumber = pRule->SisterRuleNumber;
+    296                      pRule = TOSSeqGraphList[TOSSeqGraphNumber]->Rules
+    297                              + pRule->SisterRuleNumber;
+    298          #else
+    299                      pRule = *TOSSeqGraphList[TOSSeqGraphNumber]
+    300                              + pRule->SisterRuleNumber;
+   \   008E   84             INCW      DE
+   \   008F   84             INCW      DE
+   \   0090   84             INCW      DE
+   \   0091   84             INCW      DE
+   \   0092   85             MOV       A,[DE]
+   \   0093   A006           MOV       X,#6
+   \   0095   3188           MULU      X
+   \   0097   D4             MOVW      DE,AX
+   \   0098   8E....         MOV       A,TOSSeqGraphNumber
+   \   009B   A002           MOV       X,#2
+   \   009D   3188           MULU      X
+   \   009F   CA....         ADDW      AX,#TOSSeqGraphList
+   \   00A2   D6             MOVW      HL,AX
+   \   00A3   87             MOV       A,[HL]
+   \   00A4   70             MOV       X,A
+   \   00A5   AE01           MOV       A,[HL+0x01]
+   \   00A7   E4             XCHW      AX,DE
+   \   00A8   30             XCH       A,X
+   \   00A9   610C           ADD       A,E
+   \   00AB   30             XCH       A,X
+   \   00AC   612D           ADDC      A,D
+   \   00AE   D4             MOVW      DE,AX
+    301          #endif
+    302                  }
+    303                  else
+    304                  {
+    305                      pRule = NULL;
+    306                  }
+    307              }
+    308              while(pRule != NULL);
+   \   00AF   6168           OR        A,X
+   \   00B1   BD81           BNZ       ??ScanGraph_0
+    309          }
+   \                     ??TOSSeqMotor_4:
+   \   00B3   B4             POP       DE
+   \   00B4   B2             POP       BC
+   \   00B5   AF             RET       
+   \   00B6                  REQUIRE ?CL78K_V4_6_L00
+    310          
+    311          //==============================================================================
+    312          //=========================== EXPORTED FUNCTIONS ===============================
+    313          //==============================================================================
+    314          
+    315          //==============================================================================
+    316          // DESCRIPTION:         See component header file
+    317          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    318          void TOSSeqInitialize(void)
+   \                     TOSSeqInitialize:
+    319          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    320              tTOSSeqGraphId GraphNumber;
+    321          
+    322              mLIBassert(cTOSSeqGraphNumber > 0);
+    323          
+    324              mDbgInit();
+    325          
+    326              for (GraphNumber = 0;GraphNumber < cTOSSeqGraphNumber; GraphNumber++)
+   \   0001   16....         MOVW      HL,#TOSSeqGraphContext
+   \   0004   A02F           MOV       X,#47
+    327              {
+    328                  TOSSeqGraphContext[GraphNumber].GraphState = cTOSSeqInactiveGraph;
+   \                     ??TOSSeqInitialize_0:
+   \   0006   A100           MOV       A,#0
+   \   0008   97             MOV       [HL],A
+    329                  TOSSeqGraphContext[GraphNumber].RuleNumber = 0 ;
+   \   0009   B7             PUSH      HL
+   \   000A   B4             POP       DE
+   \   000B   84             INCW      DE
+   \   000C   95             MOV       [DE],A
+    330              }
+   \   000D   86             INCW      HL
+   \   000E   86             INCW      HL
+   \   000F   50             DEC       X
+   \   0010   BDF4           BNZ       ??TOSSeqInitialize_0
+    331          }
+   \   0012   B4             POP       DE
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    332          
+    333          //==============================================================================
+    334          // DESCRIPTION:         See component header file
+    335          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    336          CALLT_TYPE void TOSSeqActivateGraph(const tTOSSeqGraphId GraphNumber)
+   \                     TOSSeqActivateGraph:
+    337          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    338              mLIBassert(GraphNumber < cTOSSeqGraphNumber);
+   \   0002   4D2F           CMP       A,#47
+   \   0004   8D03           BC        ??TOSSeqMotor_5
+   \   0006   9A....         CALL      LIBAssertionFailed
+    339              mLIBassert(TOSSeqGraphContext[GraphNumber].GraphState == cTOSSeqInactiveGraph);
+   \                     ??TOSSeqMotor_5:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   4D00           CMP       A,#0
+   \   0015   AD03           BZ        ??TOSSeqMotor_6
+   \   0017   9A....         CALL      LIBAssertionFailed
+    340          
+    341              mDbgActivateGraph(GraphNumber);
+    342              TOSSeqGraphContext[GraphNumber].GraphState = cTOSSeqActiveGraph;
+   \                     ??TOSSeqMotor_6:
+   \   001A   62             MOV       A,C
+   \   001B   A002           MOV       X,#2
+   \   001D   3188           MULU      X
+   \   001F   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0022   D6             MOVW      HL,AX
+   \   0023   A101           MOV       A,#1
+   \   0025   97             MOV       [HL],A
+    343              TOSSeqGraphContext[GraphNumber].RuleNumber = 0;
+   \   0026   A100           MOV       A,#0
+   \   0028   86             INCW      HL
+   \   0029   97             MOV       [HL],A
+    344          }
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+    345          
+    346          //==============================================================================
+    347          // DESCRIPTION:         See component header file
+    348          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    349          CALLT_TYPE void TOSSeqDeactivateGraph(const tTOSSeqGraphId GraphNumber)
+   \                     TOSSeqDeactivateGraph:
+    350          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    351              mLIBassert(GraphNumber < cTOSSeqGraphNumber);
+   \   0002   4D2F           CMP       A,#47
+   \   0004   8D03           BC        ??TOSSeqMotor_7
+   \   0006   9A....         CALL      LIBAssertionFailed
+    352              // If graph is already deactivated, it is not a fault
+    353              //  mLIBassert(TOSSeqGraphContext[GraphNumber].GraphState != cTOSSeqInactiveGraph);
+    354          
+    355              mDbgDeactivateGraph(GraphNumber);
+    356              TOSSeqGraphContext[GraphNumber].GraphState = cTOSSeqInactiveGraph;
+   \                     ??TOSSeqMotor_7:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0011   D6             MOVW      HL,AX
+   \   0012   A100           MOV       A,#0
+   \   0014   97             MOV       [HL],A
+    357          }
+   \   0015   B2             POP       BC
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    358          
+    359          //==============================================================================
+    360          // DESCRIPTION:         See component header file
+    361          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    362          void TOSSeqFreezeGraph(const tTOSSeqGraphId GraphNumber)
+   \                     TOSSeqFreezeGraph:
+    363          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    364              mLIBassert(GraphNumber < cTOSSeqGraphNumber);
+   \   0002   4D2F           CMP       A,#47
+   \   0004   8D03           BC        ??TOSSeqMotor_8
+   \   0006   9A....         CALL      LIBAssertionFailed
+    365              mLIBassert(TOSSeqGraphContext[GraphNumber].GraphState == cTOSSeqActiveGraph);
+   \                     ??TOSSeqMotor_8:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   51             DEC       A
+   \   0014   AD03           BZ        ??TOSSeqMotor_9
+   \   0016   9A....         CALL      LIBAssertionFailed
+    366          
+    367              mDbgFreezeGraph(GraphNumber);
+    368              TOSSeqGraphContext[GraphNumber].GraphState = cTOSSeqFrozenGraph;
+   \                     ??TOSSeqMotor_9:
+   \   0019   62             MOV       A,C
+   \   001A   A002           MOV       X,#2
+   \   001C   3188           MULU      X
+   \   001E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0021   D6             MOVW      HL,AX
+   \   0022   A102           MOV       A,#2
+   \   0024   97             MOV       [HL],A
+    369          }
+   \   0025   B2             POP       BC
+   \   0026   AF             RET       
+   \   0027                  REQUIRE ?CL78K_V4_6_L00
+    370          
+    371          //==============================================================================
+    372          // DESCRIPTION:         See component header file
+    373          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    374          void TOSSeqUnfreezeGraph(const tTOSSeqGraphId GraphNumber)
+   \                     TOSSeqUnfreezeGraph:
+    375          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    376              mLIBassert(GraphNumber < cTOSSeqGraphNumber);
+   \   0002   4D2F           CMP       A,#47
+   \   0004   8D03           BC        ??TOSSeqMotor_10
+   \   0006   9A....         CALL      LIBAssertionFailed
+    377              mLIBassert(TOSSeqGraphContext[GraphNumber].GraphState == cTOSSeqFrozenGraph);
+   \                     ??TOSSeqMotor_10:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   4D02           CMP       A,#2
+   \   0015   AD03           BZ        ??TOSSeqMotor_11
+   \   0017   9A....         CALL      LIBAssertionFailed
+    378          
+    379              mDbgUnfreezeGraph(GraphNumber);
+    380              TOSSeqGraphContext[GraphNumber].GraphState = cTOSSeqActiveGraph;
+   \                     ??TOSSeqMotor_11:
+   \   001A   62             MOV       A,C
+   \   001B   A002           MOV       X,#2
+   \   001D   3188           MULU      X
+   \   001F   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0022   D6             MOVW      HL,AX
+   \   0023   A101           MOV       A,#1
+   \   0025   97             MOV       [HL],A
+    381          }
+   \   0026   B2             POP       BC
+   \   0027   AF             RET       
+   \   0028                  REQUIRE ?CL78K_V4_6_L00
+    382          
+    383          //==============================================================================
+    384          // DESCRIPTION:         See component header file
+    385          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    386          CALLT_TYPE tTOSSeqGraphStateType TOSSeqGraphState(const tTOSSeqGraphId GraphNumber)
+   \                     TOSSeqGraphState:
+    387          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    388              mLIBassert(GraphNumber < cTOSSeqGraphNumber);
+   \   0002   4D2F           CMP       A,#47
+   \   0004   8D03           BC        ??TOSSeqMotor_12
+   \   0006   9A....         CALL      LIBAssertionFailed
+    389          
+    390              return (TOSSeqGraphContext[GraphNumber].GraphState);
+   \                     ??TOSSeqMotor_12:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   B2             POP       BC
+   \   0014   AF             RET       
+   \   0015                  REQUIRE ?CL78K_V4_6_L00
+    391          }
+    392          
+    393          //==============================================================================
+    394          // DESCRIPTION:         See component header file
+    395          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    396          BOOL TOSSeqTrueEval(void)
+   \                     TOSSeqTrueEval:
+    397          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    398              // This function must always return true
+    399              return (cTrue);
+   \   0000   A101           MOV       A,#1
+   \   0002   AF             RET       
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    400          }
+    401          
+    402          //==============================================================================
+    403          // DESCRIPTION:         See component header file
+    404          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    405          void TOSSeqNoAction(void)
+   \                     TOSSeqNoAction:
+    406          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    407              // This function must be always empty
+    408          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    409          
+    410          //==============================================================================
+    411          // DESCRIPTION:         See component header file
+    412          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    413          void TOSSeqMotor(const tTOSSeqGraphId StartGraph,const tTOSSeqGraphId EndGraph)
+   \                     TOSSeqMotor:
+    414          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   74             MOV       E,A
+    415              tTOSSeqGraphId OldGraphNumber;
+    416          
+    417              mLIBassert(EndGraph < cTOSSeqGraphNumber);
+   \   0003   63             MOV       A,B
+   \   0004   4D2F           CMP       A,#47
+   \   0006   8D03           BC        ??TOSSeqMotor_13
+   \   0008   9A....         CALL      LIBAssertionFailed
+    418          
+    419              mDbgSeqMotor();
+    420          
+    421              OldGraphNumber = TOSSeqGraphNumber;     // Save OldGraphNumber
+   \                     ??TOSSeqMotor_13:
+   \   000B   8E....         MOV       A,TOSSeqGraphNumber
+   \   000E   72             MOV       C,A
+    422          
+    423              // if no graph is activated -> simulation of a minimum time
+    424              mLDBSimulateProcessingTime(cTOSSeqDureeTourGrapheSimulationNs/
+    425                                         (cLDBTick*(cTOSSeqGraphNumber+1)));
+    426          
+    427              // It is possible because it is not possible to have 2 graph tasks with same priority
+    428              for (TOSSeqGraphNumber = StartGraph; TOSSeqGraphNumber<= EndGraph; TOSSeqGraphNumber++)
+   \   000F   64             MOV       A,E
+   \   0010   9E....         MOV       TOSSeqGraphNumber,A
+   \   0013   63             MOV       A,B
+   \   0014   48....         CMP       A,TOSSeqGraphNumber
+   \   0017   8D38           BC        ??TOSSeqMotor_14
+    429              {
+    430                  mLIBassert(TOSSeqGraphList[TOSSeqGraphNumber] != NULL);
+   \                     ??TOSSeqMotor_15:
+   \   0019   8E....         MOV       A,TOSSeqGraphNumber
+   \   001C   A002           MOV       X,#2
+   \   001E   3188           MULU      X
+   \   0020   CA....         ADDW      AX,#TOSSeqGraphList
+   \   0023   D6             MOVW      HL,AX
+   \   0024   87             MOV       A,[HL]
+   \   0025   70             MOV       X,A
+   \   0026   AE01           MOV       A,[HL+0x01]
+   \   0028   6168           OR        A,X
+   \   002A   BD03           BNZ       ??TOSSeqMotor_16
+   \   002C   9A....         CALL      LIBAssertionFailed
+    431          
+    432                  if (TOSSeqGraphContext[TOSSeqGraphNumber].GraphState == cTOSSeqActiveGraph)
+   \                     ??TOSSeqMotor_16:
+   \   002F   8E....         MOV       A,TOSSeqGraphNumber
+   \   0032   A002           MOV       X,#2
+   \   0034   3188           MULU      X
+   \   0036   CA....         ADDW      AX,#TOSSeqGraphContext
+   \   0039   D6             MOVW      HL,AX
+   \   003A   87             MOV       A,[HL]
+   \   003B   51             DEC       A
+   \   003C   BD06           BNZ       ??TOSSeqMotor_17
+    433                  {
+    434                      ScanGraph();
+   \   003E   9A....         CALL      ScanGraph
+    435          
+    436                      // TosSeq Call this Macro for simulate the LDB component
+    437                      // This macro is empty in the LDB embedded
+    438                      mLDBSimulateProcessingTime(cTOSSeqDureeTourGrapheSimulationNs/
+    439                                                 (cLDBTick*(cTOSSeqGraphNumber+1)));
+    440          
+    441                      // Call the scheduler for give the hand again
+    442                      TOSSchedule();
+   \   0041   9A....         CALL      TOSSchedule
+    443                  }
+    444              }
+   \                     ??TOSSeqMotor_17:
+   \   0044   8E....         MOV       A,TOSSeqGraphNumber
+   \   0047   41             INC       A
+   \   0048   9E....         MOV       TOSSeqGraphNumber,A
+   \   004B   63             MOV       A,B
+   \   004C   48....         CMP       A,TOSSeqGraphNumber
+   \   004F   9DC8           BNC       ??TOSSeqMotor_15
+    445          
+    446              TOSSeqGraphNumber = OldGraphNumber;     // Restore OldGraphNumber
+   \                     ??TOSSeqMotor_14:
+   \   0051   62             MOV       A,C
+   \   0052   9E....         MOV       TOSSeqGraphNumber,A
+    447          }
+   \   0055   B4             POP       DE
+   \   0056   B2             POP       BC
+   \   0057   AF             RET       
+   \   0058                  REQUIRE ?CL78K_V4_6_L00
+    448          
+
+   Segment part sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     TOSSeqGraphContext      94
+     TOSSeqGraphNumber        1
+     ScanGraph              182
+     TOSSeqInitialize        20
+     TOSSeqActivateGraph     44
+     TOSSeqDeactivateGraph   23
+     TOSSeqFreezeGraph       39
+     TOSSeqUnfreezeGraph     40
+     TOSSeqGraphState        21
+     TOSSeqTrueEval           3
+     TOSSeqNoAction           1
+     TOSSeqMotor             88
+
+ 
+ 461 bytes in segment CODE
+  95 bytes in segment NEAR_Z
+ 
+ 461 bytes of CODE memory
+  95 bytes of DATA memory
+
+Errors: none
+Warnings: none

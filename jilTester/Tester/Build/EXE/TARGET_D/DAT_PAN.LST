@@ -1,0 +1,1000 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:04 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PAN.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_PAN.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_PAN.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PAN.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_PAN.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_PAN.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_PAN.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    DAT_PAN
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 08 2010 13:41:28  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PAN/DAT_PAN.C-arc  $
+     16          // $Revision:   1.10  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PAN/DAT_PAN.C-arc  $
+     19           * 
+     20           *    Rev 1.10   Mar 08 2010 13:41:28   adzhelp
+     21           * Cm007697: Checking of active flasher channel using Immediate access
+     22           * 
+     23           *    Rev 1.9   Feb 13 2010 09:11:08   adzhelp
+     24           * Cm007063: Implementation of flashers' SC VBAT / open load calculation
+     25           * 
+     26           *    Rev 1.8   Feb 03 2010 10:00:58   adzhelp
+     27           * Cm006590, Cm006698: Voltage checking only for active mode
+     28           * 
+     29           *    Rev 1.7   Feb 02 2010 16:50:42   adzhelp
+     30           * Cm006590, Cm006698: Implementation of undervoltage condition checking
+     31           * 
+     32           *    Rev 1.6   Jan 15 2010 10:37:00   adzhelp
+     33           * Cm006709: Coefficients for flasher current updated
+     34           * 
+     35           *    Rev 1.5   Dec 14 2009 11:41:00   adzhelp
+     36           * Cm005566: Implementation of overvoltage protection
+     37           * 
+     38           *    Rev 1.4   Nov 20 2009 15:48:38   adzhelp
+     39           * Cm005566: UT and QAC corrections
+     40           * 
+     41           *    Rev 1.3   Oct 08 2009 12:35:20   adzhelp
+     42           * Cm006355: Calculation of 8bit voltage updated
+     43           * 
+     44           *    Rev 1.2   Sep 25 2009 10:45:52   amanevd
+     45           * Cm006355: cR6006ValueInkOhm changed from 68 to 56
+     46           * 
+     47           *    Rev 1.1   Apr 22 2009 16:38:30   adzhelp
+     48           * Cm003619: Implementation of calculated analog parameters
+     49           * 
+     50           *    Rev 1.0   20 Nov 2008 15:12:10   ailievb
+     51           * Initial revision.
+     52          */ 
+     53          //******************************************************************************
+     54          #endif
+     55          
+     56          //------------------------------------------------------------------------------
+     57          // Body Identification
+     58          //------------------------------------------------------------------------------
+     59          #define dat_pan  "dat_pan"
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Included files to resolve specific definitions in this file
+     63          //
+     64          // #include <system_file_name.h>
+     65          // #include "project_file_name.h"
+     66          //------------------------------------------------------------------------------
+     67          #include "lib.h"
+     68          #include "dat.h"
+     69          #include "dat_pan.h"
+     70          
+     71          //------------------------------------------------------------------------------
+     72          // Local constants
+     73          //
+     74          // #define cConstantName   ((tType) ConstantValue)
+     75          //------------------------------------------------------------------------------
+     76          #define cThousand               1000UL
+     77          #define cTen                      10UL
+     78          
+     79          // Vbat calculation parameters
+     80          #define cR6006ValueInkOhm       56UL
+     81          #define cR6007ValueInkOhm       150UL
+     82          #define cAdcMaxValue            1023UL
+     83          #define cAdcMaxInputVoltage     5UL
+     84          #define cMaxByte                255UL
+     85          // These coefficients needs to be updated if upper are changed:
+     86          #define cConvTo8BitCoeff        23UL    // 0.23
+     87          #define cConvTo8BitDenom        100UL
+     88          
+     89          // Flasher current calculation parameters
+     90          #define cFlasherCurrentCoeff    69564UL  // 6956.4
+     91          
+     92          #define cFlasherCurrentCoeff8Bit  915UL // =  (6956.4 / 76) * 10
+     93          
+     94          // Bulb failure calculation parameters (multiplied by 1000):
+     95          #define cParameterBulbOffset    9465000UL
+     96          #define cParameterBulbFactor    18560UL
+     97          
+     98          // SC to VBAT calculation parameters (multiplied by 1000):
+     99          #define cParameterScOffset      753200UL
+    100          #define cParameterScFactor      1477UL
+    101          
+    102          // Overvoltage parameters
+    103          #define cOverVoltageHighThresholdMv     17200UL
+    104          #define cOverVoltageLowThresholdMv      16700UL
+    105          
+    106          #define cOverVoltageHighThresholdAdc    mConvertVoltageMVInAdcUnits_BatteryInput(cOverVoltageHighThresholdMv)
+    107          #define cOverVoltageLowThresholdAdc     mConvertVoltageMVInAdcUnits_BatteryInput(cOverVoltageLowThresholdMv)
+    108          
+    109          // Undervoltage parameters
+    110          #define cUnderVoltageThresholdMv        6000UL
+    111          
+    112          #define cUnderVoltageThresholdAdc       mConvertVoltageMVInAdcUnits_BatteryInput(cUnderVoltageThresholdMv)
+    113          
+    114          //------------------------------------------------------------------------------
+    115          // Local macros
+    116          //
+    117          // #define mMacroName   (MacroDefinition)
+    118          //------------------------------------------------------------------------------
+    119          //QACJ 3443: adzhelp: standard STK macros used
+    120          #define mCheckLeftFlasherActive() (mDATRead(U1Bit, DI_LEFT,  Immediate) != cFalse)
+    121          
+    122          #define mConvertVoltageMVInAdcUnits_BatteryInput(Voltage) \
+    123              (((U32)(Voltage) * (cAdcMaxValue * cR6006ValueInkOhm)) \
+    124               / ((U32)cAdcMaxInputVoltage * (U32)(cR6006ValueInkOhm + cR6007ValueInkOhm) * (U32)cThousand))
+    125          
+    126          //------------------------------------------------------------------------------
+    127          // Local types
+    128          //
+    129          // typedef Expression    tTypeName;
+    130          //------------------------------------------------------------------------------
+    131          
+    132          //------------------------------------------------------------------------------
+    133          // Data prefix
+    134          //
+    135          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    136          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    137          //
+    138          // -----------------------------------------------------------------------------
+    139          // Local data
+    140          //
+    141          // static  tType   u8VariableName;  
+    142          // static  tType*  pu8VariableName; 
+    143          //------------------------------------------------------------------------------
+    144          
+    145          //------------------------------------------------------------------------------
+    146          // Constant local data
+    147          //
+    148          // static const tType  VariableName;
+    149          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    150          static BOOL bOverVoltageOldStatus;
+   \                     bOverVoltageOldStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    151          static U8 u8KilisLeft;
+   \                     u8KilisLeft:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    152          static U8 u8KilisRight;
+   \                     u8KilisRight:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    153          static U32 u32KilisLeftThousand;
+   \                     u32KilisLeftThousand:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    154          static U32 u32KilisRightThousand;
+   \                     u32KilisRightThousand:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    155          
+    156          //------------------------------------------------------------------------------
+    157          // Exported data
+    158          //
+    159          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    160          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    161          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    162          BOOL bDATPanOverVoltageIsDetected;
+   \                     bDATPanOverVoltageIsDetected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    163          BOOL bDATPanUnderVoltageIsDetected;
+   \                     bDATPanUnderVoltageIsDetected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    164          BOOL bDATPanFlasherBulbFailure;
+   \                     bDATPanFlasherBulbFailure:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    165          BOOL bDATPanFlasherSCBatOrOpenLoad;
+   \                     bDATPanFlasherSCBatOrOpenLoad:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    166          
+    167          //------------------------------------------------------------------------------
+    168          // Constant exported data
+    169          //
+    170          //             (LAY: 3 characters to identify the layer)
+    171          //             (Cmp: 3 characters to identify this component)
+    172          // 
+    173          // const tType   LAYCmpVariableName;
+    174          //------------------------------------------------------------------------------
+    175          
+    176          // Initialisation values for the analog inputs
+
+   \                                 In  segment CONST, align 1
+    177          const U8 DATPanInitialization[cDATPanSizeAnaGeneratorMessage] = 
+   \                     DATPanInitialization:
+   \   0000   0000FF03       DB 0, 0, 255, 3, 255, 3, 0, 0, 0, 0, 0, 0, 0, 0, 254, 2
+   \          FF030000
+   \          00000000
+   \          0000FE02
+    178              cDATPanInitBufferAnaGeneratorMessage;
+    179          
+    180          //------------------------------------------------------------------------------
+    181          // Local function prototypes
+    182          // 
+    183          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    184          //------------------------------------------------------------------------------
+    185          
+    186          //==============================================================================
+    187          //=========================== LOCAL FUNCTIONS ==================================
+    188          //==============================================================================
+    189          
+    190          //==============================================================================
+    191          // DESCRIPTION : 
+    192          //
+    193          // PARAMETERS (Type,Name,Min,Max) :   none
+    194          //
+    195          // RETURN VALUE :   none
+    196          //
+    197          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    198          //==============================================================================
+    199          
+    200          //==============================================================================
+    201          //=========================== EXPORTED FUNCTIONS ===============================
+    202          //==============================================================================
+    203          
+    204          //==============================================================================
+    205          // DESCRIPTION : Call periodicaly when analog input is filtered
+    206          //
+    207          // PARAMETERS (Type,Name,Min,Max) :   none
+    208          //
+    209          // RETURN VALUE :   none
+    210          //
+    211          // DESIGN INFORMATION : Empty function
+    212          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    213          void DATPanRefresh( void )
+   \                     DATPanRefresh:
+    214          {   
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    215              // Management of overvoltage status
+    216              const U16 u16AdcValueL = mDATRead(U16Bit, DIAG_BAT, Immediate);
+   \   0000   02....         MOVW      AX,DATAnaBufferFromLDB+14
+   \   0003   D6             MOVW      HL,AX
+    217          
+    218              if (mDATRead(U1Bit, BcmSleepMode, Default) == cFalse)
+   \   0004   8E....         MOV       A,bDATPinSleepMode
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD1C           BNZ       ??DATPanFlashersCurrentMeasure_0
+    219              {
+    220                  if (u16AdcValueL > cOverVoltageHighThresholdAdc)
+   \   000B   67             MOV       A,H
+   \   000C   EABD03         CMPW      AX,#957
+   \   000F   8D17           BC        ??DATPanFlashersCurrentMeasure_1
+    221                  {
+    222                      if (bOverVoltageOldStatus != cFalse)
+   \   0011   8E....         MOV       A,bOverVoltageOldStatus
+   \   0014   4D00           CMP       A,#0
+   \   0016   AD05           BZ        ??DATPanFlashersCurrentMeasure_2
+    223                      {
+    224                          bDATPanOverVoltageIsDetected = cTrue;
+   \   0018   A101           MOV       A,#1
+   \   001A   9E....         MOV       bDATPanOverVoltageIsDetected,A
+    225                      }
+    226                      else
+    227                      {
+    228                          // wait 2 consequtive samples
+    229                      }
+    230                      bOverVoltageOldStatus = cTrue;
+   \                     ??DATPanFlashersCurrentMeasure_2:
+   \   001D   A101           MOV       A,#1
+   \   001F   9E....         MOV       bOverVoltageOldStatus,A
+   \                     ??DATPanRefresh_0:
+   \   0022   A100           MOV       A,#0
+   \                     ??DATPanRefresh_1:
+   \   0024   9E....         MOV       bDATPanUnderVoltageIsDetected,A
+    231                  }
+    232                  else if (u16AdcValueL < cOverVoltageLowThresholdAdc)
+    233                  {
+    234                      if (bOverVoltageOldStatus == cFalse)
+    235                      {
+    236                          bDATPanOverVoltageIsDetected = cFalse;
+    237                      }
+    238                      else
+    239                      {
+    240                          // wait 2 consequtive samples
+    241                      }
+    242                      bOverVoltageOldStatus = cFalse;
+    243                  }
+    244                  else
+    245                  {
+    246                      // no change of overvoltage status
+    247                  }
+    248          
+    249                  // Management of undervoltage status
+    250                  bDATPanUnderVoltageIsDetected = (BOOL)(u16AdcValueL <= cUnderVoltageThresholdAdc);
+    251              }
+    252              else
+    253              {
+    254                  // sleep mode
+    255                  // retain last voltage status
+    256              }
+    257          }
+   \                     ??DATPanFlashersCurrentMeasure_0:
+   \   0027   AF             RET       
+   \                     ??DATPanFlashersCurrentMeasure_1:
+   \   0028   67             MOV       A,H
+   \   0029   EAA003         CMPW      AX,#928
+   \   002C   9D11           BNC       ??DATPanFlashersCurrentMeasure_3
+   \   002E   8E....         MOV       A,bOverVoltageOldStatus
+   \   0031   4D00           CMP       A,#0
+   \   0033   BD05           BNZ       ??DATPanFlashersCurrentMeasure_4
+   \   0035   A100           MOV       A,#0
+   \   0037   9E....         MOV       bDATPanOverVoltageIsDetected,A
+   \                     ??DATPanFlashersCurrentMeasure_4:
+   \   003A   A100           MOV       A,#0
+   \   003C   9E....         MOV       bOverVoltageOldStatus,A
+   \                     ??DATPanFlashersCurrentMeasure_3:
+   \   003F   67             MOV       A,H
+   \   0040   EA4E01         CMPW      AX,#334
+   \   0043   9DDD           BNC       ??DATPanRefresh_0
+   \   0045   A101           MOV       A,#1
+   \   0047   FADB           BR        ??DATPanRefresh_1
+   \   0049                  REQUIRE ?CL78K_V4_6_L00
+    258          
+    259          //==============================================================================
+    260          // DESCRIPTION : Initialize the macro component DAT_ANA
+    261          //
+    262          // PARAMETERS (Type,Name,Min,Max) :   none
+    263          //
+    264          // RETURN VALUE :   none
+    265          //
+    266          // DESIGN INFORMATION : Calls DAT_ANA init
+    267          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    268          void DATPanInit(void )
+   \                     DATPanInit:
+    269          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#DATPanInitialization
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    270              //QACJ 0310 : adzhelp: The cast is checked and is safe.    
+    271              //QACJ 3305 : adzhelp: The cast is checked and is safe.    
+    272              mDATPanControlInit();
+   \   0004   16....         MOVW      HL,#LWRD(DATAnaInitialize)
+   \   0007   A4..           MOV       E,#BYTE3(DATAnaInitialize)
+   \   0009   ..             CALLT     [__T_?FAR_CALL_L07]
+    273          
+    274              // DAT_PAN specific initialization
+    275          }
+   \   000A   B4             POP       DE
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    276          
+    277          //==============================================================================
+    278          // DESCRIPTION : Calculate battery voltage in mV
+    279          //
+    280          // PARAMETERS (Type,Name,Min,Max) :   none
+    281          //
+    282          // RETURN VALUE :   U16: battery voltage in mV
+    283          //
+    284          // DESIGN INFORMATION : Calculation using one 32-bit multiplication and one 32-bit
+    285          //                      division. Constant of resistor dividers are used
+    286          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    287          MEM_TYPE U16 DATPanCalculateBatteryVoltage(void)
+   \                     DATPanCalculateBatteryVoltage:
+    288          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100000         MOVW      AX,#0
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    289              // HSI padHSI-533: 
+    290              // V(uC_ANI1) = Vbatt * R6006 / (R6006 + R6007)
+    291              //=> Vbat = (Vbat digital value * 5/1023 ) * (R6006+R6007)/R6006
+    292              
+    293              //QACJ 3204: adzhelp: Usage of 'const' is recommended for parameters only
+    294              U16 u16AdcNumberL = mDATRead(U16Bit, DIAG_BAT, Default);
+    295          
+    296              U32 u32ResultL = (U32)u16AdcNumberL *
+    297                  (((U32)cAdcMaxInputVoltage * (U32)(cR6006ValueInkOhm + cR6007ValueInkOhm)) * 
+    298                  (U32)cThousand); // The maximal possible value fits in U32
+    299              u32ResultL /= (U32)(cAdcMaxValue * cR6006ValueInkOhm);
+    300          
+    301              return (U16)u32ResultL;
+   \   0004   B1             PUSH      AX
+   \   0005   10C8DF         MOVW      AX,#57288
+   \   0008   B1             PUSH      AX
+   \   0009   100F00         MOVW      AX,#15
+   \   000C   B1             PUSH      AX
+   \   000D   1070B7         MOVW      AX,#46960
+   \   0010   B1             PUSH      AX
+   \   0011   8E....         MOV       A,DATAnaDivisorValueNow+7
+   \   0014   72             MOV       C,A
+   \   0015   02....         MOVW      AX,DATAnaFilteredBuffer+14
+   \   0018   9A....         CALL      ?UI_RSH_L02
+   \   001B   120000         MOVW      BC,#0
+   \   001E   ..             CALLT     [__T_?L_MUL_L03]
+   \   001F   ..             CALLT     [__T_?UL_DIV_L03]
+   \   0020   B2             POP       BC
+   \   0021   AF             RET       
+   \   0022                  REQUIRE ?CL78K_V4_6_L00
+    302          }
+    303          
+    304          //==============================================================================
+    305          // DESCRIPTION : Calculate battery voltage in 8 bits
+    306          //
+    307          // PARAMETERS (Type,Name,Min,Max) :   none
+    308          //
+    309          // RETURN VALUE :   U8: Battery voltage coded in 8 bits
+    310          //
+    311          // DESIGN INFORMATION : Calculation using one 16-bit division and one 
+    312          //                      16-bit multiplication. Constants are precalculated 
+    313          //                      based on resistor divider values
+    314          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    315          MEM_TYPE U8 DATPanCalculateBatteryVoltage8Bit(void)
+   \                     DATPanCalculateBatteryVoltage8Bit:
+    316          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    317              // no 16 bit overflow will occur because max BAT is 1023
+    318              return (U8)((U16)(mDATRead(U16Bit, DIAG_BAT, Default) * (U16)cConvTo8BitCoeff) 
+    319                  / (U16)cConvTo8BitDenom);
+   \   0001   121700         MOVW      BC,#23
+   \   0004   B3             PUSH      BC
+   \   0005   B6             POP       HL
+   \   0006   8E....         MOV       A,DATAnaDivisorValueNow+7
+   \   0009   72             MOV       C,A
+   \   000A   02....         MOVW      AX,DATAnaFilteredBuffer+14
+   \   000D   9A....         CALL      ?UI_RSH_L02
+   \   0010   B7             PUSH      HL
+   \   0011   B2             POP       BC
+   \   0012   ..             CALLT     [__T_?I_MUL_L02]
+   \   0013   A264           MOV       C,#100
+   \   0015   3182           DIVUW     C
+   \   0017   60             MOV       A,X
+   \   0018   B2             POP       BC
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    320          }
+    321          
+    322          //==============================================================================
+    323          // DESCRIPTION : Calculate flashers' current in mA
+    324          //
+    325          // PARAMETERS (Type,Name,Min,Max) :   none
+    326          //
+    327          // RETURN VALUE :   U16: active flasher current in mA
+    328          //
+    329          // DESIGN INFORMATION : Calculation using one 32-bit multiplication and one 32-bit
+    330          //                      division. EEP constant is used.
+    331          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    332          MEM_TYPE U16 DATPanCalculateFlashersCurrent(void)
+   \                     DATPanCalculateFlashersCurrent:
+    333          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    334              // HSI padHSI-527: Iout =  Vsense Digital value * Kilis eeprom /15345
+    335              //QACJ 3204: adzhelp: Usage of 'const' is recommended for parameters only
+    336              U8 u8KilisL = (mCheckLeftFlasherActive() ? 
+    337                  mDATRead(U8Bit, EEP_FlaCoeffLNormal, Default) :
+    338              mDATRead(U8Bit, EEP_FlaCoeffRNormal, Default) );
+   \   0001   16....         MOVW      HL,#DATDouOutputBuffer+3
+   \   0004   31E705         BF        [HL].6, ??DATPanFlashersCurrentMeasure_5
+   \   0007   8E....         MOV       A,DATSbkMirrors+33
+   \   000A   FA03           BR        ??DATPanFlashersCurrentMeasure_6
+   \                     ??DATPanFlashersCurrentMeasure_5:
+   \   000C   8E....         MOV       A,DATSbkMirrors+34
+   \                     ??DATPanFlashersCurrentMeasure_6:
+   \   000F   73             MOV       B,A
+    339          
+    340              //QACJ 3204: adzhelp: Usage of 'const' is recommended for parameters only
+    341              U16 u16AdcNumberL = mDATRead(U16Bit, DIAG_FLASHER, Default);
+    342          
+    343              U32 u32ResultL = ((U32)u16AdcNumberL * (U32)u8KilisL) * ((U32)cThousand * (U32)cTen);
+    344              // maximal possible value fits in U32
+    345              u32ResultL /= (U32)cFlasherCurrentCoeff;
+    346          
+    347              return (U16)u32ResultL;
+   \   0010   100100         MOVW      AX,#1
+   \   0013   B1             PUSH      AX
+   \   0014   10BC0F         MOVW      AX,#4028
+   \   0017   B1             PUSH      AX
+   \   0018   100000         MOVW      AX,#0
+   \   001B   B1             PUSH      AX
+   \   001C   101027         MOVW      AX,#10000
+   \   001F   B1             PUSH      AX
+   \   0020   63             MOV       A,B
+   \   0021   74             MOV       E,A
+   \   0022   A500           MOV       D,#0
+   \   0024   160000         MOVW      HL,#0
+   \   0027   B7             PUSH      HL
+   \   0028   B5             PUSH      DE
+   \   0029   8E....         MOV       A,DATAnaDivisorValueNow+6
+   \   002C   72             MOV       C,A
+   \   002D   02....         MOVW      AX,DATAnaFilteredBuffer+12
+   \   0030   9A....         CALL      ?UI_RSH_L02
+   \   0033   120000         MOVW      BC,#0
+   \   0036   ..             CALLT     [__T_?L_MUL_L03]
+   \   0037   ..             CALLT     [__T_?L_MUL_L03]
+   \   0038   ..             CALLT     [__T_?UL_DIV_L03]
+   \   0039   B2             POP       BC
+   \   003A   AF             RET       
+   \   003B                  REQUIRE ?CL78K_V4_6_L00
+    348          }
+    349          
+    350          //==============================================================================
+    351          // DESCRIPTION : Calculate flashers' current in 8 bits
+    352          //
+    353          // PARAMETERS (Type,Name,Min,Max) :   none
+    354          //
+    355          // RETURN VALUE :   U8: active flasher current coded in 8 bits
+    356          //
+    357          // DESIGN INFORMATION : Calculation using one 32-bit multiplication and one 32-bit
+    358          //                      division. EEP constant is used.
+    359          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    360          MEM_TYPE U8 DATPanCalculateFlashersCurrent8Bit(void)
+   \                     DATPanCalculateFlashersCurrent8Bit:
+    361          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 4
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+    362              //QACJ 3204: adzhelp: Usage of 'const' is recommended for parameters only
+    363              U8 u8KilisL = (mCheckLeftFlasherActive() ? 
+    364                  mDATRead(U8Bit, EEP_FlaCoeffLNormal, Default) :
+    365              mDATRead(U8Bit, EEP_FlaCoeffRNormal, Default) );
+   \   0003   16....         MOVW      HL,#DATDouOutputBuffer+3
+   \   0006   31E705         BF        [HL].6, ??DATPanFlashersCurrentMeasure_7
+   \   0009   8E....         MOV       A,DATSbkMirrors+33
+   \   000C   FA03           BR        ??DATPanFlashersCurrentMeasure_8
+   \                     ??DATPanFlashersCurrentMeasure_7:
+   \   000E   8E....         MOV       A,DATSbkMirrors+34
+   \                     ??DATPanFlashersCurrentMeasure_8:
+   \   0011   73             MOV       B,A
+    366          
+    367              //QACJ 3204: adzhelp: Usage of 'const' is recommended for parameters only
+    368              U16 u16AdcNumberL = mDATRead(U16Bit, DIAG_FLASHER, Default);
+    369          
+    370              U32 u32ResultL = ((U32)u16AdcNumberL * (U32)u8KilisL) * (U32)cTen;
+    371                  // maximal possible value fits in U32
+    372              u32ResultL /= (U32)cFlasherCurrentCoeff8Bit;
+   \   0012   891C           MOVW      AX,SP
+   \   0014   D6             MOVW      HL,AX
+   \   0015   100000         MOVW      AX,#0
+   \   0018   B1             PUSH      AX
+   \   0019   109303         MOVW      AX,#915
+   \   001C   B1             PUSH      AX
+   \   001D   100000         MOVW      AX,#0
+   \   0020   B1             PUSH      AX
+   \   0021   A00A           MOV       X,#10
+   \   0023   B1             PUSH      AX
+   \   0024   63             MOV       A,B
+   \   0025   70             MOV       X,A
+   \   0026   A100           MOV       A,#0
+   \   0028   120000         MOVW      BC,#0
+   \   002B   B3             PUSH      BC
+   \   002C   B1             PUSH      AX
+   \   002D   8E....         MOV       A,DATAnaDivisorValueNow+6
+   \   0030   72             MOV       C,A
+   \   0031   02....         MOVW      AX,DATAnaFilteredBuffer+12
+   \   0034   9A....         CALL      ?UI_RSH_L02
+   \   0037   A200           MOV       C,#0
+   \   0039   ..             CALLT     [__T_?L_MUL_L03]
+   \   003A   ..             CALLT     [__T_?L_MUL_L03]
+   \   003B   ..             CALLT     [__T_?UL_DIV_L03]
+   \   003C   BE01           MOV       [HL+0x01],A
+   \   003E   60             MOV       A,X
+   \   003F   97             MOV       [HL],A
+   \   0040   C2             MOVW      AX,BC
+   \   0041   BE03           MOV       [HL+0x03],A
+   \   0043   60             MOV       A,X
+   \   0044   BE02           MOV       [HL+0x02],A
+    373          
+    374              if (u32ResultL > (U32)cMaxByte)
+   \   0046   87             MOV       A,[HL]
+   \   0047   70             MOV       X,A
+   \   0048   AE01           MOV       A,[HL+0x01]
+   \   004A   B5             PUSH      DE
+   \   004B   D4             MOVW      DE,AX
+   \   004C   64             MOV       A,E
+   \   004D   1D00           SUB       A,#256
+   \   004F   65             MOV       A,D
+   \   0050   3D01           SUBC      A,#1
+   \   0052   62             MOV       A,C
+   \   0053   3D00           SUBC      A,#0
+   \   0055   63             MOV       A,B
+   \   0056   3D00           SUBC      A,#0
+   \   0058   B4             POP       DE
+   \   0059   8D0F           BC        ??DATPanFlashersCurrentMeasure_9
+    375              {
+    376                  u32ResultL = cMaxByte;
+   \   005B   10FF00         MOVW      AX,#255
+   \   005E   120000         MOVW      BC,#0
+   \   0061   BE01           MOV       [HL+0x01],A
+   \   0063   60             MOV       A,X
+   \   0064   97             MOV       [HL],A
+   \   0065   C2             MOVW      AX,BC
+   \   0066   BE03           MOV       [HL+0x03],A
+   \   0068   BE02           MOV       [HL+0x02],A
+    377              }
+    378          
+    379              return (U8)u32ResultL;
+   \                     ??DATPanFlashersCurrentMeasure_9:
+   \   006A   87             MOV       A,[HL]
+   \   006B   B2             POP       BC
+   \   006C   B2             POP       BC
+   \   006D   B2             POP       BC
+   \   006E   AF             RET       
+   \   006F                  REQUIRE ?CL78K_V4_6_L00
+    380          }
+    381          
+    382          //==============================================================================
+    383          // DESCRIPTION : Check for flasher bulb failure
+    384          //
+    385          // PARAMETERS (Type,Name,Min,Max) :   none
+    386          //
+    387          // RETURN VALUE :   none
+    388          //
+    389          // DESIGN INFORMATION : 
+    390          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    391          MEM_TYPE void DATPanFlashersCurrentMeasure (void)
+   \                     DATPanFlashersCurrentMeasure:
+    392          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 4
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+    393              U8 u8KilisL;
+    394              U32 u32KilisThousandL;
+    395              U32 u32FormulaLeftSideL;
+    396              
+    397              const U16 u16AdcVsenseL = mDATRead(U16Bit, DIAG_FLASHER, Immediate); 
+    398              const U16 u16AdcVbatL = mDATRead(U16Bit, DIAG_BAT, Immediate); 
+   \   0003   02....         MOVW      AX,DATAnaBufferFromLDB+14
+   \   0006   D4             MOVW      DE,AX
+    399          
+    400              if (mCheckLeftFlasherActive())
+   \   0007   16....         MOVW      HL,#DATDouOutputBuffer+3
+   \   000A   31E729         BF        [HL].6, ??DATPanFlashersCurrentMeasure_10
+    401              {
+    402                  // Use KILIS left
+    403                  u8KilisL = mDATRead(U8Bit, EEP_FlaCoeffLNormal, Default);
+   \   000D   8E....         MOV       A,DATSbkMirrors+33
+    404          
+    405                  if (u8KilisL != u8KilisLeft)
+   \   0010   48....         CMP       A,u8KilisLeft
+   \   0013   AD18           BZ        ??DATPanFlashersCurrentMeasure_11
+    406                  {
+    407                      // perform 32 bit calculations only when values has changed
+    408                      u8KilisLeft = u8KilisL;
+   \   0015   9E....         MOV       u8KilisLeft,A
+    409                      u32KilisLeftThousand = (U32)u8KilisL * (U32)cThousand;
+   \   0018   160000         MOVW      HL,#0
+   \   001B   B7             PUSH      HL
+   \   001C   16E803         MOVW      HL,#1000
+   \   001F   B7             PUSH      HL
+   \   0020   120000         MOVW      BC,#0
+   \   0023   70             MOV       X,A
+   \   0024   63             MOV       A,B
+   \   0025   ..             CALLT     [__T_?L_MUL_L03]
+   \   0026   03....         MOVW      u32KilisLeftThousand,AX
+   \   0029   C2             MOVW      AX,BC
+   \   002A   03....         MOVW      u32KilisLeftThousand+2,AX
+    410                  }
+    411                  u32KilisThousandL = u32KilisLeftThousand;
+   \                     ??DATPanFlashersCurrentMeasure_11:
+   \   002D   02....         MOVW      AX,u32KilisLeftThousand+2
+   \   0030   D2             MOVW      BC,AX
+   \   0031   02....         MOVW      AX,u32KilisLeftThousand
+   \   0034   FA27           BR        ??DATPanFlashersCurrentMeasure_12
+    412              }
+    413              else
+    414              {
+    415                  // Use KILIS right
+    416                  u8KilisL = mDATRead(U8Bit, EEP_FlaCoeffRNormal, Default);
+   \                     ??DATPanFlashersCurrentMeasure_10:
+   \   0036   8E....         MOV       A,DATSbkMirrors+34
+    417          
+    418                  if (u8KilisL != u8KilisRight)
+   \   0039   48....         CMP       A,u8KilisRight
+   \   003C   AD18           BZ        ??DATPanFlashersCurrentMeasure_13
+    419                  {
+    420                      // perform 32 bit calculations only when values has changed
+    421                      u8KilisRight = u8KilisL;
+   \   003E   9E....         MOV       u8KilisRight,A
+    422                      u32KilisRightThousand = (U32)u8KilisL * (U32)cThousand;
+   \   0041   160000         MOVW      HL,#0
+   \   0044   B7             PUSH      HL
+   \   0045   16E803         MOVW      HL,#1000
+   \   0048   B7             PUSH      HL
+   \   0049   120000         MOVW      BC,#0
+   \   004C   70             MOV       X,A
+   \   004D   63             MOV       A,B
+   \   004E   ..             CALLT     [__T_?L_MUL_L03]
+   \   004F   03....         MOVW      u32KilisRightThousand,AX
+   \   0052   C2             MOVW      AX,BC
+   \   0053   03....         MOVW      u32KilisRightThousand+2,AX
+    423                  }
+    424                  u32KilisThousandL = u32KilisRightThousand;
+   \                     ??DATPanFlashersCurrentMeasure_13:
+   \   0056   02....         MOVW      AX,u32KilisRightThousand+2
+   \   0059   D2             MOVW      BC,AX
+   \   005A   02....         MOVW      AX,u32KilisRightThousand
+    425              }
+    426          
+    427              // Formula left side common for both conditions:
+    428              u32FormulaLeftSideL = (U32)u16AdcVsenseL * u32KilisThousandL;
+   \                     ??DATPanFlashersCurrentMeasure_12:
+   \   005D   D6             MOVW      HL,AX
+   \   005E   891C           MOVW      AX,SP
+   \   0060   E6             XCHW      AX,HL
+   \   0061   B3             PUSH      BC
+   \   0062   B1             PUSH      AX
+   \   0063   02....         MOVW      AX,DATAnaBufferFromLDB+12
+   \   0066   120000         MOVW      BC,#0
+   \   0069   ..             CALLT     [__T_?L_MUL_L03]
+   \   006A   BE01           MOV       [HL+0x01],A
+   \   006C   60             MOV       A,X
+   \   006D   97             MOV       [HL],A
+   \   006E   C2             MOVW      AX,BC
+   \   006F   BE03           MOV       [HL+0x03],A
+   \   0071   60             MOV       A,X
+   \   0072   BE02           MOV       [HL+0x02],A
+    429          
+    430              // 1. Check for SC to VBAT or open load
+    431              bDATPanFlasherSCBatOrOpenLoad = cFalse;
+   \   0074   A100           MOV       A,#0
+   \   0076   9E....         MOV       bDATPanFlasherSCBatOrOpenLoad,A
+    432          
+    433              if (u32FormulaLeftSideL <
+    434                  ((U32)cParameterScOffset + ((U32)cParameterScFactor * (U32)u16AdcVbatL))
+    435                 )
+   \   0079   70             MOV       X,A
+   \   007A   B1             PUSH      AX
+   \   007B   10C505         MOVW      AX,#1477
+   \   007E   B1             PUSH      AX
+   \   007F   C4             MOVW      AX,DE
+   \   0080   120000         MOVW      BC,#0
+   \   0083   ..             CALLT     [__T_?L_MUL_L03]
+   \   0084   30             XCH       A,X
+   \   0085   0D30           ADD       A,#48
+   \   0087   30             XCH       A,X
+   \   0088   2D7E           ADDC      A,#126
+   \   008A   E2             XCHW      AX,BC
+   \   008B   30             XCH       A,X
+   \   008C   2D0B           ADDC      A,#11
+   \   008E   30             XCH       A,X
+   \   008F   2D00           ADDC      A,#0
+   \   0091   E2             XCHW      AX,BC
+   \   0092   B3             PUSH      BC
+   \   0093   B1             PUSH      AX
+   \   0094   AE02           MOV       A,[HL+0x02]
+   \   0096   72             MOV       C,A
+   \   0097   AE03           MOV       A,[HL+0x03]
+   \   0099   73             MOV       B,A
+   \   009A   87             MOV       A,[HL]
+   \   009B   70             MOV       X,A
+   \   009C   AE01           MOV       A,[HL+0x01]
+   \   009E   D6             MOVW      HL,AX
+   \   009F   891C           MOVW      AX,SP
+   \   00A1   E6             XCHW      AX,HL
+   \   00A2   B5             PUSH      DE
+   \   00A3   D4             MOVW      DE,AX
+   \   00A4   64             MOV       A,E
+   \   00A5   1F             SUB       A,[HL]
+   \   00A6   65             MOV       A,D
+   \   00A7   3901           SUBC      A,[HL+0x01]
+   \   00A9   62             MOV       A,C
+   \   00AA   3902           SUBC      A,[HL+0x02]
+   \   00AC   63             MOV       A,B
+   \   00AD   3903           SUBC      A,[HL+0x03]
+   \   00AF   B4             POP       DE
+   \   00B0   B6             POP       HL
+   \   00B1   B6             POP       HL
+   \   00B2   9D05           BNC       ??DATPanFlashersCurrentMeasure_14
+    436              {
+    437                  bDATPanFlasherSCBatOrOpenLoad = cTrue; // SC to VBAT or open load
+   \   00B4   A101           MOV       A,#1
+   \   00B6   9E....         MOV       bDATPanFlasherSCBatOrOpenLoad,A
+    438              }
+    439          
+    440              // 2. Check for flasher bulb failure
+    441              bDATPanFlasherBulbFailure = cFalse;
+   \                     ??DATPanFlashersCurrentMeasure_14:
+   \   00B9   A100           MOV       A,#0
+   \   00BB   9E....         MOV       bDATPanFlasherBulbFailure,A
+    442              if (bDATPanFlasherSCBatOrOpenLoad == cFalse)
+   \   00BE   8E....         MOV       A,bDATPanFlasherSCBatOrOpenLoad
+   \   00C1   4D00           CMP       A,#0
+   \   00C3   BD43           BNZ       ??DATPanFlashersCurrentMeasure_15
+    443              {
+    444                  if (u32FormulaLeftSideL <
+    445                      ((U32)cParameterBulbOffset + ((U32)cParameterBulbFactor * (U32)u16AdcVbatL))
+    446                     )
+   \   00C5   100000         MOVW      AX,#0
+   \   00C8   B1             PUSH      AX
+   \   00C9   108048         MOVW      AX,#18560
+   \   00CC   B1             PUSH      AX
+   \   00CD   C4             MOVW      AX,DE
+   \   00CE   120000         MOVW      BC,#0
+   \   00D1   ..             CALLT     [__T_?L_MUL_L03]
+   \   00D2   30             XCH       A,X
+   \   00D3   0DA8           ADD       A,#168
+   \   00D5   30             XCH       A,X
+   \   00D6   2D6C           ADDC      A,#108
+   \   00D8   E2             XCHW      AX,BC
+   \   00D9   30             XCH       A,X
+   \   00DA   2D90           ADDC      A,#144
+   \   00DC   30             XCH       A,X
+   \   00DD   2D00           ADDC      A,#0
+   \   00DF   E2             XCHW      AX,BC
+   \   00E0   B3             PUSH      BC
+   \   00E1   B1             PUSH      AX
+   \   00E2   891C           MOVW      AX,SP
+   \   00E4   CA0400         ADDW      AX,#4
+   \   00E7   D6             MOVW      HL,AX
+   \   00E8   AE02           MOV       A,[HL+0x02]
+   \   00EA   72             MOV       C,A
+   \   00EB   AE03           MOV       A,[HL+0x03]
+   \   00ED   73             MOV       B,A
+   \   00EE   87             MOV       A,[HL]
+   \   00EF   70             MOV       X,A
+   \   00F0   AE01           MOV       A,[HL+0x01]
+   \   00F2   D6             MOVW      HL,AX
+   \   00F3   891C           MOVW      AX,SP
+   \   00F5   E6             XCHW      AX,HL
+   \   00F6   B5             PUSH      DE
+   \   00F7   D4             MOVW      DE,AX
+   \   00F8   64             MOV       A,E
+   \   00F9   1F             SUB       A,[HL]
+   \   00FA   65             MOV       A,D
+   \   00FB   3901           SUBC      A,[HL+0x01]
+   \   00FD   62             MOV       A,C
+   \   00FE   3902           SUBC      A,[HL+0x02]
+   \   0100   63             MOV       A,B
+   \   0101   3903           SUBC      A,[HL+0x03]
+   \   0103   B4             POP       DE
+   \   0104   B6             POP       HL
+   \   0105   B6             POP       HL
+   \   0106   9D05           BNC       ??DATPanFlashersCurrentMeasure_16
+    447                  {
+    448                      bDATPanFlasherBulbFailure = cTrue; // bulb failure
+   \                     ??DATPanFlashersCurrentMeasure_15:
+   \   0108   A101           MOV       A,#1
+   \   010A   9E....         MOV       bDATPanFlasherBulbFailure,A
+    449                  }
+    450              }
+    451              else
+    452              {
+    453                  bDATPanFlasherBulbFailure = cTrue;
+    454              }
+    455          }
+   \                     ??DATPanFlashersCurrentMeasure_16:
+   \   010D   B0             POP       AX
+   \   010E   B0             POP       AX
+   \   010F   B2             POP       BC
+   \   0110   AF             RET       
+   \   0111                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?L_MUL_L03:
+   \   0000   ....           DW       ?L_MUL_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?UL_DIV_L03:
+   \   0000   ....           DW       ?UL_DIV_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_MUL_L02:
+   \   0000   ....           DW       ?I_MUL_L02
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     bOverVoltageOldStatus             1
+     u8KilisLeft                       1
+     u8KilisRight                      1
+     u32KilisLeftThousand              4
+     u32KilisRightThousand             4
+     bDATPanOverVoltageIsDetected      1
+     bDATPanUnderVoltageIsDetected     1
+     bDATPanFlasherBulbFailure         1
+     bDATPanFlasherSCBatOrOpenLoad     1
+     DATPanInitialization             16
+     DATPanRefresh                    73
+     DATPanInit                       12
+     DATPanCalculateBatteryVoltage    34
+     DATPanCalculateBatteryVoltage8Bit
+                                      26
+     DATPanCalculateFlashersCurrent   59
+     DATPanCalculateFlashersCurrent8Bit
+                                     111
+     DATPanFlashersCurrentMeasure    273
+     __T_?FAR_CALL_L07                 2
+     __T_?L_MUL_L03                    2
+     __T_?UL_DIV_L03                   2
+     __T_?I_MUL_L02                    2
+
+ 
+ 503 bytes in segment BCODE
+   8 bytes in segment CLTVEC
+  85 bytes in segment CODE
+  16 bytes in segment CONST
+  15 bytes in segment NEAR_Z
+ 
+ 588 bytes of CODE  memory (+ 8 bytes shared)
+  16 bytes of CONST memory
+  15 bytes of DATA  memory
+
+Errors: none
+Warnings: none

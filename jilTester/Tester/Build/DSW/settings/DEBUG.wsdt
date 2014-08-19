@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<Workspace>
+  <ConfigDictionary>
+    
+  <CurrentConfigs><Project>TARGET/Debug</Project></CurrentConfigs></ConfigDictionary>
+  <Desktop>
+    <Static>
+      <Workspace>
+        <ColumnWidths>
+          
+          
+          
+          
+        <Column0>248</Column0><Column1>28</Column1><Column2>27</Column2><Column3>14677140</Column3></ColumnWidths>
+      <PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></Workspace>
+      <Build>
+        
+        
+        
+        
+      <PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>Workspace</Factory></Window><Window><Factory>Debug-Log</Factory></Window></Windows></PreferedWindows><ColumnWidth0>20</ColumnWidth0><ColumnWidth1>914</ColumnWidth1><ColumnWidth2>243</ColumnWidth2><ColumnWidth3>60</ColumnWidth3></Build>
+      <TerminalIO/>
+      <Debug-Log><PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>Build</Factory></Window></Windows></PreferedWindows></Debug-Log>
+    <Disassembly><MixedMode>1</MixedMode><CodeCovShow>0</CodeCovShow></Disassembly><SourceBrowser><PreferedWindows><Position>1</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows></SourceBrowser></Static>
+    <Windows>
+      
+      
+    <Wnd1><Tabs><Tab><Identity>TabID-29179-4797</Identity><TabName>Workspace</TabName><Factory>Workspace</Factory><Session><NodeDict><ExpandedNode>TARGET</ExpandedNode></NodeDict></Session></Tab><Tab><Identity>TabID-13125-10811</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab><Tab><Identity>TabID-8686-20465</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab></Tabs><SelectedTab>2</SelectedTab></Wnd1></Windows>
+    <Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SUP.C</Filename><XPos>0</XPos><YPos>304</YPos><SelStart>11898</SelStart><SelEnd>11898</SelEnd></Tab><ActiveTab>0</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_VLG.C</Filename><XPos>0</XPos><YPos>660</YPos><SelStart>22162</SelStart><SelEnd>22164</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_CAR.c</Filename><XPos>0</XPos><YPos>363</YPos><SelStart>14848</SelStart><SelEnd>14848</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_PIN.C</Filename><XPos>0</XPos><YPos>829</YPos><SelStart>30620</SelStart><SelEnd>30620</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_TFC.C</Filename><XPos>0</XPos><YPos>1895</YPos><SelStart>78820</SelStart><SelEnd>78820</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-01389118><key>iaridepm.enu1</key></Toolbar-01389118></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>889</Bottom><Right>323</Right><x>-2</x><y>-2</y><xscreen>0</xscreen><yscreen>0</yscreen><sizeHorzCX>0</sizeHorzCX><sizeHorzCY>0</sizeHorzCY><sizeVertCX>253906</sizeVertCX><sizeVertCY>954984</sizeVertCY></Rect></Wnd1></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes/></Row0></Bottom><Float><Sizes/></Float></Positions>
+  </Desktop>
+</Workspace>
+
+

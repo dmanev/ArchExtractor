@@ -1,0 +1,82 @@
+/****************************************************************************
+  Project ......................... (Common or Project Name)
+  Component ....................... lap_sup
+  File revision.................... $Revision$
+  Last modification date .......... $Modtime$
+  -------------------------------------------------------------------------
+  Copyright ... This software is JCI property. Duplication or
+                disclosure is prohibited without JCI written permission
+  ------------------------------------------------------------------------- 
+    
+  Automatic Generation by DllGraph V01.03
+
+  Generated the 23 Jan 2004 at 13:29
+
+  Source file: "LAP_SUP.GFT" of 23 Jan 2004
+    
+  -------------------------------------------------------------------------
+  LAP_SUP.hgr file review :
+  
+   $Log$
+
+*****************************************************************************/
+
+/*--------------------------------------------------------------------------
+                        Function prototypes
+  --------------------------------------------------------------------------*/
+
+#ifndef lap_sup
+   extern const tTOSSeqGraphType Supervisor; 
+#endif
+
+#ifdef lap_sup
+   extern BOOL LAPSupActiveSleepRequested(void);
+   extern void     LAPSupControlDATEnterActiveState(void);
+   extern void     LAPSupControlEnterStartingStepState(void);
+   extern void     LAPSupControlLAPEnterActiveState(void);
+   extern void     LAPSupControlLeaveActiveState(void);
+   extern void     LAPSupControlLeaveStartingStepState(void);
+   extern void     LAPSupEnterSleep(void);
+   extern void     LAPSupMinimumActiveTime(void);
+   extern BOOL LAPSupMinimumActiveTimeIsElapsed(void);
+   extern BOOL LAPSupNobodyMaintainActiveSleepState(void);
+   extern BOOL LAPSupNobodyMaintainActiveState(void);
+   extern BOOL LAPSupNobodyMaintainStartingStepState(void);
+   extern BOOL LAPSupWakeUpRequested(void);
+   extern void     TOSSeqNoAction(void);
+   extern BOOL TOSSeqTrueEval(void); 
+#endif
+
+/*--------------------------------------------------------------------------
+                        Component rules
+  --------------------------------------------------------------------------*/
+
+#ifdef lap_sup
+  const tTOSSeqGraphType Supervisor =
+  {
+#ifdef COMPILATION_NATIVE
+    "Supervisor",
+    {
+#endif
+  /*   0*/  {TOSSeqTrueEval,LAPSupControlEnterStartingStepState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPSupNobodyMaintainStartingStepState,LAPSupControlLeaveStartingStepState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPSupWakeUpRequested,LAPSupControlDATEnterActiveState,mTOSSeqRuleNumber(9),mTOSSeqRuleNumber(3)},
+  /*   3*/  {TOSSeqTrueEval,LAPSupControlLAPEnterActiveState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*   4*/  {TOSSeqTrueEval,LAPSupMinimumActiveTime,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)},
+  /*   5*/  {LAPSupWakeUpRequested,LAPSupMinimumActiveTime,mTOSSeqRuleNumber(6),mTOSSeqRuleNumber(5)},
+  /*   6*/  {LAPSupMinimumActiveTimeIsElapsed,TOSSeqNoAction,cTOSSeqInvalidRule,mTOSSeqRuleNumber(7)},
+  /*   7*/  {LAPSupWakeUpRequested,LAPSupMinimumActiveTime,mTOSSeqRuleNumber(8),mTOSSeqRuleNumber(5)},
+  /*   8*/  {LAPSupNobodyMaintainActiveState,LAPSupControlLeaveActiveState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   9*/  {LAPSupNobodyMaintainActiveSleepState,LAPSupEnterSleep,cTOSSeqInvalidRule,mTOSSeqRuleNumber(10)},
+  /*  10*/  {LAPSupActiveSleepRequested,TOSSeqNoAction,mTOSSeqRuleNumber(11),mTOSSeqRuleNumber(2)},
+  /*  11*/  {LAPSupWakeUpRequested,LAPSupControlDATEnterActiveState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+/****************************************************************************
+                        End of generation
+*****************************************************************************/

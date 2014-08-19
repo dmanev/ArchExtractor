@@ -1,0 +1,30 @@
+class StkPortCriteria
+!!!224879.python!!!	__init__(inout self : )
+        self.itsAccessModes = {}
+        self.registerAccessModes()
+!!!224751.python!!!	registerAccessModes(in self : ) : void
+        self.itsAccessModes = {'Defaut' : 'Default',
+                               'Default' : 'Default', 
+                               'Immediat' : 'Immediate',
+                               'Immediate' : 'Immediate',
+                               'Differe' : 'Delayed',
+                               'Delayed' : 'Delayed'}
+!!!218095.python!!!	extractLevelOneBlock(in self : , in inpText : ) : string
+        openningBrace=0
+        closingBrace=0
+        startDataConfig=None
+        endDataConfig=None
+        result=None
+        for brace in re.finditer(r'(?P<OpenningBrace>{)|(?P<ClosingBrace>})', inpText):
+            if brace.group('OpenningBrace'):
+                openningBrace+=1
+                if not startDataConfig:
+                    startDataConfig=brace.end()
+            if brace.group('ClosingBrace'): 
+                closingBrace+=1
+                openningBrace-=1
+                if startDataConfig and openningBrace==0 and not endDataConfig:
+                    endDataConfig=brace.end()-1
+            if startDataConfig and endDataConfig:
+                result=inpText[startDataConfig:endDataConfig]
+        return result

@@ -1,0 +1,621 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:08 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SWI.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_SWI.LST -o                           #
+#                    ..\EXE\TARGET_R\LDB_SWI.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SWI.C                                                  #
+#    List file    =  ..\EXE\TARGET_R\LDB_SWI.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LDB_SWI.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SWI.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_SWI
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Nov 17 2009 11:22:48  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SWI/LDB_SWI.C-arc  $
+     15          // $Revision:   1.7  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SWI/LDB_SWI.C-arc             $
+     18          // 
+     19          //    Rev 1.7   Nov 17 2009 11:22:48   adzhelp
+     20          // Cm006675: LDB_BUZ initialization excluded for CPU trace configuration
+     21          // 
+     22          //    Rev 1.6   Jul 16 2009 09:22:12   adzhelp
+     23          // Cm005205: LDB_PWM.h included
+     24          // 
+     25          //    Rev 1.5   Apr 27 2009 15:31:34   adzhelp
+     26          // Cm003272: LDB_TRP added; LDBSupEnterSleepMode() called last
+     27          // 
+     28          //    Rev 1.4   Apr 22 2009 17:47:42   adzhelp
+     29          // Cm003265: LDB_RF channel added
+     30          // 
+     31          //    Rev 1.3   Apr 13 2009 15:19:20   adzhelp
+     32          // Cm003271: LDB_ALA channel added
+     33          // 
+     34          //    Rev 1.2   Apr 10 2009 14:15:36   adzhelp
+     35          // Cm003264: Integration of LDB_SPD
+     36          // 
+     37          //    Rev 1.1   Mar 20 2009 14:49:44   adzhelp
+     38          // Cm003619: LDB_KWP and LDB_BUZ channels added
+     39          // 
+     40          //    Rev 1.0   Feb 04 2009 17:03:14   adzhelp
+     41          // Initial revision.
+     42          //
+     43          //******************************************************************************
+     44          
+     45          /*--------------------------------------------------------------------------
+     46            Body Identification
+     47            --------------------------------------------------------------------------*/
+     48          
+     49          #define ldb_swi   "ldb_swi"
+     50          
+     51          /*-------------------------------------------------------------------------
+     52            Included files
+     53          
+     54            #include <system_file_name.h>
+     55            #include "project_file_name.h"
+     56            --------------------------------------------------------------------------*/
+     57          #include "ldb.h"
+     58          #include "lib.h"
+     59          #include "ldb_ana.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0d
+   \   union <unnamed> volatile __saddr _A_P13
+   \                     _A_P13:
+   \   0000                  DS 1
+     60          #include "ldb_kwp.h"
+     61          #include "ldb_buz.h"
+     62          #include "ldb_spd.h"
+     63          #include "ldb_ala.h"
+     64          #include "ldb_rf.h"
+     65          #include "ldb_trp.h"
+     66          #include "ldb_pwm.h"
+     67          #include "ldb_swi.h"
+     68          
+     69          /*--------------------------------------------------------------------------
+     70            Local constants
+     71          
+     72            #define cConstantName   ((tType) ConstantValue)
+     73            --------------------------------------------------------------------------*/
+     74          
+     75          
+     76          /*--------------------------------------------------------------------------
+     77            Local macros
+     78          
+     79            #define mMacroName   (MacroDefinition)
+     80            --------------------------------------------------------------------------*/
+     81          
+     82          
+     83          /*--------------------------------------------------------------------------
+     84            Local types
+     85          
+     86            struct  sStructureName { ... };
+     87            union   uUnionName { ... };
+     88            enum    eEnumerationName { ... };
+     89            typedef Expression tTypeName;
+     90            --------------------------------------------------------------------------*/
+     91          
+     92          
+     93          /*--------------------------------------------------------------------------
+     94            Local data
+     95          
+     96            static  tType   VariableName;
+     97            static  tType*  pVariableName; 
+     98            --------------------------------------------------------------------------*/
+     99          
+    100          
+    101          /*--------------------------------------------------------------------------
+    102            Constant local data
+    103          
+    104            static const tType  VariableName;
+    105            --------------------------------------------------------------------------*/
+    106          
+    107          
+    108          /*--------------------------------------------------------------------------
+    109            Exported data
+    110          
+    111            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    112            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    113            --------------------------------------------------------------------------*/
+    114          
+    115          
+    116          /*--------------------------------------------------------------------------
+    117            Constant exported data
+    118           
+    119            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    120            --------------------------------------------------------------------------*/
+    121          
+    122          
+    123          /*--------------------------------------------------------------------------
+    124            Local function prototypes
+    125            
+    126            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    127            --------------------------------------------------------------------------*/
+    128          #ifdef X90_PROJECT
+    129          static MEM_TYPE void LDBInit_Static(void);
+    130          static MEM_TYPE void LDBEnterSleepMode_Static(void);
+    131          static MEM_TYPE void LDBLeaveSleepMode_Static(void);
+    132          #endif
+    133          
+    134          
+    135          /*============================================================================
+    136            =========================== LOCAL FUNCTIONS ================================
+    137            ==========================================================================*/
+    138          /*============================================================================
+    139            DESCRIPTION :
+    140            
+    141            PARAMETERS (Type,Name,Min,Max) :   none
+    142          
+    143            RETURN VALUE :   none
+    144           
+    145            DESIGN INFORMATION :   refer to Detailed Design Document
+    146            ==========================================================================*/
+    147          //static type FunctionName(...)
+    148          
+    149          
+    150          /*============================================================================
+    151            =========================== EXPORTED FUNCTIONS =============================
+    152            ==========================================================================*/
+    153          /*============================================================================
+    154            DESCRIPTION :void LDBInit(void)
+    155                          Init of the LDB layer
+    156            
+    157            PARAMETERS (Type,Name,Min,Max) :  none
+    158          
+    159            RETURN VALUE :  none
+    160           
+    161            DESIGN INFORMATION :  refer to Detailed Design Document
+    162          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    163          void LDBInit(void)
+   \                     LDBInit:
+    164          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    165          #ifdef X90_PROJECT
+    166              LDBInit_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LDBInit_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LDBInit_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    167          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    168          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    169          static MEM_TYPE void LDBInit_Static(void)
+   \                     LDBInit_Static:
+    170          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    171          #endif
+    172          
+    173          #ifdef mLDBHarInit
+    174                mLDBHarInit();
+   \   0000   9A....         CALL      LDBHarInit
+    175          #endif
+    176          #ifdef mLDBSupInit
+    177               mLDBSupInit();
+    178          #endif
+    179          #ifdef mLDBIntInit
+    180               mLDBIntInit();
+   \   0003   9A....         CALL      LDBIntInit
+    181          #endif
+    182          #ifdef mLDBTimInit
+    183               mLDBTimInit();
+   \   0006   9A....         CALL      LDBTimInit
+    184          #endif
+    185          #ifdef mLDBSpiInit
+    186                mLDBSpiInit();
+   \   0009   9A....         CALL      LDBSpiInit
+    187          #endif
+    188          #ifdef mLDBEepInit
+    189                mLDBEepInit();
+   \   000C   16....         MOVW      HL,#LWRD(LDBEepInit)
+   \   000F   A4..           MOV       E,#BYTE3(LDBEepInit)
+   \   0011   ..             CALLT     [__T_?FAR_CALL_L07]
+    190          #endif
+    191          #ifdef mLDBKwpInit
+    192                mLDBKwpInit();
+   \   0012   16....         MOVW      HL,#LWRD(LDBKwpInit)
+   \   0015   A4..           MOV       E,#BYTE3(LDBKwpInit)
+   \   0017   ..             CALLT     [__T_?FAR_CALL_L07]
+    193          #endif
+    194          #ifdef mLDBCanInit
+    195                mLDBCanInit();
+    196          #endif
+    197          #ifdef mLDBAnaInit
+    198                mLDBAnaInit();
+   \   0018   9A....         CALL      LDBAnaInit
+    199          #endif
+    200          #ifdef mLDBPwmInit
+    201                mLDBPwmInit();
+   \   001B   16....         MOVW      HL,#LWRD(LDBPwmInit)
+   \   001E   A4..           MOV       E,#BYTE3(LDBPwmInit)
+   \   0020   ..             CALLT     [__T_?FAR_CALL_L07]
+    202          #endif
+    203          #ifdef mLDBDinInit
+    204                mLDBDinInit();
+   \   0021   9A....         CALL      LDBDinInit
+    205          #endif
+    206          #ifdef mLDBDouInit
+    207                mLDBDouInit();
+   \   0024   16....         MOVW      HL,#LWRD(LDBDouInit)
+   \   0027   A4..           MOV       E,#BYTE3(LDBDouInit)
+   \   0029   ..             CALLT     [__T_?FAR_CALL_L07]
+    208          #endif
+    209          #ifdef mLDBFlaInit
+    210                mLDBFlaInit();
+    211          #endif
+    212          #ifdef mLDBLshInit
+    213                mLDBLshInit();
+    214          #endif
+    215          #ifdef mLDBLmhInit
+    216                mLDBLmhInit();
+    217          #endif
+    218          #ifdef mLDBMotInit
+    219                mLDBMotInit();
+    220          #endif
+    221          #ifdef mLDBBuzInit
+    222          #ifndef TRACE_CPU_ACTIVE // buzzer channel is not used for CPU trace
+    223              mLDBBuzInit();
+   \   002A   16....         MOVW      HL,#LWRD(LDBBuzInit)
+   \   002D   A4..           MOV       E,#BYTE3(LDBBuzInit)
+   \   002F   ..             CALLT     [__T_?FAR_CALL_L07]
+    224          #endif
+    225          #endif
+    226          #ifdef mLDBSpdInit
+    227              mLDBSpdInit();
+   \   0030   9A....         CALL      LDBSpdInit
+    228          #endif
+    229          #ifdef mLDBAlaInit
+    230              mLDBAlaInit();
+   \   0033   9A....         CALL      LDBAlaInit
+    231          #endif
+    232          #ifdef mLDBRfInit
+    233              mLDBRfInit();
+   \   0036   16....         MOVW      HL,#LWRD(LDBRfInit)
+   \   0039   A4..           MOV       E,#BYTE3(LDBRfInit)
+   \   003B   ..             CALLT     [__T_?FAR_CALL_L07]
+    234          #endif
+    235          #ifdef mLDBTrpInit
+    236              mLDBTrpInit();
+   \   003C   16....         MOVW      HL,#LWRD(LDBTrpInit)
+   \   003F   A4..           MOV       E,#BYTE3(LDBTrpInit)
+   \   0041   ..             CALLT     [__T_?FAR_CALL_L07]
+    237          #endif
+    238          }
+   \   0042   AF             RET       
+   \   0043                  REQUIRE ?CL78K_V4_6_L00
+    239          /*============================================================================
+    240            DESCRIPTION :void LDBEnterSleepMode(void)
+    241                          Enter in sleep mode
+    242            
+    243            PARAMETERS (Type,Name,Min,Max) :  none
+    244          
+    245            RETURN VALUE :  none
+    246           
+    247            DESIGN INFORMATION :  refer to Detailed Design Document
+    248          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    249          void LDBEnterSleepMode(void)
+   \                     LDBEnterSleepMode:
+    250          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    251          #ifdef X90_PROJECT
+    252              LDBEnterSleepMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LDBEnterSleepMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LDBEnterSleepMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    253          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    254          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    255          static MEM_TYPE void LDBEnterSleepMode_Static(void)
+   \                     LDBEnterSleepMode_Static:
+    256          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    257          #endif
+    258          
+    259          #ifdef mLDBIntEnterSleepMode
+    260               mLDBIntEnterSleepMode();
+    261          #endif
+    262          #ifdef mLDBTimEnterSleepMode
+    263               mLDBTimEnterSleepMode();
+    264          #endif
+    265          #ifdef mLDBEepEnterSleepMode
+    266                mLDBEepEnterSleepMode();
+   \   0000   0B0D           CLR1      S:0xFF0D.0
+    267          #endif
+    268          #ifdef mLDBSpiEnterSleepMode
+    269                mLDBSpiEnterSleepMode();
+   \   0002   4B00           CLR1      S:0xFF00.4
+   \   0004   2B00           CLR1      S:0xFF00.2
+    270          #endif
+    271          #ifdef mLDBKwpEnterSleepMode
+    272                mLDBKwpEnterSleepMode();
+    273          #endif
+    274          #ifdef mLDBCanEnterSleepMode
+    275                mLDBCanEnterSleepMode();
+    276          #endif
+    277          #ifdef mLDBAnaEnterSleepMode
+    278                mLDBAnaEnterSleepMode();
+   \   0006   9A....         CALL      LDBAnaEnterSleepMode
+    279          #endif
+    280          #ifdef mLDBPwmEnterSleepMode
+    281                mLDBPwmEnterSleepMode();
+   \   0009   16....         MOVW      HL,#LWRD(LDBPwmEnterSleepMode)
+   \   000C   A4..           MOV       E,#BYTE3(LDBPwmEnterSleepMode)
+   \   000E   ..             CALLT     [__T_?FAR_CALL_L07]
+    282          #endif
+    283          #ifdef mLDBDinEnterSleepMode
+    284                mLDBDinEnterSleepMode();
+   \   000F   A102           MOV       A,#2
+   \   0011   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   0014   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   0016   ..             CALLT     [__T_?FAR_CALL_L07]
+    285          #endif
+    286          #ifdef mLDBDouEnterSleepMode
+    287                mLDBDouEnterSleepMode();
+   \   0017   A102           MOV       A,#2
+   \   0019   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   001C   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   001E   ..             CALLT     [__T_?FAR_CALL_L07]
+    288          #endif
+    289          #ifdef mLDBFlaEnterSleepMode
+    290                mLDBFlaEnterSleepMode();
+    291          #endif
+    292          #ifdef mLDBLshEnterSleepMode
+    293                mLDBLshEnterSleepMode();
+    294          #endif
+    295          #ifdef mLDBLmhEnterSleepMode
+    296                mLDBLmhEnterSleepMode();
+    297          #endif
+    298          #ifdef mLDBHarEnterSleepMode
+    299                mLDBHarEnterSleepMode();
+    300          #endif
+    301          #ifdef mLDBMotEnterSleepMode
+    302                mLDBMotEnterSleepMode();
+    303          #endif
+    304          #ifdef mLDBBuzEnterSleepMode
+    305                mLDBBuzEnterSleepMode();
+    306          #endif
+    307          #ifdef mLDBSpdEnterSleepMode
+    308                mLDBSpdEnterSleepMode();
+    309          #endif
+    310          #ifdef mLDBAlaEnterSleepMode
+    311                mLDBAlaEnterSleepMode();
+    312          #endif
+    313          #ifdef mLDBRfEnterSleepMode
+    314                mLDBRfEnterSleepMode();
+   \   001F   A108           MOV       A,#8
+   \   0021   16....         MOVW      HL,#LWRD(LDBRfControl)
+   \   0024   A4..           MOV       E,#BYTE3(LDBRfControl)
+   \   0026   ..             CALLT     [__T_?FAR_CALL_L07]
+    315          #endif
+    316          #ifdef mLDBTrpEnterSleepMode
+    317                mLDBTrpEnterSleepMode();
+   \   0027   A104           MOV       A,#4
+   \   0029   16....         MOVW      HL,#LWRD(LDBTrpControl)
+   \   002C   A4..           MOV       E,#BYTE3(LDBTrpControl)
+   \   002E   ..             CALLT     [__T_?FAR_CALL_L07]
+    318          #endif
+    319          #ifdef mLDBSupEnterSleepMode
+    320               mLDBSupEnterSleepMode();
+   \   002F   9B....         BR        N:LDBSupEnterSleepMode
+   \   0032                  REQUIRE ?CL78K_V4_6_L00
+   \   0032                  REQUIRE _A_P0
+   \   0032                  REQUIRE _A_P13
+    321          #endif
+    322          }
+    323          /*============================================================================
+    324            DESCRIPTION :void LDBLeaveSleepMode(void)
+    325                          Init of the LDB layer
+    326            
+    327            PARAMETERS (Type,Name,Min,Max) :  none
+    328          
+    329            RETURN VALUE :  none
+    330           
+    331            DESIGN INFORMATION :  refer to Detailed Design Document
+    332          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    333          void LDBLeaveSleepMode(void)
+   \                     LDBLeaveSleepMode:
+    334          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    335          #ifdef X90_PROJECT
+    336              LDBLeaveSleepMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LDBLeaveSleepMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LDBLeaveSleepMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    337          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    338          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    339          static MEM_TYPE void LDBLeaveSleepMode_Static(void)
+   \                     LDBLeaveSleepMode_Static:
+    340          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    341          #endif
+    342          
+    343          #ifdef mLDBHarLeaveSleepMode
+    344               mLDBHarLeaveSleepMode();
+    345          #endif
+    346          #ifdef mLDBSupLeaveSleepMode
+    347               mLDBSupLeaveSleepMode();
+   \   0000   9A....         CALL      LDBSupLeaveSleepMode
+    348          #endif
+    349          #ifdef mLDBIntLeaveSleepMode
+    350               mLDBIntLeaveSleepMode();
+    351          #endif
+    352          #ifdef mLDBTimLeaveSleepMode
+    353               mLDBTimLeaveSleepMode();
+    354          #endif
+    355          #ifdef mLDBSpiLeaveSleepMode
+    356                mLDBSpiLeaveSleepMode();
+   \   0003   4B00           CLR1      S:0xFF00.4
+   \   0005   2B00           CLR1      S:0xFF00.2
+    357          #endif
+    358          #ifdef mLDBEepLeaveSleepMode
+    359                mLDBEepLeaveSleepMode();
+   \   0007   0B0D           CLR1      S:0xFF0D.0
+    360          #endif
+    361          #ifdef mLDBKwpLeaveSleepMode
+    362                mLDBKwpLeaveSleepMode();
+    363          #endif
+    364          #ifdef mLDBCanLeaveSleepMode
+    365                mLDBCanLeaveSleepMode();
+    366          #endif
+    367          #ifdef mLDBAnaLeaveSleepMode
+    368                mLDBAnaLeaveSleepMode();
+   \   0009   9A....         CALL      LDBAnaLeaveSleepMode
+    369          #endif
+    370          #ifdef mLDBPwmLeaveSleepMode
+    371                mLDBPwmLeaveSleepMode();
+   \   000C   16....         MOVW      HL,#LWRD(LDBPwmLeaveSleepMode)
+   \   000F   A4..           MOV       E,#BYTE3(LDBPwmLeaveSleepMode)
+   \   0011   ..             CALLT     [__T_?FAR_CALL_L07]
+    372          #endif
+    373          #ifdef mLDBDinLeaveSleepMode
+    374                mLDBDinLeaveSleepMode();
+   \   0012   A101           MOV       A,#1
+   \   0014   16....         MOVW      HL,#LWRD(LDBDinControl)
+   \   0017   A4..           MOV       E,#BYTE3(LDBDinControl)
+   \   0019   ..             CALLT     [__T_?FAR_CALL_L07]
+    375          #endif
+    376          #ifdef mLDBDouLeaveSleepMode
+    377                mLDBDouLeaveSleepMode();
+   \   001A   A101           MOV       A,#1
+   \   001C   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   001F   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0021   ..             CALLT     [__T_?FAR_CALL_L07]
+    378          #endif
+    379          #ifdef mLDBFlaLeaveSleepMode
+    380                mLDBFlaLeaveSleepMode();
+    381          #endif
+    382          #ifdef mLDBLshLeaveSleepMode
+    383                mLDBLshLeaveSleepMode();
+    384          #endif
+    385          #ifdef mLDBLmhLeaveSleepMode
+    386                mLDBLmhLeaveSleepMode();
+    387          #endif
+    388          #ifdef mLDBMotLeaveSleepMode
+    389                mLDBMotLeaveSleepMode();
+    390          #endif
+    391          #ifdef mLDBBuzLeaveSleepMode
+    392                mLDBBuzLeaveSleepMode();
+    393          #endif
+    394          #ifdef mLDBSpdLeaveSleepMode
+    395                mLDBSpdLeaveSleepMode();
+    396          #endif
+    397          #ifdef mLDBAlaLeaveSleepMode
+    398                mLDBAlaLeaveSleepMode();
+    399          #endif
+    400          #ifdef mLDBRfLeaveSleepMode
+    401                mLDBRfLeaveSleepMode();
+   \   0022   A107           MOV       A,#7
+   \   0024   16....         MOVW      HL,#LWRD(LDBRfControl)
+   \   0027   A4..           MOV       E,#BYTE3(LDBRfControl)
+   \   0029   ..             CALLT     [__T_?FAR_CALL_L07]
+    402          #endif
+    403          #ifdef mLDBTrpLeaveSleepMode
+    404                mLDBTrpLeaveSleepMode();
+   \   002A   A103           MOV       A,#3
+   \   002C   16....         MOVW      HL,#LWRD(LDBTrpControl)
+   \   002F   A4..           MOV       E,#BYTE3(LDBTrpControl)
+   \   0031   ..             CALLT     [__T_?FAR_CALL_L07]
+    405          #endif
+    406          }
+   \   0032   AF             RET       
+   \   0033                  REQUIRE ?CL78K_V4_6_L00
+   \   0033                  REQUIRE _A_P0
+   \   0033                  REQUIRE _A_P13
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+    407          
+
+   Segment part sizes:
+
+     Function/Label           Bytes
+     --------------           -----
+     _A_P0                       1
+     _A_P13                      1
+     LDBInit                     9
+     LDBInit_Static             67
+     LDBEnterSleepMode           9
+     LDBEnterSleepMode_Static   50
+     LDBLeaveSleepMode           9
+     LDBLeaveSleepMode_Static   51
+     __T_?FAR_CALL_L07           2
+
+ 
+ 168 bytes in segment BCODE
+   2 bytes in segment CLTVEC
+  27 bytes in segment CODE
+   2 bytes in segment SADDR_A
+ 
+ 195 bytes of CODE memory (+ 2 bytes shared)
+   0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

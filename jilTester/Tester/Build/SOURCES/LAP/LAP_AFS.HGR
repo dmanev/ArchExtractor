@@ -1,0 +1,57 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    LAP_AFS.HGR
+// -----------------------------------------------------------------------------
+// $Date:$
+// $Archive:$
+// $Revision:$
+// -----------------------------------------------------------------------------
+// $Log:$
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef lap_afs
+   extern const tTOSSeqGraphType LAPAfsIOControlByLocalID; 
+#endif
+
+#ifdef lap_afs
+   extern void     FreeActuator(void);
+   extern BOOL IOCBLIDTimeOutIsElapsed(void);
+   extern void     StartActivationTimeOut(void);
+   extern BOOL TOSSeqEvalVrai(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef lap_afs
+  const tTOSSeqGraphType LAPAfsIOControlByLocalID =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPAfsIOControlByLocalID",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,StartActivationTimeOut,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {IOCBLIDTimeOutIsElapsed,FreeActuator,cTOSSeqInvalidRule,cTOSSeqInvalidRule}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

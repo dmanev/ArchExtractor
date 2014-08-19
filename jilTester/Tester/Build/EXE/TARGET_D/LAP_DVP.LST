@@ -1,0 +1,1466 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:33 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_DVP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_DVP.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_DVP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_DVP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_DVP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_DVP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_DVP.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_DVP.C
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Apr 22 2009 15:33:08  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_DVP/LAP_DVP.C-arc  $
+     16          // $Revision:   1.2  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_DVP/LAP_DVP.C-arc  $
+     19          // 
+     20          //    Rev 1.2   Apr 22 2009 15:33:08   adzhelp
+     21          // Cm003128: MEM_TYPE attribute added to service functions.
+     22          // RF Test results added. DIAG_DRIVER updated
+     23          // 
+     24          //    Rev 1.1   20 Mar 2009 18:13:30   akodzhh
+     25          // Cm003128 - 2 bytes memmory address - use U16 instead of U32, RF test.
+     26          // 
+     27          //    Rev 1.0   12 Mar 2009 15:47:34   akodzhh
+     28          // Initial revision.
+     29          //******************************************************************************
+     30          #endif
+     31          
+     32          //------------------------------------------------------------------------------
+     33          // Body Identification
+     34          //------------------------------------------------------------------------------
+     35          #define lap_dvp   "lap_dvp"
+     36          
+     37          //------------------------------------------------------------------------------
+     38          //  Included files
+     39          //
+     40          // #include <system_file_name.h>
+     41          // #include "project_file_name.h"
+     42          //------------------------------------------------------------------------------
+     43          
+     44          #include "lib.h"
+     45          #include "tos.h"
+     46          #include "dat.h"
+     47          
+     48          #include "lap_kwp.h"
+     49          #include "lap_dvp.h"
+     50          
+     51          //------------------------------------------------------------------------------
+     52          // Local constants
+     53          //
+     54          // #define cConstantName   ((tType) ConstantValue)
+     55          //------------------------------------------------------------------------------
+     56          #define cDVPNbFunctionControled         ((U8)2UL)
+     57          
+     58          /////////////////////////////////////////////////////
+     59          // constantes for StartRoutineByLocalIdentifier service
+     60          /////////////////////////////////////////////////////
+     61          #define cSRBLIDReq_Lght                       ((U8) 0x03)
+     62          #define cSRBLIDReqRW_Lght                     ((U8) 0x08)
+     63          #define cSRBLIDResp_Lght                      ((U8) 0x03)
+     64          // SRBLI - Local Identifiers suported
+     65          #define cLocalId_Write                        ((U8) 0xFA )
+     66          #define cLocalId_Read                         ((U8) 0xFB )
+     67          #define cLocalId_TestRF                       ((U8) 0xFF )
+     68          #define cLocalId_TestEraseEepromDefault       ((U8) 0xFE )
+     69          
+     70          // SRBLI Read/Write Memory type
+     71          #define    cDirectAccessEeprom                ((U8) 0x05 )
+     72          #define    cDirectAccessRam                   ((U8) 0x01 )
+     73          #define    cDirectAccessRom                   ((U8) 0x03 )
+     74          
+     75          // SRBLI option byte 
+     76          #define cStartRoutine                         ((U8) 0x00 )
+     77          #define cReadRoutineStatus                    ((U8) 0x01 )
+     78          
+     79          
+     80          // Indice in DVPTableStatutFunction table
+     81          #define cRoutineWrite                         ((U8) 0x00 )
+     82          #define cRoutineRead                          ((U8) 0x01 )
+     83          
+     84          #define cStartRoutine                         ((U8) 0x00 )
+     85          #define cReadRoutineStatus                    ((U8) 0x01 )
+     86          
+     87          #define cMinRam1AdrMemory                     ((U16) 0xE800 ) 
+     88          #define cMaxRam1AdrMemory                     ((U16) 0xF7FF )
+     89          #define cMinRam2AdrMemory                     ((U16) 0xFB00 ) 
+     90          #define cMaxRam2AdrMemory                     ((U16) 0xFEDF )
+     91          
+     92          #define cMinRomAdrMemory                      (0x0000UL )
+     93          #define cMaxRomAdrMemory                      ((U16) 0xBFFF )
+     94          
+     95          #define cHeaderLgth  (U8)4
+     96          #define cMaxReadBufferSize   (U8)(( cDATKwpTxBufferSize-cHeaderLgth ) - cSRBLIDResp_Lght ) 
+     97          
+     98          
+     99          /////////////////////////////////////////////////////
+    100          // constants for ReadDataByLocalIdentifier (RDBLID)
+    101          /////////////////////////////////////////////////////
+    102          #define cBankNumber                             ((U8)cNbDbk + cNbSbk)
+    103          
+    104          #define cRDBLIDReq_Lgth                         ((U8)2)
+    105          
+    106          #define cRDBLID_EepromErrorID                   ((U8)0xF0)
+    107          #define cRDBLIDAns_EepromError_Lgth             ((U8)11)
+    108          
+    109          
+    110          //------------------------------------------------------------------------------
+    111          // Local macros
+    112          //
+    113          // #define mMacroName   (MacroDefinition)
+    114          //------------------------------------------------------------------------------
+    115          #define mDVPInitDvpTabIdentifierServiceSupported()  \
+    116          {                                                   \
+    117            cLAPKwpIdStartRoutineByLocalIdentifier,              \
+    118            cLAPKwpIdStopRoutineByLocalIdentifier,               \
+    119            cLAPKwpIdReadDataByLocalIdentifier                   \
+    120          }
+    121          
+    122          #define mDVPInitDvpTabServiceSupported()          \
+    123          {                                                 \
+    124            LAPDvpTreatStartRoutineByLocalIdentifierService,    \
+    125            LAPDvpTreatStopRoutineByLocalIdentifierService,     \
+    126            LAPDvpTreatReadDataByLocalIdentifierService         \
+    127          }
+    128          
+    129          // RAM/ROM direct access
+    130          #define mIsValidRamAddress(Address, DataLgth)     \
+    131            (BOOL)( (((Address) >= cMinRam1AdrMemory)&&((Address)+(U16)(DataLgth) <= cMaxRam1AdrMemory))      \
+    132                  ||(((Address) >= cMinRam2AdrMemory)&&((Address)+(U16)(DataLgth) <= cMaxRam2AdrMemory)))
+    133          
+    134          #if (cMinRomAdrMemory > 0)
+    135          #define mIsValidRomAddress(Address, DataLgth)     \
+    136            (BOOL)( ((Address) >= cMinRomAdrMemory)&&((Address) + (U16)(DataLgth) <= cMaxRomAdrMemory))
+    137          #else
+    138          #define mIsValidRomAddress(Address, DataLgth)     \
+    139            (BOOL)((Address) + (U16)(DataLgth) <= cMaxRomAdrMemory)
+    140          #endif
+    141          
+    142          
+    143          //------------------------------------------------------------------------------
+    144          // Local types
+    145          //
+    146          // struct  sStructureName { ... };
+    147          // union   uUnionName { ... };
+    148          // enum    eEnumerationName { ... };
+    149          // typedef Expression    tTypeName;
+    150          //------------------------------------------------------------------------------
+    151          
+    152          
+    153          // -----------------------------------------------------------------------------
+    154          // Local data
+    155          //
+    156          // static  tType   u8VariableName;  
+    157          // static  tType*  pu8VariableName; 
+    158          //------------------------------------------------------------------------------
+    159          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    160          static U8    u8BufferSizeInByte;
+   \                     u8BufferSizeInByte:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    161          static U8    u8TypeOfMemory;
+   \                     u8TypeOfMemory:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    162          static BOOL  bWritingIsDone;
+   \                     bWritingIsDone:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    163          
+    164          //------------------------------------------------------------------------------
+    165          // Constant local data
+    166          //
+    167          // static const tType  VariableName;
+    168          //------------------------------------------------------------------------------
+    169          
+    170          //------------------------------------------------------------------------------
+    171          // Exported data
+    172          //
+    173          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    174          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    175          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    176          static U8    DVPTableStatutFunction[cDVPNbFunctionControled];
+   \                     DVPTableStatutFunction:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    177          
+    178          //------------------------------------------------------------------------------
+    179          // Constant exported data
+    180          //
+    181          //             (LAY: 3 characters to identify the layer)
+    182          //             (Cmp: 3 characters to identify this component)
+    183          // 
+    184          // const tType   LAYCmpVariableName;
+    185          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 1
+    186          const U8 TabIdentifierServiceSupportedInDvpSession[cNbServicesSupportedInDVP] =
+   \                     TabIdentifierServiceSupportedInDvpSession:
+   \   0000   313221         DB 49, 50, 33
+    187                    mDVPInitDvpTabIdentifierServiceSupported();
+    188          
+
+   \                                 In  segment CONST, align 2
+    189          const tLAPKwpServiceFunction TabServiceSupportedInDvpSession[cNbServicesSupportedInDVP] =
+   \                     TabServiceSupportedInDvpSession:
+   \   0000   ........       DD LAPDvpTreatStartRoutineByLocalIdentifierService
+   \   0004   ........       DD LAPDvpTreatStopRoutineByLocalIdentifierService
+   \   0008   ........       DD LAPDvpTreatReadDataByLocalIdentifierService
+    190                    mDVPInitDvpTabServiceSupported();
+    191          
+    192          //------------------------------------------------------------------------------
+    193          // Local function prototypes
+    194          // 
+    195          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    196          //------------------------------------------------------------------------------
+    197          
+    198          //==============================================================================
+    199          //=========================== LOCAL FUNCTIONS ==================================
+    200          //==============================================================================
+    201          
+    202          //============================================================================
+    203          //  DESCRIPTION :
+    204          //  
+    205          //  PARAMETERS (Type,Name,Min,Max) :   none
+    206          //
+    207          //  RETURN VALUE :   none
+    208          // 
+    209          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    210          //  ==========================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    211          static MEM_TYPE void StatusRequest(void)
+   \                     StatusRequest:
+    212          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    213              U8  u8Access;
+    214              U8  u8Index;
+    215          
+    216              if (LAPKwpReadDiagnosticRequest(1) == cLocalId_Read)
+   \   0002   8E....         MOV       A,DATKwpRxBuffer+4
+   \   0005   4DFB           CMP       A,#251
+   \   0007   BD04           BNZ       ??LAPDvpCloseSession_0
+    217              {
+    218                  u8Access=cRoutineRead;
+   \   0009   A301           MOV       B,#1
+   \   000B   FA02           BR        ??LAPDvpCloseSession_1
+    219              }
+    220              else
+    221              {
+    222                  u8Access=cRoutineWrite;
+   \                     ??LAPDvpCloseSession_0:
+   \   000D   A300           MOV       B,#0
+    223              }
+    224          
+    225              if ( (mDATRead(U8Bit,DATDeaActionIsFinished,Default) == cTrue) && 
+    226                   (u8TypeOfMemory == cDirectAccessEeprom))
+   \                     ??LAPDvpCloseSession_1:
+   \   000F   8E....         MOV       A,DATDeaActionIsFinished
+   \   0012   51             DEC       A
+   \   0013   BD1E           BNZ       ??LAPDvpCloseSession_2
+   \   0015   8E....         MOV       A,u8TypeOfMemory
+   \   0018   4D05           CMP       A,#5
+   \   001A   BD17           BNZ       ??LAPDvpCloseSession_2
+    227              {        
+    228                  // Preparation réponse positive
+    229                  DVPTableStatutFunction[u8Access]=cLAPKwpRoutineTerminatedOK;
+   \   001C   A102           MOV       A,#2
+   \   001E   16....         MOVW      HL,#DVPTableStatutFunction
+   \   0021   BB             MOV       [HL+B],A
+    230                  if (u8Access == cRoutineWrite)
+   \   0022   63             MOV       A,B
+   \   0023   4D00           CMP       A,#0
+   \   0025   BD13           BNZ       ??LAPDvpCloseSession_3
+    231                  {
+    232                      if (mDATRead(U8Bit,DATDeaWriteIsOk,Default) == cFalse)
+   \   0027   8E....         MOV       A,DATDeaWriteIsOk
+   \   002A   4D00           CMP       A,#0
+   \   002C   BD05           BNZ       ??LAPDvpCloseSession_2
+    233                      {
+    234                          DVPTableStatutFunction[u8Access]=cLAPKwpRoutineTerminatedNOK;
+   \   002E   A104           MOV       A,#4
+   \   0030   9E....         MOV       DVPTableStatutFunction,A
+    235                      }
+    236                      LAPKwpPreparePositiveResponse(3);
+   \                     ??LAPDvpCloseSession_2:
+   \   0033   A103           MOV       A,#3
+   \   0035   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   0038   FA3B           BR        ??LAPDvpCloseSession_4
+    237                  }
+    238                  else
+    239                  {
+    240                      for (u8Index=0;u8Index<u8BufferSizeInByte;u8Index++)
+   \                     ??LAPDvpCloseSession_3:
+   \   003A   8E....         MOV       A,u8BufferSizeInByte
+   \   003D   4D00           CMP       A,#0
+   \   003F   AD2C           BZ        ??LAPDvpCloseSession_5
+   \   0041   10....         MOVW      AX,#DATDeaBufferU8Bit
+   \   0044   14....         MOVW      DE,#DATKwpTxBuffer+6
+   \   0047   B6             POP       HL
+   \   0048   B1             PUSH      AX
+   \   0049   8E....         MOV       A,u8BufferSizeInByte
+   \   004C   72             MOV       C,A
+    241                      {
+    242                          LAPKwpWriteDiagnosticResponse(3+u8Index,(mDATReadBuffer(DATDeaBufferU8Bit,u8Index, Default)));
+   \                     ??StatusRequest_0:
+   \   004D   891C           MOVW      AX,SP
+   \   004F   D6             MOVW      HL,AX
+   \   0050   87             MOV       A,[HL]
+   \   0051   70             MOV       X,A
+   \   0052   AE01           MOV       A,[HL+0x01]
+   \   0054   D6             MOVW      HL,AX
+   \   0055   87             MOV       A,[HL]
+   \   0056   B5             PUSH      DE
+   \   0057   B6             POP       HL
+   \   0058   97             MOV       [HL],A
+    243                      } 
+   \   0059   891C           MOVW      AX,SP
+   \   005B   D6             MOVW      HL,AX
+   \   005C   87             MOV       A,[HL]
+   \   005D   70             MOV       X,A
+   \   005E   AE01           MOV       A,[HL+0x01]
+   \   0060   D6             MOVW      HL,AX
+   \   0061   86             INCW      HL
+   \   0062   C6             MOVW      AX,HL
+   \   0063   B6             POP       HL
+   \   0064   B1             PUSH      AX
+   \   0065   B5             PUSH      DE
+   \   0066   B6             POP       HL
+   \   0067   86             INCW      HL
+   \   0068   B7             PUSH      HL
+   \   0069   B4             POP       DE
+   \   006A   52             DEC       C
+   \   006B   BDE0           BNZ       ??StatusRequest_0
+    244                      LAPKwpPreparePositiveResponse((U8)(3+u8BufferSizeInByte));
+   \                     ??LAPDvpCloseSession_5:
+   \   006D   A103           MOV       A,#3
+   \   006F   08....         ADD       A,u8BufferSizeInByte
+   \   0072   9A....         CALL      LAPKwpPreparePositiveResponse
+    245                  }
+    246              }
+    247              else
+    248              {
+    249                  LAPKwpPreparePositiveResponse(3);
+    250              }
+    251              LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+   \                     ??LAPDvpCloseSession_4:
+   \   0075   8E....         MOV       A,DATKwpRxBuffer+4
+   \   0078   9E....         MOV       DATKwpTxBuffer+4,A
+    252              LAPKwpWriteDiagnosticResponse(2,DVPTableStatutFunction[u8Access]);
+   \   007B   16....         MOVW      HL,#DVPTableStatutFunction
+   \   007E   AB             MOV       A,[HL+B]
+   \   007F   9E....         MOV       DATKwpTxBuffer+5,A
+    253          
+    254          }
+   \   0082   B0             POP       AX
+   \   0083   B2             POP       BC
+   \   0084   AF             RET       
+   \   0085                  REQUIRE ?CL78K_V4_6_L00
+    255          
+    256          
+    257          //============================================================================
+    258          //  =========================== EXPORTED FUNCTIONS =============================
+    259          //  ==========================================================================
+    260          //============================================================================
+    261          //  DESCRIPTION :
+    262          //  
+    263          //  PARAMETERS (Type,Name,Min,Max) :  none
+    264          //
+    265          //  RETURN VALUE :  none
+    266          // 
+    267          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    268          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    269          MEM_TYPE void LAPDvpTreatReadDataByLocalIdentifierService(void)
+   \                     LAPDvpTreatReadDataByLocalIdentifierService:
+    270          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    271              U8  u8RequestStatusL;
+    272              U8  u8IndexL;
+    273              U8  ResponseLength ;
+    274            
+    275              u8RequestStatusL = cLAPKwpServiceIsCorrect;
+    276              
+    277              if(  (mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cRDBLIDReq_Lgth)
+    278                 &&(LAPKwpReadDiagnosticRequest(1) == cRDBLID_EepromErrorID) ) 
+   \   0000   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0003   4D02           CMP       A,#2
+   \   0005   BD23           BNZ       ??LAPDvpCloseSession_6
+   \   0007   8E....         MOV       A,DATKwpRxBuffer+4
+   \   000A   4DF0           CMP       A,#240
+   \   000C   BD1C           BNZ       ??LAPDvpCloseSession_6
+    279              {
+    280                  for (u8IndexL=0; u8IndexL<cBankNumber; u8IndexL++)
+   \   000E   16....         MOVW      HL,#DATKwpTxBuffer+5
+   \   0011   14....         MOVW      DE,#DATSbkMirrors
+   \   0014   A00A           MOV       X,#10
+    281                  {
+    282                     LAPKwpWriteDiagnosticResponse(2+u8IndexL,mDATReadTable(U8Bit,EEPErrorTable, u8IndexL, Default));
+   \                     ??LAPDvpTreatReadDataByLocalIdentifierService_0:
+   \   0016   85             MOV       A,[DE]
+   \   0017   97             MOV       [HL],A
+    283                  }
+   \   0018   84             INCW      DE
+   \   0019   86             INCW      HL
+   \   001A   50             DEC       X
+   \   001B   BDF9           BNZ       ??LAPDvpTreatReadDataByLocalIdentifierService_0
+    284                  ResponseLength = cRDBLIDAns_EepromError_Lgth;  
+    285              }
+    286              else
+    287              {
+    288                  u8RequestStatusL = cLAPKwpInvalidFormat;
+    289              }
+    290          
+    291              if(u8RequestStatusL == cLAPKwpServiceIsCorrect)
+    292              {
+    293                  LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+   \   001D   A1F0           MOV       A,#240
+   \   001F   16....         MOVW      HL,#DATKwpTxBuffer+4
+   \   0022   97             MOV       [HL],A
+    294                  LAPKwpPreparePositiveResponse(ResponseLength);
+   \   0023   A10B           MOV       A,#11
+   \   0025   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   0028   FA05           BR        ??LAPDvpCloseSession_7
+    295              }
+    296              else
+    297              {
+    298                  LAPKwpPrepareNegativeResponse(u8RequestStatusL);
+   \                     ??LAPDvpCloseSession_6:
+   \   002A   A112           MOV       A,#18
+   \   002C   9A....         CALL      LAPKwpPrepareNegativeResponse
+    299              }
+    300              LAPKwpSetServiceIsFinished();
+   \                     ??LAPDvpCloseSession_7:
+   \   002F                  REQUIRE ?CL78K_V4_6_L00
+   \   002F                  REQUIRE ?Subroutine0
+   \   002F                  ; // Fall through to label ?Subroutine0
+    301          
+    302          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   A103           MOV       A,#3
+   \   0002   9E....         MOV       u8LAPKwpRequestStatus,A
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    303          
+    304          //============================================================================
+    305          //  DESCRIPTION :
+    306          //  
+    307          //  PARAMETERS (Type,Name,Min,Max) :  none
+    308          //
+    309          //  RETURN VALUE :  none
+    310          // 
+    311          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    312          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    313          MEM_TYPE void LAPDvpTreatStartRoutineByLocalIdentifierService(void)
+   \                     LAPDvpTreatStartRoutineByLocalIdentifierService:
+    314          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 10
+   \   0001   ..             CALLT     [__T_?FUNC_ENTER_L06]
+   \   0002   0A00           DW        0xA
+    315            U16   u16AddressMemory;
+    316            U32   u8Index;
+    317            U8    u8Access;
+    318            U8    u8RequestStatus;
+    319            
+    320            u8RequestStatus = cLAPKwpServiceIsCorrect;
+   \   0004   A400           MOV       E,#0
+    321            
+    322              switch(LAPKwpReadDiagnosticRequest(1))
+   \   0006   8E....         MOV       A,DATKwpRxBuffer+4
+   \   0009   4DFA           CMP       A,#250
+   \   000B   BD03           BNZ       $+5
+   \   000D   9B....         BR        N:??LAPDvpCloseSession_8
+   \   0010   4DFB           CMP       A,#251
+   \   0012   BD03           BNZ       $+5
+   \   0014   9B....         BR        N:??LAPDvpCloseSession_9
+   \   0017   4DFE           CMP       A,#254
+   \   0019   BD03           BNZ       $+5
+   \   001B   9B....         BR        N:??LAPDvpCloseSession_10
+   \   001E   4DFF           CMP       A,#255
+   \   0020   AD03           BZ        $+5
+   \   0022   9B....         BR        N:??LAPDvpCloseSession_11
+    323              {
+    324                  case cLocalId_TestRF:
+    325                  
+    326                  if(  (LAPKwpReadDiagnosticRequest(2) == cReadRoutineStatus)
+    327                     &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+   \   0025   8E....         MOV       A,DATKwpRxBuffer+5
+   \   0028   51             DEC       A
+   \   0029   BD54           BNZ       ??LAPDvpCloseSession_12
+   \   002B   8E....         MOV       A,DATKwpRxFrameLgth
+   \   002E   4D03           CMP       A,#3
+   \   0030   AD03           BZ        $+5
+   \   0032   9B....         BR        N:??LAPDvpCloseSession_11
+    328                  {
+    329                      for(u8Index = 3; u8Index < 9; u8Index++)
+   \   0035   A006           MOV       X,#6
+    330                      {
+    331                          LAPKwpWriteDiagnosticResponse(3,0x00);
+   \                     ??LAPDvpTreatStartRoutineByLocalIdentifierServi_0:
+   \   0037   A100           MOV       A,#0
+   \   0039   16....         MOVW      HL,#DATKwpTxBuffer+6
+   \   003C   97             MOV       [HL],A
+    332                      }
+   \   003D   50             DEC       X
+   \   003E   BDF7           BNZ       ??LAPDvpTreatStartRoutineByLocalIdentifierServi_0
+    333                      // Read the
+    334                      LAPKwpWriteDiagnosticResponse(1,cLocalId_TestRF);
+   \   0040   A1FF           MOV       A,#255
+   \   0042   16....         MOVW      HL,#DATKwpTxBuffer+4
+   \   0045   97             MOV       [HL],A
+    335                      LAPKwpWriteDiagnosticResponse(2,cLAPKwpRoutineInProgress);
+   \   0046   A101           MOV       A,#1
+   \   0048   86             INCW      HL
+   \   0049   97             MOV       [HL],A
+    336          
+    337                      // Number of Wake up received by the BCM
+    338                                  LAPKwpWriteDiagnosticResponse(3,mDATRead(U8Bit, DATRfNbWakeUpBlocksReceived, Default));
+   \   004A   8E....         MOV       A,DATRfNbWakeUpBlocksReceived
+   \   004D   9E....         MOV       DATKwpTxBuffer+6,A
+    339                                  // Number of RC bloc received by the BCM
+    340                                  LAPKwpWriteDiagnosticResponse(4,mDATRead(U8Bit, DATRfNbRCBlocksReceived, Default));
+   \   0050   8E....         MOV       A,DATRfNbRCBlocksReceived
+   \   0053   9E....         MOV       DATKwpTxBuffer+7,A
+    341                                  // Number of RC bloc received with the data defined in DAT_RFp.h by the BCM
+    342                                  LAPKwpWriteDiagnosticResponse(5,mDATRead(U8Bit, DATRfNbRCBlocksReceivedAndOK, Default));
+   \   0056   8E....         MOV       A,DATRfNbRCBlocksReceivedAndOK
+   \   0059   9E....         MOV       DATKwpTxBuffer+8,A
+    343                      
+    344                      // PDO value in milli-volt
+    345                      LAPKwpWriteDiagnosticResponse(6, (U8)((mDATRead(U16Bit, PDOInMilliVolt, Immediate) & 0xFF00)  >> 8));
+   \   005C   8E....         MOV       A,DATAnaDivisorValueNow
+   \   005F   72             MOV       C,A
+   \   0060   02....         MOVW      AX,DATAnaFilteredBuffer
+   \   0063   9A....         CALL      ?UI_RSH_L02
+   \   0066   9E....         MOV       DATKwpTxBuffer+9,A
+    346                      LAPKwpWriteDiagnosticResponse(7, (U8)( mDATRead(U16Bit, PDOInMilliVolt, Immediate) & 0x00FF)); 
+   \   0069   8E....         MOV       A,DATAnaDivisorValueNow
+   \   006C   72             MOV       C,A
+   \   006D   02....         MOVW      AX,DATAnaFilteredBuffer
+   \   0070   9A....         CALL      ?UI_RSH_L02
+   \   0073   60             MOV       A,X
+   \   0074   9E....         MOV       DATKwpTxBuffer+10,A
+    347                      /*
+    348                      // Number of SI bloc received by the BCM (contents not verified)
+    349                                  LAPKwpWriteDiagnosticResponse(8,mDATRead(U8Bit, DATRfNbSIBlocksReceived, Default));*/
+    350                      
+    351          
+    352                      LAPKwpPreparePositiveResponse((U8)(9));
+   \   0077   A109           MOV       A,#9
+   \   0079   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   007C   9B....         BR        N:??LAPDvpCloseSession_13
+    353                  }  
+    354                  else if(  (LAPKwpReadDiagnosticRequest(2) == cStartRoutine)
+    355                          &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+   \                     ??LAPDvpCloseSession_12:
+   \   007F   8E....         MOV       A,DATKwpRxBuffer+5
+   \   0082   4D00           CMP       A,#0
+   \   0084   AD03           BZ        $+5
+   \   0086   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0089   8E....         MOV       A,DATKwpRxFrameLgth
+   \   008C   4D03           CMP       A,#3
+   \   008E   AD03           BZ        $+5
+   \   0090   9B....         BR        N:??LAPDvpCloseSession_11
+    356                  {
+    357                      // Launch the RF test
+    358                      mDATControl(Rf, InitializeRFTest);
+   \   0093   9A....         CALL      DATRfInitializeRFTest
+    359                      LAPKwpWriteDiagnosticResponse(1,cLocalId_TestRF);
+   \   0096   A1FF           MOV       A,#255
+   \   0098   16....         MOVW      HL,#DATKwpTxBuffer+4
+   \   009B   97             MOV       [HL],A
+    360                      LAPKwpWriteDiagnosticResponse(2,cLAPKwpRoutineInProgress);
+   \   009C   A101           MOV       A,#1
+   \   009E   86             INCW      HL
+   \   009F   97             MOV       [HL],A
+    361                      LAPKwpPreparePositiveResponse(cSRBLIDResp_Lght);
+   \   00A0   A103           MOV       A,#3
+   \   00A2   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   00A5   9B....         BR        N:??LAPDvpCloseSession_13
+    362                  }
+    363                  else
+    364                  {
+    365                      u8RequestStatus = cLAPKwpInvalidFormat;
+    366                  }
+    367                  break;
+    368              
+    369          
+    370              case cLocalId_TestEraseEepromDefault:
+    371               
+    372                  if (  (LAPKwpReadDiagnosticRequest(2) == cReadRoutineStatus)
+    373                     &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+   \                     ??LAPDvpCloseSession_10:
+   \   00A8   8E....         MOV       A,DATKwpRxBuffer+5
+   \   00AB   51             DEC       A
+   \   00AC   BD1C           BNZ       ??LAPDvpCloseSession_14
+   \   00AE   8E....         MOV       A,DATKwpRxFrameLgth
+   \   00B1   4D03           CMP       A,#3
+   \   00B3   AD03           BZ        $+5
+   \   00B5   9B....         BR        N:??LAPDvpCloseSession_11
+    374                  {
+    375                      LAPKwpWriteDiagnosticResponse(1,cLocalId_TestEraseEepromDefault);
+   \   00B8   A1FE           MOV       A,#254
+   \   00BA   16....         MOVW      HL,#DATKwpTxBuffer+4
+   \   00BD   97             MOV       [HL],A
+    376                      LAPKwpWriteDiagnosticResponse(2,cLAPKwpRoutineTerminatedOK);
+   \   00BE   A102           MOV       A,#2
+   \   00C0   86             INCW      HL
+   \   00C1   97             MOV       [HL],A
+    377                      LAPKwpPreparePositiveResponse(cSRBLIDResp_Lght);
+   \   00C2   A103           MOV       A,#3
+   \   00C4   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   00C7   9B....         BR        N:??LAPDvpCloseSession_13
+    378                  }  
+    379                  else if(  (LAPKwpReadDiagnosticRequest(2) == cStartRoutine)
+    380                          &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+   \                     ??LAPDvpCloseSession_14:
+   \   00CA   8E....         MOV       A,DATKwpRxBuffer+5
+   \   00CD   4D00           CMP       A,#0
+   \   00CF   AD03           BZ        $+5
+   \   00D1   9B....         BR        N:??LAPDvpCloseSession_11
+   \   00D4   8E....         MOV       A,DATKwpRxFrameLgth
+   \   00D7   4D03           CMP       A,#3
+   \   00D9   AD03           BZ        $+5
+   \   00DB   9B....         BR        N:??LAPDvpCloseSession_11
+    381                  {
+    382                      for (u8Index=0; u8Index<cBankNumber; u8Index++)
+   \   00DE   14....         MOVW      DE,#DATSbkMirrors
+   \   00E1   A20A           MOV       C,#10
+    383                      {
+    384                          mDATWriteTable(U8Bit, EEPErrorTable, u8Index, 0x00, Default);
+   \                     ??LAPDvpTreatStartRoutineByLocalIdentifierServi_1:
+   \   00E3   85             MOV       A,[DE]
+   \   00E4   4D00           CMP       A,#0
+   \   00E6   AD06           BZ        ??LAPDvpCloseSession_15
+   \   00E8   A100           MOV       A,#0
+   \   00EA   95             MOV       [DE],A
+   \   00EB   9A....         CALL      DATSbkStartUpdate
+    385                      }
+   \                     ??LAPDvpCloseSession_15:
+   \   00EE   84             INCW      DE
+   \   00EF   8AF2           DBNZ      C, ??LAPDvpTreatStartRoutineByLocalIdentifierServi_1
+    386                      LAPKwpWriteDiagnosticResponse(1,cLocalId_TestEraseEepromDefault);
+   \   00F1   A1FE           MOV       A,#254
+   \   00F3   16....         MOVW      HL,#DATKwpTxBuffer+4
+   \   00F6   97             MOV       [HL],A
+    387                      LAPKwpWriteDiagnosticResponse(2,cLAPKwpRoutineInProgress);
+   \   00F7   A101           MOV       A,#1
+   \   00F9   86             INCW      HL
+   \   00FA   97             MOV       [HL],A
+    388                      LAPKwpPreparePositiveResponse(cSRBLIDResp_Lght);
+   \   00FB   A103           MOV       A,#3
+   \   00FD   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   0100   9B....         BR        N:??LAPDvpCloseSession_13
+    389                  }
+    390                  else
+    391                  {
+    392                      u8RequestStatus = cLAPKwpInvalidFormat;
+    393                  }
+    394                  break;
+    395          
+    396              case cLocalId_Read:
+    397          
+    398                  if (  (LAPKwpReadDiagnosticRequest(2) == cReadRoutineStatus)
+    399                     &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+   \                     ??LAPDvpCloseSession_9:
+   \   0103   8E....         MOV       A,DATKwpRxBuffer+5
+   \   0106   51             DEC       A
+   \   0107   BD13           BNZ       ??LAPDvpCloseSession_16
+   \                     ??LAPDvpTreatStartRoutineByLocalIdentifierServi_2:
+   \   0109   8E....         MOV       A,DATKwpRxFrameLgth
+   \   010C   4D03           CMP       A,#3
+   \   010E   AD03           BZ        $+5
+   \   0110   9B....         BR        N:??LAPDvpCloseSession_11
+    400                  {
+    401                      // Request of the routine Status
+    402                      StatusRequest();
+   \   0113   16....         MOVW      HL,#LWRD(StatusRequest)
+   \   0116   A4..           MOV       E,#BYTE3(StatusRequest)
+   \   0118   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0119   9B....         BR        N:??LAPDvpCloseSession_13
+    403                  }
+    404                  else if (  (LAPKwpReadDiagnosticRequest(2) == cStartRoutine)
+    405                           &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReqRW_Lght)
+    406                           &&(LAPKwpReadDiagnosticRequest(4)==0x00)) // address MSB
+   \                     ??LAPDvpCloseSession_16:
+   \   011C   8E....         MOV       A,DATKwpRxBuffer+5
+   \   011F   4D00           CMP       A,#0
+   \   0121   AD03           BZ        $+5
+   \   0123   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0126   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0129   4D08           CMP       A,#8
+   \   012B   AD03           BZ        $+5
+   \   012D   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0130   8E....         MOV       A,DATKwpRxBuffer+7
+   \   0133   4D00           CMP       A,#0
+   \   0135   AD03           BZ        $+5
+   \   0137   9B....         BR        N:??LAPDvpCloseSession_11
+    407                  {
+    408                      u8TypeOfMemory = LAPKwpReadDiagnosticRequest(3);
+   \   013A   8E....         MOV       A,DATKwpRxBuffer+6
+   \   013D   9E....         MOV       u8TypeOfMemory,A
+    409                      u16AddressMemory = ((U16)(LAPKwpReadDiagnosticRequest(5))<<8) + \
+    410                                          (U16)(LAPKwpReadDiagnosticRequest(6));
+   \   0140   8E....         MOV       A,DATKwpRxBuffer+9
+   \   0143   76             MOV       L,A
+   \   0144   8E....         MOV       A,DATKwpRxBuffer+8
+   \   0147   A000           MOV       X,#0
+   \   0149   30             XCH       A,X
+   \   014A   610E           ADD       A,L
+   \   014C   30             XCH       A,X
+   \   014D   B6             POP       HL
+   \   014E   B1             PUSH      AX
+    411                      u8BufferSizeInByte = LAPKwpReadDiagnosticRequest(7);
+   \   014F   8E....         MOV       A,DATKwpRxBuffer+10
+   \   0152   9E....         MOV       u8BufferSizeInByte,A
+    412          
+    413                      
+    414                      if (  (u8TypeOfMemory == cDirectAccessEeprom) 
+    415                          &&(u8BufferSizeInByte != 0)&&(u8BufferSizeInByte <= cDATDeaMaxByte)
+    416                          &&((U16)(u8BufferSizeInByte+u16AddressMemory)<=cDATDeaSizeEeprom)  
+    417                          &&((u16AddressMemory&0x01) == 0)&&((u8BufferSizeInByte&0x01) == 0))
+   \   0155   8E....         MOV       A,u8TypeOfMemory
+   \   0158   4D05           CMP       A,#5
+   \   015A   BD72           BNZ       ??LAPDvpCloseSession_17
+   \   015C   8E....         MOV       A,u8BufferSizeInByte
+   \   015F   4D00           CMP       A,#0
+   \   0161   BD03           BNZ       $+5
+   \   0163   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0166   4D11           CMP       A,#17
+   \   0168   8D03           BC        $+5
+   \   016A   9B....         BR        N:??LAPDvpCloseSession_11
+   \   016D   891C           MOVW      AX,SP
+   \   016F   D6             MOVW      HL,AX
+   \   0170   87             MOV       A,[HL]
+   \   0171   70             MOV       X,A
+   \   0172   AE01           MOV       A,[HL+0x01]
+   \   0174   D6             MOVW      HL,AX
+   \   0175   8E....         MOV       A,u8BufferSizeInByte
+   \   0178   74             MOV       E,A
+   \   0179   67             MOV       A,H
+   \   017A   30             XCH       A,X
+   \   017B   610C           ADD       A,E
+   \   017D   30             XCH       A,X
+   \   017E   2D00           ADDC      A,#0
+   \   0180   EA0102         CMPW      AX,#513
+   \   0183   8D03           BC        $+5
+   \   0185   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0188   16....         MOVW      HL,#u8BufferSizeInByte
+   \   018B   87             MOV       A,[HL]
+   \   018C   5D01           AND       A,#1
+   \   018E   72             MOV       C,A
+   \   018F   891C           MOVW      AX,SP
+   \   0191   D6             MOVW      HL,AX
+   \   0192   87             MOV       A,[HL]
+   \   0193   5D01           AND       A,#1
+   \   0195   70             MOV       X,A
+   \   0196   62             MOV       A,C
+   \   0197   30             XCH       A,X
+   \   0198   6168           OR        A,X
+   \   019A   BD70           BNZ       ??LAPDvpCloseSession_11
+    418                      { 
+    419                          if(mDATRead(U8Bit,DATDeaActionIsFinished,Default) == cTrue)
+   \   019C   8E....         MOV       A,DATDeaActionIsFinished
+   \   019F   51             DEC       A
+   \   01A0   BD28           BNZ       ??LAPDvpCloseSession_18
+    420                          {
+    421                              u8Access = cRoutineRead;
+    422                              DVPTableStatutFunction[u8Access]=cLAPKwpRoutineInProgress;
+   \   01A2   A101           MOV       A,#1
+   \   01A4   9E....         MOV       DVPTableStatutFunction+1,A
+    423                              mDATWrite(U8Bit, DATDeaSizeBufferInByte, u8BufferSizeInByte, Default);
+   \   01A7   8E....         MOV       A,u8BufferSizeInByte
+   \   01AA   9E....         MOV       DATDeaSizeBufferInByte,A
+    424                              mDATWrite(U16Bit, DATDeaAddressInByte, u16AddressMemory, Default);
+   \   01AD   87             MOV       A,[HL]
+   \   01AE   70             MOV       X,A
+   \   01AF   AE01           MOV       A,[HL+0x01]
+   \   01B1   03....         MOVW      DATDeaAddressInByte,AX
+    425          
+    426                              mDATControl(DATDea, StartReadEepromByAddress);
+   \   01B4   9A....         CALL      DATDeaStartReadEepromByAddress
+    427          
+    428                              LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+   \   01B7   8E....         MOV       A,DATKwpRxBuffer+4
+   \   01BA   9E....         MOV       DATKwpTxBuffer+4,A
+    429                              LAPKwpWriteDiagnosticResponse(2,DVPTableStatutFunction[u8Access]);
+   \   01BD   8E....         MOV       A,DVPTableStatutFunction+1
+   \   01C0   9E....         MOV       DATKwpTxBuffer+5,A
+    430                              LAPKwpPreparePositiveResponse(3);
+   \   01C3   A103           MOV       A,#3
+   \   01C5   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   01C8   FA48           BR        ??LAPDvpCloseSession_13
+    431                          }
+    432                          else
+    433                          {
+    434                              u8RequestStatus = cLAPKwpConditionNotCorrect;
+   \                     ??LAPDvpCloseSession_18:
+   \   01CA   A422           MOV       E,#34
+   \   01CC   FA40           BR        ??LAPDvpCloseSession_19
+    435                          }
+    436          
+    437                      }
+    438                      else if(  ( ((u8TypeOfMemory == cDirectAccessRam)&&
+    439                                    mIsValidRamAddress(u16AddressMemory,u8BufferSizeInByte))
+    440                                 ||
+    441                                  ((u8TypeOfMemory == cDirectAccessRom)&&
+    442                                    mIsValidRomAddress(u16AddressMemory,u8BufferSizeInByte)) )
+    443                              &&(u8BufferSizeInByte <= cMaxReadBufferSize))
+   \                     ??LAPDvpCloseSession_17:
+   \   01CE   51             DEC       A
+   \   01CF   BD4B           BNZ       ??LAPDvpCloseSession_20
+   \   01D1   891C           MOVW      AX,SP
+   \   01D3   D6             MOVW      HL,AX
+   \   01D4   87             MOV       A,[HL]
+   \   01D5   70             MOV       X,A
+   \   01D6   AE01           MOV       A,[HL+0x01]
+   \   01D8   EA00E8         CMPW      AX,#59392
+   \   01DB   8D13           BC        ??LAPDvpCloseSession_21
+   \   01DD   8E....         MOV       A,u8BufferSizeInByte
+   \   01E0   74             MOV       E,A
+   \   01E1   A500           MOV       D,#0
+   \   01E3   AE01           MOV       A,[HL+0x01]
+   \   01E5   30             XCH       A,X
+   \   01E6   610C           ADD       A,E
+   \   01E8   30             XCH       A,X
+   \   01E9   2D00           ADDC      A,#0
+   \   01EB   EA00F8         CMPW      AX,#63488
+   \   01EE   8D4B           BC        ??LAPDvpCloseSession_22
+   \                     ??LAPDvpCloseSession_21:
+   \   01F0   87             MOV       A,[HL]
+   \   01F1   70             MOV       X,A
+   \   01F2   AE01           MOV       A,[HL+0x01]
+   \   01F4   EA00FB         CMPW      AX,#64256
+   \   01F7   8D13           BC        ??LAPDvpCloseSession_11
+   \   01F9   8E....         MOV       A,u8BufferSizeInByte
+   \   01FC   74             MOV       E,A
+   \   01FD   A500           MOV       D,#0
+   \   01FF   AE01           MOV       A,[HL+0x01]
+   \   0201   30             XCH       A,X
+   \   0202   610C           ADD       A,E
+   \   0204   30             XCH       A,X
+   \   0205   2D00           ADDC      A,#0
+   \   0207   EAE0FE         CMPW      AX,#65248
+   \   020A   8D2F           BC        ??LAPDvpCloseSession_22
+   \                     ??LAPDvpCloseSession_11:
+   \   020C   A412           MOV       E,#18
+    444                      {
+    445                          u8Access = cRoutineRead;
+    446                          // Double cast needed because CPU has 16-bit address field
+    447                          mLIBmemcpy(&DATKwpTxBuffer[6],(U8*)u16AddressMemory, u8BufferSizeInByte);
+    448                          LAPKwpPreparePositiveResponse((U8) (3 + u8BufferSizeInByte));
+    449          
+    450                          DVPTableStatutFunction[u8Access] = cLAPKwpRoutineTerminatedOK;
+    451                          LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+    452                          LAPKwpWriteDiagnosticResponse(2,DVPTableStatutFunction[u8Access]);
+    453                      }
+    454                      else
+    455                      {
+    456                          // Others memories no treated
+    457                          u8RequestStatus = cLAPKwpInvalidFormat;
+    458                      }
+    459                  }
+    460                  else
+    461                  {
+    462                      u8RequestStatus = cLAPKwpInvalidFormat;
+    463                  }
+    464                  break;
+    465          
+    466              case cLocalId_Write:
+    467                  
+    468                  if (  (LAPKwpReadDiagnosticRequest(2) == cReadRoutineStatus)
+    469                      &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == cSRBLIDReq_Lght))
+    470                  {
+    471                      // Request of the routine Status
+    472                      StatusRequest();
+    473                  }
+    474                  else if( (LAPKwpReadDiagnosticRequest(2) == cStartRoutine)
+    475                         &&(mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == (cSRBLIDReqRW_Lght + LAPKwpReadDiagnosticRequest(7)))
+    476                         &&(LAPKwpReadDiagnosticRequest(4)==0x00)) // address MSB
+    477                  {
+    478                      u8TypeOfMemory  =  LAPKwpReadDiagnosticRequest(3);
+    479                      u16AddressMemory = ((U16)(LAPKwpReadDiagnosticRequest(5))<<8) + \
+    480                                          (U16)(LAPKwpReadDiagnosticRequest(6));
+    481                      u8BufferSizeInByte = LAPKwpReadDiagnosticRequest(7);
+    482          
+    483                      if (  (u8TypeOfMemory == cDirectAccessEeprom)
+    484                          &&( mDATRead(U8Bit,DATKwpRxFrameLgth,Default) == (cSRBLIDReqRW_Lght + u8BufferSizeInByte)) 
+    485                          &&(u8BufferSizeInByte != 0)&&(u8BufferSizeInByte <= cDATDeaMaxByte)
+    486                          &&((U16)(u8BufferSizeInByte+u16AddressMemory)<=cDATDeaSizeEeprom)  
+    487                          &&((u16AddressMemory&0x01) == 0)&&((u8BufferSizeInByte&0x01) == 0))
+    488                      { 
+    489                          
+    490                          if(mDATRead(U8Bit,DATDeaActionIsFinished,Default) == cTrue)
+    491                          {
+    492                              u8Access = cRoutineWrite;
+    493                              DVPTableStatutFunction[u8Access]=cLAPKwpRoutineInProgress;
+    494                              mDATWrite (U8Bit, DATDeaSizeBufferInByte, u8BufferSizeInByte, Default);
+    495                              mDATWrite  (U16Bit, DATDeaAddressInByte, u16AddressMemory, Default);
+    496          
+    497                              for (u8Index=0;u8Index<u8BufferSizeInByte;u8Index++)
+    498                              {
+    499                                  mDATWriteBuffer(DATDeaBufferU8Bit,u8Index, LAPKwpReadDiagnosticRequest (8+u8Index), Default);
+    500                              }
+    501                              mDATControl (DATDea, StartWriteEepromByAddress);
+    502                              bWritingIsDone = cTrue;
+    503                          }
+    504                          else
+    505                          {
+    506                              u8RequestStatus = cLAPKwpConditionNotCorrect;
+    507                          }
+    508                          
+    509                          LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+    510                          LAPKwpWriteDiagnosticResponse(2,DVPTableStatutFunction[u8Access]);
+    511                          LAPKwpPreparePositiveResponse(3);
+    512                      }
+    513                      else if(  (u8TypeOfMemory == cDirectAccessRam)
+    514                              && mIsValidRamAddress(u16AddressMemory,u8BufferSizeInByte))
+    515                      {
+    516                          u8Access = cRoutineWrite;
+    517                          // Double cast needed because CPU has 16-bit address field
+    518                          mLIBmemcpy((U8*)u16AddressMemory,&DATKwpRxBuffer[11], u8BufferSizeInByte); 
+    519          
+    520                          DVPTableStatutFunction[u8Access] = cLAPKwpRoutineTerminatedOK;               
+    521                          LAPKwpPreparePositiveResponse((U8)3);
+    522                          LAPKwpWriteDiagnosticResponse(1,LAPKwpReadDiagnosticRequest(1));
+    523                          LAPKwpWriteDiagnosticResponse(2,DVPTableStatutFunction[u8Access]);
+    524                      }
+    525                      else
+    526                      {
+    527                          // Others memories no treated
+    528                          u8RequestStatus = cLAPKwpInvalidFormat;
+    529                      }
+    530                  }
+    531                  else    
+    532                  {
+    533                      u8RequestStatus = cLAPKwpInvalidFormat;
+    534                  }
+    535                  break;
+    536          
+    537              default:
+    538                  u8RequestStatus = cLAPKwpInvalidFormat;
+    539                  break;
+    540              }
+    541          
+    542          
+    543              if (u8RequestStatus != cLAPKwpServiceIsCorrect)
+    544              {
+    545                  // Prepare Reponse negative : Format Invalide
+    546                  LAPKwpPrepareNegativeResponse(u8RequestStatus);
+   \                     ??LAPDvpCloseSession_19:
+   \   020E   64             MOV       A,E
+   \   020F   9A....         CALL      LAPKwpPrepareNegativeResponse
+    547              }    
+    548              LAPKwpSetServiceIsFinished();
+   \                     ??LAPDvpCloseSession_13:
+   \   0212   A103           MOV       A,#3
+   \   0214   9E....         MOV       u8LAPKwpRequestStatus,A
+    549          
+    550          }
+   \   0217   ..             CALLT     [__T_?FUNC_DEALL_L06]
+   \   0218   0A00           DW        0xA
+   \   021A   B2             POP       BC
+   \   021B   AF             RET       
+   \                     ??LAPDvpCloseSession_20:
+   \   021C   8E....         MOV       A,u8TypeOfMemory
+   \   021F   4D03           CMP       A,#3
+   \   0221   BDE9           BNZ       ??LAPDvpCloseSession_11
+   \   0223   8E....         MOV       A,u8BufferSizeInByte
+   \   0226   74             MOV       E,A
+   \   0227   A500           MOV       D,#0
+   \   0229   891C           MOVW      AX,SP
+   \   022B   D6             MOVW      HL,AX
+   \   022C   87             MOV       A,[HL]
+   \   022D   70             MOV       X,A
+   \   022E   AE01           MOV       A,[HL+0x01]
+   \   0230   30             XCH       A,X
+   \   0231   610C           ADD       A,E
+   \   0233   30             XCH       A,X
+   \   0234   2D00           ADDC      A,#0
+   \   0236   EA00C0         CMPW      AX,#49152
+   \   0239   9DD1           BNC       ??LAPDvpCloseSession_11
+   \                     ??LAPDvpCloseSession_22:
+   \   023B   8E....         MOV       A,u8BufferSizeInByte
+   \   023E   4D40           CMP       A,#64
+   \   0240   9DCA           BNC       ??LAPDvpCloseSession_11
+   \   0242   74             MOV       E,A
+   \   0243   891C           MOVW      AX,SP
+   \   0245   D6             MOVW      HL,AX
+   \   0246   87             MOV       A,[HL]
+   \   0247   70             MOV       X,A
+   \   0248   AE01           MOV       A,[HL+0x01]
+   \   024A   D2             MOVW      BC,AX
+   \   024B   10....         MOVW      AX,#DATKwpTxBuffer+6
+   \   024E   9A....         CALL      memcpy
+   \   0251   A103           MOV       A,#3
+   \   0253   08....         ADD       A,u8BufferSizeInByte
+   \   0256   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   0259   A102           MOV       A,#2
+   \   025B   9E....         MOV       DVPTableStatutFunction+1,A
+   \   025E   8E....         MOV       A,DATKwpRxBuffer+4
+   \   0261   9E....         MOV       DATKwpTxBuffer+4,A
+   \   0264   A102           MOV       A,#2
+   \   0266   16....         MOVW      HL,#DATKwpTxBuffer+5
+   \   0269   97             MOV       [HL],A
+   \   026A   FAA6           BR        ??LAPDvpCloseSession_13
+   \                     ??LAPDvpCloseSession_8:
+   \   026C   8E....         MOV       A,DATKwpRxBuffer+5
+   \   026F   51             DEC       A
+   \   0270   BD03           BNZ       $+5
+   \   0272   9B....         BR        N:??LAPDvpTreatStartRoutineByLocalIdentifierServi_2
+   \   0275   8E....         MOV       A,DATKwpRxBuffer+5
+   \   0278   4D00           CMP       A,#0
+   \   027A   BD90           BNZ       ??LAPDvpCloseSession_11
+   \   027C   8E....         MOV       A,DATKwpRxBuffer+10
+   \   027F   70             MOV       X,A
+   \   0280   A100           MOV       A,#0
+   \   0282   CA0800         ADDW      AX,#8
+   \   0285   D6             MOVW      HL,AX
+   \   0286   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0289   A000           MOV       X,#0
+   \   028B   611E           SUB       A,L
+   \   028D   30             XCH       A,X
+   \   028E   613F           SUBC      A,H
+   \   0290   6168           OR        A,X
+   \   0292   AD03           BZ        $+5
+   \   0294   9B....         BR        N:??LAPDvpCloseSession_11
+   \   0297   8E....         MOV       A,DATKwpRxBuffer+7
+   \   029A   4D00           CMP       A,#0
+   \   029C   AD03           BZ        $+5
+   \   029E   9B....         BR        N:??LAPDvpCloseSession_11
+   \   02A1   8E....         MOV       A,DATKwpRxBuffer+6
+   \   02A4   9E....         MOV       u8TypeOfMemory,A
+   \   02A7   8E....         MOV       A,DATKwpRxBuffer+9
+   \   02AA   76             MOV       L,A
+   \   02AB   8E....         MOV       A,DATKwpRxBuffer+8
+   \   02AE   A000           MOV       X,#0
+   \   02B0   30             XCH       A,X
+   \   02B1   610E           ADD       A,L
+   \   02B3   30             XCH       A,X
+   \   02B4   B6             POP       HL
+   \   02B5   B1             PUSH      AX
+   \   02B6   8E....         MOV       A,DATKwpRxBuffer+10
+   \   02B9   9E....         MOV       u8BufferSizeInByte,A
+   \   02BC   8E....         MOV       A,u8TypeOfMemory
+   \   02BF   4D05           CMP       A,#5
+   \   02C1   AD03           BZ        $+5
+   \   02C3   9B....         BR        N:??LAPDvpCloseSession_23
+   \   02C6   8E....         MOV       A,u8BufferSizeInByte
+   \   02C9   4D00           CMP       A,#0
+   \   02CB   BD03           BNZ       $+5
+   \   02CD   9B....         BR        N:??LAPDvpCloseSession_11
+   \   02D0   4D11           CMP       A,#17
+   \   02D2   8D03           BC        $+5
+   \   02D4   9B....         BR        N:??LAPDvpCloseSession_11
+   \   02D7   891C           MOVW      AX,SP
+   \   02D9   D6             MOVW      HL,AX
+   \   02DA   87             MOV       A,[HL]
+   \   02DB   70             MOV       X,A
+   \   02DC   AE01           MOV       A,[HL+0x01]
+   \   02DE   D6             MOVW      HL,AX
+   \   02DF   8E....         MOV       A,u8BufferSizeInByte
+   \   02E2   72             MOV       C,A
+   \   02E3   67             MOV       A,H
+   \   02E4   A300           MOV       B,#0
+   \   02E6   30             XCH       A,X
+   \   02E7   610A           ADD       A,C
+   \   02E9   30             XCH       A,X
+   \   02EA   2D00           ADDC      A,#0
+   \   02EC   EA0102         CMPW      AX,#513
+   \   02EF   8D03           BC        $+5
+   \   02F1   9B....         BR        N:??LAPDvpCloseSession_11
+   \   02F4   16....         MOVW      HL,#u8BufferSizeInByte
+   \   02F7   87             MOV       A,[HL]
+   \   02F8   5D01           AND       A,#1
+   \   02FA   72             MOV       C,A
+   \   02FB   891C           MOVW      AX,SP
+   \   02FD   D6             MOVW      HL,AX
+   \   02FE   87             MOV       A,[HL]
+   \   02FF   5D01           AND       A,#1
+   \   0301   70             MOV       X,A
+   \   0302   62             MOV       A,C
+   \   0303   30             XCH       A,X
+   \   0304   6168           OR        A,X
+   \   0306   AD03           BZ        $+5
+   \   0308   9B....         BR        N:??LAPDvpCloseSession_11
+   \   030B   8E....         MOV       A,DATDeaActionIsFinished
+   \   030E   51             DEC       A
+   \   030F   AD03           BZ        $+5
+   \   0311   9B....         BR        N:??LAPDvpCloseSession_24
+   \   0314   A101           MOV       A,#1
+   \   0316   A500           MOV       D,#0
+   \   0318   9E....         MOV       DVPTableStatutFunction,A
+   \   031B   8E....         MOV       A,u8BufferSizeInByte
+   \   031E   9E....         MOV       DATDeaSizeBufferInByte,A
+   \   0321   87             MOV       A,[HL]
+   \   0322   70             MOV       X,A
+   \   0323   AE01           MOV       A,[HL+0x01]
+   \   0325   03....         MOVW      DATDeaAddressInByte,AX
+   \   0328   10....         MOVW      AX,#DATDeaBufferU8Bit
+   \   032B   D6             MOVW      HL,AX
+   \   032C   891C           MOVW      AX,SP
+   \   032E   E6             XCHW      AX,HL
+   \   032F   BE05           MOV       [HL+0x05],A
+   \   0331   60             MOV       A,X
+   \   0332   BE04           MOV       [HL+0x04],A
+   \   0334   10....         MOVW      AX,#DATKwpRxBuffer+11
+   \   0337   D6             MOVW      HL,AX
+   \   0338   891C           MOVW      AX,SP
+   \   033A   E6             XCHW      AX,HL
+   \   033B   BE03           MOV       [HL+0x03],A
+   \   033D   60             MOV       A,X
+   \   033E   BE02           MOV       [HL+0x02],A
+   \   0340   891C           MOVW      AX,SP
+   \   0342   CA0600         ADDW      AX,#6
+   \   0345   D6             MOVW      HL,AX
+   \   0346   8E....         MOV       A,u8BufferSizeInByte
+   \   0349   A200           MOV       C,#0
+   \   034B   70             MOV       X,A
+   \   034C   63             MOV       A,B
+   \   034D   BE01           MOV       [HL+0x01],A
+   \   034F   60             MOV       A,X
+   \   0350   97             MOV       [HL],A
+   \   0351   C2             MOVW      AX,BC
+   \   0352   BE03           MOV       [HL+0x03],A
+   \   0354   BE02           MOV       [HL+0x02],A
+   \                     ??LAPDvpTreatStartRoutineByLocalIdentifierServi_3:
+   \   0356   891C           MOVW      AX,SP
+   \   0358   D6             MOVW      HL,AX
+   \   0359   AE04           MOV       A,[HL+0x04]
+   \   035B   70             MOV       X,A
+   \   035C   AE05           MOV       A,[HL+0x05]
+   \   035E   D6             MOVW      HL,AX
+   \   035F   B7             PUSH      HL
+   \   0360   B2             POP       BC
+   \   0361   891C           MOVW      AX,SP
+   \   0363   D6             MOVW      HL,AX
+   \   0364   AE02           MOV       A,[HL+0x02]
+   \   0366   70             MOV       X,A
+   \   0367   AE03           MOV       A,[HL+0x03]
+   \   0369   D6             MOVW      HL,AX
+   \   036A   87             MOV       A,[HL]
+   \   036B   B3             PUSH      BC
+   \   036C   B6             POP       HL
+   \   036D   97             MOV       [HL],A
+   \   036E   891C           MOVW      AX,SP
+   \   0370   D6             MOVW      HL,AX
+   \   0371   AE02           MOV       A,[HL+0x02]
+   \   0373   70             MOV       X,A
+   \   0374   AE03           MOV       A,[HL+0x03]
+   \   0376   D6             MOVW      HL,AX
+   \   0377   86             INCW      HL
+   \   0378   891C           MOVW      AX,SP
+   \   037A   E6             XCHW      AX,HL
+   \   037B   BE03           MOV       [HL+0x03],A
+   \   037D   60             MOV       A,X
+   \   037E   BE02           MOV       [HL+0x02],A
+   \   0380   AE04           MOV       A,[HL+0x04]
+   \   0382   70             MOV       X,A
+   \   0383   AE05           MOV       A,[HL+0x05]
+   \   0385   D6             MOVW      HL,AX
+   \   0386   86             INCW      HL
+   \   0387   891C           MOVW      AX,SP
+   \   0389   E6             XCHW      AX,HL
+   \   038A   BE05           MOV       [HL+0x05],A
+   \   038C   60             MOV       A,X
+   \   038D   BE04           MOV       [HL+0x04],A
+   \   038F   10FFFF         MOVW      AX,#65535
+   \   0392   D2             MOVW      BC,AX
+   \   0393   D6             MOVW      HL,AX
+   \   0394   891C           MOVW      AX,SP
+   \   0396   CA0600         ADDW      AX,#6
+   \   0399   E6             XCHW      AX,HL
+   \   039A   07             XCH       A,[HL]
+   \   039B   0F             ADD       A,[HL]
+   \   039C   97             MOV       [HL],A
+   \   039D   30             XCH       A,X
+   \   039E   DE01           XCH       A,[HL+0x01]
+   \   03A0   2901           ADDC      A,[HL+0x01]
+   \   03A2   BE01           MOV       [HL+0x01],A
+   \   03A4   E2             XCHW      AX,BC
+   \   03A5   DE02           XCH       A,[HL+0x02]
+   \   03A7   2902           ADDC      A,[HL+0x02]
+   \   03A9   BE02           MOV       [HL+0x02],A
+   \   03AB   30             XCH       A,X
+   \   03AC   DE03           XCH       A,[HL+0x03]
+   \   03AE   2903           ADDC      A,[HL+0x03]
+   \   03B0   BE03           MOV       [HL+0x03],A
+   \   03B2   E2             XCHW      AX,BC
+   \   03B3   B5             PUSH      DE
+   \   03B4   6160           OR        X,A
+   \   03B6   62             MOV       A,C
+   \   03B7   6160           OR        X,A
+   \   03B9   63             MOV       A,B
+   \   03BA   6160           OR        X,A
+   \   03BC   B4             POP       DE
+   \   03BD   BD97           BNZ       ??LAPDvpTreatStartRoutineByLocalIdentifierServi_3
+   \   03BF   9A....         CALL      DATDeaStartWriteEepromByAddress
+   \   03C2   A101           MOV       A,#1
+   \   03C4   9E....         MOV       bWritingIsDone,A
+   \   03C7   FA02           BR        ??LAPDvpCloseSession_25
+   \                     ??LAPDvpCloseSession_24:
+   \   03C9   A422           MOV       E,#34
+   \                     ??LAPDvpCloseSession_25:
+   \   03CB   8E....         MOV       A,DATKwpRxBuffer+4
+   \   03CE   9E....         MOV       DATKwpTxBuffer+4,A
+   \   03D1   65             MOV       A,D
+   \   03D2   A000           MOV       X,#0
+   \   03D4   30             XCH       A,X
+   \   03D5   CA....         ADDW      AX,#DVPTableStatutFunction
+   \   03D8   D6             MOVW      HL,AX
+   \   03D9   87             MOV       A,[HL]
+   \   03DA   9E....         MOV       DATKwpTxBuffer+5,A
+   \   03DD   A103           MOV       A,#3
+   \   03DF   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   03E2   64             MOV       A,E
+   \   03E3   4D00           CMP       A,#0
+   \   03E5   AD03           BZ        $+5
+   \   03E7   9B....         BR        N:??LAPDvpCloseSession_19
+   \   03EA   9B....         BR        N:??LAPDvpCloseSession_13
+   \                     ??LAPDvpCloseSession_23:
+   \   03ED   51             DEC       A
+   \   03EE   AD03           BZ        $+5
+   \   03F0   9B....         BR        N:??LAPDvpCloseSession_11
+   \   03F3   891C           MOVW      AX,SP
+   \   03F5   D6             MOVW      HL,AX
+   \   03F6   87             MOV       A,[HL]
+   \   03F7   70             MOV       X,A
+   \   03F8   AE01           MOV       A,[HL+0x01]
+   \   03FA   EA00E8         CMPW      AX,#59392
+   \   03FD   8D13           BC        ??LAPDvpCloseSession_26
+   \   03FF   8E....         MOV       A,u8BufferSizeInByte
+   \   0402   74             MOV       E,A
+   \   0403   A500           MOV       D,#0
+   \   0405   AE01           MOV       A,[HL+0x01]
+   \   0407   30             XCH       A,X
+   \   0408   610C           ADD       A,E
+   \   040A   30             XCH       A,X
+   \   040B   2D00           ADDC      A,#0
+   \   040D   EA00F8         CMPW      AX,#63488
+   \   0410   8D22           BC        ??LAPDvpCloseSession_27
+   \                     ??LAPDvpCloseSession_26:
+   \   0412   87             MOV       A,[HL]
+   \   0413   70             MOV       X,A
+   \   0414   AE01           MOV       A,[HL+0x01]
+   \   0416   EA00FB         CMPW      AX,#64256
+   \   0419   9D03           BNC       $+5
+   \   041B   9B....         BR        N:??LAPDvpCloseSession_11
+   \   041E   8E....         MOV       A,u8BufferSizeInByte
+   \   0421   74             MOV       E,A
+   \   0422   A500           MOV       D,#0
+   \   0424   AE01           MOV       A,[HL+0x01]
+   \   0426   30             XCH       A,X
+   \   0427   610C           ADD       A,E
+   \   0429   30             XCH       A,X
+   \   042A   2D00           ADDC      A,#0
+   \   042C   EAE0FE         CMPW      AX,#65248
+   \   042F   8D03           BC        $+5
+   \   0431   9B....         BR        N:??LAPDvpCloseSession_11
+   \                     ??LAPDvpCloseSession_27:
+   \   0434   12....         MOVW      BC,#DATKwpRxBuffer+11
+   \   0437   87             MOV       A,[HL]
+   \   0438   70             MOV       X,A
+   \   0439   AE01           MOV       A,[HL+0x01]
+   \   043B   9A....         CALL      memcpy
+   \   043E   A102           MOV       A,#2
+   \   0440   9E....         MOV       DVPTableStatutFunction,A
+   \   0443   A103           MOV       A,#3
+   \   0445   9A....         CALL      LAPKwpPreparePositiveResponse
+   \   0448   8E....         MOV       A,DATKwpRxBuffer+4
+   \   044B   9E....         MOV       DATKwpTxBuffer+4,A
+   \   044E   8E....         MOV       A,DVPTableStatutFunction
+   \   0451   9E....         MOV       DATKwpTxBuffer+5,A
+   \   0454   9B....         BR        N:??LAPDvpCloseSession_13
+   \   0457                  REQUIRE ?CL78K_V4_6_L00
+    551          //============================================================================
+    552          //  DESCRIPTION :
+    553          //  
+    554          //  PARAMETERS (Type,Name,Min,Max) :  none
+    555          //
+    556          //  RETURN VALUE :  none
+    557          // 
+    558          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    559          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    560          MEM_TYPE void LAPDvpTreatStopRoutineByLocalIdentifierService(void)
+   \                     LAPDvpTreatStopRoutineByLocalIdentifierService:
+    561          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    562             LAPKwpSetServiceIsFinished();
+   \   0000   9B....         BR        N:?Subroutine0
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    563          }
+    564          
+    565          //============================================================================
+    566          //  DESCRIPTION :
+    567          //  
+    568          //  PARAMETERS (Type,Name,Min,Max) :  none
+    569          //
+    570          //  RETURN VALUE :  none
+    571          // 
+    572          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    573          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    574          MEM_TYPE void LAPDvpInitSession(void)
+   \                     LAPDvpInitSession:
+    575          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#DVPTableStatutFunction
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    576              // init des fonctions controlees en test fin chaine
+    577              mLIBmemset(DVPTableStatutFunction, cLAPKwpRoutineNotActivated, cDVPNbFunctionControled);
+   \   0004   140200         MOVW      DE,#2
+   \   0007   120000         MOVW      BC,#0
+   \   000A   9A....         CALL      memset
+    578          
+    579              bWritingIsDone = cFalse;
+   \   000D   A100           MOV       A,#0
+   \   000F   9E....         MOV       bWritingIsDone,A
+    580          }
+   \   0012   B2             POP       BC
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    581          //============================================================================
+    582          //  DESCRIPTION :
+    583          //  
+    584          //  PARAMETERS (Type,Name,Min,Max) :  none
+    585          //
+    586          //  RETURN VALUE :  none
+    587          // 
+    588          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    589          //============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    590          MEM_TYPE void LAPDvpCloseSession(void)
+   \                     LAPDvpCloseSession:
+    591          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    592              // Reset when the frame is sent
+    593              if (bWritingIsDone == cTrue)
+   \   0000   8E....         MOV       A,bWritingIsDone
+   \   0003   51             DEC       A
+   \   0004   BD03           BNZ       ??LAPDvpCloseSession_28
+    594              {
+    595                  mDATControl(Cpu, Reset);
+   \   0006   9A....         CALL      LDBReset
+    596              }
+    597          }
+   \                     ??LAPDvpCloseSession_28:
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_ENTER_L06:
+   \   0000   ....           DW       ?FUNC_ENTER_L06
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_DEALL_L06:
+   \   0000   ....           DW       ?FUNC_DEALL_L06
+    598          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     u8BufferSizeInByte                1
+     u8TypeOfMemory                    1
+     bWritingIsDone                    1
+     DVPTableStatutFunction            2
+     TabIdentifierServiceSupportedInDvpSession
+                                       3
+     TabServiceSupportedInDvpSession
+                                      12
+     StatusRequest                   133
+     LAPDvpTreatReadDataByLocalIdentifierService
+                                      47
+     ?Subroutine0                      6
+     LAPDvpTreatStartRoutineByLocalIdentifierService
+                                    1111
+     LAPDvpTreatStopRoutineByLocalIdentifierService
+                                       3
+     LAPDvpInitSession                20
+     LAPDvpCloseSession               10
+     __T_?FAR_FAST_CALL_L07            2
+     __T_?FUNC_ENTER_L06               2
+     __T_?FUNC_DEALL_L06               2
+
+ 
+ 1 330 bytes in segment BCODE
+     6 bytes in segment CLTVEC
+    15 bytes in segment CONST
+     5 bytes in segment NEAR_Z
+ 
+ 1 330 bytes of CODE  memory (+ 6 bytes shared)
+    15 bytes of CONST memory
+     5 bytes of DATA  memory
+
+Errors: none
+Warnings: none

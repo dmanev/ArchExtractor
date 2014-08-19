@@ -1,0 +1,191 @@
+//-------------------------------------------------------------------------
+//      XLINK command file template for 78K0 microcontroller uPD78F0536_64.
+//
+//      This filecan be used to link object files from the 78K0
+//      Assembler, A78K, and the C/C++ compiler ICC78K.
+//
+//      Project: X90_BCM
+//
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
+//      The following segments are defined in this link file:
+//
+//      INTVEC      -- Interrupt vectors.
+//      CLTVEC      -- Calltable vectors.
+//      RCODE       -- Code used by C/C++ startup and run-time library.
+//      FCODE       -- Code used by __callf functions.
+//      CODE        -- Code used by __non_banked, __interrupt and __callt functions.
+//      BCODE       -- Code used by __banked functions.
+//      CONST       -- Constants used by const.
+//      SADDR_x     -- Variables used by __saddr.
+//      NEAR_x      -- Variables used by __near.
+//      HEAP        -- The heap used for malloc and free
+//      SWITCH      -- Switch tables.
+//      DIFUNCT     -- Dynamic initialization vector used by C++
+//
+//      Where _x could be one of:
+//
+//      _Z      -- Initialized data (initvalue = 0 or without init value).
+//      _I      -- Initialized data (initvalue != 0).
+//      _ID     -- The inial values of _I.
+//      _N      -- Uninitialized data, used by __no_init.
+//
+//      Segments not mentioned here are project specific
+//
+//-------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------
+//      Definition of constants
+//-------------------------------------------------------------------------
+//Size of the stack
+-D_CSTACK_SIZE=278 // SIR LL#4: available internal RAM assigned to stack
+-D_CSTACK_END_ADDRESS=FE1F
+
+// Memory banks
+-D_CODEBANK_START=8000      // Logical start address of banked area
+-D_CODEBANK1_START=18000      // Logical start address of bank 1
+-D_CODEBANK2_START=28000      // Logical start address of bank 2
+-D_CODEBANK3_START=38000      // Logical start address of bank 3
+-D_REAL_CODEBANK_START=8000 // Physical start address of bank 0
+-D_REAL_CODEBANK1_START=C000 // Physical start address of bank 1
+-D_REAL_CODEBANK2_START=10000 // Physical start address of bank 2
+-D_REAL_CODEBANK3_START=14000 // Physical start address of bank 3
+-D_CODEBANK_END=BFFF        // Logical end address of banked area
+-D_CODEBANK1_END=1BFFF        // Logical end address of bank 1
+-D_CODEBANK2_END=2BFFF        // Logical end address of bank 2
+
+-D_CODEBANK_REG=FFF3        // Address of BANK switch register
+
+//BCODE segment definitions
+-D_BCODE_START=8208         // Logical start address of banked code in bank 0
+-D_BCODE_START1=18174       // Logical start address of banked code in bank 1
+-D_BCODE_START2=28174       // Logical start address of banked code in bank 2
+-D_BCODE_START3=38174       // Logical start address of banked code in bank 3 
+
+// The area between _CODEBANK_START and _BCODE_START can be used as common
+// memory area. Warning: this area shall be duplicated in all banks
+// For debug configuration BCODE can start at higher address because 
+// space for bootloader can be used by application
+
+// Following constants is defined in link.bat depending on configuration:
+// Application checksum (at the end of application)
+//-D_APPLICATION_CHECKSUM_START=... // checksum at the end of application
+//-D_CODEBANK3_END=3ABFF        // Logical end address of bank 3 (last 5k reserved for boot)
+
+//-------------------------------------------------------------------------
+//      Allocate the read only segments that are mapped to ROM.
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//      Interrupt vector segment.
+//-------------------------------------------------------------------------
+-Z(CODE)INTVEC=0000-003F
+
+//-------------------------------------------------------------------------
+//      CALLT table area.
+//-------------------------------------------------------------------------
+-Z(CODE)CLTVEC=0040-007F
+
+//-------------------------------------------------------------------------
+//      OPTION BYTE area.
+//-------------------------------------------------------------------------
+-Z(CODE)OPTBYTE=0080-0084
+
+//-------------------------------------------------------------------------
+//      CALLF functions code segment.
+//-------------------------------------------------------------------------
+-Z(CODE)FCODE=0800-0FFF
+
+//-------------------------------------------------------------------------
+//      Startup, Runtime-library, Non banked, Interrupt 
+//      and CALLT functions code segment.
+//-------------------------------------------------------------------------
+-Z(CODE)RCODE,CODE=0090-_APPLICATION_CHECKSUM_START
+
+//-------------------------------------------------------------------------
+//      Banked functions code segment.
+//-------------------------------------------------------------------------
+// Allocate banked segments
+-P(CODE)BCODE=_BCODE_START-_CODEBANK_END,_BCODE_START1-_CODEBANK1_END,_BCODE_START2-_CODEBANK2_END,_BCODE_START3-_CODEBANK3_END
+
+//-------------------------------------------------------------------------
+//      CHECKSUM segment
+//-------------------------------------------------------------------------
+-Z(CODE)CHECKSUM=_APPLICATION_CHECKSUM_START:+2
+
+//-------------------------------------------------------------------------
+//      Constant segments 
+//-------------------------------------------------------------------------
+-Z(CONST)CONST=0090-_APPLICATION_CHECKSUM_START
+-Z(CONST)SWITCH=_CODEBANK_START-_BCODE_START // beginning of bank 0
+-KSWITCH=10000,3 // duplicate segments in banks 1, 2 & 3
+// Duplication is needed because banking is used and the same content shall
+// persist in all banks
+
+//-------------------------------------------------------------------------
+//      Data initializer segments
+//-------------------------------------------------------------------------
+-Z(CONST)NEAR_ID,SADDR_ID=_CODEBANK_START-_BCODE_START
+// Duplication is not needed because segments are accessed on startup when
+// active bank is 0
+
+//-------------------------------------------------------------------------
+//      Allocate the read/write segments that are mapped to RAM.
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//      Internal extended RAM segment(s).
+//      Note: This segment(s) will not be automatically created
+//            and it will not be initialised by CSTARTUP!
+//-------------------------------------------------------------------------
+-Z(DATA)IXRAM=E800-F7FF
+
+//-------------------------------------------------------------------------
+//      Near data segments.
+//-------------------------------------------------------------------------
+// Place zero data in extended RAM
+// Note: extended RAM will be reset to zero in LDB_SUP.c
+// The initialization in LDB_SUPa.s26 must be disabled
+-Z(DATA)NEAR_Z=E800-F7FF
+
+// Place initialized and non-initialized data in internal RAM
+-Z(DATA)NEAR_I,NEAR_N=FB00-FE1F
+
+// Data is placed in the beginning of RAM and size used depends on the 
+// necessary amount of data. 
+// Note: if size of data exceeds 800 bytes (size of available internal RAM)
+// minus stack size there will be overlap with stack segment
+
+//-------------------------------------------------------------------------
+//      Stack segment (allocated from high to low addresses by default)
+//-------------------------------------------------------------------------
+// Place stack at the end: allocated starting from '_CSTACK_END_ADDRESS' 
+// reserving '_CSTACK_SIZE' bytes
+-Z(DATA)CSTACK+_CSTACK_SIZE#FB00-_CSTACK_END_ADDRESS
+
+// Stack is placed at the end of RAM in order to assure that there will
+// be unused space between stack and near data. If stack overflows it will
+// not as much as possible corrupt data.
+// Between CSTACK and NEAR_I/NEAR_N there will be unused space
+// Size of unused space is 800 bytes - stack size - (NEAR_I+NEAR_N)size
+
+// It is not advised to place stack at the beginning of RAM because
+// the SP can point only to internal RAM: if stack is placed at the 
+// beginning of RAM and it overflows (after SP reaches FB00) then SP 
+// will point to FEFF where general purpose registers are placed 
+// which is very dangerous.
+
+//-------------------------------------------------------------------------
+//      Workseg and short address data segments.
+//-------------------------------------------------------------------------
+-Z(DATA)WRKSEG=FE20-FEDF
+-Z(DATA)SADDR_I,SADDR_Z,SADDR_N=FE20-FEDF
+
+//-------------------------------------------------------------------------
+//      Shared data segments.
+//-------------------------------------------------------------------------
+// Data placed at the end of external RAM
+-Z(DATA)SHARED_RAM+10=F7F0-F7FF // data shared with bootloader
+
+//-------------------------------------------------------------------------
+//      End of File
+//-------------------------------------------------------------------------

@@ -1,0 +1,10 @@
+class StkCFileReqDATControlCriteria
+!!!232303.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+        for datControl in re.findall(r'mDATControl\s*\(\s*(\w+)\s*,\s*\w+\s*\)', inpTextContent):
+            pif = self.getPortInterfaceFactory()
+            dtf = self.getDataTypeFactory()            
+            clSrvIntIf = pif.getStkDATControlIf(datControl, dtf)
+            reqPort = PortInterface.RequiredPort.RequiredPort(clSrvIntIf)
+            reqPort.setName(datControl)
+            reqPort.setInterface(clSrvIntIf)
+            inoutIComponent.addPort(reqPort)            

@@ -1,0 +1,443 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:45 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TIMP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_TIMP.LST -o                       #
+#                    ..\EXE\TARGET_D\LDB_TIMP.R26                             #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TIMP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LDB_TIMP.LST                             #
+#    Object file  =  ..\EXE\TARGET_D\LDB_TIMP.R26                             #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_TIMP.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_TIM
+     12          //               Sleep mode timer management    
+     13          //               Example implementation of LDBTimPerfCntGetTime() 
+     14          //               high resolution timer
+     15          // -----------------------------------------------------------------------------
+     16          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_TIM/LDB_TIMP.C-arc  $
+     17          // 
+     18          //    Rev 1.3   Nov 17 2009 11:21:28   adzhelp
+     19          // Cm006675: Variables added and timer handling used in CPU trace configuration
+     20          // 
+     21          //    Rev 1.2   Apr 27 2009 15:14:46   adzhelp
+     22          // Cm003272: Sharing of sleep timer implemented
+     23          // 
+     24          //    Rev 1.1   Apr 16 2009 10:36:54   adzhelp
+     25          // Cm003276: Implementation of sleep mode timer management
+     26          // 
+     27          //    Rev 1.0   04 Feb 2009 17:03:24   adzhelp
+     28          // Initial revision.
+     29          //******************************************************************************
+     30          
+     31          //------------------------------------------------------------------------------
+     32          // Body Identification
+     33          //------------------------------------------------------------------------------
+     34          #define ldb_timp   "ldb_timp"
+     35          
+     36          //------------------------------------------------------------------------------
+     37          // Included files to resolve specific definitions in this file
+     38          //
+     39          // #include <system_file_name.h>
+     40          // #include "project_file_name.h"
+     41          //------------------------------------------------------------------------------
+     42          
+     43          #include "ldb.h"
+     44          #include "ldb_ioc.h"
+
+   \                                 In  segment SADDR_A, at 0xff1a
+   \   unsigned char volatile __saddr __no_bit_access CMP01
+   \                     CMP01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff6c
+   \   union <unnamed> volatile __sfr _A_TMHMD1
+   \                     _A_TMHMD1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+     45          #include "ldb_int.h"
+     46          #ifdef TOS_PERF_CNT_ENABLE
+     47           #include "TOS_PerfCnt.h"
+     48          #endif
+     49          #include "ldb_tim.h"
+     50          
+     51          //------------------------------------------------------------------------------
+     52          // Local constants
+     53          //
+     54          // #define cConstantName   ((tType) ConstantValue)
+     55          //------------------------------------------------------------------------------
+     56          
+     57          //------------------------------------------------------------------------------
+     58          // Local macros
+     59          //
+     60          // #define mMacroName   (MacroDefinition)
+     61          //------------------------------------------------------------------------------
+     62          
+     63          #ifdef TRACE_CPU_ACTIVE
+     64          // Select hardware timer
+     65          //to do...
+     66          
+     67          // Change to (1) if you want PerfCnt to trace its own interrupt
+     68          #define mSelfTrace              (0)
+     69          
+     70          #define mTraceCpuInterruptID INTTM50
+     71          #define cTCL50Init           0x06U // fprs/(2^8)
+     72          
+     73          // to do #define mGetOverflowFlag(Timer)
+     74          // to do #define mGetOverflowFlagx(Timer)
+     75          #endif
+     76          
+     77          //------------------------------------------------------------------------------
+     78          // Local types
+     79          //
+     80          // typedef Expression    tTypeName;
+     81          //------------------------------------------------------------------------------
+     82          
+     83          
+     84          //------------------------------------------------------------------------------
+     85          // Data prefix
+     86          //
+     87          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+     88          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+     89          //
+     90          // -----------------------------------------------------------------------------
+     91          // Local data
+     92          //
+     93          // static  tType   u8VariableName;  
+     94          // static  tType*  pu8VariableName; 
+     95          //------------------------------------------------------------------------------
+     96          #ifdef TOS_PERF_CNT_ENABLE
+     97          //to do: static volatile U16 u16TmrH;
+     98          #endif
+     99          
+    100          //------------------------------------------------------------------------------
+    101          // Constant local data
+    102          //
+    103          // static const tType  VariableName;
+    104          //------------------------------------------------------------------------------
+    105          
+    106          // select prescale value for HW timer
+    107          #define cPrescaleValue              0
+    108          
+    109          
+    110          #define cTimerResolutionInBits      16
+    111          
+    112          
+    113          //------------------------------------------------------------------------------
+    114          // Exported data
+    115          //
+    116          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    117          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    118          //------------------------------------------------------------------------------
+    119          #ifdef TRACE_CPU_ACTIVE
+    120          MEM_FAST volatile BOOL LDBHandleTimerOverflow;
+    121          MEM_FAST volatile tLDBHandleTimer LDBHandleTimeStamp;
+    122          #endif
+    123          
+    124          //------------------------------------------------------------------------------
+    125          // Constant exported data
+    126          //
+    127          //             (LAY: 3 characters to identify the layer)
+    128          //             (Cmp: 3 characters to identify this component)
+    129          // 
+    130          // const tType   LAYCmpVariableName;
+    131          //------------------------------------------------------------------------------
+    132          
+    133          //------------------------------------------------------------------------------
+    134          // Local function prototypes
+    135          // 
+    136          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    137          //------------------------------------------------------------------------------
+    138          
+    139          //==============================================================================
+    140          //=========================== LOCAL FUNCTIONS ==================================
+    141          //==============================================================================
+    142          
+    143          
+    144          //==============================================================================
+    145          //=========================== EXPORTED FUNCTIONS ===============================
+    146          //==============================================================================
+    147          
+    148          
+    149          //==============================================================================
+    150          // DESCRIPTION : Initialize high resolution timer
+    151          //
+    152          // PARAMETERS (Type,Name,Min,Max) :   none
+    153          //
+    154          // RETURN VALUE :   none
+    155          //
+    156          // DESIGN INFORMATION : Refer to Detailed Design Document
+    157          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    158          void LDBTimpInit(void)
+   \                     LDBTimpInit:
+    159          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    160          #ifdef TRACE_CPU_ACTIVE
+    161              mLDBIocWriteTrigger(Trigger50, (U8)~0U);
+    162              mLDBRegWrite8BitRegister(TCL50, cTCL50Init);
+    163              
+    164              mLDBIntClearIsrRequestFlag(mTraceCpuInterruptID);
+    165              mLDBIntEnableIsr(mTraceCpuInterruptID);
+    166              mLDBIocStartTimer(mLDBTraceCpuTimerID);
+    167          #endif
+    168          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    169          
+    170          //==============================================================================
+    171          // DESCRIPTION : Returns high resolution timer value in ticks
+    172          //
+    173          // PARAMETERS (Type,Name,Min,Max) :   none
+    174          //
+    175          // RETURN VALUE :   32 - bit rolling timer value
+    176          //
+    177          // DESIGN INFORMATION : Refer to Detailed Design Document
+    178          //==============================================================================
+    179          #ifdef TOS_PERF_CNT_ENABLE
+    180          U32 LDBTimPerfCntGetTime(void)
+    181          {
+    182          //to do...
+    183              return (1);
+    184          }
+    185          #endif
+    186          
+    187          //==============================================================================
+    188          // DESCRIPTION : Handle 8 bit hardware timer overflow and increase the 
+    189          //     higher word of high resolution 32 bit timer. 
+    190          //      mLDBIntEnterIsr and mLDBIntLeaveIsr are omitted intentionally, because
+    191          //      TraceCPU cannot measure its own execution
+    192          //
+    193          // PARAMETERS (Type,Name,Min,Max) :   none
+    194          //
+    195          // RETURN VALUE :   none
+    196          //
+    197          // DESIGN INFORMATION : Refer to Detailed Design Document
+    198          //==============================================================================
+    199          #ifdef TRACE_CPU_ACTIVE
+    200          mLDBIntDeclareIsr(mTraceCpuInterruptID)
+    201          {
+    202              // write some value to this variable to trigger trace event
+    203              // this will alert parser that overflow timer occurred.
+    204              LDBHandleTimerOverflow = cTrue;
+    205          }
+    206          #endif
+    207          
+    208          /*============================================================================
+    209            DESCRIPTION         : Start ldb_tim component
+    210            
+    211            PARAMETERS          : None
+    212            (Type,Name,Min,Max) 
+    213          
+    214            RETURN VALUE        : Always 0 for OSEK compatibility
+    215           
+    216            DESIGN INFORMATION  : Refer to Detailed Design Document
+    217            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    218          void LDBTimStartSlowTimer(void)
+   \                     LDBTimStartSlowTimer:
+    219          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    220              mLIBassert((cLDBSleepTick/cLDBHarSleepTickInNsRealTimeTimer) <
+    221                         (1UL << mLDBIocGetType(cLDBHarSleepRealTimeTimer)));
+    222              
+    223              // Initialize timer
+    224              mLDBIntGetInterruptTMH1(cLDBIntTimOwnerTMH1);
+   \   0000   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0003   4D02           CMP       A,#2
+   \   0005   AD07           BZ        ??LDBTimSleepInterruptRealTime_0
+   \   0007   4D00           CMP       A,#0
+   \   0009   AD03           BZ        ??LDBTimSleepInterruptRealTime_0
+   \   000B   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBTimSleepInterruptRealTime_0:
+   \   000E   A102           MOV       A,#2
+   \   0010   9E....         MOV       LDBIntInterruptOwnerTMH1,A
+    225              mLDBIocSetTimerModeIntervalTimer(cLDBHarSleepRealTimeTimer);
+   \   0013   713B6C         CLR1      0xFF6C.3
+   \   0016   712B6C         CLR1      0xFF6C.2
+    226              mLDBIocSelectClock(cLDBHarSleepRealTimeTimer, cLDBHarSleepRealTimeTimerPrescaler);
+   \   0019   716A6C         SET1      0xFF6C.6
+   \   001C   715B6C         CLR1      0xFF6C.5
+   \   001F   714A6C         SET1      0xFF6C.4
+    227          
+    228              // Start timer
+    229              mLDBIocWriteTrigger(cLDBHarSleepRealTimeTrigger,
+    230                                  ((cLDBSleepTick / cLDBHarSleepTickInNsRealTimeTimer)-1));
+   \   0022   111A24         MOV       S:0xFF1A,#36
+    231              mLDBIntClearIsrRequestFlag(cLDBHarSleepInterruptRealTimeIt);
+   \   0025   713BE1         CLR1      0xFFE1.3
+    232              mLDBIntEnableIsr(cLDBHarSleepInterruptRealTimeIt);
+   \   0028   7B1E           DI
+   \   002A   3B..           CLR1      S:LDBIntGroup1.3
+   \   002C   C8..00         CMP       S:LDBIntLevel,#0
+   \   002F   BD03           BNZ       ??LDBTimSleepInterruptRealTime_1
+   \   0031   713BE5         CLR1      0xFFE5.3
+   \                     ??LDBTimSleepInterruptRealTime_1:
+   \   0034   C8..02         CMP       S:LDBIntLevel,#2
+   \   0037   AD02           BZ        ??LDBTimSleepInterruptRealTime_2
+   \   0039   7A1E           EI
+    233              mLDBIocStartTimer(cLDBHarSleepRealTimeTimer);
+   \                     ??LDBTimSleepInterruptRealTime_2:
+   \   003B   717A6C         SET1      0xFF6C.7
+    234          }
+   \   003E   AF             RET       
+   \   003F                  REQUIRE ?CL78K_V4_6_L00
+   \   003F                  REQUIRE _A_IF0
+   \   003F                  REQUIRE _A_MK0
+   \   003F                  REQUIRE CMP01
+   \   003F                  REQUIRE _A_TMHMD1
+    235          
+    236          /*============================================================================
+    237            DESCRIPTION         : Stop ldb_tim component
+    238            
+    239            PARAMETERS          : None
+    240            (Type,Name,Min,Max) 
+    241          
+    242            RETURN VALUE        : Always 0 for OSEK compatibility
+    243           
+    244            DESIGN INFORMATION  : Refer to Detailed Design Document
+    245            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    246          void LDBTimStopSlowTimer(void)
+   \                     LDBTimStopSlowTimer:
+    247          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    248              mLDBIocStopTimer(cLDBHarSleepRealTimeTimer);
+   \   0000   717B6C         CLR1      0xFF6C.7
+    249              mLDBIntDisableIsr(cLDBHarSleepInterruptRealTimeIt);
+   \   0003   7B1E           DI
+   \   0005   3A..           SET1      S:LDBIntGroup1.3
+   \   0007   C8..00         CMP       S:LDBIntLevel,#0
+   \   000A   BD03           BNZ       ??LDBTimSleepInterruptRealTime_3
+   \   000C   713AE5         SET1      0xFFE5.3
+   \                     ??LDBTimSleepInterruptRealTime_3:
+   \   000F   C8..02         CMP       S:LDBIntLevel,#2
+   \   0012   AD02           BZ        ??LDBTimSleepInterruptRealTime_4
+   \   0014   7A1E           EI
+    250              mLDBIntReleaseInterruptTMH1(cLDBIntTimOwnerTMH1);
+   \                     ??LDBTimSleepInterruptRealTime_4:
+   \   0016   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0019   4D02           CMP       A,#2
+   \   001B   AD07           BZ        ??LDBTimSleepInterruptRealTime_5
+   \   001D   4D00           CMP       A,#0
+   \   001F   AD03           BZ        ??LDBTimSleepInterruptRealTime_5
+   \   0021   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBTimSleepInterruptRealTime_5:
+   \   0024   A100           MOV       A,#0
+   \   0026   9E....         MOV       LDBIntInterruptOwnerTMH1,A
+    251          }
+   \   0029   AF             RET       
+   \   002A                  REQUIRE ?CL78K_V4_6_L00
+   \   002A                  REQUIRE _A_MK0
+   \   002A                  REQUIRE _A_TMHMD1
+    252          
+    253          //==============================================================================
+    254          // DESCRIPTION : Real time interrupt for sleep mode
+    255          //
+    256          // PARAMETERS (Type,Name,Min,Max) :   none
+    257          //
+    258          // RETURN VALUE :   None
+    259          //
+    260          // DESIGN INFORMATION : Refer to Detailed Design Document
+    261          //==============================================================================
+    262          #ifndef X90_PROJECT
+    263          mLDBIntDeclareIsr(cLDBHarSleepInterruptRealTimeIt)
+    264          {
+    265              mLDBIntEnterIsr(cLDBHarSleepInterruptRealTimeIt);
+    266          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    267          void LDBTimSleepInterruptRealTime(void)
+   \                     LDBTimSleepInterruptRealTime:
+    268          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    269          #endif    
+    270              // IT clearing
+    271              mLDBIntClearIsrRequestFlag(cLDBHarSleepInterruptRealTimeIt);
+   \   0000   713BE1         CLR1      0xFFE1.3
+    272              mLaunchSleepItSequencedTimeOut();
+   \   0003   9A....         CALL      LDBSupCallBackSleepTimer
+   \   0006   9A....         CALL      LDBRfCallBackSleepTick
+    273          
+    274              mLauchTosSequencedTimeOut();
+   \   0009   9B....         BR        N:TOSAlaCallBackTimer
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+   \   000C                  REQUIRE _A_IF0
+    275          
+    276          #ifndef X90_PROJECT
+    277              mLDBIntLeaveIsr(cLDBHarSleepInterruptRealTimeIt);
+    278          #endif
+    279          }
+
+   Segment part sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     CMP01                           1
+     _A_TMHMD1                       1
+     _A_IF0                          2
+     _A_MK0                          2
+     LDBTimpInit                     1
+     LDBTimStartSlowTimer           63
+     LDBTimStopSlowTimer            42
+     LDBTimSleepInterruptRealTime   12
+
+ 
+ 118 bytes in segment CODE
+   5 bytes in segment NEAR_A
+   1 byte  in segment SADDR_A
+ 
+ 118 bytes of CODE memory
+   0 bytes of DATA memory (+ 6 bytes shared)
+
+Errors: none
+Warnings: none

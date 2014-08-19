@@ -1,0 +1,38 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      STK
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    TOS_SEQ
+//               JIL definitions
+// -----------------------------------------------------------------------------
+// $Date:   04 Feb 2009 17:03:08  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SEQ.JIL-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SEQ.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:03:08   adzhelp
+// Initial revision.
+*/
+//******************************************************************************
+#ifndef I_TOS_SEQ_JIL
+#define I_TOS_SEQ_JIL
+
+
+Component Tos_seq 
+{
+    OnControl = CallBack
+    {
+         Ctrl = "TOSInitialize";
+         Fct = "TOSSeqInitialize";
+    };
+};
+
+
+#endif /* I_TOS_SEQ_JIL */

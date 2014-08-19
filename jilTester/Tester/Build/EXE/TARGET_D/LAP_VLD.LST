@@ -1,0 +1,718 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:59 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_VLD.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_VLD.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_VLD.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_VLD.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_VLD.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_VLD.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_VLD.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LAP_VLD
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Mar 10 2010 12:46:50  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_VLD/LAP_VLD.c-arc  $
+     15          // $Revision:   1.15  $
+     16          // -----------------------------------------------------------------------------  
+     17          //  $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_VLD/LAP_VLD.c-arc  $
+     18          // 
+     19          //    Rev 1.15   Mar 10 2010 12:46:50   amanevd
+     20          // Cm007212: Code review corrections
+     21          // 
+     22          //    Rev 1.14   Feb 25 2010 17:02:54   adzhelp
+     23          // Cm007212:  HWP: Implementation of SC detection of Verlog LED in sleep mode mode to LAP_DLK
+     24          // 
+     25          //    Rev 1.13   Feb 25 2010 15:00:44   adzhelp
+     26          // Cm007634: VERLOG LED protection moved to LAP_DLK
+     27          // 
+     28          //    Rev 1.12   Feb 24 2010 15:47:08   adzhelp
+     29          // Cm007212:  HWP: Implementation of SC detection of Verlog LED in sleep mode
+     30          // 
+     31          //    Rev 1.11   Feb 10 2010 16:48:18   amanevd
+     32          // Cm007075: Volatile Faults and Deprotection cleared at IGN ON
+     33          // 
+     34          //    Rev 1.10   Jan 18 2010 14:02:42   amanevd
+     35          // Cm006833: portected state:
+     36          // 1,5s period, 0,66 Hz at 3,33% duty cycle (50ms led on)
+     37          // 
+     38          //    Rev 1.9   Dec 15 2009 10:53:42   amanevd
+     39          // Cm005566: LED_VERLOG is not turned off prior attempt to protect it
+     40          // 
+     41          //    Rev 1.8   Dec 14 2009 11:02:20   amanevd
+     42          // Cm005566: Full Hardware Protection
+     43          // 
+     44          //    Rev 1.7   Nov 04 2009 17:52:10   amanevd
+     45          // Cm005566: Simplified Protection
+     46          // 
+     47          //    Rev 1.6   May 21 2009 12:37:22   amanevd
+     48          // Cm003272 - CCover justification - NO IMPACT ON REAL CODE
+     49          // 
+     50          //    Rev 1.5   May 13 2009 14:41:20   amanevd
+     51          // Cm003272 - QAC fix - NO IMPACT ON REAL CODE
+     52          // 
+     53          //    Rev 1.4   May 07 2009 10:52:18   amanevd
+     54          // Cm003272 - Finishing part 3 - pre-integration
+     55          // 
+     56          //    Rev 1.3   Apr 29 2009 13:14:20   amanevd
+     57          // Cm003272 - Intermediate part 3 
+     58          // - PRS compliance
+     59          // 
+     60          //    Rev 1.2   Apr 24 2009 17:17:16   amanevd
+     61          // Cm003272 - Finishing part 2 - pre-integration
+     62          // 
+     63          //    Rev 1.1   Apr 22 2009 19:23:58   amanevd
+     64          // Cm003272 - Finishing part 1 - pre-integration
+     65          // 
+     66          //    Rev 1.0   Feb 23 2009 16:33:02   amanevd
+     67          // Initial revision.
+     68          //
+     69          //=============================================================================
+     70          
+     71          //-----------------------------------------------------------------------------
+     72          //  Body Identification
+     73          //-----------------------------------------------------------------------------
+     74          #define LAP_VLD  "LAP_VLD"
+     75          
+     76          //-----------------------------------------------------------------------------
+     77          //  Included files
+     78          //
+     79          //  #include <system_file_name.h>
+     80          //  #include "project_file_name.h"
+     81          //-----------------------------------------------------------------------------
+     82          #include "tos.h"
+     83          #include "dat.h"
+     84          #include "LAP_VLD.h"
+     85          #include "LAP_VLD.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPVldPatternManagement[3]
+   \                     LAPVldPatternManagement:
+   \   0000   ........       DW LAPVldNewLedPattern, LAPVldInitPattern
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPVldNewLedPattern, LAPVldInitPattern
+   \   000A   0201           DB 2, 1
+   \   000C   ........       DW LAPVldCurrentLedPattern, LAPVldTreatCurrentPattern
+   \   0010   FF01           DB 255, 1
+     86          
+     87          //-----------------------------------------------------------------------------
+     88          //  Local constants
+     89          //
+     90          //  #define cConstantName   ((tType) ConstantValue)
+     91          //-----------------------------------------------------------------------------
+     92          // Tempo value for different led pattern
+     93          #define cLedVerlogAlarmValueInUs    ((U32)20000UL)
+     94          
+     95          #define cGraphEngineSleepPeriodMs   ((U8)20)
+     96          
+     97          #define cTempo40ms                  ((U8)(40/cGraphEngineSleepPeriodMs))
+     98          #define cTempo1460ms                ((U8)(1460/cGraphEngineSleepPeriodMs))
+     99          
+    100          #define cTempo125ms                 ((U8)(130/cGraphEngineSleepPeriodMs))
+    101          
+    102          #define cTempo250ms                 ((U8)(260/cGraphEngineSleepPeriodMs))
+    103          
+    104          #define cLedOff                     ((BOOL) 0)
+    105          #define cLedOn                      ((BOOL) 1)
+    106          
+    107          // HW Protection
+    108          #define cMaxU8                      ((U8) 0xFFU)
+    109          
+    110          //-----------------------------------------------------------------------------
+    111          //  Local macros
+    112          //
+    113          //  #define mMacroName   (MacroDefinition)
+    114          //-----------------------------------------------------------------------------
+    115          
+    116          //-----------------------------------------------------------------------------
+    117          //  Local types
+    118          //
+    119          //  struct  sStructureName { ... };
+    120          //  union   uUnionName { ... };
+    121          //  enum    eEnumerationName { ... };
+    122          //  typedef Expression tTypeName;
+    123          //-----------------------------------------------------------------------------
+    124          
+    125          //-----------------------------------------------------------------------------
+    126          //  Local data
+    127          //
+    128          //  static  tType   VariableName;
+    129          //  static  tType*  pVariableName; 
+    130          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    131          static U8   u8CurrentLedPattern;
+   \                     u8CurrentLedPattern:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    132          static BOOL bLedState;
+   \                     bLedState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    133          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    134          static U8   u8LedTempoDuration;
+   \                     u8LedTempoDuration:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    135          
+    136          //-----------------------------------------------------------------------------
+    137          //  Constant local data
+    138          //
+    139          //  static const tType  VariableName;
+    140          //-----------------------------------------------------------------------------
+    141          
+    142          
+    143          //-----------------------------------------------------------------------------
+    144          //  Exported data
+    145          //
+    146          //  tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    147          //  tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    148          //-----------------------------------------------------------------------------
+    149          
+    150          
+    151          //-----------------------------------------------------------------------------
+    152          //  Constant exported data
+    153          //
+    154          //              (LAY: 3 characters to identify the layer)
+    155          //              (Cmp: 3 characters to identify this component)
+    156          // 
+    157          //  const tType   LAYCmpVariableName;
+    158          //-----------------------------------------------------------------------------
+    159          
+    160          
+    161          //-----------------------------------------------------------------------------
+    162          //  Local function prototypes
+    163          //  
+    164          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    165          //-----------------------------------------------------------------------------
+    166          static void SetVerlogLedOutput(const BOOL bStateP);
+    167          
+    168          #ifdef X90_PROJECT
+    169          static MEM_TYPE void LAPVldInitPattern_Static(void);
+    170          static MEM_TYPE void LAPVldTreatCurrentPattern_Static(void);
+    171          #endif
+    172          //=============================================================================
+    173          //=========================== LOCAL FUNCTIONS =================================
+    174          //=============================================================================
+    175          
+    176          //=============================================================================
+    177          //  DESCRIPTION :
+    178          //  
+    179          //  PARAMETERS (Type,Name,Min,Max) :   none
+    180          //
+    181          //  RETURN VALUE :   none
+    182          // 
+    183          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    184          //=============================================================================
+    185          //static type FunctionName(...)
+    186          
+    187          //=============================================================================
+    188          //  DESCRIPTION :
+    189          //  
+    190          //  PARAMETERS (Type,Name,Min,Max) :   none
+    191          //
+    192          //  RETURN VALUE :   none
+    193          // 
+    194          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    195          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    196          static void SetVerlogLedOutput(const BOOL bStateP)
+   \                     SetVerlogLedOutput:
+    197          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    198              mDATWrite(U1Bit, VERLOG_LED, bStateP, Default);
+   \   0001   4D00           CMP       A,#0
+   \   0003   AD0D           BZ        ??LAPVldInitialize_0
+   \   0005   2A..           SET1      S:DATPouSoftOutputBuffer.2
+   \   0007   8E....         MOV       A,bVERLOG_LEDDirectProtected
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD06           BNZ       ??LAPVldInitialize_1
+   \   000E   A109           MOV       A,#9
+   \   0010   FA04           BR        ??LAPVldInitialize_2
+   \                     ??LAPVldInitialize_0:
+   \   0012   2B..           CLR1      S:DATPouSoftOutputBuffer.2
+   \                     ??LAPVldInitialize_1:
+   \   0014   A10A           MOV       A,#10
+    199              mDATWrite(U1Bit, VERLOG_LEDDirect, bStateP, Default);
+   \                     ??LAPVldInitialize_2:
+   \   0016   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   0019   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   001B   ..             CALLT     [__T_?FAR_CALL_L07]
+    200          }
+   \   001C   B4             POP       DE
+   \   001D   AF             RET       
+   \   001E                  REQUIRE ?CL78K_V4_6_L00
+    201          
+    202          //=============================================================================
+    203          //============================ EXPORTED FUNCTIONS =============================
+    204          //=============================================================================
+    205          
+    206          //=============================================================================
+    207          //  DESCRIPTION : Read the led pattern
+    208          //                Switches the pattern and the led state, starts the timer with 
+    209          //                associated value switch ON or OFF the led
+    210          //  
+    211          //  PARAMETERS (Type,Name,Min,Max) :   none
+    212          //
+    213          //  RETURN VALUE :   none
+    214          // 
+    215          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    216          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    217          void LAPVldInitPattern(void)
+   \                     LAPVldInitPattern:
+    218          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    219          #ifdef X90_PROJECT
+    220              LAPVldInitPattern_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPVldInitPattern_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPVldInitPattern_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    221          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    222          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    223          static MEM_TYPE void LAPVldInitPattern_Static(void)
+   \                     LAPVldInitPattern_Static:
+    224          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    225          #endif
+    226              // Read the led pattern requested
+    227              u8CurrentLedPattern = mDATRead(U8Bit, LedVerlogPattern, Default);
+   \   0000   8E....         MOV       A,DATCmnImmoData+18
+   \   0003   9E....         MOV       u8CurrentLedPattern,A
+    228          
+    229              switch (u8CurrentLedPattern)
+   \   0006   4D01           CMP       A,#1
+   \   0008   AD30           BZ        ??LAPVldInitialize_8
+   \   000A   4D03           CMP       A,#3
+   \   000C   AD33           BZ        ??LAPVldInitialize_9
+   \   000E   4D04           CMP       A,#4
+   \   0010   AD0A           BZ        ??LAPVldInitialize_10
+   \   0012   4D05           CMP       A,#5
+   \   0014   AD12           BZ        ??LAPVldInitialize_11
+   \   0016   4D06           CMP       A,#6
+   \   0018   AD17           BZ        ??LAPVldInitialize_12
+   \   001A   FA29           BR        ??LAPVldInitialize_13
+    230              {
+    231                  case cDATVehicleProtectedVerlogPattern:
+    232                  bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_10:
+   \   001C   A101           MOV       A,#1
+   \   001E   9E....         MOV       bLedState,A
+    233                  u8LedTempoDuration  = cTempo40ms;
+   \   0021   A102           MOV       A,#2
+   \                     ??LAPVldInitPattern_Static_0:
+   \   0023   9E....         MOV       u8LedTempoDuration,A
+   \   0026   FA20           BR        ??LAPVldInitialize_14
+    234                  break;
+    235          
+    236                  case cDATLearningVerlogPattern:
+    237                  bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_11:
+   \   0028   A101           MOV       A,#1
+   \   002A   9E....         MOV       bLedState,A
+    238                  u8LedTempoDuration  = cTempo250ms;
+   \   002D   A10D           MOV       A,#13
+   \   002F   FAF2           BR        ??LAPVldInitPattern_Static_0
+    239                  break;
+    240          
+    241                  case cDATKeyNotRecognizedVerlogPattern:
+    242                  bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_12:
+   \   0031   A101           MOV       A,#1
+   \   0033   9E....         MOV       bLedState,A
+    243                  u8LedTempoDuration  = cTempo125ms;
+   \   0036   A106           MOV       A,#6
+   \   0038   FAE9           BR        ??LAPVldInitPattern_Static_0
+    244                  break;
+    245          
+    246                  case cDATSwitchOnVerlogPattern:
+    247                  bLedState   = cLedOn;
+   \                     ??LAPVldInitialize_8:
+   \   003A   A101           MOV       A,#1
+   \                     ??LAPVldInitPattern_Static_1:
+   \   003C   9E....         MOV       bLedState,A
+   \   003F   FA07           BR        ??LAPVldInitialize_14
+    248                  break;
+    249          
+    250                  case cDATSwitchOffVerlogPattern:
+    251                  bLedState   = cLedOff;
+   \                     ??LAPVldInitialize_9:
+   \   0041   A100           MOV       A,#0
+   \   0043   FAF7           BR        ??LAPVldInitPattern_Static_1
+    252                  break;
+    253          
+    254                  //CCOV: amanevd: Cannot be covered because this default case rises explicit assert
+    255                  default:
+    256                  mLIBassert(cFalse);
+   \                     ??LAPVldInitialize_13:
+   \   0045   9A....         CALL      LIBAssertionFailed
+    257                  break;
+    258              }
+    259          
+    260              SetVerlogLedOutput(bLedState);
+   \                     ??LAPVldInitialize_14:
+   \   0048   8E....         MOV       A,bLedState
+   \   004B   9B....         BR        N:SetVerlogLedOutput
+   \   004E                  REQUIRE ?CL78K_V4_6_L00
+    261          }
+    262          
+    263          //=============================================================================
+    264          //  DESCRIPTION : Switch the led state for blinking patterns
+    265          //  
+    266          //  PARAMETERS (Type,Name,Min,Max) :   none
+    267          //
+    268          //  RETURN VALUE :   none
+    269          // 
+    270          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    271          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    272          void LAPVldTreatCurrentPattern(void)
+   \                     LAPVldTreatCurrentPattern:
+    273          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    274          #ifdef X90_PROJECT
+    275              LAPVldTreatCurrentPattern_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPVldTreatCurrentPattern_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPVldTreatCurrentPattern_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    276          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    277          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    278          static MEM_TYPE void LAPVldTreatCurrentPattern_Static(void)
+   \                     LAPVldTreatCurrentPattern_Static:
+    279          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    280          #endif
+    281          
+    282              switch (u8CurrentLedPattern)
+   \   0000   8E....         MOV       A,u8CurrentLedPattern
+   \   0003   4D04           CMP       A,#4
+   \   0005   AD0A           BZ        ??LAPVldInitialize_15
+   \   0007   4D05           CMP       A,#5
+   \   0009   AD21           BZ        ??LAPVldInitialize_16
+   \   000B   4D06           CMP       A,#6
+   \   000D   AD30           BZ        ??LAPVldInitialize_17
+   \   000F   FA41           BR        ??LAPVldInitialize_18
+    283              {
+    284                  case cDATVehicleProtectedVerlogPattern:
+    285                  if (bLedState == cLedOn)
+   \                     ??LAPVldInitialize_15:
+   \   0011   8E....         MOV       A,bLedState
+   \   0014   51             DEC       A
+   \   0015   BD0C           BNZ       ??LAPVldInitialize_19
+    286                  {
+    287                      bLedState           = cLedOff;
+   \   0017   A100           MOV       A,#0
+   \   0019   9E....         MOV       bLedState,A
+    288                      u8LedTempoDuration  = cTempo1460ms;
+   \   001C   A149           MOV       A,#73
+   \                     ??LAPVldTreatCurrentPattern_Static_0:
+   \   001E   9E....         MOV       u8LedTempoDuration,A
+   \   0021   FA32           BR        ??LAPVldInitialize_20
+    289                  }
+    290                  else
+    291                  {
+    292                      bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_19:
+   \   0023   A101           MOV       A,#1
+   \   0025   9E....         MOV       bLedState,A
+    293                      u8LedTempoDuration  = cTempo40ms;
+   \   0028   A102           MOV       A,#2
+   \   002A   FAF2           BR        ??LAPVldTreatCurrentPattern_Static_0
+    294                  }
+    295                  break;
+    296          
+    297                  case cDATLearningVerlogPattern:
+    298                  if (bLedState == cLedOn)
+   \                     ??LAPVldInitialize_16:
+   \   002C   8E....         MOV       A,bLedState
+   \   002F   51             DEC       A
+   \   0030   BD09           BNZ       ??LAPVldInitialize_21
+    299                  {
+    300                      bLedState           = cLedOff;
+   \   0032   A100           MOV       A,#0
+   \                     ??LAPVldTreatCurrentPattern_Static_1:
+   \   0034   9E....         MOV       bLedState,A
+    301                      u8LedTempoDuration  = cTempo250ms;
+   \   0037   A10D           MOV       A,#13
+   \   0039   FAE3           BR        ??LAPVldTreatCurrentPattern_Static_0
+    302                  }
+    303                  else
+    304                  {
+    305                      bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_21:
+   \   003B   A101           MOV       A,#1
+   \   003D   FAF5           BR        ??LAPVldTreatCurrentPattern_Static_1
+    306                      u8LedTempoDuration  = cTempo250ms;
+    307                  }
+    308                  break;
+    309          
+    310                  case cDATKeyNotRecognizedVerlogPattern:
+    311                  if (bLedState == cLedOn)
+   \                     ??LAPVldInitialize_17:
+   \   003F   8E....         MOV       A,bLedState
+   \   0042   51             DEC       A
+   \   0043   BD09           BNZ       ??LAPVldInitialize_22
+    312                  {
+    313                      bLedState           = cLedOff;
+   \   0045   A100           MOV       A,#0
+   \                     ??LAPVldTreatCurrentPattern_Static_2:
+   \   0047   9E....         MOV       bLedState,A
+    314                      u8LedTempoDuration  = cTempo125ms;
+   \   004A   A106           MOV       A,#6
+   \   004C   FAD0           BR        ??LAPVldTreatCurrentPattern_Static_0
+    315                  }
+    316                  else
+    317                  {
+    318                      bLedState           = cLedOn;
+   \                     ??LAPVldInitialize_22:
+   \   004E   A101           MOV       A,#1
+   \   0050   FAF5           BR        ??LAPVldTreatCurrentPattern_Static_2
+    319                      u8LedTempoDuration  = cTempo125ms;
+    320                  }
+    321                  break;
+    322          
+    323                  //CCOV: amanevd: Cannot be covered because this default case rises explicit assert
+    324                  default:
+    325                  mLIBassert(cFalse);
+   \                     ??LAPVldInitialize_18:
+   \   0052   9A....         CALL      LIBAssertionFailed
+    326                  break;
+    327              }
+    328              SetVerlogLedOutput(bLedState);
+   \                     ??LAPVldInitialize_20:
+   \   0055   8E....         MOV       A,bLedState
+   \   0058   9B....         BR        N:SetVerlogLedOutput
+   \   005B                  REQUIRE ?CL78K_V4_6_L00
+    329          }
+    330          
+    331          //=============================================================================
+    332          //  DESCRIPTION : Test the end of a half pattern for blinking pattern
+    333          //  
+    334          //  PARAMETERS (Type,Name,Min,Max) :   none
+    335          //
+    336          //  RETURN VALUE :   none
+    337          // 
+    338          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    339          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    340          BOOL LAPVldCurrentLedPattern(void)
+   \                     LAPVldCurrentLedPattern:
+    341          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    342              return (   (u8CurrentLedPattern != cDATSwitchOnVerlogPattern)
+    343                      && (u8CurrentLedPattern != cDATSwitchOffVerlogPattern)
+    344                      && (u8LedTempoDuration == 0) );
+   \   0000   8E....         MOV       A,u8CurrentLedPattern
+   \   0003   51             DEC       A
+   \   0004   AD11           BZ        ??LAPVldInitialize_3
+   \   0006   8E....         MOV       A,u8CurrentLedPattern
+   \   0009   4D03           CMP       A,#3
+   \   000B   AD0A           BZ        ??LAPVldInitialize_3
+   \   000D   8E....         MOV       A,u8LedTempoDuration
+   \   0010   4D00           CMP       A,#0
+   \   0012   BD03           BNZ       ??LAPVldInitialize_3
+   \   0014   A101           MOV       A,#1
+   \   0016   AF             RET       
+   \                     ??LAPVldInitialize_3:
+   \   0017   A100           MOV       A,#0
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    345          }
+    346          
+    347          //=============================================================================
+    348          //  DESCRIPTION : Test if a new pattern is requested
+    349          //  
+    350          //  PARAMETERS (Type,Name,Min,Max) :   none
+    351          //
+    352          //  RETURN VALUE :   none
+    353          // 
+    354          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    355          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    356          BOOL LAPVldNewLedPattern(void)
+   \                     LAPVldNewLedPattern:
+    357          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    358              if (u8LedTempoDuration > 0)
+   \   0000   8E....         MOV       A,u8LedTempoDuration
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD04           BZ        ??LAPVldInitialize_4
+    359              {
+    360                  u8LedTempoDuration--;
+   \   0007   51             DEC       A
+   \   0008   9E....         MOV       u8LedTempoDuration,A
+    361              }
+    362              return (u8CurrentLedPattern != mDATRead(U8Bit, LedVerlogPattern, Default));
+   \                     ??LAPVldInitialize_4:
+   \   000B   8E....         MOV       A,u8CurrentLedPattern
+   \   000E   48....         CMP       A,DATCmnImmoData+18
+   \   0011   AD03           BZ        ??LAPVldInitialize_5
+   \   0013   A101           MOV       A,#1
+   \   0015   AF             RET       
+   \                     ??LAPVldInitialize_5:
+   \   0016   A100           MOV       A,#0
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    363          }
+    364          
+    365          //*****************************************************************************
+    366          //  DESCRIPTION         : Initialize the component
+    367          //
+    368          //  PARAMETERS          : None
+    369          //  (Type,Name,Min,Max) 
+    370          //
+    371          //  RETURN VALUE        : None
+    372          //
+    373          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    374          //
+    375          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    376          void LAPVldInitialize(void)
+   \                     LAPVldInitialize:
+    377          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    378              // Pattern must be 20 ms
+    379              mLIBassert((cGraphEngineSleepPeriodMs*1000UL) == cLedVerlogAlarmValueInUs);
+    380              mLIBassert(mDATRead(U1Bit, VERLOG_LED, Default) == cLedOff);
+   \   0000   3123..03       BF        S:DATPouSoftOutputBuffer.2, ??LAPVldInitialize_6
+   \   0004   9A....         CALL      LIBAssertionFailed
+    381              mLIBassert(mDATRead(U8Bit, LedVerlogPattern, Default) == cDATSwitchOffVerlogPattern);
+   \                     ??LAPVldInitialize_6:
+   \   0007   8E....         MOV       A,DATCmnImmoData+18
+   \   000A   4D03           CMP       A,#3
+   \   000C   AD03           BZ        ??LAPVldInitialize_7
+   \   000E   9A....         CALL      LIBAssertionFailed
+    382          
+    383              // Initialize the local variables
+    384              u8LedTempoDuration      = 0;
+   \                     ??LAPVldInitialize_7:
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       u8LedTempoDuration,A
+    385              u8CurrentLedPattern     = cDATSwitchOffVerlogPattern;
+   \   0016   A103           MOV       A,#3
+   \   0018   9E....         MOV       u8CurrentLedPattern,A
+    386              bLedState               = cLedOff;
+   \   001B   A100           MOV       A,#0
+   \   001D   9E....         MOV       bLedState,A
+    387             
+    388              mDATWrite(U1Bit, VERLOG_LEDProtection, 0, Default);
+   \   0020   9E....         MOV       bVERLOG_LEDDirectProtected,A
+   \   0023   A12D           MOV       A,#45
+   \   0025   2B..           CLR1      S:DATPouHardMaskBuffer.2
+    389          
+    390              TOSSeqActivateGraph(cTOSSeqGraphIdLAPVldPatternManagement);
+   \   0027   ..             CALLT     [__T_TOSSeqActivateGraph]
+    391          }
+   \   0028   AF             RET       
+   \   0029                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LAPVldPatternManagement          18
+     u8CurrentLedPattern               1
+     bLedState                         1
+     u8LedTempoDuration                1
+     SetVerlogLedOutput               30
+     LAPVldInitPattern                 9
+     LAPVldInitPattern_Static         78
+     LAPVldTreatCurrentPattern         9
+     LAPVldTreatCurrentPattern_Static
+                                      91
+     LAPVldCurrentLedPattern          26
+     LAPVldNewLedPattern              25
+     LAPVldInitialize                 41
+     __T_?FAR_CALL_L07                 2
+     __T_TOSSeqActivateGraph           2
+
+ 
+ 169 bytes in segment BCODE
+   4 bytes in segment CLTVEC
+ 140 bytes in segment CODE
+  18 bytes in segment CONST
+   3 bytes in segment NEAR_Z
+ 
+ 309 bytes of CODE  memory (+ 4 bytes shared)
+  18 bytes of CONST memory
+   3 bytes of DATA  memory
+
+Errors: none
+Warnings: none

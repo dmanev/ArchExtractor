@@ -1,0 +1,765 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:57 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_PWM.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_PWM.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_PWM.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_PWM.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_PWM.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_PWM.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_PWM.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LDB_PWM
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Oct 08 2009 18:26:50  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_PWM/LDB_PWM.c-arc  $
+     16          // $Revision:   1.4  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_PWM/LDB_PWM.c-arc  $
+     19          // 
+     20          //    Rev 1.4   Oct 08 2009 18:26:50   adzhelp
+     21          // Cm006468: Correct order of enable of flag controling interrupt
+     22          // 
+     23          //    Rev 1.3   Aug 18 2009 09:26:58   adzhelp
+     24          // Cm005205: Corrected problem on switching to 0%
+     25          // 
+     26          //    Rev 1.2   Jul 01 2009 09:57:54   adzhelp
+     27          // Cm005205: Corrected problem on switching between 100% -> 95% PWM
+     28          // 
+     29          //    Rev 1.1   Jun 30 2009 14:27:10   adzhelp
+     30          // Cm005205: Updates after integration test and unit test
+     31          // 
+     32          //    Rev 1.0   Jun 23 2009 15:26:22   amarinm1
+     33          // Initial revision.
+     34          //
+     35          //******************************************************************************
+     36          #endif
+     37          
+     38          //------------------------------------------------------------------------------
+     39          // Body Identification
+     40          //------------------------------------------------------------------------------
+     41          #define ldb_pwm   "ldb_pwm"
+     42          
+     43          //------------------------------------------------------------------------------
+     44          // Included files to resolve specific definitions in this file
+     45          //------------------------------------------------------------------------------
+     46          #include "ldb_reg.h"
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff1a
+   \   unsigned char volatile __saddr __no_bit_access CMP01
+   \                     CMP01:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff1b
+   \   unsigned char volatile __saddr __no_bit_access CMP11
+   \                     CMP11:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff6c
+   \   union <unnamed> volatile __sfr _A_TMHMD1
+   \                     _A_TMHMD1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+     47          #include "ldb_har.h"
+     48          #include "ldb_ioc.h"
+     49          #include "ldb_int.h"
+     50          #include "ldb_pwm.h"
+     51          #include "dat_pwmp.h"
+     52          
+     53          
+     54          //------------------------------------------------------------------------------
+     55          // Local constants
+     56          //------------------------------------------------------------------------------
+     57          
+     58          // length of DAT buffer to LDB in bytes
+     59          #define cDatMessageLength       ((U16)3)
+     60          
+     61          #define cMaxRatio               (U8)100
+     62          #define cu8RatioDivider         (U8)4
+     63          
+     64          #define cTimerTrigger           ((U8)((cLDBHarPwmTimerPeriodInNs / cLDBHarTickInNsPwmTimer) - 1UL))  // N=23
+     65          
+     66          //------------------------------------------------------------------------------
+     67          // Local macros
+     68          //------------------------------------------------------------------------------
+     69          // Set PWM duty cycle
+     70          // CMP11 = duty cycle / 4 - 1
+     71          // It is important that values 0 ... 3 are preset to 0 and 96...99 are preset to 100
+     72          #define mSetPwmDutyCycle(DutyCycle) \
+     73          { \
+     74              U8 RegDutyCycleValue = (((U8)(DutyCycle) / cu8RatioDivider) - 1); \
+     75              mLIBassert(RegDutyCycleValue < cTimerTrigger); /* M = 0...N-1 */\
+     76              mLDBIocSetPwmDutyCycle(cLDBHarPwmTimer, RegDutyCycleValue); \
+     77          }
+     78          
+     79          //------------------------------------------------------------------------------
+     80          // Local types
+     81          //------------------------------------------------------------------------------
+     82          
+     83          // This is an example:
+     84          // typedef Expression   tTypeName;
+     85          
+     86          //------------------------------------------------------------------------------
+     87          // Local data
+     88          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     89          static U8 u8OldPwmRatio;
+   \                     u8OldPwmRatio:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     90          static BOOL bKeepOutputActive;
+   \                     bKeepOutputActive:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     91          
+     92          //------------------------------------------------------------------------------
+     93          // Constant local data
+     94          //------------------------------------------------------------------------------
+     95          
+     96          // This is an example:
+     97          // static const tType  cConstantName;
+     98          
+     99          //------------------------------------------------------------------------------
+    100          // Exported data
+    101          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    102          BOOL bPwmIsFadingControlRequested;
+   \                     bPwmIsFadingControlRequested:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    103          
+    104          //------------------------------------------------------------------------------
+    105          // Constant exported data
+    106          //------------------------------------------------------------------------------
+    107          
+    108          // This is an example:
+    109          // Reduce to minimum the usage of extern constant data members!!!
+    110          // extern const tType  cLAYCmpConstantName;
+    111          // extern const U32    cu32LAYCmpConstantName;
+    112          
+    113          //------------------------------------------------------------------------------
+    114          // Local function prototypes
+    115          //------------------------------------------------------------------------------
+    116          
+    117          
+    118          //==============================================================================
+    119          //=========================== LOCAL FUNCTIONS ==================================
+    120          //==============================================================================
+    121          
+    122          
+    123          //==============================================================================
+    124          //=========================== EXPORTED FUNCTIONS ===============================
+    125          //==============================================================================
+    126          
+    127          //==============================================================================
+    128          // DESCRIPTION:         Initialization of PWM channel
+    129          //
+    130          // PARAMETERS:          None
+    131          //
+    132          // RETURN VALUE:        None
+    133          //
+    134          // DESIGN INFORMATION:  Refer to DCD
+    135          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    136          MEM_TYPE void LDBPwmInit( void )
+   \                     LDBPwmInit:
+    137          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    138              mLDBHarWrite(cLDBHarILLOutput, 0);
+   \   0000   A100           MOV       A,#0
+   \   0002   6B01           CLR1      S:0xFF01.6
+    139              mLDBHarConfig(cLDBHarILLOutput, cLDBHarOutput);
+   \   0004   716B21         CLR1      0xFF21.6
+    140              u8OldPwmRatio = 0;
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+   \   0007                  REQUIRE ?Subroutine0
+   \   0007                  REQUIRE _A_P1
+   \   0007                  REQUIRE _A_PM1
+   \   0007                  ; // Fall through to label ?Subroutine0
+    141              bPwmIsFadingControlRequested = cFalse;
+    142              bKeepOutputActive = cFalse;
+    143          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   9E....         MOV       u8OldPwmRatio,A
+   \   0003   9E....         MOV       bPwmIsFadingControlRequested,A
+   \   0006   9E....         MOV       bKeepOutputActive,A
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    144          
+    145          
+    146          //==============================================================================
+    147          // DESCRIPTION:         Leave sleep mode of PWM channel
+    148          //
+    149          // PARAMETERS:          None
+    150          //
+    151          // RETURN VALUE:        None
+    152          //
+    153          // DESIGN INFORMATION:  Refer to DCD
+    154          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    155          MEM_TYPE void LDBPwmLeaveSleepMode( void )
+   \                     LDBPwmLeaveSleepMode:
+    156          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    157              mLDBHarWrite(cLDBHarILLOutput, 0);
+   \   0000   6B01           CLR1      S:0xFF01.6
+    158          
+    159              // Initialization of Internal Lights output (Timer H1)
+    160          
+    161              // 1.Clear interrupt flag
+    162              //QACJ 3141: adzhelp: Warning comes from STK macro
+    163              mLDBIntClearIsrRequestFlag(cLDBHarPwmTimerIt);
+   \   0002   713BE1         CLR1      0xFFE1.3
+    164          
+    165          #ifdef X90_PROJECT
+    166              mLDBIntGetInterruptTMH1(cLDBIntTrpPwmOwnerTMH1);
+   \   0005   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0008   51             DEC       A
+   \   0009   AD0A           BZ        ??LDBPwmControlFadingIt_0
+   \   000B   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   000E   4D00           CMP       A,#0
+   \   0010   AD03           BZ        ??LDBPwmControlFadingIt_0
+   \   0012   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBPwmControlFadingIt_0:
+   \   0015   A101           MOV       A,#1
+   \   0017   9E....         MOV       LDBIntInterruptOwnerTMH1,A
+    167          #endif
+    168              
+    169              // 2. Enable interrupt
+    170              //QACJ 3141: adzhelp: Warning comes from STK macro
+    171              mLDBIntEnableIsr(cLDBHarPwmTimerIt);
+   \   001A   7B1E           DI
+   \   001C   3B..           CLR1      S:LDBIntGroup1.3
+   \   001E   C8..00         CMP       S:LDBIntLevel,#0
+   \   0021   BD03           BNZ       ??LDBPwmControlFadingIt_1
+   \   0023   713BE5         CLR1      0xFFE5.3
+   \                     ??LDBPwmControlFadingIt_1:
+   \   0026   C8..02         CMP       S:LDBIntLevel,#2
+   \   0029   AD02           BZ        ??LDBPwmControlFadingIt_2
+   \   002B   7A1E           EI
+    172              
+    173              // 3. Select PWM mode (TMMD10 = 0; TMMD11 = 1)
+    174              mLDBIocSetPWMMode(cLDBHarPwmTimer);
+   \                     ??LDBPwmControlFadingIt_2:
+   \   002D   A100           MOV       A,#0
+   \   002F   712B6C         CLR1      0xFF6C.2
+   \   0032   713A6C         SET1      0xFF6C.3
+    175          
+    176              // 5.Select input clock fPRS/2^12 = 3906.25Hz (CKS10 = 0; CKS11 = 0; CKS12 = 1)
+    177              //QACJ 3109: adzhelp: Warning comes from STK macro
+    178              mLDBIocSelectClock(cLDBHarPwmTimer, cLDBHarPwmTimerPrescaler);
+   \   0035   716A6C         SET1      0xFF6C.6
+   \   0038   715B6C         CLR1      0xFF6C.5
+   \   003B   714B6C         CLR1      0xFF6C.4
+    179          
+    180              // 6. Write trigger
+    181              //QACJ 0434: adzhelp: CMP01 is a MCU register identifier
+    182              //QACJ 3892: adzhelp: CMP01 is 8 bits like cTimerTrigger
+    183              mLDBIocWriteTrigger(cLDBHarPwmTimerTrigger, cTimerTrigger);
+   \   003E   111A17         MOV       S:0xFF1A,#23
+    184          
+    185              // 7. Prepare output
+    186              mLDBIocSetActiveLevel(cLDBHarPwmTimer, High);
+   \   0041   711B6C         CLR1      0xFF6C.1
+    187              mLDBIocPWMOutputDisable(cLDBHarPwmTimer);
+   \   0044   710B6C         CLR1      0xFF6C.0
+    188          
+    189              // 8. Start timer
+    190              mLDBIocStartTimer(cLDBHarPwmTimer);
+   \   0047   717A6C         SET1      0xFF6C.7
+    191          
+    192              u8OldPwmRatio = 0;
+   \   004A   9B....         BR        N:?Subroutine0
+   \   004D                  REQUIRE ?CL78K_V4_6_L00
+   \   004D                  REQUIRE _A_P1
+   \   004D                  REQUIRE CMP01
+   \   004D                  REQUIRE _A_TMHMD1
+   \   004D                  REQUIRE _A_IF0
+   \   004D                  REQUIRE _A_MK0
+    193              bPwmIsFadingControlRequested = cFalse;
+    194              bKeepOutputActive = cFalse;
+    195          }
+    196          
+    197          
+    198          //==============================================================================
+    199          // DESCRIPTION:         Enter sleep mode of PWM channel
+    200          //
+    201          // PARAMETERS:          None
+    202          //
+    203          // RETURN VALUE:        None
+    204          //
+    205          // DESIGN INFORMATION:  Refer to DCD
+    206          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    207          MEM_TYPE void LDBPwmEnterSleepMode( void )
+   \                     LDBPwmEnterSleepMode:
+    208          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    209              mLDBHarWrite(cLDBHarILLOutput, 0);
+   \   0000   6B01           CLR1      S:0xFF01.6
+    210              mLDBHarConfig(cLDBHarILLOutput, cLDBHarOutput);
+   \   0002   716B21         CLR1      0xFF21.6
+    211              
+    212              // Disable of Timer H1
+    213          
+    214              // 1.Disable interrupt
+    215              //QACJ 3141: adzhelp: Warning comes from STK macro
+    216              mLDBIntDisableIsr(cLDBHarPwmTimerIt);
+   \   0005   7B1E           DI
+   \   0007   3A..           SET1      S:LDBIntGroup1.3
+   \   0009   C8..00         CMP       S:LDBIntLevel,#0
+   \   000C   BD03           BNZ       ??LDBPwmControlFadingIt_3
+   \   000E   713AE5         SET1      0xFFE5.3
+   \                     ??LDBPwmControlFadingIt_3:
+   \   0011   C8..02         CMP       S:LDBIntLevel,#2
+   \   0014   AD02           BZ        ??LDBPwmControlFadingIt_4
+   \   0016   7A1E           EI
+    217              
+    218              // 2.Stop count operation before setting other registers (TMHE1 = 0)
+    219              mLDBIocStopTimer(cLDBHarPwmTimer);
+   \                     ??LDBPwmControlFadingIt_4:
+   \   0018   717B6C         CLR1      0xFF6C.7
+    220          
+    221              // 3.Disable the output (TOEN1 = 0)
+    222              mLDBIocPWMOutputDisable(cLDBHarPwmTimer);
+   \   001B   710B6C         CLR1      0xFF6C.0
+    223          
+    224          #ifdef X90_PROJECT
+    225              mLDBIntReleaseInterruptTMH1(cLDBIntTrpPwmOwnerTMH1);
+   \   001E   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0021   51             DEC       A
+   \   0022   AD0A           BZ        ??LDBPwmControlFadingIt_5
+   \   0024   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0027   4D00           CMP       A,#0
+   \   0029   AD03           BZ        ??LDBPwmControlFadingIt_5
+   \   002B   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBPwmControlFadingIt_5:
+   \   002E   A100           MOV       A,#0
+   \   0030   9E....         MOV       LDBIntInterruptOwnerTMH1,A
+    226          #endif
+    227          }
+   \   0033   AF             RET       
+   \   0034                  REQUIRE ?CL78K_V4_6_L00
+   \   0034                  REQUIRE _A_P1
+   \   0034                  REQUIRE _A_PM1
+   \   0034                  REQUIRE _A_TMHMD1
+   \   0034                  REQUIRE _A_MK0
+    228          
+    229          
+    230          //==============================================================================
+    231          // DESCRIPTION:         Send with address of PWM channl
+    232          //
+    233          // PARAMETERS:          tAddress AddrP - Address of PWM output, 
+    234          //                      tMsg pMsgP - Message of type tDATPwmStruct containg duty cycle (ratio)
+    235          //                      Freq is not used
+    236          //
+    237          // RETURN VALUE:        None
+    238          //
+    239          // DESIGN INFORMATION:  Refer to DCD
+    240          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    241          MEM_TYPE void LDBPwmSendWithAddr( const tAddress AddrP, const tMsg * const pMsgP )
+   \                     LDBPwmSendWithAddr:
+    242          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   D4             MOVW      DE,AX
+    243              tDATPwmStruct * pPwmConfigL;    
+    244              U8 u8Ratio;
+    245              
+    246              // Verify the validity of the message
+    247              mLIBassert(pMsgP          != NULL);
+   \   0001   C2             MOVW      AX,BC
+   \   0002   6168           OR        A,X
+   \   0004   BD03           BNZ       ??LDBPwmControlFadingIt_6
+   \   0006   9A....         CALL      LIBAssertionFailed
+    248              mLIBassert(pMsgP->pBuffer != NULL);
+   \                     ??LDBPwmControlFadingIt_6:
+   \   0009   C2             MOVW      AX,BC
+   \   000A   D6             MOVW      HL,AX
+   \   000B   87             MOV       A,[HL]
+   \   000C   70             MOV       X,A
+   \   000D   AE01           MOV       A,[HL+0x01]
+   \   000F   6168           OR        A,X
+   \   0011   BD03           BNZ       ??LDBPwmControlFadingIt_7
+   \   0013   9A....         CALL      LIBAssertionFailed
+    249              mLIBassert(pMsgP->Lng     == cDatMessageLength);
+   \                     ??LDBPwmControlFadingIt_7:
+   \   0016   C2             MOVW      AX,BC
+   \   0017   D6             MOVW      HL,AX
+   \   0018   AE02           MOV       A,[HL+0x02]
+   \   001A   70             MOV       X,A
+   \   001B   AE03           MOV       A,[HL+0x03]
+   \   001D   EA0300         CMPW      AX,#3
+   \   0020   AD03           BZ        ??LDBPwmControlFadingIt_8
+   \   0022   9A....         CALL      LIBAssertionFailed
+    250              
+    251            
+    252              //QACJ 0310: amarinm1: This is the original pointer type in DAT_PWM.c 
+    253              //QACJ 3305: amarinm1: This is the original pointer type in DAT_PWM.c 
+    254              //QACJ 0506: amarinm1: It is checked for NULL value in the assert above.
+    255              pPwmConfigL = (tDATPwmStruct *)pMsgP->pBuffer;
+    256              u8Ratio =(U8)(pPwmConfigL->Ratio);
+   \                     ??LDBPwmControlFadingIt_8:
+   \   0025   C2             MOVW      AX,BC
+   \   0026   D6             MOVW      HL,AX
+   \   0027   87             MOV       A,[HL]
+   \   0028   70             MOV       X,A
+   \   0029   AE01           MOV       A,[HL+0x01]
+   \   002B   D6             MOVW      HL,AX
+   \   002C   AE02           MOV       A,[HL+0x02]
+   \   002E   72             MOV       C,A
+    257          
+    258              // Verify the validity of the Cyclic ratio
+    259              mLIBassert(u8Ratio <= cMaxRatio);
+   \   002F   4D65           CMP       A,#101
+   \   0031   8D03           BC        ??LDBPwmControlFadingIt_9
+   \   0033   9A....         CALL      LIBAssertionFailed
+    260          
+    261          
+    262              switch(AddrP)
+   \                     ??LDBPwmControlFadingIt_9:
+   \   0036   C4             MOVW      AX,DE
+   \   0037   6168           OR        A,X
+   \   0039   BD65           BNZ       ??LDBPwmControlFadingIt_10
+    263              {
+    264                  case (tAddress)cPWM_ROOMLAMP_ID:
+    265                  if (u8OldPwmRatio == u8Ratio)
+   \   003B   8E....         MOV       A,u8OldPwmRatio
+   \   003E   614A           CMP       A,C
+   \   0040   AD61           BZ        ??LDBPwmControlFadingIt_11
+    266                  {
+    267                      // no change, do nothing
+    268                  }
+    269                  else if (u8Ratio == cMaxRatio)
+   \   0042   62             MOV       A,C
+   \   0043   4D64           CMP       A,#100
+   \   0045   BD09           BNZ       ??LDBPwmControlFadingIt_12
+    270                  {
+    271                      mLDBHarWrite(cLDBHarILLOutput, 1); // According to Figure 9-2. Block Diagram of 8-Bit Timer H1 (MCU Manual)
+   \   0047   A164           MOV       A,#100
+   \   0049   6A01           SET1      S:0xFF01.6
+    272                      // When P16 = 1 then output is always 1 (logical OR)
+    273                      u8OldPwmRatio = cMaxRatio;
+   \   004B   9E....         MOV       u8OldPwmRatio,A
+   \   004E   FA53           BR        ??LDBPwmControlFadingIt_11
+    274                  }
+    275                  else if (u8Ratio == 0)
+   \                     ??LDBPwmControlFadingIt_12:
+   \   0050   4D00           CMP       A,#0
+   \   0052   BD11           BNZ       ??LDBPwmControlFadingIt_13
+    276                  {
+    277                      u8OldPwmRatio = 0; // old value to be set before fading control requested
+   \   0054   A100           MOV       A,#0
+   \   0056   9E....         MOV       u8OldPwmRatio,A
+    278                      mLDBHarWrite(cLDBHarILLOutput, 0); // restore output latch
+   \   0059   A101           MOV       A,#1
+   \   005B   6B01           CLR1      S:0xFF01.6
+    279                      
+    280                      // Disable output immediately in order to prevent short parasitic pulse
+    281                      // Such pulse appears when timer output is disabled after interrupt request
+    282                      mLDBHarConfig(cLDBHarILLOutput, cLDBHarInput);  // safe when level on output is low
+   \   005D   716A21         SET1      0xFF21.6
+    283                      bPwmIsFadingControlRequested = cTrue;
+   \                     ??LDBPwmSendWithAddr_0:
+   \   0060   9E....         MOV       bPwmIsFadingControlRequested,A
+   \   0063   FA3E           BR        ??LDBPwmControlFadingIt_11
+    284                  }
+    285                  else // Ratio between 0 and 100
+    286                  {
+    287                      if ((u8OldPwmRatio == 0) || (u8OldPwmRatio == cMaxRatio))
+   \                     ??LDBPwmControlFadingIt_13:
+   \   0065   8E....         MOV       A,u8OldPwmRatio
+   \   0068   4D00           CMP       A,#0
+   \   006A   AD04           BZ        ??LDBPwmControlFadingIt_14
+   \   006C   4D64           CMP       A,#100
+   \   006E   BD19           BNZ       ??LDBPwmControlFadingIt_15
+    288                      {
+    289                          u8OldPwmRatio = u8Ratio; // old value to be set before fading control requested
+   \                     ??LDBPwmControlFadingIt_14:
+   \   0070   62             MOV       A,C
+   \   0071   9E....         MOV       u8OldPwmRatio,A
+    290                          // Update the duty cycle
+    291                          // NOTE: update of CMP11 during counter operation is not
+    292                          // taken into account until previous value has been reached 
+    293                          // by the clock counter. Also, even if the value is reached 
+    294                          // at the moment of writing, it takes at least 3 clock
+    295                          // cycles to update the register.
+    296                          //QACJ 3205: adzhelp: RegDutyCycleValue is used in STK macro
+    297                          //QACJ 3220: adzhelp: Macro implementation contains block declaration                
+    298                          //QACJ 3109: adzhelp: Warning comes from STK macro
+    299                          mSetPwmDutyCycle(u8Ratio);
+   \   0074   21             CLR1      CY
+   \   0075   25             RORC      A,0x1
+   \   0076   21             CLR1      CY
+   \   0077   25             RORC      A,0x1
+   \   0078   72             MOV       C,A
+   \   0079   52             DEC       C
+   \   007A   62             MOV       A,C
+   \   007B   4D17           CMP       A,#23
+   \   007D   8D03           BC        ??LDBPwmControlFadingIt_16
+   \   007F   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBPwmControlFadingIt_16:
+   \   0082   62             MOV       A,C
+   \   0083   F21B           MOV       S:0xFF1B,A
+    300                          bPwmIsFadingControlRequested = cTrue;
+   \   0085   A101           MOV       A,#1
+   \   0087   FAD7           BR        ??LDBPwmSendWithAddr_0
+    301                      }
+    302                      else
+    303                      {
+    304                          // Only duty cycle needs to be updated
+    305                          u8OldPwmRatio = u8Ratio;
+   \                     ??LDBPwmControlFadingIt_15:
+   \   0089   62             MOV       A,C
+   \   008A   9E....         MOV       u8OldPwmRatio,A
+    306                          // Update the duty cycle
+    307                          //QACJ 3205: adzhelp: RegDutyCycleValue is used in STK macro
+    308                          //QACJ 3220: adzhelp: Macro implementation contains block declaration                
+    309                          //QACJ 3109: adzhelp: Warning comes from STK macro
+    310                          mSetPwmDutyCycle(u8Ratio);
+   \   008D   21             CLR1      CY
+   \   008E   25             RORC      A,0x1
+   \   008F   21             CLR1      CY
+   \   0090   25             RORC      A,0x1
+   \   0091   72             MOV       C,A
+   \   0092   52             DEC       C
+   \   0093   62             MOV       A,C
+   \   0094   4D17           CMP       A,#23
+   \   0096   8D03           BC        ??LDBPwmControlFadingIt_17
+   \   0098   9A....         CALL      LIBAssertionFailed
+   \                     ??LDBPwmControlFadingIt_17:
+   \   009B   62             MOV       A,C
+   \   009C   F21B           MOV       S:0xFF1B,A
+   \   009E   FA03           BR        ??LDBPwmControlFadingIt_11
+    311                      }
+    312                  }
+    313                  break;
+    314            
+    315                  default:
+    316                  mLIBassert(cFalse);
+   \                     ??LDBPwmControlFadingIt_10:
+   \   00A0   9A....         CALL      LIBAssertionFailed
+    317              //QACJ 3352: amarinm1: It is easily expandable this way.
+    318              }
+    319          
+    320              DATPwmCallBackTxWithAddr(AddrP, cLDBCorrect);
+   \                     ??LDBPwmControlFadingIt_11:
+   \   00A3   C4             MOVW      AX,DE
+   \   00A4   A300           MOV       B,#0
+   \   00A6   9B....         BR        N:DATPwmCallBackTxWithAddr
+   \   00A9                  REQUIRE ?CL78K_V4_6_L00
+   \   00A9                  REQUIRE _A_P1
+   \   00A9                  REQUIRE CMP11
+   \   00A9                  REQUIRE _A_PM1
+    321          }
+    322          
+    323          //==============================================================================
+    324          // DESCRIPTION:         ISR of PWM timer
+    325          //
+    326          // PARAMETERS:          None
+    327          //
+    328          // RETURN VALUE:        None
+    329          //
+    330          // DESIGN INFORMATION:  Refer to DCD
+    331          //==============================================================================
+    332          #ifndef X90_PROJECT
+    333          mLDBIntDeclareIsr(cLDBHarPwmTimerIt)
+    334          {
+    335              //QACJ 3141: adzhelp: Warning comes from STK macro
+    336              mLDBIntEnterIsr(cLDBHarPwmTimerIt);
+    337          
+    338              if (mLDBPwmIsFadingControlRequested())
+    339              {
+    340          
+    341          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    342          void LDBPwmControlFadingIt(void)
+   \                     LDBPwmControlFadingIt:
+    343          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    344          #endif
+    345          
+    346                  if (u8OldPwmRatio == 0)
+   \   0000   8E....         MOV       A,u8OldPwmRatio
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD12           BNZ       ??LDBPwmControlFadingIt_18
+    347                  {
+    348                      // Switch to 0% PWM
+    349                      // 1.Stop count operation before setting other registers
+    350                      mLDBIocStopTimer(cLDBHarPwmTimer);
+   \   0007   A100           MOV       A,#0
+   \   0009   717B6C         CLR1      0xFF6C.7
+    351                      // 2. Disable output
+    352                      mLDBIocPWMOutputDisable(cLDBHarPwmTimer);
+   \   000C   710B6C         CLR1      0xFF6C.0
+    353                      // 3. Start timer
+    354                      mLDBIocStartTimer(cLDBHarPwmTimer);
+   \   000F   717A6C         SET1      0xFF6C.7
+    355                      bPwmIsFadingControlRequested = cFalse;
+   \   0012   9E....         MOV       bPwmIsFadingControlRequested,A
+    356          
+    357                      // restore output
+    358                      mLDBHarConfig(cLDBHarILLOutput, cLDBHarOutput);
+   \   0015   716B21         CLR1      0xFF21.6
+   \   0018   AF             RET       
+    359                      // Output shall be restored after timer output is disabled 
+    360                      // in order to remove parasitic short pulse
+    361                  }
+    362                  else // ratio > 1
+    363                  {
+    364                      // Switch to XX% PWM
+    365                      if (bKeepOutputActive == cFalse)
+   \                     ??LDBPwmControlFadingIt_18:
+   \   0019   8E....         MOV       A,bKeepOutputActive
+   \   001C   4D00           CMP       A,#0
+   \   001E   BD13           BNZ       ??LDBPwmControlFadingIt_19
+    366                      {
+    367                          bKeepOutputActive = cTrue;
+   \   0020   A101           MOV       A,#1
+   \   0022   9E....         MOV       bKeepOutputActive,A
+    368                          // 1.Stop count operation before setting other registers
+    369                          mLDBIocStopTimer(cLDBHarPwmTimer);
+   \   0025   717B6C         CLR1      0xFF6C.7
+    370                          // 2. Enable output
+    371                          mLDBIocPWMOutputEnable(cLDBHarPwmTimer);
+   \   0028   710A6C         SET1      0xFF6C.0
+    372                          // 3. Start timer
+    373                          mLDBIocStartTimer(cLDBHarPwmTimer);
+   \   002B   717A6C         SET1      0xFF6C.7
+    374                          mLDBIocRefreshPwmDutyCycle(cLDBHarPwmTimer); // see list of precautions for TimerHn
+   \   002E   F01B           MOV       A,S:0xFF1B
+   \   0030   F21B           MOV       S:0xFF1B,A
+   \   0032   AF             RET       
+    375                          // output will be 0 for 1 period: hold it fixed to '1' : see Figure 9-12
+    376                      }
+    377                      else
+    378                      {            
+    379                          mLDBHarWrite(cLDBHarILLOutput, 0); // restore output latch
+   \                     ??LDBPwmControlFadingIt_19:
+   \   0033   A100           MOV       A,#0
+   \   0035   6B01           CLR1      S:0xFF01.6
+    380                          bKeepOutputActive = cFalse;
+   \   0037   9E....         MOV       bKeepOutputActive,A
+    381                          bPwmIsFadingControlRequested = cFalse;
+   \   003A   9E....         MOV       bPwmIsFadingControlRequested,A
+    382                      }
+    383                  }
+    384          
+    385          #ifndef X90_PROJECT
+    386              }
+    387          
+    388              //QACJ 3141: adzhelp: Warning comes from STK macro
+    389              mLDBIntLeaveIsr(cLDBHarPwmTimerIt);
+    390          #endif
+    391          }
+   \   003D   AF             RET       
+   \   003E                  REQUIRE ?CL78K_V4_6_L00
+   \   003E                  REQUIRE _A_P1
+   \   003E                  REQUIRE CMP11
+   \   003E                  REQUIRE _A_PM1
+   \   003E                  REQUIRE _A_TMHMD1
+
+   Segment part sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     _A_P1                           1
+     CMP01                           1
+     CMP11                           1
+     _A_PM1                          1
+     _A_TMHMD1                       1
+     _A_IF0                          2
+     _A_MK0                          2
+     u8OldPwmRatio                   1
+     bKeepOutputActive               1
+     bPwmIsFadingControlRequested    1
+     LDBPwmInit                      7
+     ?Subroutine0                   10
+     LDBPwmLeaveSleepMode           77
+     LDBPwmEnterSleepMode           52
+     LDBPwmSendWithAddr            169
+     LDBPwmControlFadingIt          62
+
+ 
+ 315 bytes in segment BCODE
+  62 bytes in segment CODE
+   6 bytes in segment NEAR_A
+   3 bytes in segment NEAR_Z
+   3 bytes in segment SADDR_A
+ 
+ 377 bytes of CODE memory
+   3 bytes of DATA memory (+ 9 bytes shared)
+
+Errors: none
+Warnings: none

@@ -1,0 +1,734 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:50 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_DIN.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_DIN.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_DIN.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_DIN.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_DIN.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_DIN.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_DIN.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_DIN
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Jan 15 2010 11:25:18  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_DIN/LDB_DIN.C-arc  $
+     15          // $Revision:   1.10  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_DIN/LDB_DIN.C-arc   $
+     18          // 
+     19          //    Rev 1.10   Jan 15 2010 11:25:18   adzhelp
+     20          // Cm006828: Shorten the time for LDB_KWP activation
+     21          // 
+     22          //    Rev 1.9   Jan 14 2010 14:27:56   adzhelp
+     23          // Cm006828: Implementation of sleep mode KLine WuP detection
+     24          // 
+     25          //    Rev 1.8   Oct 07 2009 09:01:32   adzhelp
+     26          // Cm005497: Disabled inversed inputs are set as inactive
+     27          // 
+     28          //    Rev 1.7   Jun 23 2009 17:22:42   adzhelp
+     29          // Cm005124: Inversion of reading of P01 removed
+     30          // 
+     31          //    Rev 1.6   Apr 27 2009 15:58:20   adzhelp
+     32          // Cm003619: LDBDouControl() placed in banked memory
+     33          // 
+     34          //    Rev 1.5   Apr 17 2009 15:23:58   adzhelp
+     35          // Cm003619: Inversion of inputs P140 and P33 removed
+     36          // 
+     37          //    Rev 1.4   Apr 16 2009 10:20:06   adzhelp
+     38          // Cm003276: Checking of falling edge on KLine for wake-up added
+     39          // 
+     40          //    Rev 1.3   Mar 19 2009 13:38:06   adzhelp
+     41          // Cm003276: In sleep mode only wake-up pins are read
+     42          // 
+     43          //    Rev 1.2   Mar 10 2009 10:22:40   adzhelp
+     44          // Cm003619: Parameterization according to DAT_DINp.jil
+     45          // 
+     46          //    Rev 1.1   Mar 20 2009 14:32:20   ailievb
+     47          // Cm003619: LDB_DIN parametrization.
+     48          // 
+     49          //    Rev 1.0   10 Nov 2008 15:27:18   ailievb
+     50          // Initial revision.
+     51          //******************************************************************************
+     52          
+     53          /*--------------------------------------------------------------------------
+     54          Body Identification
+     55          --------------------------------------------------------------------------*/
+     56          #define ldb_din "ldb_din"
+     57          
+     58          /*-------------------------------------------------------------------------
+     59          Included files
+     60          
+     61            #include <system_file_name.h>
+     62            #include "project_file_name.h"
+     63          --------------------------------------------------------------------------*/
+     64          #include "ldbtypes.h"
+     65          #include "ldb.h"
+     66          #include "ldb_har.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff03
+   \   union <unnamed> volatile __saddr _A_P3
+   \                     _A_P3:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff04
+   \   union <unnamed> volatile __saddr _A_P4
+   \                     _A_P4:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff05
+   \   union <unnamed> volatile __saddr _A_P5
+   \                     _A_P5:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff06
+   \   union <unnamed> volatile __saddr _A_P6
+   \                     _A_P6:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0c
+   \   union <unnamed> volatile __saddr _A_P12
+   \                     _A_P12:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0e
+   \   union <unnamed> volatile __saddr _A_P14
+   \                     _A_P14:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff24
+   \   union <unnamed> volatile __sfr _A_PM4
+   \                     _A_PM4:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff25
+   \   union <unnamed> volatile __sfr _A_PM5
+   \                     _A_PM5:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2c
+   \   union <unnamed> volatile __sfr _A_PM12
+   \                     _A_PM12:
+   \   0000                  DS 1
+     67          #include "ldb_sup.h"
+     68          #include "ldb_din.h"
+     69          #include "ldb_dinp.h"
+     70          
+     71          /*--------------------------------------------------------------------------
+     72          Local constants
+     73          
+     74            #define cConstantName   ((tType) ConstantValue)
+     75          --------------------------------------------------------------------------*/
+     76          // Configuration according to DAT_DINp.jil
+     77          
+     78          // Active bits ('1') in mask specify which pins are read
+     79          // Active bits in inversion mask will invert the input value
+     80          // Active bits in sleep mask specify which inputs are read in sleep mode
+     81          
+     82          // Buffer byte 0
+     83          #define cBuffer0Port        P0
+     84          #define cBuffer0Mask        (U8)0x22U
+     85          #define cBuffer0MaskInvert  (U8)0x00U
+     86          // Buffer byte 1
+     87          #define cBuffer1Port        P1
+     88          #define cBuffer1Mask        (U8)0x10U
+     89          #define cBuffer1MaskInvert  (U8)0x10U
+     90          #define cBuffer1MaskSleep   (U8)0x10U
+     91          // Buffer byte 2
+     92          #define cBuffer2Port        P3
+     93          #define cBuffer2Mask        (U8)0x0FU
+     94          #define cBuffer2MaskInvert  (U8)0x06U
+     95          // Buffer byte 3
+     96          #define cBuffer3Port        P4
+     97          #define cBuffer3Mask        (U8)0x0DU
+     98          #define cBuffer3MaskInvert  (U8)0x0DU
+     99          // Buffer byte 4
+    100          #define cBuffer4Port        P5
+    101          #define cBuffer4Mask        (U8)0x0BU
+    102          #define cBuffer4MaskInvert  (U8)0x02U
+    103          #define cBuffer4MaskSleep   (U8)0x08U
+    104          // Buffer byte 5
+    105          #define cBuffer5Port        P6
+    106          #define cBuffer5Mask        (U8)0x0FU
+    107          #define cBuffer5MaskInvert  (U8)0x00U
+    108          // Buffer byte 6
+    109          #define cBuffer6Port        P12
+    110          #define cBuffer6Mask        (U8)0x19U
+    111          #define cBuffer6MaskInvert  (U8)0x18U
+    112          #define cBuffer6MaskSleep   (U8)0x19U
+    113          // Buffer byte 7
+    114          #define cBuffer7Port        P14
+    115          #define cBuffer7Mask        (U8)0x01U
+    116          #define cBuffer7MaskInvert  (U8)0x00U
+    117          
+    118          #define cBufferSize         9U
+    119          
+    120          // KLine sleep mode polling:
+    121          #define cSampleLowMaxNum    (U8)2U
+    122          
+    123          /*--------------------------------------------------------------------------
+    124          Local macros
+    125          
+    126            #define mMacroName   (MacroDefinition)
+    127          --------------------------------------------------------------------------*/
+    128          #define mReadPortInputsToBuffer(ByteNumber)             \
+    129              mReadPortInputs(cBuffer##ByteNumber##Port,          \
+    130                              cBuffer##ByteNumber##Mask,          \
+    131                              cBuffer##ByteNumber##MaskInvert)
+    132          
+    133          #define mReadPortInputsToBufferSleep(ByteNumber)        \
+    134              mReadPortInputs(cBuffer##ByteNumber##Port,          \
+    135                              cBuffer##ByteNumber##MaskSleep,     \
+    136                              cBuffer##ByteNumber##MaskInvert)
+    137          
+    138          #define mReadPortInputs(Port, Mask, MaskInvert) \
+    139              (U8)( (U8)(mLDBRegRead8BitRegister(Port) & (Mask)) ^ (MaskInvert))
+    140          
+    141          #define mDisableInversedInputsConfiguredAsOutputs() \
+    142              if (mLDBRegRead1BitInRegister(PM4, 0) == cLDBHarOutput) \
+    143              { \
+    144                  pu8Buffer[3] &= (U8)0xFEU; /* byte 3, bit 0 */ \
+    145              } \
+    146              if (mLDBRegRead1BitInRegister(PM12, 4) == cLDBHarOutput) \
+    147              { \
+    148                  pu8Buffer[6] &= (U8)0xEFU; /* byte 6, bit 4 */ \
+    149              } \
+    150              if (mLDBRegRead1BitInRegister(PM5, 1) == cLDBHarOutput) \
+    151              { \
+    152                  pu8Buffer[4] &= (U8)0xFDU; /* byte 4, bit 1 */ \
+    153              }
+    154          
+    155          
+    156          /*--------------------------------------------------------------------------
+    157          Local types
+    158          
+    159            struct  sStructureName { ... };
+    160            union   uUnionName { ... };
+    161            enum    eEnumerationName { ... };
+    162            typedef Expression tTypeName;
+    163          --------------------------------------------------------------------------*/
+    164          
+    165          /*--------------------------------------------------------------------------
+    166          Local data
+    167          
+    168            static  tType   VariableName;
+    169            static  tType*  pVariableName; 
+    170          --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    171          static BOOL bSleepMode = cTrue;
+   \                     bSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bSleepMode>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    172          
+    173          // KLine sleep mode polling:
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    174          static BOOL bKLinePreviousLevel;
+   \                     bKLinePreviousLevel:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    175          static BOOL bKLineFallingEdge;
+   \                     bKLineFallingEdge:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    176          static BOOL u8KLineLowLeveCount;
+   \                     u8KLineLowLeveCount:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    177          
+    178          /*--------------------------------------------------------------------------
+    179          Constant local data
+    180          
+    181            static const tType  VariableName;
+    182          --------------------------------------------------------------------------*/
+    183          
+    184          
+    185          /*--------------------------------------------------------------------------
+    186          Exported data
+    187          
+    188            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    189            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    190          --------------------------------------------------------------------------*/
+    191          
+    192          
+    193          /*--------------------------------------------------------------------------
+    194          Constant exported data
+    195          
+    196            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    197          --------------------------------------------------------------------------*/
+    198          
+    199          
+    200          /*--------------------------------------------------------------------------
+    201          Local function prototypes
+    202          
+    203            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    204          --------------------------------------------------------------------------*/
+    205          
+    206          
+    207          /*============================================================================
+    208          =========================== LOCAL FUNCTIONS ================================
+    209          ==========================================================================*/
+    210          
+    211          /*============================================================================
+    212            DESCRIPTION :
+    213          
+    214            PARAMETERS (Type,Name,Min,Max) :   none
+    215            
+    216            RETURN VALUE :   none
+    217              
+    218            DESIGN INFORMATION :   refer to Detailed Design Document
+    219          ==========================================================================*/
+    220          //static type FunctionName(...)
+    221          
+    222          
+    223          /*============================================================================
+    224          =========================== EXPORTED FUNCTIONS =============================
+    225          ==========================================================================*/
+    226          
+    227          /*============================================================================
+    228            DESCRIPTION : 
+    229          
+    230            PARAMETERS (Type,Name,Min,Max) :  none
+    231            
+    232            RETURN VALUE :  none
+    233              
+    234            DESIGN INFORMATION :  refer to Detailed Design Document
+    235          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    236          void LDBDinInit(void)
+   \                     LDBDinInit:
+    237          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    238          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    239          
+    240          /*============================================================================
+    241            DESCRIPTION : 
+    242          
+    243            PARAMETERS (Type,Name,Min,Max) :  none
+    244            
+    245            RETURN VALUE :  none
+    246              
+    247            DESIGN INFORMATION :  refer to Detailed Design Document
+    248          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    249          void LDBDinReceiveWithoutAddr(tMsg* pMsg)
+   \                     LDBDinReceiveWithoutAddr:
+    250          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D2             MOVW      BC,AX
+    251              if (pMsg != NULL)
+   \   0003   6168           OR        A,X
+   \   0005   BD03           BNZ       $+5
+   \   0007   9B....         BR        N:??LDBDinControl_0
+    252              {
+    253                  U8* pu8Buffer = pMsg->pBuffer;
+   \   000A   63             MOV       A,B
+   \   000B   D6             MOVW      HL,AX
+   \   000C   87             MOV       A,[HL]
+   \   000D   70             MOV       X,A
+   \   000E   AE01           MOV       A,[HL+0x01]
+   \   0010   D4             MOVW      DE,AX
+    254                  mLIBassert(pMsg->Lng == cBufferSize);
+   \   0011   AE02           MOV       A,[HL+0x02]
+   \   0013   70             MOV       X,A
+   \   0014   AE03           MOV       A,[HL+0x03]
+   \   0016   EA0900         CMPW      AX,#9
+   \   0019   AD03           BZ        ??LDBDinControl_1
+   \   001B   9A....         CALL      LIBAssertionFailed
+    255          
+    256                  if (bSleepMode == cFalse)
+   \                     ??LDBDinControl_1:
+   \   001E   8E....         MOV       A,bSleepMode
+   \   0021   4D00           CMP       A,#0
+   \   0023   BD59           BNZ       ??LDBDinControl_2
+    257                  {
+    258                      pu8Buffer[0] = mReadPortInputsToBuffer(0);
+   \   0025   F000           MOV       A,S:0xFF00
+   \   0027   5D22           AND       A,#34
+   \   0029   95             MOV       [DE],A
+    259                      pu8Buffer[1] = mReadPortInputsToBuffer(1);
+   \   002A   F001           MOV       A,S:0xFF01
+   \   002C   5D10           AND       A,#16
+   \   002E   7D10           XOR       A,#16
+   \   0030   B5             PUSH      DE
+   \   0031   B6             POP       HL
+   \   0032   86             INCW      HL
+   \   0033   97             MOV       [HL],A
+    260                      pu8Buffer[2] = mReadPortInputsToBuffer(2);
+   \   0034   F003           MOV       A,S:0xFF03
+   \   0036   5D0F           AND       A,#15
+   \   0038   7D06           XOR       A,#6
+   \   003A   B5             PUSH      DE
+   \   003B   B6             POP       HL
+   \   003C   86             INCW      HL
+   \   003D   86             INCW      HL
+   \   003E   97             MOV       [HL],A
+    261                      pu8Buffer[3] = mReadPortInputsToBuffer(3);
+   \   003F   F004           MOV       A,S:0xFF04
+   \   0041   5D0D           AND       A,#13
+   \   0043   7D0D           XOR       A,#13
+   \   0045   B5             PUSH      DE
+   \   0046   B6             POP       HL
+   \   0047   86             INCW      HL
+   \   0048   86             INCW      HL
+   \   0049   86             INCW      HL
+   \   004A   97             MOV       [HL],A
+    262                      pu8Buffer[4] = mReadPortInputsToBuffer(4);
+   \   004B   F005           MOV       A,S:0xFF05
+   \   004D   5D0B           AND       A,#11
+   \   004F   7D02           XOR       A,#2
+   \   0051   B5             PUSH      DE
+   \   0052   B6             POP       HL
+   \   0053   86             INCW      HL
+   \   0054   86             INCW      HL
+   \   0055   86             INCW      HL
+   \   0056   86             INCW      HL
+   \   0057   97             MOV       [HL],A
+    263                      pu8Buffer[5] = mReadPortInputsToBuffer(5);
+   \   0058   F006           MOV       A,S:0xFF06
+   \   005A   5D0F           AND       A,#15
+   \   005C   B5             PUSH      DE
+   \   005D   B6             POP       HL
+   \   005E   86             INCW      HL
+   \   005F   86             INCW      HL
+   \   0060   86             INCW      HL
+   \   0061   86             INCW      HL
+   \   0062   86             INCW      HL
+   \   0063   97             MOV       [HL],A
+    264                      pu8Buffer[6] = mReadPortInputsToBuffer(6);
+   \   0064   F00C           MOV       A,S:0xFF0C
+   \   0066   5D19           AND       A,#25
+   \   0068   7D18           XOR       A,#24
+   \   006A   B5             PUSH      DE
+   \   006B   B6             POP       HL
+   \   006C   E6             XCHW      AX,HL
+   \   006D   CA0600         ADDW      AX,#6
+   \   0070   E6             XCHW      AX,HL
+   \   0071   97             MOV       [HL],A
+    265                      pu8Buffer[7] = mReadPortInputsToBuffer(7);
+   \   0072   F00E           MOV       A,S:0xFF0E
+   \   0074   5D01           AND       A,#1
+   \   0076   B5             PUSH      DE
+   \   0077   B6             POP       HL
+   \   0078   E6             XCHW      AX,HL
+   \   0079   CA0700         ADDW      AX,#7
+   \   007C   FA23           BR        ??LDBDinControl_3
+    266                  }
+    267                  else
+    268                  {
+    269                      // Only wake-up inputs are read to avoid non-stabilization issues
+    270                      pu8Buffer[1] = mReadPortInputsToBufferSleep(1);
+   \                     ??LDBDinControl_2:
+   \   007E   F001           MOV       A,S:0xFF01
+   \   0080   5D10           AND       A,#16
+   \   0082   7D10           XOR       A,#16
+   \   0084   B5             PUSH      DE
+   \   0085   B6             POP       HL
+   \   0086   86             INCW      HL
+   \   0087   97             MOV       [HL],A
+    271                      pu8Buffer[4] = mReadPortInputsToBufferSleep(4);
+   \   0088   F005           MOV       A,S:0xFF05
+   \   008A   5D08           AND       A,#8
+   \   008C   7D02           XOR       A,#2
+   \   008E   B5             PUSH      DE
+   \   008F   B6             POP       HL
+   \   0090   86             INCW      HL
+   \   0091   86             INCW      HL
+   \   0092   86             INCW      HL
+   \   0093   86             INCW      HL
+   \   0094   97             MOV       [HL],A
+    272                      pu8Buffer[6] = mReadPortInputsToBufferSleep(6);
+   \   0095   F00C           MOV       A,S:0xFF0C
+   \   0097   5D19           AND       A,#25
+   \   0099   7D18           XOR       A,#24
+   \   009B   B5             PUSH      DE
+   \   009C   B6             POP       HL
+   \   009D   E6             XCHW      AX,HL
+   \   009E   CA0600         ADDW      AX,#6
+   \                     ??LDBDinControl_3:
+   \   00A1   E6             XCHW      AX,HL
+   \   00A2   97             MOV       [HL],A
+    273                  }
+    274                  //Disabled inversed inputs which has been configured as outputs 
+    275                  //driving 0V (based on ECUType by LDB_DOU)
+    276                  mDisableInversedInputsConfiguredAsOutputs();
+   \   00A3   31062407       BT        0xFF24.0, ??LDBDinControl_4
+   \   00A7   B5             PUSH      DE
+   \   00A8   B6             POP       HL
+   \   00A9   86             INCW      HL
+   \   00AA   86             INCW      HL
+   \   00AB   86             INCW      HL
+   \   00AC   7183           CLR1      [HL].0
+   \                     ??LDBDinControl_4:
+   \   00AE   31462C07       BT        0xFF2C.4, ??LDBDinControl_5
+   \   00B2   C4             MOVW      AX,DE
+   \   00B3   CA0600         ADDW      AX,#6
+   \   00B6   D6             MOVW      HL,AX
+   \   00B7   71C3           CLR1      [HL].4
+   \                     ??LDBDinControl_5:
+   \   00B9   31162508       BT        0xFF25.1, ??LDBDinControl_0
+   \   00BD   84             INCW      DE
+   \   00BE   84             INCW      DE
+   \   00BF   84             INCW      DE
+   \   00C0   84             INCW      DE
+   \   00C1   C4             MOVW      AX,DE
+   \   00C2   D6             MOVW      HL,AX
+   \   00C3   7193           CLR1      [HL].1
+    277              }
+    278          }
+   \                     ??LDBDinControl_0:
+   \   00C5   B4             POP       DE
+   \   00C6   B2             POP       BC
+   \   00C7   AF             RET       
+   \   00C8                  REQUIRE ?CL78K_V4_6_L00
+   \   00C8                  REQUIRE _A_P5
+   \   00C8                  REQUIRE _A_P6
+   \   00C8                  REQUIRE _A_P12
+   \   00C8                  REQUIRE _A_P14
+   \   00C8                  REQUIRE _A_P0
+   \   00C8                  REQUIRE _A_P1
+   \   00C8                  REQUIRE _A_P3
+   \   00C8                  REQUIRE _A_P4
+   \   00C8                  REQUIRE _A_PM4
+   \   00C8                  REQUIRE _A_PM5
+   \   00C8                  REQUIRE _A_PM12
+    279          
+    280          /*============================================================================
+    281            DESCRIPTION : 
+    282          
+    283            PARAMETERS (Type,Name,Min,Max) :  none
+    284            
+    285            RETURN VALUE :  none
+    286              
+    287            DESIGN INFORMATION :  refer to Detailed Design Document
+    288          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    289          MEM_TYPE void LDBDinControl(tCtrl Ctrl)
+   \                     LDBDinControl:
+    290          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    291              switch(Ctrl)
+   \   0000   4D01           CMP       A,#1
+   \   0002   AD0E           BZ        ??LDBDinControl_6
+   \   0004   4D02           CMP       A,#2
+   \   0006   AD10           BZ        ??LDBDinControl_7
+   \   0008   4D04           CMP       A,#4
+   \   000A   AD21           BZ        ??LDBDinControl_8
+   \   000C   4D05           CMP       A,#5
+   \   000E   AD13           BZ        ??LDBDinControl_9
+   \   0010   FA57           BR        ??LDBDinControl_10
+    292              {    
+    293              case cLDBDinEnterNominalMode:
+    294                  bSleepMode = cFalse;
+   \                     ??LDBDinControl_6:
+   \   0012   A100           MOV       A,#0
+   \   0014   9E....         MOV       bSleepMode,A
+   \   0017   AF             RET       
+    295                  break;
+    296              case cLDBDinEnterSleepMode:
+    297                  bSleepMode = cTrue;
+   \                     ??LDBDinControl_7:
+   \   0018   A101           MOV       A,#1
+   \   001A   9E....         MOV       bSleepMode,A
+    298                  bKLineFallingEdge = cFalse;
+   \                     ??LDBDinControl_11:
+   \   001D   A100           MOV       A,#0
+   \   001F   9E....         MOV       bKLineFallingEdge,A
+   \   0022   AF             RET       
+    299                  break;
+    300              case cLDBDinInitiateKLineWakeupConditions:
+    301                  bKLinePreviousLevel = mLDBHarRead(cLDBHarRxKwp);
+   \                     ??LDBDinControl_9:
+   \   0023   A100           MOV       A,#0
+   \   0025   711401         MOV1      CY,S:0xFF01.1
+   \   0028   27             ROLC      A,0x1
+   \   0029   9E....         MOV       bKLinePreviousLevel,A
+   \   002C   AF             RET       
+    302                  break;
+    303              case cLDBDinCheckKLineWakeupConditions:
+    304                  if (bKLineFallingEdge == cFalse)
+   \                     ??LDBDinControl_8:
+   \   002D   8E....         MOV       A,bKLineFallingEdge
+   \   0030   4D00           CMP       A,#0
+   \   0032   BD16           BNZ       ??LDBDinControl_12
+    305                  {        
+    306                      if ((mLDBHarRead(cLDBHarRxKwp) == 0) && (bKLinePreviousLevel != 0))
+   \   0034   9C01EC         BT        S:0xFF01.1, ??LDBDinControl_9
+   \   0037   8E....         MOV       A,bKLinePreviousLevel
+   \   003A   4D00           CMP       A,#0
+   \   003C   ADE5           BZ        ??LDBDinControl_9
+    307                      {
+    308                          bKLineFallingEdge = cTrue;
+   \   003E   A101           MOV       A,#1
+   \   0040   9E....         MOV       bKLineFallingEdge,A
+    309                          u8KLineLowLeveCount = cSampleLowMaxNum;
+   \   0043   A102           MOV       A,#2
+   \   0045   9E....         MOV       u8KLineLowLeveCount,A
+    310                      }
+    311                      else
+    312                      {
+    313                          // wait for falling edge
+    314                      }
+    315                      bKLinePreviousLevel = mLDBHarRead(cLDBHarRxKwp);
+   \   0048   FAD9           BR        ??LDBDinControl_9
+    316                  }
+    317                  else
+    318                  {
+    319                      if (u8KLineLowLeveCount > 0)
+   \                     ??LDBDinControl_12:
+   \   004A   8E....         MOV       A,u8KLineLowLeveCount
+   \   004D   4D00           CMP       A,#0
+   \   004F   ADCC           BZ        ??LDBDinControl_11
+    320                      {
+    321                          u8KLineLowLeveCount--;
+   \   0051   51             DEC       A
+   \   0052   9E....         MOV       u8KLineLowLeveCount,A
+    322          
+    323                          if (mLDBHarRead(cLDBHarRxKwp) == 1)
+   \   0055   31130113       BF        S:0xFF01.1, ??LDBDinControl_13
+    324                          {
+    325                              // rising edge found
+    326                              // request wake-up
+    327                              LDBSupLeaveSleepMode();
+   \   0059   9A....         CALL      LDBSupLeaveSleepMode
+    328                              // KWP wait for StartComminucations
+    329                              LDBControl(cLDBChannelKwp, cLDBKwpWaitForStartCom);
+   \   005C   A104           MOV       A,#4
+   \   005E   16....         MOVW      HL,#LWRD(LDBKwpControl)
+   \   0061   A4..           MOV       E,#BYTE3(LDBKwpControl)
+   \   0063   ..             CALLT     [__T_?FAR_CALL_L07]
+    330                              DATPinCallBackCtrl(cLDBPinWakeUpRequested);
+   \   0064   A105           MOV       A,#5
+   \   0066   9B....         BR        N:DATPinCallBackCtrl
+    331                          }
+    332                          else
+    333                          {
+    334                              // wait for rising edge
+    335                          }
+    336                      }
+    337                      else
+    338                      {
+    339                          bKLineFallingEdge = cFalse;
+    340                      }
+    341                  }
+    342                  break;
+    343              default:
+    344                  mLIBassert(cFalse);
+   \                     ??LDBDinControl_10:
+   \   0069   9A....         CALL      LIBAssertionFailed
+    345                  break;
+    346              }
+    347          }
+   \                     ??LDBDinControl_13:
+   \   006C   AF             RET       
+   \   006D                  REQUIRE ?CL78K_V4_6_L00
+   \   006D                  REQUIRE _A_P1
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bSleepMode>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   Segment part sizes:
+
+     Function/Label                Bytes
+     --------------                -----
+     _A_P0                            1
+     _A_P1                            1
+     _A_P3                            1
+     _A_P4                            1
+     _A_P5                            1
+     _A_P6                            1
+     _A_P12                           1
+     _A_P14                           1
+     _A_PM4                           1
+     _A_PM5                           1
+     _A_PM12                          1
+     bSleepMode                       1
+     bKLinePreviousLevel              1
+     bKLineFallingEdge                1
+     u8KLineLowLeveCount              1
+     LDBDinInit                       1
+     LDBDinReceiveWithoutAddr       200
+     LDBDinControl                  109
+     ?<Initializer for bSleepMode>    1
+     __T_?FAR_CALL_L07                2
+
+ 
+ 109 bytes in segment BCODE
+   2 bytes in segment CLTVEC
+ 201 bytes in segment CODE
+   3 bytes in segment NEAR_A
+   1 byte  in segment NEAR_I
+   1 byte  in segment NEAR_ID
+   3 bytes in segment NEAR_Z
+   8 bytes in segment SADDR_A
+ 
+ 310 bytes of CODE  memory (+  2 bytes shared)
+   1 byte  of CONST memory
+   4 bytes of DATA  memory (+ 11 bytes shared)
+
+Errors: none
+Warnings: none

@@ -1,0 +1,675 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:49 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_INTP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_INTP.LST -o                       #
+#                    ..\EXE\TARGET_D\LDB_INTP.R26                             #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_INTP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LDB_INTP.LST                             #
+#    Object file  =  ..\EXE\TARGET_D\LDB_INTP.R26                             #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_INTP.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_INTp
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Jul 16 2009 08:55:36  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_INT/LDB_INTP.C-arc  $
+     15          // $Revision:   1.3  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_INT/LDB_INTP.C-arc  $
+     18          // 
+     19          //    Rev 1.3   Jul 16 2009 08:55:36   adzhelp
+     20          // Cm005205: INTTMH1 shared between sleep system timer, verlog and roomlamp dimming
+     21          // 
+     22          //    Rev 1.2   Jul 10 2009 15:06:36   adzhelp
+     23          // Cm005100: SAD.ROB.INT.02.R01 - Unexpected interrupts treatment  
+     24          // 
+     25          //    Rev 1.1   Apr 27 2009 15:52:08   adzhelp
+     26          // Cm003619: Integration test corrections
+     27          // 
+     28          //    Rev 1.0   Apr 27 2009 11:20:50   adzhelp
+     29          // Initial revision.
+     30          // 
+     31          //******************************************************************************
+     32          
+     33          /*--------------------------------------------------------------------------
+     34            Body Identification
+     35            --------------------------------------------------------------------------*/
+     36          
+     37          #define LDB_INTP   "LDB_INTP"
+     38          
+     39          /*-------------------------------------------------------------------------
+     40            Included files
+     41          
+     42            #include <system_file_name.h>
+     43            #include "project_file_name.h"
+     44            --------------------------------------------------------------------------*/
+     45          
+     46          #include "ldb_intp.h"
+     47          #include "ldb_swi.h"
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     48          #include "ldb_har.h"
+     49          #include "ldb_trp.h"
+     50          #include "ldb_pwm.h"
+     51          
+     52          /*--------------------------------------------------------------------------
+     53            Local constants
+     54          
+     55            #define cConstantName   ((tType) ConstantValue)
+     56            --------------------------------------------------------------------------*/
+     57          
+     58          
+     59          /*--------------------------------------------------------------------------
+     60            Local macros
+     61          
+     62            #define mMacroName   (MacroDefinition)
+     63            --------------------------------------------------------------------------*/
+     64          
+     65          
+     66          /*--------------------------------------------------------------------------
+     67            Local types
+     68          
+     69            struct  sStructureName { ... };
+     70            union   uUnionName { ... };
+     71            enum    eEnumerationName { ... };
+     72            typedef Expression tTypeName;
+     73            --------------------------------------------------------------------------*/
+     74          
+     75          
+     76          /*--------------------------------------------------------------------------
+     77            Local data
+     78          
+     79            static  tType   VariableName;
+     80            static  tType*  pVariableName; 
+     81            --------------------------------------------------------------------------*/
+     82          
+     83          
+     84          /*--------------------------------------------------------------------------
+     85            Constant local data
+     86          
+     87            static const tType  VariableName;
+     88            --------------------------------------------------------------------------*/
+     89          
+     90          
+     91          /*--------------------------------------------------------------------------
+     92            Exported data
+     93          
+     94            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     95            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     96            --------------------------------------------------------------------------*/
+     97          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     98          U8 LDBIntInterruptOwnerTM00TM01 = cLDBIntNoOwnerTM00TM01;
+   \                     LDBIntInterruptOwnerTM00TM01:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     99          U8 LDBIntInterruptOwnerTMH1     = cLDBIntNoOwnerTMH1;
+   \                     LDBIntInterruptOwnerTMH1:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    100          
+    101          /*--------------------------------------------------------------------------
+    102            Constant exported data
+    103           
+    104            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    105            --------------------------------------------------------------------------*/
+    106          
+    107          
+    108          /*--------------------------------------------------------------------------
+    109            Local function prototypes
+    110            
+    111            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    112            --------------------------------------------------------------------------*/
+    113          
+    114          
+    115          /*============================================================================
+    116            =========================== LOCAL FUNCTIONS ================================
+    117            ==========================================================================*/
+    118          
+    119          /*============================================================================
+    120            DESCRIPTION :
+    121            
+    122            PARAMETERS (Type,Name,Min,Max) :   none
+    123          
+    124            RETURN VALUE :   none
+    125           
+    126            DESIGN INFORMATION :   refer to Detailed Design Document
+    127            ==========================================================================*/
+    128          //static type FunctionName(...)
+    129          
+    130          
+    131          /*============================================================================
+    132            =========================== EXPORTED FUNCTIONS =============================
+    133            ==========================================================================*/
+    134          
+    135          /*============================================================================
+    136            DESCRIPTION : Unexpected interrupt treatment
+    137            
+    138            PARAMETERS (Type,Name,Min,Max) :  none
+    139          
+    140            RETURN VALUE :  none
+    141           
+    142            DESIGN INFORMATION :  refer to Detailed Design Document
+    143          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    144          mLDBIntDeclareIsr(UnexpectedInterrupt)
+   \                     LDBIntIsrUnexpectedInterrupt:
+    145          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B7             PUSH      HL
+   \   0002                  ; Total Auto size: 0
+    146              mLIBassert(cFalse);
+   \   0002   9A....         CALL      LIBAssertionFailed
+    147              LDBReset();
+   \   0005   9A....         CALL      LDBReset
+    148          }
+   \   0008   B6             POP       HL
+   \   0009   B0             POP       AX
+   \   000A   9F             RETB      
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    149          
+    150          /*============================================================================
+    151            DESCRIPTION : INTTM001 Interrupt service
+    152            
+    153            PARAMETERS (Type,Name,Min,Max) :  none
+    154          
+    155            RETURN VALUE :  none
+    156           
+    157            DESIGN INFORMATION :  refer to Detailed Design Document
+    158          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    159          mLDBIntDeclareIsr(INTTM001)
+   \                     LDBIntIsrINTTM001:
+    160          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    161              mLDBIntEnterIsr(INTTM001);
+   \   0003   F0..           MOV       A,S:LDBIntLevel
+   \   0005   72             MOV       C,A
+   \   0006   11..02         MOV       S:LDBIntLevel,#2
+    162          
+    163              if (LDBIntInterruptOwnerTM00TM01 == cLDBIntTrpOwnerTM00TM01)
+   \   0009   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   000C   51             DEC       A
+   \   000D   BD05           BNZ       ??LDBIntIsrINTTMH1_0
+    164              {
+    165                  LDBTrpPPGIt();
+   \   000F   9A....         CALL      LDBTrpPPGIt
+   \   0012   FA0D           BR        ??LDBIntIsrINTTMH1_1
+    166              }
+    167              else
+    168              {
+    169                  mLIBassert(LDBIntInterruptOwnerTM00TM01 == cLDBIntRfOwnerTM00TM01);
+   \                     ??LDBIntIsrINTTMH1_0:
+   \   0014   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   0017   4D02           CMP       A,#2
+   \   0019   AD03           BZ        ??LDBIntIsrINTTMH1_2
+   \   001B   9A....         CALL      LIBAssertionFailed
+    170                  LDBRfInterruptRfOCIt();
+   \                     ??LDBIntIsrINTTMH1_2:
+   \   001E   9A....         CALL      LDBRfInterruptRfOCIt
+    171              }
+    172          
+    173              mLDBIntLeaveIsr(INTTM001);
+   \                     ??LDBIntIsrINTTMH1_1:
+   \   0021   9B....         BR        N:?Subroutine0
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    174          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   62             MOV       A,C
+   \   0001   F2..           MOV       S:LDBIntLevel,A
+   \   0003   B6             POP       HL
+   \   0004   B2             POP       BC
+   \   0005   B0             POP       AX
+   \   0006   8F             RETI      
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    175          
+    176          /*============================================================================
+    177            DESCRIPTION : INTTM000 Interrupt service
+    178            
+    179            PARAMETERS (Type,Name,Min,Max) :  none
+    180          
+    181            RETURN VALUE :  none
+    182           
+    183            DESIGN INFORMATION :  refer to Detailed Design Document
+    184          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    185          mLDBIntDeclareIsr(INTTM000)
+   \                     LDBIntIsrINTTM000:
+    186          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    187              mLDBIntEnterIsr(INTTM000);
+   \   0003   F0..           MOV       A,S:LDBIntLevel
+   \   0005   72             MOV       C,A
+   \   0006   11..02         MOV       S:LDBIntLevel,#2
+    188          
+    189              if (LDBIntInterruptOwnerTM00TM01 == cLDBIntTrpOwnerTM00TM01)
+   \   0009   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   000C   51             DEC       A
+   \   000D   BD05           BNZ       ??LDBIntIsrINTTMH1_3
+    190              {
+    191                  LDBTrpTimeOutIt();
+   \   000F   9A....         CALL      LDBTrpTimeOutIt
+   \   0012   FA0D           BR        ??LDBIntIsrINTTMH1_4
+    192              }
+    193              else
+    194              {
+    195                  mLIBassert(LDBIntInterruptOwnerTM00TM01 == cLDBIntRfOwnerTM00TM01);
+   \                     ??LDBIntIsrINTTMH1_3:
+   \   0014   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   0017   4D02           CMP       A,#2
+   \   0019   AD03           BZ        ??LDBIntIsrINTTMH1_5
+   \   001B   9A....         CALL      LIBAssertionFailed
+    196                  mLIBassert(cFalse); // not used by RF
+   \                     ??LDBIntIsrINTTMH1_5:
+   \   001E   9A....         CALL      LIBAssertionFailed
+    197              }  
+    198          
+    199              mLDBIntLeaveIsr(INTTM000);
+   \                     ??LDBIntIsrINTTMH1_4:
+   \   0021   9B....         BR        N:?Subroutine0
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    200          }
+    201          
+    202          /*============================================================================
+    203            DESCRIPTION : INTTM011 Interrupt service
+    204            
+    205            PARAMETERS (Type,Name,Min,Max) :  none
+    206          
+    207            RETURN VALUE :  none
+    208           
+    209            DESIGN INFORMATION :  refer to Detailed Design Document
+    210          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    211          mLDBIntDeclareIsr(INTTM011)
+   \                     LDBIntIsrINTTM011:
+    212          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    213              mLDBIntEnterIsr(INTTM011);
+   \   0003   F0..           MOV       A,S:LDBIntLevel
+   \   0005   72             MOV       C,A
+   \   0006   11..02         MOV       S:LDBIntLevel,#2
+    214          
+    215              if (LDBIntInterruptOwnerTM00TM01 == cLDBIntTrpOwnerTM00TM01)
+   \   0009   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   000C   51             DEC       A
+   \   000D   BD05           BNZ       ??LDBIntIsrINTTMH1_6
+    216              {
+    217                  LDBTrpTimeCaptureIt();
+   \   000F   9A....         CALL      LDBTrpTimeCaptureIt
+   \   0012   FA0D           BR        ??LDBIntIsrINTTMH1_7
+    218              }
+    219              else
+    220              {
+    221                  mLIBassert(LDBIntInterruptOwnerTM00TM01 == cLDBIntRfOwnerTM00TM01);
+   \                     ??LDBIntIsrINTTMH1_6:
+   \   0014   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   0017   4D02           CMP       A,#2
+   \   0019   AD03           BZ        ??LDBIntIsrINTTMH1_8
+   \   001B   9A....         CALL      LIBAssertionFailed
+    222                  mLIBassert(cFalse);  // not used by RF
+   \                     ??LDBIntIsrINTTMH1_8:
+   \   001E   9A....         CALL      LIBAssertionFailed
+    223              }  
+    224          
+    225              mLDBIntLeaveIsr(INTTM011);
+   \                     ??LDBIntIsrINTTMH1_7:
+   \   0021                  REQUIRE ?CL78K_V4_6_L00
+   \   0021                  REQUIRE ?Subroutine0
+   \   0021                  ; // Fall through to label ?Subroutine0
+    226          }
+    227          
+    228          /*============================================================================
+    229            DESCRIPTION : INTTM011 Interrupt service
+    230            
+    231            PARAMETERS (Type,Name,Min,Max) :  none
+    232          
+    233            RETURN VALUE :  none
+    234           
+    235            DESIGN INFORMATION :  refer to Detailed Design Document
+    236          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    237          mLDBIntDeclareIsr(INTTM010)
+   \                     LDBIntIsrINTTM010:
+    238          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    239              mLDBIntEnterIsr(INTTM010);
+   \   0003   F0..           MOV       A,S:LDBIntLevel
+   \   0005   72             MOV       C,A
+   \   0006   11..02         MOV       S:LDBIntLevel,#2
+    240          
+    241              if (LDBIntInterruptOwnerTM00TM01 == cLDBIntTrpOwnerTM00TM01)
+   \   0009   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   000C   51             DEC       A
+   \   000D   BD05           BNZ       ??LDBIntIsrINTTMH1_9
+    242              {
+    243                  mLIBassert(cFalse);
+   \   000F   9A....         CALL      LIBAssertionFailed
+   \   0012   FA0D           BR        ??LDBIntIsrINTTMH1_10
+    244              }
+    245              else
+    246              {
+    247                  mLIBassert(LDBIntInterruptOwnerTM00TM01 == cLDBIntRfOwnerTM00TM01);
+   \                     ??LDBIntIsrINTTMH1_9:
+   \   0014   8E....         MOV       A,LDBIntInterruptOwnerTM00TM01
+   \   0017   4D02           CMP       A,#2
+   \   0019   AD03           BZ        ??LDBIntIsrINTTMH1_11
+   \   001B   9A....         CALL      LIBAssertionFailed
+    248                  LDBRfInterruptRfICIt();
+   \                     ??LDBIntIsrINTTMH1_11:
+   \   001E   9A....         CALL      LDBRfInterruptRfICIt
+    249              }  
+    250          
+    251              mLDBIntLeaveIsr(INTTM010);
+   \                     ??LDBIntIsrINTTMH1_10:
+   \   0021   9B....         BR        N:?Subroutine0
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    252          }
+    253          
+    254          /*============================================================================
+    255            DESCRIPTION : INTTMH1 Interrupt service
+    256            
+    257            PARAMETERS (Type,Name,Min,Max) :  none
+    258          
+    259            RETURN VALUE :  none
+    260           
+    261            DESIGN INFORMATION :  refer to Detailed Design Document
+    262          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    263          mLDBIntDeclareIsr(INTTMH1)
+   \                     LDBIntIsrINTTMH1:
+    264          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B7             PUSH      HL
+   \   0002                  ; Total Auto size: 0
+    265              mLDBIntEnterIsr(INTTMH1);
+   \   0002   11..01         MOV       S:LDBIntLevel,#1
+   \   0005   F4E5           MOV       A,0xFFE5
+   \   0007   6D1E           OR        A,#30
+   \   0009   F6E5           MOV       0xFFE5,A
+   \   000B   F4E6           MOV       A,0xFFE6
+   \   000D   6D46           OR        A,#70
+   \   000F   F6E6           MOV       0xFFE6,A
+   \   0011   7A1E           EI
+    266          
+    267              if (LDBIntInterruptOwnerTMH1 == cLDBIntTrpPwmOwnerTMH1)
+   \   0013   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0016   51             DEC       A
+   \   0017   BD16           BNZ       ??LDBIntIsrINTTMH1_12
+    268              {
+    269                  if (mLDBTrpIsVerlogTimerEnabled()) // LDB_TRP ISR invoked only when enabled
+   \   0019   8E....         MOV       A,bLDBTrpIsVerlogTimerEnabled
+   \   001C   4D00           CMP       A,#0
+   \   001E   AD03           BZ        ??LDBIntIsrINTTMH1_13
+    270                  {          
+    271                      LDBTrpVerlogTimerIt();
+   \   0020   9A....         CALL      LDBTrpVerlogTimerIt
+    272                  }
+    273                  if (mLDBPwmIsFadingControlRequested())
+   \                     ??LDBIntIsrINTTMH1_13:
+   \   0023   8E....         MOV       A,bPwmIsFadingControlRequested
+   \   0026   4D00           CMP       A,#0
+   \   0028   AD12           BZ        ??LDBIntIsrINTTMH1_14
+    274                  {
+    275                      // LDB_PWM ISR invoked only when change control requested
+    276                      LDBPwmControlFadingIt();
+   \   002A   9A....         CALL      LDBPwmControlFadingIt
+   \   002D   FA0D           BR        ??LDBIntIsrINTTMH1_14
+    277                  }
+    278                  // No callback may be called: No need to disable interrupt for simplicity and 
+    279                  // because then the system is not heavily loaded (IMMO not operating)
+    280              }
+    281              else
+    282              {
+    283                  mLIBassert(LDBIntInterruptOwnerTMH1 == cLDBIntTimOwnerTMH1);
+   \                     ??LDBIntIsrINTTMH1_12:
+   \   002F   8E....         MOV       A,LDBIntInterruptOwnerTMH1
+   \   0032   4D02           CMP       A,#2
+   \   0034   AD03           BZ        ??LDBIntIsrINTTMH1_15
+   \   0036   9A....         CALL      LIBAssertionFailed
+    284                  LDBTimSleepInterruptRealTime();
+   \                     ??LDBIntIsrINTTMH1_15:
+   \   0039   9A....         CALL      LDBTimSleepInterruptRealTime
+    285              }
+    286          
+    287              mLDBIntLeaveIsr(INTTMH1);
+   \                     ??LDBIntIsrINTTMH1_14:
+   \   003C   7B1E           DI
+   \   003E   11..00         MOV       S:LDBIntLevel,#0
+   \   0041   F0..           MOV       A,S:LDBIntGroup1
+   \   0043   70             MOV       X,A
+   \   0044   F4E5           MOV       A,0xFFE5
+   \   0046   6158           AND       A,X
+   \   0048   F6E5           MOV       0xFFE5,A
+   \   004A   F0..           MOV       A,S:LDBIntGroup1+1
+   \   004C   70             MOV       X,A
+   \   004D   F4E6           MOV       A,0xFFE6
+   \   004F   6158           AND       A,X
+   \   0051   F6E6           MOV       0xFFE6,A
+    288          }
+   \   0053   B6             POP       HL
+   \   0054   B0             POP       AX
+   \   0055   8F             RETI      
+   \   0056                  REQUIRE ?CL78K_V4_6_L00
+   \   0056                  REQUIRE _A_MK0
+   \   0056                  REQUIRE _A_MK1
+
+   \                                 In  segment INTVEC, offset 0x2, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 2`:
+   \   0002   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x4, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 4`:
+   \   0004   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x6, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 6`:
+   \   0006   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x8, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 8`:
+   \   0008   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0xa, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 10`:
+   \   000A   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0xc, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 12`:
+   \   000C   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0xe, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 14`:
+   \   000E   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x10, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 16`:
+   \   0010   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x12, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 18`:
+   \   0012   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x14, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 20`:
+   \   0014   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x1a, root
+   \                     `??LDBIntIsrINTTMH1??INTVEC 26`:
+   \   001A   ....           DW LDBIntIsrINTTMH1
+
+   \                                 In  segment INTVEC, offset 0x1e, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 30`:
+   \   001E   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x20, root
+   \                     `??LDBIntIsrINTTM000??INTVEC 32`:
+   \   0020   ....           DW LDBIntIsrINTTM000
+
+   \                                 In  segment INTVEC, offset 0x22, root
+   \                     `??LDBIntIsrINTTM010??INTVEC 34`:
+   \   0022   ....           DW LDBIntIsrINTTM010
+
+   \                                 In  segment INTVEC, offset 0x24, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 36`:
+   \   0024   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x2a, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 42`:
+   \   002A   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x2c, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 44`:
+   \   002C   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x2e, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 46`:
+   \   002E   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x32, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 50`:
+   \   0032   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x34, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 52`:
+   \   0034   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x36, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 54`:
+   \   0036   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   \                                 In  segment INTVEC, offset 0x38, root
+   \                     `??LDBIntIsrINTTM001??INTVEC 56`:
+   \   0038   ....           DW LDBIntIsrINTTM001
+
+   \                                 In  segment INTVEC, offset 0x3a, root
+   \                     `??LDBIntIsrINTTM011??INTVEC 58`:
+   \   003A   ....           DW LDBIntIsrINTTM011
+
+   \                                 In  segment INTVEC, offset 0x3e, root
+   \                     `??LDBIntIsrUnexpectedInterrupt??INTVEC 62`:
+   \   003E   ....           DW LDBIntIsrUnexpectedInterrupt
+
+   Segment part sizes:
+
+     Function/Label                            Bytes
+     --------------                            -----
+     _A_MK0                                       2
+     _A_MK1                                       2
+     LDBIntInterruptOwnerTM00TM01                 1
+     LDBIntInterruptOwnerTMH1                     1
+     LDBIntIsrUnexpectedInterrupt                11
+     LDBIntIsrINTTM001                           36
+     ?Subroutine0                                 7
+     LDBIntIsrINTTM000                           36
+     LDBIntIsrINTTM011                           33
+     LDBIntIsrINTTM010                           36
+     LDBIntIsrINTTMH1                            86
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 2     2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 4     2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 6     2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 8     2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 10    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 12    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 14    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 16    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 18    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 20    2
+     ??LDBIntIsrINTTMH1??INTVEC 26                2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 30    2
+     ??LDBIntIsrINTTM000??INTVEC 32               2
+     ??LDBIntIsrINTTM010??INTVEC 34               2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 36    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 42    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 44    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 46    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 50    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 52    2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 54    2
+     ??LDBIntIsrINTTM001??INTVEC 56               2
+     ??LDBIntIsrINTTM011??INTVEC 58               2
+     ??LDBIntIsrUnexpectedInterrupt??INTVEC 62    2
+
+ 
+ 245 bytes in segment CODE
+  48 bytes in segment INTVEC
+   4 bytes in segment NEAR_A
+   2 bytes in segment NEAR_Z
+ 
+ 245 bytes of CODE memory (+ 48 bytes shared)
+   2 bytes of DATA memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none

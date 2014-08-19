@@ -1,0 +1,5 @@
+class StkS8
+!!!174063.python!!!	__init__(inout self : )
+        self.Name = 'S8'
+        self.lowerLimit = -126
+        self.upperLimit = 127

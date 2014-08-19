@@ -1,0 +1,10 @@
+class StkCFileReqWriteTOSSignalCriteria
+!!!245615.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+        for tosSignal in re.findall(r'TOSWriteSignal\s*\(\s*c(TOSSignal\w+)\s*\)', inpTextContent):
+            pif = self.getPortInterfaceFactory()
+            dtf = self.getDataTypeFactory()
+            tosCtrlIf = pif.getStkTOSSignalIf(tosSignal, dtf)
+            reqPort = PortInterface.RequiredPort.RequiredPort(tosCtrlIf)
+            reqPort.setName(tosSignal)
+            reqPort.setInterface(tosCtrlIf)
+            inoutIComponent.addPort(reqPort)

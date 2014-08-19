@@ -1,0 +1,1911 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:27:32 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_PAL.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LAP_PAL.LST -o                           #
+#                    ..\EXE\TARGET_R\LAP_PAL.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_PAL.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\LAP_PAL.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LAP_PAL.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_PAL.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LAP_PAL
+     12          //               
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 11 2010 14:08:54  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_PAL/LAP_PAL.c-arc  $
+     16          // $Revision:   1.12  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_PAL/LAP_PAL.c-arc  $
+     19          // 
+     20          //    Rev 1.12   Mar 11 2010 14:08:54   adzhelp
+     21          // Cm006590, Cm006698: Code review corrections
+     22          // 
+     23          //    Rev 1.11   Jan 18 2010 14:50:22   adzhelp
+     24          // Cm006590, Cm006698: Door opened before reset is ignored in awake mode
+     25          // 
+     26          //    Rev 1.10   Dec 14 2009 11:02:18   amanevd
+     27          // Cm005566: Full Hardware Protection
+     28          // 
+     29          //    Rev 1.9   Dec 02 2009 11:10:22   adzhelp
+     30          // Cm006667: LAP_PAL can go to BCM sleep mode during alarm awake mode
+     31          // 
+     32          //    Rev 1.8   04 Nov 2009 15:57:18   akodzhh
+     33          // Cm006425: remove assert.
+     34          // 
+     35          //    Rev 1.7   04 Nov 2009 15:24:40   akodzhh
+     36          // Cm006562: Clear FlagRfLock after check is done.
+     37          // Cm006425: Disable of alarm by CALALPRI not terminate awake mode.
+     38          // 
+     39          //    Rev 1.6   Nov 04 2009 14:26:42   adzhelp
+     40          // Cm005566: Implementation of HW Protection functionality
+     41          // 
+     42          //    Rev 1.5   Oct 22 2009 14:45:32   amanevd
+     43          // Cm006425: QAC justification and UTest update
+     44          // 
+     45          //    Rev 1.4   06 Oct 2009 10:06:28   aangovt
+     46          // Cm006425: EEP_CALALPRI checks at active cycle are removed.
+     47          // 
+     48          //    Rev 1.3   06 Oct 2009 09:55:32   aangovt
+     49          // Cm006425: Corrections according to code review.
+     50          // 
+     51          //    Rev 1.2   Sep 25 2009 10:08:42   adzhelp
+     52          // Cm005225: Integration test changes
+     53          // 
+     54          //    Rev 1.1   Sep 14 2009 15:04:36   aangovt
+     55          // Cm005225: Clear Reset flag after alarm cycle
+     56          // 
+     57          //    Rev 1.0   Sep 09 2009 15:54:26   aangovt
+     58          // Initial revision.
+     59          //******************************************************************************
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Body Identification
+     63          //------------------------------------------------------------------------------
+     64          
+     65          #define LAP_PAL  "LAP_PAL"
+     66          
+     67          //------------------------------------------------------------------------------
+     68          // Included files to resolve specific definitions in this file
+     69          //------------------------------------------------------------------------------
+     70          
+     71          // This is an example:
+     72          // #include <system_file_name.h>
+     73          // #include "project_file_name.h"
+     74          
+     75          #include "dat.h"
+     76          #include "deftypes.h"
+     77          #include "lib.h"
+     78          #include "tos.h"
+     79          #include "LAP_PAL.h"
+     80          #include "LAP_PAL.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near PerimeterAlarmManagement[12]
+   \                     PerimeterAlarmManagement:
+   \   0000   ........       DW LAPPalAlarmInhibited, LAPPalInitializeDisableMode
+   \   0004   0100           DB 1, 0
+   \   0006   ........       DW LAPPalRfLock, LAPPalInitializeStandbyMode
+   \   000A   0200           DB 2, 0
+   \   000C   ........       DW LAPPalRfUnlockOrKeyIsRecognised, LAPPalInitializeDisableMode
+   \   0010   0300           DB 3, 0
+   \   0012   ........       DW LAPPalActivate, LAPPalStartHorn
+   \   0016   0B04           DB 11, 4
+   \   0018   ........       DW LAPPalRfUnlockOrKeyIsRecognised, LAPPalInitializeDisableMode
+   \   001C   0500           DB 5, 0
+   \   001E   ........       DW LAPPalHornActivationContinues, LAPPalStartHorn
+   \   0022   0604           DB 6, 4
+   \   0024   ........       DW LAPPalHornActivationFinished, LAPPalStartHornPause
+   \   0028   0907           DB 9, 7
+   \   002A   ........       DW LAPPalRfUnlockOrKeyIsRecognised, LAPPalInitializeDisableMode
+   \   002E   0800           DB 8, 0
+   \   0030   ........       DW LAPPAlHornPauseElapsed, TOSSeqNoAction
+   \   0034   FF00           DB 255, 0
+   \   0036   ........       DW LAPPalNextAlarmCycle, LAPPalEndOfAlarmCycle
+   \   003A   FF0A           DB 255, 10
+   \   003C   ........       DW TOSSeqTrueEval, LAPPalInitializeStandbyMode
+   \   0040   FF00           DB 255, 0
+   \   0042   ........       DW LAPPalNewAlarmCycle, LAPPalStartHornPause
+   \   0046   FF07           DB 255, 7
+     81          
+     82          //------------------------------------------------------------------------------
+     83          // Local constants
+     84          //------------------------------------------------------------------------------
+     85          
+     86          // This is an example:
+     87          // #define cConstantName    ((tType)ConstantValue)
+     88          
+     89           
+     90          
+     91          #define cWarningCycleDuration       ((tTOSTimer) (mTOSConvMsInTimerTick(2000UL)-(tTOSTimer) 1)) //2sec
+     92          #define cSilencePeriodDuration      ((tTOSTimer) (mTOSConvMsInTimerTick(10000UL)-(tTOSTimer) 1))//10sec
+     93          #define cWarningCycleRepetition     15
+     94          #define cEvenOrOddDevider            2
+     95          // Local macros
+     96          //------------------------------------------------------------------------------
+     97          
+     98          
+     99          // This is an example:
+    100          // #define mMacroName       (MacroDefinition)
+    101          
+    102          #define cKeyIsRecognised            ((U16) 0x0001) //1
+    103          #define cKeyIsNotRecognised         ((U16) 0x0002)
+    104          #define cRfUnlockReceived           ((U16) 0x0004)
+    105          #define cRfLockReceived             ((U16) 0x0008)
+    106          #define cAlarmIsAwake               ((U16) 0x0010)
+    107          #define cAlarmIsActive              ((U16) 0x0020)
+    108          #define cFrontDoorsOpened           ((U16) 0x0040)
+    109          #define cRearDoorsOpened            ((U16) 0x0080)
+    110          #define cPowerIgnitionInhibited     ((U16) 0x0100)
+    111          #define cRfInhibited                ((U16) 0x0200)
+    112          #define cAuthenticationInhibited    ((U16) 0x0400)
+    113          #define cFirst30SecOfAlarmCycleDone ((U16) 0x0800)
+    114          #define cBcmCanSleep                ((U16) 0x1000) 
+    115          #define cAlarmTestModeRequested     ((U16) 0x2000) 
+    116          
+    117          #define cMinNumberOfAlarmCycles         ((U8) 2)
+    118          #define cNumberOfAlarmCycles            ((U8) 3)
+    119          #define cMaxNumberOfAlarmCycles         ((U8) 10)
+    120          
+    121          
+    122          #define cAllDoorAreClosed                 ((U8)0x00U) // all doors are closed
+    123          
+    124          
+    125          #define cAlarmDeactivated                ((U8)0)
+    126          #define cAlarmAwake                      ((U8)1)
+    127          #define cAlarmActivated                  ((U8)2)
+    128          
+    129          //------------------------------------------------------------------------------
+    130          // Local macros
+    131          //------------------------------------------------------------------------------
+    132          
+    133          // This is an example:
+    134          // #define mMacroName       (MacroDefinition)
+    135          
+    136          // Flag's access macros
+    137          #define mSetFlagKeyIsRecognised()       (u16AlaFlag |= cKeyIsRecognised)
+    138          #define mClearFlagKeyIsRecognised()     (u16AlaFlag &= (U16)(~cKeyIsRecognised))
+    139          #define mGetFlagKeyIsRecognised()       ((u16AlaFlag & cKeyIsRecognised) != 0)
+    140          
+    141          #define mSetFlagKeyIsNotRecognised()    (u16AlaFlag |= cKeyIsNotRecognised)
+    142          #define mClearFlagKeyIsNotRecognised()  (u16AlaFlag &= (U16)(~cKeyIsNotRecognised))
+    143          #define mGetFlagKeyIsNotRecognised()    ((u16AlaFlag & cKeyIsNotRecognised) != 0)
+    144          
+    145          #define mSetFlagRfUnlockReceived()      (u16AlaFlag |= cRfUnlockReceived)
+    146          #define mClearFlagRfUnlockReceived()    (u16AlaFlag &= (U16)(~cRfUnlockReceived))
+    147          #define mGetFlagRfUnlockReceived()      ((u16AlaFlag & cRfUnlockReceived) != 0)
+    148          
+    149          #define mSetFlagRfLockReceived()        (u16AlaFlag |= cRfLockReceived)
+    150          #define mClearFlagRfLockReceived()      (u16AlaFlag &= (U16)(~cRfLockReceived))
+    151          #define mGetFlagRfLockReceived()        ((u16AlaFlag & cRfLockReceived) != 0)
+    152          
+    153          
+    154          
+    155          #define mSetFlagAlarmIsAwake()       (u16AlaFlag |= cAlarmIsAwake)
+    156          #define mClearFlagAlarmIsAwake()     (u16AlaFlag &= (U16)(~cAlarmIsAwake))
+    157          #define mGetFlagAlarmIsAwake()       ((u16AlaFlag & cAlarmIsAwake) != 0)
+    158          #define mGetFlagAlarmIsNotAwake()       ((u16AlaFlag & cAlarmIsAwake) == 0)
+    159          
+    160          #define mSetFlagAlarmIsActive()        (u16AlaFlag |= cAlarmIsActive)
+    161          #define mClearFlagAlarmIsActive()      (u16AlaFlag &= (U16)(~cAlarmIsActive))
+    162          #define mGetFlagAlarmIsActive()        ((u16AlaFlag & cAlarmIsActive) != 0)
+    163          #define mGetFlagAlarmIsNotActive()        ((u16AlaFlag & cAlarmIsActive) == 0)
+    164          
+    165          #define mSetFlagFrontDoorsOpened()        (u16AlaFlag |= cFrontDoorsOpened)
+    166          #define mClearFlagFrontDoorsOpened()      (u16AlaFlag &= (U16)(~cFrontDoorsOpened))
+    167          #define mGetFlagFrontDoorsOpened()        ((u16AlaFlag & cFrontDoorsOpened) != 0)
+    168          #define mGetFlagFrontDoorsNotOpened()     ((u16AlaFlag & cFrontDoorsOpened) == 0)
+    169          
+    170          #define mSetFlagRearDoorsOpened()        (u16AlaFlag |= cRearDoorsOpened)
+    171          #define mClearFlagRearDoorsOpened()      (u16AlaFlag &= (U16)(~cRearDoorsOpened))
+    172          #define mGetFlagRearDoorsOpened()        ((u16AlaFlag & cRearDoorsOpened) != 0)
+    173          #define mGetFlagRearDoorsNotInhibited()     ((u16AlaFlag & cRearDoorsOpened) == 0)
+    174          
+    175          #define mSetFlagPowerIgnitionInhibited()        (u16AlaFlag |= cPowerIgnitionInhibited)
+    176          #define mClearFlagPowerIgnitionInhibited()      (u16AlaFlag &= (U16)(~cPowerIgnitionInhibited))
+    177          #define mGetFlagPowerIgnitionInhibited()        ((u16AlaFlag & cPowerIgnitionInhibited) != 0)
+    178          #define mGetFlagPowerIgnitionNotInhibited()     ((u16AlaFlag & cPowerIgnitionInhibited) == 0)
+    179          
+    180          #define mSetFlagRfInhibited()     (u16AlaFlag |= cRfInhibited)
+    181          #define mClearFlagRfInhibited()   (u16AlaFlag &= (U16)(~cRfInhibited))
+    182          #define mGetFlagRfInhibited()     ((u16AlaFlag & cRfInhibited) != 0)
+    183          #define mGetFlagRfNotInhibited()  ((u16AlaFlag & cRfInhibited) == 0)
+    184          
+    185          #define mSetFlagAuthenticationInhibited()            (u16AlaFlag |= cAuthenticationInhibited)
+    186          #define mClearFlagAuthenticationInhibited()          (u16AlaFlag &= (U16)(~cAuthenticationInhibited))
+    187          #define mGetFlagAuthenticationInhibited()            ((u16AlaFlag & cAuthenticationInhibited) != 0)
+    188          #define mGetFlagAuthenticationNotInhibited()            ((u16AlaFlag & cAuthenticationInhibited) == 0)
+    189                                                    
+    190          #define mSetFlagFirst30SecOfAlarmCycleDone()         (u16AlaFlag |= cFirst30SecOfAlarmCycleDone)
+    191          #define mClearFlagFirst30SecOfAlarmCycleDone()       (u16AlaFlag &= (U16)(~cFirst30SecOfAlarmCycleDone))
+    192          #define mGetFlagFirst30SecOfAlarmCycleDone()         ((u16AlaFlag & cFirst30SecOfAlarmCycleDone) != 0)
+    193          #define mGetFlagFirst30SecOfAlarmCycleNotDone()      ((u16AlaFlag & cFirst30SecOfAlarmCycleDone) == 0)
+    194          
+    195                                                    
+    196          #define mSetFlagBcmCanSleep()                (u16AlaFlag |= cBcmCanSleep)
+    197          #define mClearFlagBcmCanSleep()              (u16AlaFlag &= (U16)(~cBcmCanSleep))
+    198          #define mGetFlagBcmCanSleep()                ((u16AlaFlag & cBcmCanSleep) != 0)
+    199          #define mGetFlagBcmCannotSleep()             ((u16AlaFlag & cBcmCanSleep) == 0)
+    200          
+    201          #define mSetFlagAlarmTestModeRequested()     (u16AlaFlag |= cAlarmTestModeRequested)
+    202          #define mClearFlagAlarmTestModeRequested()   (u16AlaFlag &= (U16)(~cAlarmTestModeRequested))
+    203          #define mGetFlagAlarmTestModeRequested()     ((u16AlaFlag & cAlarmTestModeRequested) != 0)
+    204          
+    205          //------------------------------------------------------------------------------
+    206          // Local types
+    207          //------------------------------------------------------------------------------
+    208          
+    209          // This is an example:
+    210          // typedef Expression   tTypeName;
+    211          
+    212          //------------------------------------------------------------------------------
+    213          // Local data
+    214          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    215          static tTOSTimer  WarningCycleTimer;
+   \                     WarningCycleTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    216          static tTOSTimer  PauseCycleTimer;
+   \                     PauseCycleTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    217          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    218          static U16    u16AlaFlag;
+   \                     u16AlaFlag:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    219          static U8     u8WarningCyclesCounter = 0;
+   \                     u8WarningCyclesCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    220          static U8     u8WarningTONCounter = 0;
+   \                     u8WarningTONCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    221          static BOOL   bPauseBetweenCyclesHasDone = cFalse;
+   \                     bPauseBetweenCyclesHasDone:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    222          static BOOL   bResetDuringAlarmCycle = cFalse;
+   \                     bResetDuringAlarmCycle:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    223          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    224          static BOOL bDisableFrontDoorActivation = cFalse;
+   \                     bDisableFrontDoorActivation:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    225          static BOOL bDisableRearDoorActivation = cFalse;
+   \                     bDisableRearDoorActivation:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    226          
+    227          //------------------------------------------------------------------------------
+    228          // Constant local data
+    229          //------------------------------------------------------------------------------
+    230          
+    231          // This is an example:
+    232          // static const tType  cConstantName;
+    233          
+    234          
+    235          //------------------------------------------------------------------------------
+    236          // Exported data
+    237          //------------------------------------------------------------------------------
+    238          
+    239          // This is an example:
+    240          // Reduce to minimum the usage of extern data members!!!
+    241          // tType   LAYCmpVariableName;  //LAY: 3 characters to identify the layer
+    242          // tType*  pLAYCmpVariableName; //Cmp: 3-4 characters to identify the component
+    243          // U8      u8LAYCmpVariableName;
+    244          // U16*    pu16LAYCmpVariableName;
+    245          
+    246          //------------------------------------------------------------------------------
+    247          // Constant exported data
+    248          //------------------------------------------------------------------------------
+    249          
+    250          // This is an example:
+    251          // Reduce to minimum the usage of extern constant data members!!!
+    252          // extern const tType  cLAYCmpConstantName;
+    253          // extern const U32    cu32LAYCmpConstantName;
+    254          
+    255          
+    256          //------------------------------------------------------------------------------
+    257          // Local function prototypes
+    258          //------------------------------------------------------------------------------
+    259          
+    260          // This is an example:
+    261          // static tType CmpFunctionName( tTypeArgument1 ArgumentName1, ... );
+    262          
+    263          static MEM_TYPE BOOL ReadDoorsInput(void);
+    264          
+    265          #ifdef X90_PROJECT
+    266          static MEM_TYPE void LAPPalLeaveStartingStepState_Static(void);
+    267          static MEM_TYPE BOOL LAPPalRfLock_Static(void);
+    268          static MEM_TYPE void LAPPalInitializeDisableMode_Static(void);
+    269          static MEM_TYPE void LAPPalInitializeStandbyMode_Static(void);
+    270          static MEM_TYPE BOOL LAPPalActivate_Static(void);
+    271          static MEM_TYPE BOOL LAPPalNewAlarmCycle_Static(void);
+    272          static MEM_TYPE BOOL LAPPalHornActivationFinished_Static(void);
+    273          static MEM_TYPE void LAPPalStartHorn_Static(void);
+    274          static MEM_TYPE void LAPPalStartHornPause_Static(void);
+    275          static MEM_TYPE void LAPPalEndOfAlarmCycle_Static(void);
+    276          #endif
+    277          
+    278          //==============================================================================
+    279          //=========================== LOCAL FUNCTIONS ==================================
+    280          
+    281          //==============================================================================
+    282          // DESCRIPTION : Door state
+    283          //
+    284          // PARAMETERS (Type,Name,Min,Max) :   none
+    285          //
+    286          // RETURN VALUE :   none
+    287          //
+    288          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    289          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    290          static MEM_TYPE BOOL ReadDoorsInput(void)
+   \                     ReadDoorsInput:
+    291          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    292              BOOL bReturnValueL;
+    293              bReturnValueL = cFalse;
+   \   0000   A000           MOV       X,#0
+    294          
+    295          
+    296              if((mDATRead(U1Bit, FR_DOORS_SW, Default) != 0) || (mDATRead(U1Bit, RR_DOORS_SW, Default) != 0))
+   \   0002   BC..04         BT        S:DATDinInputBuffers+6.3, ??LAPPalEndOfAlarmCycle_Static_0
+   \   0005   3103..02       BF        S:DATDinInputBuffers+8.0, ??LAPPalEndOfAlarmCycle_Static_1
+    297              {
+    298                  bReturnValueL = cTrue;
+   \                     ??LAPPalEndOfAlarmCycle_Static_0:
+   \   0009   A001           MOV       X,#1
+    299              }
+    300              
+    301          
+    302              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_1:
+   \   000B   60             MOV       A,X
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    303          }
+    304          /* [LOCAL_FUNCTIONS_END] */
+    305          //==============================================================================
+    306          //=========================== EXPORTED FUNCTIONS ===============================
+    307          //==============================================================================
+    308          
+    309          //==============================================================================
+    310          // DESCRIPTION : Component initialization
+    311          //
+    312          // PARAMETERS (Type,Name,Min,Max) :   none
+    313          //
+    314          // RETURN VALUE :   none
+    315          //
+    316          // DESIGN INFORMATION : 
+    317          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    318          void LAPPalInitialize(void)
+   \                     LAPPalInitialize:
+    319          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    320          
+    321              u16AlaFlag = 0;
+   \   0000   100000         MOVW      AX,#0
+   \   0003   03....         MOVW      u16AlaFlag,AX
+    322              bPauseBetweenCyclesHasDone = cFalse;
+   \   0006   9E....         MOV       bPauseBetweenCyclesHasDone,A
+    323              u8WarningTONCounter = 0;
+   \   0009   9E....         MOV       u8WarningTONCounter,A
+    324              u8WarningCyclesCounter = 0; 
+   \   000C   9E....         MOV       u8WarningCyclesCounter,A
+    325              bResetDuringAlarmCycle = cFalse;
+   \   000F   9E....         MOV       bResetDuringAlarmCycle,A
+    326          }
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    327          //==============================================================================
+    328          // DESCRIPTION : Checks after reset
+    329          //
+    330          // PARAMETERS (Type,Name,Min,Max) :   none
+    331          //
+    332          // RETURN VALUE :   none
+    333          //
+    334          // DESIGN INFORMATION : prsFS_ASA-430, prsFS_ASA-432, prsFS_ASA-435
+    335          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    336          void LAPPalLeaveStartingStepState(void)
+   \                     LAPPalLeaveStartingStepState:
+    337          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    338          #ifdef X90_PROJECT
+    339              LAPPalLeaveStartingStepState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalLeaveStartingStepState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalLeaveStartingStepState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    340          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    341          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    342          static MEM_TYPE void LAPPalLeaveStartingStepState_Static(void)
+   \                     LAPPalLeaveStartingStepState_Static:
+    343          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    344          #endif
+    345          
+    346              U8 u8AlarmStateAfterResetL;
+    347              
+    348              u16AlaFlag = 0;
+   \   0000   100000         MOVW      AX,#0
+   \   0003   03....         MOVW      u16AlaFlag,AX
+    349              bPauseBetweenCyclesHasDone = cFalse;
+   \   0006   9E....         MOV       bPauseBetweenCyclesHasDone,A
+    350              u8WarningTONCounter = 0;
+   \   0009   9E....         MOV       u8WarningTONCounter,A
+    351              u8WarningCyclesCounter = 0; 
+   \   000C   9E....         MOV       u8WarningCyclesCounter,A
+    352              
+    353              TOSSeqActivateGraph(cTOSSeqGraphIdPerimeterAlarmManagement);
+   \   000F   A11D           MOV       A,#29
+   \   0011   ..             CALLT     [__T_TOSSeqActivateGraph]
+    354              u8AlarmStateAfterResetL = mDATRead(U8Bit, EEP_PerimeterAlarmState, Defaut);
+    355              
+    356              switch(u8AlarmStateAfterResetL)
+   \   0012   8E....         MOV       A,DATDbkMirrors+66
+   \   0015   4D00           CMP       A,#0
+   \   0017   AD09           BZ        ??LAPPalEndOfAlarmCycle_Static_2
+   \   0019   4D01           CMP       A,#1
+   \   001B   AD0C           BZ        ??LAPPalEndOfAlarmCycle_Static_3
+   \   001D   4D02           CMP       A,#2
+   \   001F   AD28           BZ        ??LAPPalEndOfAlarmCycle_Static_4
+   \   0021   AF             RET       
+    357              {
+    358              case cAlarmDeactivated:
+    359          
+    360                  mSetFlagBcmCanSleep();
+   \                     ??LAPPalEndOfAlarmCycle_Static_2:
+   \   0022   16....         MOVW      HL,#u16AlaFlag
+   \   0025   86             INCW      HL
+   \   0026   71C2           SET1      [HL].4
+   \   0028   AF             RET       
+    361                  break;
+    362              case cAlarmAwake:
+    363                  //QACJ 0277: aangovt: Clear bit operation
+    364                  mSetFlagBcmCanSleep();
+    365                  mSetFlagAlarmIsAwake();
+   \                     ??LAPPalEndOfAlarmCycle_Static_3:
+   \   0029   101010         MOVW      AX,#4112
+   \   002C   68....         OR        A,u16AlaFlag
+   \   002F   30             XCH       A,X
+   \   0030   68....         OR        A,u16AlaFlag+1
+   \   0033   03....         MOVW      u16AlaFlag,AX
+    366          
+    367                  // Disable activation by a door that has been open before reset
+    368                  if (mDATRead(U1Bit, FR_DOORS_SW, Immediate) != cFalse)
+   \   0036   3133..05       BF        S:DATDinInputBuffers+15.3, ??LAPPalEndOfAlarmCycle_Static_5
+    369                  {
+    370                      bDisableFrontDoorActivation = cTrue;
+   \   003A   A101           MOV       A,#1
+   \   003C   9E....         MOV       bDisableFrontDoorActivation,A
+    371                      // rising edge expected after DIN filtration
+    372                  }
+    373                  if (mDATRead(U1Bit, RR_DOORS_SW, Immediate) != cFalse)
+   \                     ??LAPPalEndOfAlarmCycle_Static_5:
+   \   003F   3103..16       BF        S:DATDinInputBuffers+17.0, ??LAPPalEndOfAlarmCycle_Static_6
+    374                  {
+    375                      bDisableRearDoorActivation = cTrue;
+   \   0043   A101           MOV       A,#1
+   \   0045   9E....         MOV       bDisableRearDoorActivation,A
+   \   0048   AF             RET       
+    376                      // rising edge expected after DIN filtration
+    377                  }
+    378                  break;
+    379              case cAlarmActivated:
+    380                  bResetDuringAlarmCycle = cTrue;
+   \                     ??LAPPalEndOfAlarmCycle_Static_4:
+   \   0049   A101           MOV       A,#1
+   \   004B   9E....         MOV       bResetDuringAlarmCycle,A
+    381                  //QACJ 0277: aangovt: Clear bit operation
+    382                  mClearFlagBcmCanSleep();
+    383                  mSetFlagAlarmIsActive();
+   \   004E   16....         MOVW      HL,#u16AlaFlag
+   \   0051   86             INCW      HL
+   \   0052   71C3           CLR1      [HL].4
+   \   0054   16....         MOVW      HL,#u16AlaFlag
+   \   0057   71D2           SET1      [HL].5
+    384                  break;
+    385              //CCOV: aangovt: Cannot be covered because this default case rises explicit assert
+    386              default:
+    387                  mLIBassert(cFalse);
+    388                  break;
+    389              }
+    390          
+    391          
+    392          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_6:
+   \   0059   AF             RET       
+   \   005A                  REQUIRE ?CL78K_V4_6_L00
+    393          //==============================================================================
+    394          // DESCRIPTION : 
+    395          //
+    396          // PARAMETERS (Type,Name,Min,Max) :   none
+    397          //
+    398          // RETURN VALUE :   none
+    399          //
+    400          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    401          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    402          void LAPPalIsAnybodyMaintainActiveState(void)
+   \                     LAPPalIsAnybodyMaintainActiveState:
+    403          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    404              if (mGetFlagBcmCannotSleep())
+   \   0000   16....         MOVW      HL,#u16AlaFlag+1
+   \   0003   31C604         BT        [HL].4, ??LAPPalEndOfAlarmCycle_Static_23
+    405              {
+    406                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   0006   102900         MOVW      AX,#41
+   \   0009   ..             CALLT     [__T_TOSWriteSignal]
+    407              }
+    408          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_23:
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    409          //==============================================================================
+    410          // DESCRIPTION : Key Authentication
+    411          //
+    412          // PARAMETERS (Type,Name,Min,Max) :   none
+    413          //
+    414          // RETURN VALUE :   none
+    415          //
+    416          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    417          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    418          void LAPPalKeyIsAuthenticated(void)
+   \                     LAPPalKeyIsAuthenticated:
+    419          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    420              mSetFlagKeyIsRecognised(); 
+    421              //QACJ 0277: aangovt: Clear bit operation
+    422              mClearFlagKeyIsNotRecognised();
+   \   0000   02....         MOVW      AX,u16AlaFlag
+   \   0003   30             XCH       A,X
+   \   0004   5DFD           AND       A,#253
+   \   0006   6D01           OR        A,#1
+   \   0008                  REQUIRE ?CL78K_V4_6_L00
+   \   0008                  REQUIRE ?Subroutine0
+   \   0008                  ; // Fall through to label ?Subroutine0
+    423          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   30             XCH       A,X
+   \   0001   03....         MOVW      u16AlaFlag,AX
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    424          
+    425          //==============================================================================
+    426          // DESCRIPTION : Rf Lock
+    427          //
+    428          // PARAMETERS (Type,Name,Min,Max) :   none
+    429          //
+    430          // RETURN VALUE :   none
+    431          //
+    432          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    433          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    434          void LAPPalLockFromTheOutside(void)
+   \                     LAPPalLockFromTheOutside:
+    435          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    436              mSetFlagRfLockReceived();
+    437              //QACJ 0277: aangovt: Clear bit operation
+    438              mClearFlagRfUnlockReceived();
+   \   0000   02....         MOVW      AX,u16AlaFlag
+   \   0003   30             XCH       A,X
+   \   0004   5DFB           AND       A,#251
+   \   0006   6D08           OR        A,#8
+   \   0008   9B....         BR        N:?Subroutine0
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    439          }
+    440          
+    441          //==============================================================================
+    442          // DESCRIPTION : Rf unlock
+    443          //
+    444          // PARAMETERS (Type,Name,Min,Max) :   none
+    445          //
+    446          // RETURN VALUE :   none
+    447          //
+    448          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    449          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    450          void LAPPalUnlockFromTheOutside(void)
+   \                     LAPPalUnlockFromTheOutside:
+    451          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    452              mSetFlagRfUnlockReceived();
+    453              //QACJ 0277: aangovt: Clear bit operation
+    454              mClearFlagRfLockReceived();
+   \   0000   02....         MOVW      AX,u16AlaFlag
+   \   0003   30             XCH       A,X
+   \   0004   5DF7           AND       A,#247
+   \   0006   6D04           OR        A,#4
+   \   0008   9B....         BR        N:?Subroutine0
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    455          }
+    456          //==============================================================================
+    457          // DESCRIPTION : Condition for awake state of alarm
+    458          //
+    459          // PARAMETERS (Type,Name,Min,Max) :   none
+    460          //
+    461          // RETURN VALUE :   none
+    462          //
+    463          // DESIGN INFORMATION : prsFS_ASA-410, prsFS_ASA-415
+    464          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    465          BOOL LAPPalRfLock(void)
+   \                     LAPPalRfLock:
+    466          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    467          #ifdef X90_PROJECT
+    468              return LAPPalRfLock_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalRfLock_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalRfLock_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    469          }
+    470          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    471          static MEM_TYPE BOOL LAPPalRfLock_Static(void)
+   \                     LAPPalRfLock_Static:
+    472          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    473          #endif
+    474          
+    475              BOOL bReturnValueL = cFalse;
+   \   0001   A200           MOV       C,#0
+    476              BOOL bDoorStatusL;
+    477              bDoorStatusL = ReadDoorsInput();
+   \   0003   16....         MOVW      HL,#LWRD(ReadDoorsInput)
+   \   0006   A4..           MOV       E,#BYTE3(ReadDoorsInput)
+   \   0008   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    478              
+    479              if ((mGetFlagRfLockReceived()) && (bDoorStatusL == 0))
+   \   0009   16....         MOVW      HL,#u16AlaFlag
+   \   000C   31B706         BF        [HL].3, ??LAPPalEndOfAlarmCycle_Static_7
+   \   000F   4D00           CMP       A,#0
+   \   0011   BD02           BNZ       ??LAPPalEndOfAlarmCycle_Static_7
+    480              {
+    481                  bReturnValueL = cTrue;
+   \   0013   A201           MOV       C,#1
+    482              }
+    483              // Cm006562: perimeter alarm state during RKE lock and Door open.
+    484              //QACJ 0277: aangovt: Clear bit operation
+    485              mClearFlagRfLockReceived();
+   \                     ??LAPPalEndOfAlarmCycle_Static_7:
+   \   0015   62             MOV       A,C
+   \   0016   71B3           CLR1      [HL].3
+    486              
+    487              return bReturnValueL;
+   \   0018   B2             POP       BC
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    488          }
+    489          //==============================================================================
+    490          // DESCRIPTION : Deactivation of alarm
+    491          //
+    492          // PARAMETERS (Type,Name,Min,Max) :   none
+    493          //
+    494          // RETURN VALUE :   none
+    495          //
+    496          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    497          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    498          void LAPPalInitializeDisableMode(void)
+   \                     LAPPalInitializeDisableMode:
+    499          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    500          #ifdef X90_PROJECT
+    501              LAPPalInitializeDisableMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalInitializeDisableMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalInitializeDisableMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    502          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    503          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    504          static MEM_TYPE void LAPPalInitializeDisableMode_Static(void)
+   \                     LAPPalInitializeDisableMode_Static:
+    505          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    506          #endif
+    507          
+    508              
+    509           
+    510              mDATWrite(U1Bit, HORN_RL,0, Default);
+   \   0000   A100           MOV       A,#0
+   \   0002   2B..           CLR1      S:DATPouSoftOutputBuffer+2.2
+    511              mDATWrite(U1Bit, HazardAlarmRequested, 0, Default);
+   \   0004   16....         MOVW      HL,#DATCmnData+3
+   \   0007   97             MOV       [HL],A
+    512           
+    513          
+    514              bResetDuringAlarmCycle = cFalse;
+   \   0008   9E....         MOV       bResetDuringAlarmCycle,A
+    515              //QACJ 0277: aangovt: Clear bit operation 
+    516              mClearFlagFrontDoorsOpened();
+    517              //QACJ 0277: aangovt: Clear bit operation
+    518              mClearFlagRearDoorsOpened();
+    519              u8WarningCyclesCounter = 0;
+   \   000B   9E....         MOV       u8WarningCyclesCounter,A
+    520              //QACJ 0277: aangovt: Clear bit operation
+    521              mClearFlagAlarmIsActive();
+    522              //QACJ 0277: aangovt: Clear bit operation
+    523              mClearFlagAlarmIsAwake();
+    524              //QACJ 0277: aangovt: Clear bit operation
+    525              mClearFlagKeyIsRecognised();
+    526              //QACJ 0277: aangovt: Clear bit operation
+    527              mClearFlagRfUnlockReceived();
+   \   000E   100AFF         MOVW      AX,#65290
+   \   0011   30             XCH       A,X
+   \   0012   58....         AND       A,u16AlaFlag
+   \   0015   30             XCH       A,X
+   \   0016   58....         AND       A,u16AlaFlag+1
+   \   0019   03....         MOVW      u16AlaFlag,AX
+    528              mDATWrite(U8Bit, EEP_PerimeterAlarmState, cAlarmDeactivated, Immediate);
+   \   001C   8E....         MOV       A,DATDbkMirrors+66
+   \   001F   4D00           CMP       A,#0
+   \   0021   AD0B           BZ        ??LAPPalEndOfAlarmCycle_Static_8
+   \   0023   A100           MOV       A,#0
+   \   0025   16....         MOVW      HL,#DATDbkMirrors+66
+   \   0028   97             MOV       [HL],A
+   \   0029   A102           MOV       A,#2
+   \   002B   9A....         CALL      DATDbkStartUpdate
+    529              mSetFlagBcmCanSleep();
+   \                     ??LAPPalEndOfAlarmCycle_Static_8:
+   \   002E   A100           MOV       A,#0
+   \   0030   16....         MOVW      HL,#u16AlaFlag
+   \   0033   86             INCW      HL
+   \   0034   71C2           SET1      [HL].4
+    530              u8WarningTONCounter = 0;
+   \   0036   9E....         MOV       u8WarningTONCounter,A
+    531          }
+   \   0039   AF             RET       
+   \   003A                  REQUIRE ?CL78K_V4_6_L00
+    532          //==============================================================================
+    533          // DESCRIPTION : Alarm in awake mode
+    534          //
+    535          // PARAMETERS (Type,Name,Min,Max) :   none
+    536          //
+    537          // RETURN VALUE :   none
+    538          //
+    539          // DESIGN INFORMATION : prsFS_ASA-410
+    540          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    541          void LAPPalInitializeStandbyMode(void)
+   \                     LAPPalInitializeStandbyMode:
+    542          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    543          #ifdef X90_PROJECT
+    544              LAPPalInitializeStandbyMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalInitializeStandbyMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalInitializeStandbyMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    545          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    546          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    547          static MEM_TYPE void LAPPalInitializeStandbyMode_Static(void)
+   \                     LAPPalInitializeStandbyMode_Static:
+    548          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    549          #endif
+    550          
+    551              bResetDuringAlarmCycle = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bResetDuringAlarmCycle,A
+    552              //QACJ 0277: aangovt: Clear bit operation
+    553              mClearFlagAlarmIsActive();
+    554              mSetFlagAlarmIsAwake();
+    555              //QACJ 0277: aangovt: Clear bit operation
+    556              mSetFlagBcmCanSleep();
+    557              //QACJ 0277: aangovt: Clear bit operation
+    558              mClearFlagRfLockReceived();
+   \   0005   10D7FF         MOVW      AX,#65495
+   \   0008   30             XCH       A,X
+   \   0009   58....         AND       A,u16AlaFlag
+   \   000C   30             XCH       A,X
+   \   000D   58....         AND       A,u16AlaFlag+1
+   \   0010   03....         MOVW      u16AlaFlag,AX
+   \   0013   101010         MOVW      AX,#4112
+   \   0016   68....         OR        A,u16AlaFlag
+   \   0019   30             XCH       A,X
+   \   001A   68....         OR        A,u16AlaFlag+1
+   \   001D   03....         MOVW      u16AlaFlag,AX
+    559              mDATWrite(U8Bit, EEP_PerimeterAlarmState, cAlarmAwake, Immediate);
+   \   0020   8E....         MOV       A,DATDbkMirrors+66
+   \   0023   51             DEC       A
+   \   0024   AD0B           BZ        ??LAPPalEndOfAlarmCycle_Static_9
+   \   0026   A101           MOV       A,#1
+   \   0028   16....         MOVW      HL,#DATDbkMirrors+66
+   \   002B   97             MOV       [HL],A
+   \   002C   A102           MOV       A,#2
+   \   002E   9A....         CALL      DATDbkStartUpdate
+    560          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_9:
+   \   0031   AF             RET       
+   \   0032                  REQUIRE ?CL78K_V4_6_L00
+    561          //==============================================================================
+    562          // DESCRIPTION : Condition for deactivation of alarm
+    563          //
+    564          // PARAMETERS (Type,Name,Min,Max) :   none
+    565          //
+    566          // RETURN VALUE :   none
+    567          //
+    568          // DESIGN INFORMATION : prsFS_ASA-410, prsFS_ASA-417, prsFS_ASA-419
+    569          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    570          BOOL LAPPalRfUnlockOrKeyIsRecognised(void)
+   \                     LAPPalRfUnlockOrKeyIsRecognised:
+    571          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    572              return ((BOOL)(  mGetFlagKeyIsRecognised() 
+    573                    || ( mGetFlagRfUnlockReceived() )));
+   \   0000   8E....         MOV       A,u16AlaFlag
+   \   0003   5D05           AND       A,#5
+   \   0005   AD03           BZ        ??LAPPalEndOfAlarmCycle_Static_24
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPPalEndOfAlarmCycle_Static_24:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    574          }
+    575          //==============================================================================
+    576          // DESCRIPTION : Configuration parameter of alarm is changed
+    577          //
+    578          // PARAMETERS (Type,Name,Min,Max) :   none
+    579          //
+    580          // RETURN VALUE :   none
+    581          //
+    582          // DESIGN INFORMATION : prsFS_ASA-456
+    583          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    584          BOOL LAPPalAlarmInhibited(void)
+   \                     LAPPalAlarmInhibited:
+    585          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    586              BOOL bReturnValueL = cFalse;
+   \   0000   A000           MOV       X,#0
+    587             
+    588              if(((BOOL)mGetFlagAlarmIsActive() == cFalse ) && ((BOOL)mGetFlagAlarmIsAwake() == cFalse))
+   \   0002   8E....         MOV       A,u16AlaFlag
+   \   0005   5D30           AND       A,#48
+   \   0007   BD08           BNZ       ??LAPPalEndOfAlarmCycle_Static_25
+    589              {
+    590                  bReturnValueL = (mDATRead(U1Bit, EEP_CALALPRI, Default) == cFalse);
+   \   0009   16....         MOVW      HL,#DATDbkMirrors+24
+   \   000C   319602         BT        [HL].1, ??LAPPalEndOfAlarmCycle_Static_25
+   \   000F   A001           MOV       X,#1
+    591              }
+    592          
+    593              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_25:
+   \   0011   60             MOV       A,X
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    594          }
+    595          //==============================================================================
+    596          // DESCRIPTION : Pause between 2 HORN sequences
+    597          //
+    598          // PARAMETERS (Type,Name,Min,Max) :   none
+    599          //
+    600          // RETURN VALUE :   none 
+    601          //
+    602          // DESIGN INFORMATION : prsFS_ASA-407
+    603          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    604          BOOL LAPPAlHornPauseElapsed(void)
+   \                     LAPPAlHornPauseElapsed:
+    605          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#PauseCycleTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    606              BOOL bTimerElapsedL;
+    607              bTimerElapsedL = TOSIsTimerElapsed(&PauseCycleTimer, cSilencePeriodDuration);
+    608              return bTimerElapsedL; 
+   \   0004   12E703         MOVW      BC,#999
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    609          }
+    610          //==============================================================================
+    611          // DESCRIPTION : Checks for alarm activation
+    612          //
+    613          // PARAMETERS (Type,Name,Min,Max) :   none
+    614          //
+    615          // RETURN VALUE :   none 
+    616          //
+    617          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    618          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    619          BOOL LAPPalActivate(void)
+   \                     LAPPalActivate:
+    620          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    621          #ifdef X90_PROJECT
+    622              return LAPPalActivate_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalActivate_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalActivate_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    623          }
+    624          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    625          static MEM_TYPE BOOL LAPPalActivate_Static(void)
+   \                     LAPPalActivate_Static:
+    626          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    627          #endif
+    628          
+    629              BOOL bReturnValueL = cFalse;
+   \   0001   A200           MOV       C,#0
+    630              BOOL bFlagActivateAlarmL; 
+    631          
+    632              
+    633          
+    634              if(u8WarningCyclesCounter == 0)
+   \   0003   8E....         MOV       A,u8WarningCyclesCounter
+   \   0006   4D00           CMP       A,#0
+   \   0008   BD05           BNZ       ??LAPPalEndOfAlarmCycle_Static_10
+    635              {
+    636                  bPauseBetweenCyclesHasDone = cTrue;
+   \   000A   A101           MOV       A,#1
+   \   000C   9E....         MOV       bPauseBetweenCyclesHasDone,A
+    637              }
+    638          
+    639              bFlagActivateAlarmL = (BOOL)  (((BOOL)mGetFlagRearDoorsOpened() == cTrue) 
+    640                  || ((BOOL)mGetFlagFrontDoorsOpened() == cTrue));
+   \                     ??LAPPalEndOfAlarmCycle_Static_10:
+   \   000F   8E....         MOV       A,u16AlaFlag
+   \   0012   5DC0           AND       A,#192
+   \   0014   AD04           BZ        ??LAPPalEndOfAlarmCycle_Static_11
+   \   0016   A001           MOV       X,#1
+   \   0018   FA02           BR        ??LAPPalEndOfAlarmCycle_Static_12
+   \                     ??LAPPalEndOfAlarmCycle_Static_11:
+   \   001A   A000           MOV       X,#0
+    641          
+    642          
+    643              if ((u8WarningCyclesCounter < cNumberOfAlarmCycles) &&
+    644                  ((bFlagActivateAlarmL == cTrue) || (bResetDuringAlarmCycle == cTrue)) && (bPauseBetweenCyclesHasDone == cTrue) )
+   \                     ??LAPPalEndOfAlarmCycle_Static_12:
+   \   001C   8E....         MOV       A,u8WarningCyclesCounter
+   \   001F   4D03           CMP       A,#3
+   \   0021   9D22           BNC       ??LAPPalEndOfAlarmCycle_Static_13
+   \   0023   60             MOV       A,X
+   \   0024   51             DEC       A
+   \   0025   AD06           BZ        ??LAPPalEndOfAlarmCycle_Static_14
+   \   0027   8E....         MOV       A,bResetDuringAlarmCycle
+   \   002A   51             DEC       A
+   \   002B   BD18           BNZ       ??LAPPalEndOfAlarmCycle_Static_13
+   \                     ??LAPPalEndOfAlarmCycle_Static_14:
+   \   002D   8E....         MOV       A,bPauseBetweenCyclesHasDone
+   \   0030   51             DEC       A
+   \   0031   BD12           BNZ       ??LAPPalEndOfAlarmCycle_Static_13
+    645              {
+    646                  bReturnValueL = cTrue;
+   \   0033   A201           MOV       C,#1
+    647              }
+    648          
+    649          
+    650              if (bReturnValueL == cTrue)
+    651              {
+    652                  mDATWrite(U8Bit, EEP_PerimeterAlarmState, cAlarmActivated, Immediate);
+   \   0035   8E....         MOV       A,DATDbkMirrors+66
+   \   0038   4D02           CMP       A,#2
+   \   003A   AD09           BZ        ??LAPPalEndOfAlarmCycle_Static_13
+   \   003C   A102           MOV       A,#2
+   \   003E   16....         MOVW      HL,#DATDbkMirrors+66
+   \   0041   97             MOV       [HL],A
+   \   0042   9A....         CALL      DATDbkStartUpdate
+    653              }
+    654          
+    655              
+    656              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_13:
+   \   0045   62             MOV       A,C
+   \   0046   B2             POP       BC
+   \   0047   AF             RET       
+   \   0048                  REQUIRE ?CL78K_V4_6_L00
+    657          }
+    658          //==============================================================================
+    659          // DESCRIPTION : Start 10sec  pause between 2 alarm cycles
+    660          //
+    661          // PARAMETERS (Type,Name,Min,Max) :   none
+    662          //
+    663          // RETURN VALUE :   none 
+    664          //
+    665          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    666          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    667          BOOL LAPPalNewAlarmCycle(void)
+   \                     LAPPalNewAlarmCycle:
+    668          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    669          #ifdef X90_PROJECT
+    670              return LAPPalNewAlarmCycle_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalNewAlarmCycle_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalNewAlarmCycle_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    671          }
+    672          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    673          static MEM_TYPE BOOL LAPPalNewAlarmCycle_Static(void)
+   \                     LAPPalNewAlarmCycle_Static:
+    674          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    675          #endif
+    676              
+    677              BOOL bReturnValueL = cFalse;
+   \   0001   A200           MOV       C,#0
+    678              BOOL bFlagActivateAlarmL = cFalse;
+   \   0003   A000           MOV       X,#0
+    679          
+    680              if(((BOOL)mGetFlagRearDoorsOpened() == cTrue) 
+    681                  || ((BOOL) mGetFlagFrontDoorsOpened() == cTrue))
+   \   0005   8E....         MOV       A,u16AlaFlag
+   \   0008   5DC0           AND       A,#192
+   \   000A   AD02           BZ        ??LAPPalEndOfAlarmCycle_Static_15
+    682              {
+    683                  bFlagActivateAlarmL = cTrue;
+   \   000C   A001           MOV       X,#1
+    684              }
+    685          
+    686          
+    687              if((u8WarningCyclesCounter > 0) && (u8WarningCyclesCounter < cNumberOfAlarmCycles) && (bFlagActivateAlarmL == cTrue))
+   \                     ??LAPPalEndOfAlarmCycle_Static_15:
+   \   000E   8E....         MOV       A,u8WarningCyclesCounter
+   \   0011   4D00           CMP       A,#0
+   \   0013   AD1A           BZ        ??LAPPalEndOfAlarmCycle_Static_16
+   \   0015   4D03           CMP       A,#3
+   \   0017   9D16           BNC       ??LAPPalEndOfAlarmCycle_Static_16
+   \   0019   60             MOV       A,X
+   \   001A   51             DEC       A
+   \   001B   BD12           BNZ       ??LAPPalEndOfAlarmCycle_Static_16
+    688              {
+    689                  bReturnValueL = cTrue;
+   \   001D   A201           MOV       C,#1
+    690              }
+    691          
+    692          
+    693              if (bReturnValueL == cTrue)
+    694              {
+    695                  mDATWrite(U8Bit, EEP_PerimeterAlarmState, cAlarmActivated, Immediate);
+   \   001F   8E....         MOV       A,DATDbkMirrors+66
+   \   0022   4D02           CMP       A,#2
+   \   0024   AD09           BZ        ??LAPPalEndOfAlarmCycle_Static_16
+   \   0026   A102           MOV       A,#2
+   \   0028   16....         MOVW      HL,#DATDbkMirrors+66
+   \   002B   97             MOV       [HL],A
+   \   002C   9A....         CALL      DATDbkStartUpdate
+    696              }
+    697          
+    698          
+    699          
+    700          
+    701              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_16:
+   \   002F   62             MOV       A,C
+   \   0030   B2             POP       BC
+   \   0031   AF             RET       
+   \   0032                  REQUIRE ?CL78K_V4_6_L00
+    702          }
+    703          //==============================================================================
+    704          // DESCRIPTION : Horn activation continues
+    705          //
+    706          // PARAMETERS (Type,Name,Min,Max) :   none
+    707          //
+    708          // RETURN VALUE :   none 
+    709          //
+    710          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    711          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    712          BOOL LAPPalHornActivationContinues(void)
+   \                     LAPPalHornActivationContinues:
+    713          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#WarningCycleTimer
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    714              BOOL bReturnValueL = cFalse;
+   \   0005   A400           MOV       E,#0
+    715              BOOL bTimerElapsedL;
+    716              bTimerElapsedL = TOSIsTimerElapsed(&WarningCycleTimer, cWarningCycleDuration);
+    717          
+    718              if((bTimerElapsedL) && (u8WarningTONCounter < cWarningCycleRepetition))
+   \   0007   12C700         MOVW      BC,#199
+   \   000A   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   000B   4D00           CMP       A,#0
+   \   000D   AD09           BZ        ??LAPPalEndOfAlarmCycle_Static_26
+   \   000F   8E....         MOV       A,u8WarningTONCounter
+   \   0012   4D0F           CMP       A,#15
+   \   0014   9D02           BNC       ??LAPPalEndOfAlarmCycle_Static_26
+    719              {
+    720                  bReturnValueL = cTrue;
+   \   0016   A401           MOV       E,#1
+    721              }
+    722              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_26:
+   \   0018   64             MOV       A,E
+   \   0019   B4             POP       DE
+   \   001A   B2             POP       BC
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    723          }
+    724          //==============================================================================
+    725          // DESCRIPTION : Horn activation finished
+    726          //
+    727          // PARAMETERS (Type,Name,Min,Max) :   none
+    728          //
+    729          // RETURN VALUE :   none 
+    730          //
+    731          // DESIGN INFORMATION : prsFS_ASA-428
+    732          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    733          BOOL LAPPalHornActivationFinished(void)
+   \                     LAPPalHornActivationFinished:
+    734          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    735          #ifdef X90_PROJECT
+    736              return LAPPalHornActivationFinished_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalHornActivationFinished_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalHornActivationFinished_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    737          }
+    738          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    739          static MEM_TYPE BOOL LAPPalHornActivationFinished_Static(void)
+   \                     LAPPalHornActivationFinished_Static:
+    740          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#WarningCycleTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    741          #endif
+    742          
+    743              BOOL bReturnValueL = cFalse;
+   \   0004   A400           MOV       E,#0
+    744              BOOL bTimerElapsedL;
+    745              bTimerElapsedL = TOSIsTimerElapsed(&WarningCycleTimer, cWarningCycleDuration);
+    746          
+    747              if((bTimerElapsedL) && (cWarningCycleRepetition == u8WarningTONCounter) 
+    748                  && ((BOOL)mGetFlagFirst30SecOfAlarmCycleNotDone() == cTrue))
+   \   0006   12C700         MOVW      BC,#199
+   \   0009   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   000A   4D00           CMP       A,#0
+   \   000C   AD0F           BZ        ??LAPPalEndOfAlarmCycle_Static_17
+   \   000E   8E....         MOV       A,u8WarningTONCounter
+   \   0011   4D0F           CMP       A,#15
+   \   0013   BD08           BNZ       ??LAPPalEndOfAlarmCycle_Static_17
+   \   0015   16....         MOVW      HL,#u16AlaFlag+1
+   \   0018   31B602         BT        [HL].3, ??LAPPalEndOfAlarmCycle_Static_17
+    749              {
+    750                  bReturnValueL = cTrue;
+   \   001B   A401           MOV       E,#1
+    751              }
+    752              
+    753          
+    754              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_17:
+   \   001D   64             MOV       A,E
+   \   001E   B2             POP       BC
+   \   001F   AF             RET       
+   \   0020                  REQUIRE ?CL78K_V4_6_L00
+    755          }
+    756          //==============================================================================
+    757          // DESCRIPTION : Wait for new alarm cycle
+    758          //
+    759          // PARAMETERS (Type,Name,Min,Max) :   none
+    760          //
+    761          // RETURN VALUE :   none 
+    762          //
+    763          // DESIGN INFORMATION : prsFS_ASA-423
+    764          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    765          BOOL LAPPalNextAlarmCycle(void)
+   \                     LAPPalNextAlarmCycle:
+    766          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#WarningCycleTimer
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    767              BOOL bReturnValueL = cFalse;
+   \   0005   A400           MOV       E,#0
+    768              BOOL bTimerElapsedL;
+    769              bTimerElapsedL = TOSIsTimerElapsed(&WarningCycleTimer, cWarningCycleDuration);
+    770              
+    771              if ((bTimerElapsedL) && (cWarningCycleRepetition == u8WarningTONCounter) )
+   \   0007   12C700         MOVW      BC,#199
+   \   000A   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   000B   4D00           CMP       A,#0
+   \   000D   AD09           BZ        ??LAPPalEndOfAlarmCycle_Static_27
+   \   000F   8E....         MOV       A,u8WarningTONCounter
+   \   0012   4D0F           CMP       A,#15
+   \   0014   BD02           BNZ       ??LAPPalEndOfAlarmCycle_Static_27
+    772              {
+    773                  bReturnValueL = cTrue;
+   \   0016   A401           MOV       E,#1
+    774              }
+    775               
+    776              
+    777              
+    778              return bReturnValueL;
+   \                     ??LAPPalEndOfAlarmCycle_Static_27:
+   \   0018   64             MOV       A,E
+   \   0019   B4             POP       DE
+   \   001A   B2             POP       BC
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    779          }
+    780          //==============================================================================
+    781          // DESCRIPTION : Start Horn and Warnings
+    782          //
+    783          // PARAMETERS (Type,Name,Min,Max) :   none
+    784          //
+    785          // RETURN VALUE :   none
+    786          //
+    787          // DESIGN INFORMATION : prsFS_ASA-406,  prsFS_ASA-421
+    788          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    789          void LAPPalStartHorn(void)
+   \                     LAPPalStartHorn:
+    790          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    791          #ifdef X90_PROJECT
+    792              LAPPalStartHorn_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalStartHorn_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalStartHorn_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    793          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    794          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    795          static MEM_TYPE void LAPPalStartHorn_Static(void)
+   \                     LAPPalStartHorn_Static:
+    796          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    797          #endif
+    798          
+    799              u8WarningTONCounter++;
+   \   0000   8E....         MOV       A,u8WarningTONCounter
+   \   0003   41             INC       A
+   \   0004   9E....         MOV       u8WarningTONCounter,A
+    800              
+    801              //QACJ 0277: aangovt: Clear bit operation
+    802              mClearFlagBcmCanSleep();
+    803              //QACJ 0277: aangovt: Clear bit operation
+    804              mClearFlagAlarmIsAwake();
+    805              mSetFlagAlarmIsActive();
+   \   0007   10EFEF         MOVW      AX,#61423
+   \   000A   58....         AND       A,u16AlaFlag
+   \   000D   30             XCH       A,X
+   \   000E   58....         AND       A,u16AlaFlag+1
+   \   0011   03....         MOVW      u16AlaFlag,AX
+   \   0014   16....         MOVW      HL,#u16AlaFlag
+   \   0017   71D2           SET1      [HL].5
+    806              
+    807            
+    808              
+    809              if ((u8WarningTONCounter == 1)) 
+   \   0019   8E....         MOV       A,u8WarningTONCounter
+   \   001C   51             DEC       A
+   \   001D   BD06           BNZ       ??LAPPalEndOfAlarmCycle_Static_18
+    810              {
+    811                  mDATWrite(U1Bit, HazardAlarmRequested, 1, Default);
+   \   001F   A101           MOV       A,#1
+   \   0021   16....         MOVW      HL,#DATCmnData+3
+   \   0024   97             MOV       [HL],A
+    812              }
+    813              
+    814          
+    815              if (  (u8WarningTONCounter % cEvenOrOddDevider) == 1 )
+   \                     ??LAPPalEndOfAlarmCycle_Static_18:
+   \   0025   16....         MOVW      HL,#u8WarningTONCounter
+   \   0028   318704         BF        [HL].0, ??LAPPalEndOfAlarmCycle_Static_19
+    816              {
+    817                  mDATWrite(U1Bit, HORN_RL,1, Default);
+   \   002B   2A..           SET1      S:DATPouSoftOutputBuffer+2.2
+   \   002D   FA02           BR        ??LAPPalEndOfAlarmCycle_Static_20
+    818              }
+    819              else
+    820              {
+    821                  mDATWrite(U1Bit, HORN_RL,0, Default);
+   \                     ??LAPPalEndOfAlarmCycle_Static_19:
+   \   002F   2B..           CLR1      S:DATPouSoftOutputBuffer+2.2
+    822              }
+    823              TOSStartTimer(&WarningCycleTimer);
+   \                     ??LAPPalEndOfAlarmCycle_Static_20:
+   \   0031   10....         MOVW      AX,#WarningCycleTimer
+   \   0034   ..             CALLT     [__T_TOSStartTimer]
+    824          
+    825          }
+   \   0035   AF             RET       
+   \   0036                  REQUIRE ?CL78K_V4_6_L00
+    826          //==============================================================================
+    827          // DESCRIPTION : Start 10 sec pause between 2 horn sequences or 2 alarm cycles
+    828          //
+    829          // PARAMETERS (Type,Name,Min,Max) :   none
+    830          //
+    831          // RETURN VALUE :   none
+    832          //
+    833          // DESIGN INFORMATION : prsFS_ASA-406, prsFS_ASA-408
+    834          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    835          void LAPPalStartHornPause(void)
+   \                     LAPPalStartHornPause:
+    836          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    837          #ifdef X90_PROJECT
+    838              LAPPalStartHornPause_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalStartHornPause_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalStartHornPause_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    839          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    840          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    841          static MEM_TYPE void LAPPalStartHornPause_Static(void)
+   \                     LAPPalStartHornPause_Static:
+    842          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    843          #endif
+    844          
+    845          
+    846              if (bPauseBetweenCyclesHasDone == cTrue)
+   \   0000   8E....         MOV       A,bPauseBetweenCyclesHasDone
+   \   0003   51             DEC       A
+   \   0004   BD06           BNZ       ??LAPPalEndOfAlarmCycle_Static_21
+    847              {
+    848                  mSetFlagFirst30SecOfAlarmCycleDone();
+   \   0006   16....         MOVW      HL,#u16AlaFlag
+   \   0009   86             INCW      HL
+   \   000A   71B2           SET1      [HL].3
+    849              }
+    850              
+    851              //QACJ 0277: aangovt: Clear bit operation
+    852              mClearFlagBcmCanSleep();
+    853              //QACJ 0277: aangovt: Clear bit operation
+    854              mClearFlagAlarmIsAwake();
+    855              mSetFlagAlarmIsActive();
+   \                     ??LAPPalEndOfAlarmCycle_Static_21:
+   \   000C   10EFEF         MOVW      AX,#61423
+   \   000F   58....         AND       A,u16AlaFlag
+   \   0012   30             XCH       A,X
+   \   0013   58....         AND       A,u16AlaFlag+1
+   \   0016   03....         MOVW      u16AlaFlag,AX
+   \   0019   A100           MOV       A,#0
+   \   001B   16....         MOVW      HL,#u16AlaFlag
+   \   001E   71D2           SET1      [HL].5
+    856              u8WarningTONCounter = 0;
+   \   0020   9E....         MOV       u8WarningTONCounter,A
+    857              
+    858              mDATWrite(U1Bit, HORN_RL, 0, Default);
+   \   0023   A101           MOV       A,#1
+   \   0025   2B..           CLR1      S:DATPouSoftOutputBuffer+2.2
+    859              
+    860              bPauseBetweenCyclesHasDone = cTrue;
+   \   0027   9E....         MOV       bPauseBetweenCyclesHasDone,A
+    861              TOSStartTimer(&PauseCycleTimer);
+   \   002A   10....         MOVW      AX,#PauseCycleTimer
+   \   002D   ..             CALLT     [__T_TOSStartTimer]
+    862          }
+   \   002E   AF             RET       
+   \   002F                  REQUIRE ?CL78K_V4_6_L00
+    863          //==============================================================================
+    864          // DESCRIPTION : 
+    865          //
+    866          // PARAMETERS (Type,Name,Min,Max) :   none
+    867          //
+    868          // RETURN VALUE :   none
+    869          //
+    870          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    871          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    872          void LAPPalRising_RR_DOORS_SW(void)
+   \                     LAPPalRising_RR_DOORS_SW:
+    873          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    874              if( (BOOL)mGetFlagAlarmIsAwake() == cTrue)
+   \   0000   16....         MOVW      HL,#u16AlaFlag
+   \   0003   31C70F         BF        [HL].4, ??LAPPalEndOfAlarmCycle_Static_28
+    875              {
+    876                  if (bDisableRearDoorActivation == cFalse)
+   \   0006   8E....         MOV       A,bDisableRearDoorActivation
+   \   0009   4D00           CMP       A,#0
+   \   000B   BD03           BNZ       ??LAPPalEndOfAlarmCycle_Static_29
+    877                  {
+    878                      mSetFlagRearDoorsOpened();
+   \   000D   71F2           SET1      [HL].7
+   \   000F   AF             RET       
+    879                  }
+    880                  else
+    881                  {
+    882                      // rising edge caused by door opened before/during reset
+    883                      bDisableRearDoorActivation = cFalse;
+   \                     ??LAPPalEndOfAlarmCycle_Static_29:
+   \   0010   A100           MOV       A,#0
+   \   0012   9E....         MOV       bDisableRearDoorActivation,A
+    884                  }
+    885              }    
+    886          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_28:
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+    887          //==============================================================================
+    888          // DESCRIPTION : Rising edge of front doors
+    889          //
+    890          // PARAMETERS (Type,Name,Min,Max) :   none
+    891          //
+    892          // RETURN VALUE :   none
+    893          //
+    894          // DESIGN INFORMATION : prsFS_ASA-426, prsFS_ASA-456
+    895          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    896          void LAPPalRising_FR_DOORS_SW(void)
+   \                     LAPPalRising_FR_DOORS_SW:
+    897          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    898              if( (BOOL)mGetFlagAlarmIsAwake() == cTrue)
+   \   0000   16....         MOVW      HL,#u16AlaFlag
+   \   0003   31C70F         BF        [HL].4, ??LAPPalEndOfAlarmCycle_Static_30
+    899              {
+    900                  if (bDisableFrontDoorActivation == cFalse)
+   \   0006   8E....         MOV       A,bDisableFrontDoorActivation
+   \   0009   4D00           CMP       A,#0
+   \   000B   BD03           BNZ       ??LAPPalEndOfAlarmCycle_Static_31
+    901                  {
+    902                      mSetFlagFrontDoorsOpened();
+   \   000D   71E2           SET1      [HL].6
+   \   000F   AF             RET       
+    903                  }
+    904                  else
+    905                  {
+    906                      // rising edge caused by door opened before/during reset
+    907                      bDisableFrontDoorActivation = cFalse;
+   \                     ??LAPPalEndOfAlarmCycle_Static_31:
+   \   0010   A100           MOV       A,#0
+   \   0012   9E....         MOV       bDisableFrontDoorActivation,A
+    908                  }
+    909              }
+    910          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_30:
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+    911          //==============================================================================
+    912          // DESCRIPTION : Leave active state
+    913          //
+    914          // PARAMETERS (Type,Name,Min,Max) :   none
+    915          //
+    916          // RETURN VALUE :   none
+    917          //
+    918          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    919          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    920          void LAPPalLeaveActiveState(void)
+   \                     LAPPalLeaveActiveState:
+    921          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    922              TOSSeqDeactivateGraph(cTOSSeqGraphIdPerimeterAlarmManagement);
+   \   0000   A11D           MOV       A,#29
+   \   0002   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    923              bDisableFrontDoorActivation = cFalse;
+   \   0003   A100           MOV       A,#0
+   \   0005   9E....         MOV       bDisableFrontDoorActivation,A
+    924              bDisableRearDoorActivation = cFalse;
+   \   0008   9E....         MOV       bDisableRearDoorActivation,A
+    925          }
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    926          //==============================================================================
+    927          // DESCRIPTION : Enter active state 
+    928          //
+    929          // PARAMETERS (Type,Name,Min,Max) :   none
+    930          //
+    931          // RETURN VALUE :   none
+    932          //
+    933          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    934          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    935          void LAPPalEnterActiveState(void)
+   \                     LAPPalEnterActiveState:
+    936          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    937              U8 u8GraphStateL; 
+    938          
+    939              u8GraphStateL = (U8) TOSSeqGraphState(cTOSSeqGraphIdPerimeterAlarmManagement);
+    940              if (u8GraphStateL == cTOSSeqInactiveGraph)
+   \   0000   A11D           MOV       A,#29
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??LAPPalEndOfAlarmCycle_Static_32
+    941              {
+    942                  TOSSeqActivateGraph(cTOSSeqGraphIdPerimeterAlarmManagement);
+   \   0007   A11D           MOV       A,#29
+   \   0009   ..             CALLT     [__T_TOSSeqActivateGraph]
+    943              }
+    944          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_32:
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    945          //==============================================================================
+    946          // DESCRIPTION : End of alarm cycle
+    947          //
+    948          // PARAMETERS (Type,Name,Min,Max) :   none
+    949          //
+    950          // RETURN VALUE :   none 
+    951          //
+    952          // DESIGN INFORMATION : prsFS_ASA-428, prsFS_ASA-454
+    953          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    954          void LAPPalEndOfAlarmCycle(void)
+   \                     LAPPalEndOfAlarmCycle:
+    955          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    956          #ifdef X90_PROJECT
+    957              LAPPalEndOfAlarmCycle_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPPalEndOfAlarmCycle_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPPalEndOfAlarmCycle_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    958          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    959          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    960          static MEM_TYPE void LAPPalEndOfAlarmCycle_Static(void)
+   \                     LAPPalEndOfAlarmCycle_Static:
+    961          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    962          #endif
+    963              
+    964              mDATWrite(U1Bit, HORN_RL,0, Default);
+   \   0000   A100           MOV       A,#0
+   \   0002   2B..           CLR1      S:DATPouSoftOutputBuffer+2.2
+    965              mDATWrite(U1Bit, HazardAlarmRequested, 0, Default);        
+   \   0004   16....         MOVW      HL,#DATCmnData+3
+   \   0007   97             MOV       [HL],A
+    966              bResetDuringAlarmCycle = cFalse;
+   \   0008   9E....         MOV       bResetDuringAlarmCycle,A
+    967              u8WarningCyclesCounter++;
+   \   000B   8E....         MOV       A,u8WarningCyclesCounter
+   \   000E   41             INC       A
+   \   000F   9E....         MOV       u8WarningCyclesCounter,A
+    968              u8WarningTONCounter = 0;
+   \   0012   A100           MOV       A,#0
+   \   0014   9E....         MOV       u8WarningTONCounter,A
+    969              //QACJ 0277: aangovt: Clear bit operation
+    970              mClearFlagFrontDoorsOpened();
+    971              //QACJ 0277: aangovt: Clear bit operation
+    972              mClearFlagRearDoorsOpened();
+    973              //QACJ 0277: aangovt: Clear bit operation
+    974              mClearFlagFirst30SecOfAlarmCycleDone();
+   \   0017   103FF7         MOVW      AX,#63295
+   \   001A   30             XCH       A,X
+   \   001B   58....         AND       A,u16AlaFlag
+   \   001E   30             XCH       A,X
+   \   001F   58....         AND       A,u16AlaFlag+1
+   \   0022   03....         MOVW      u16AlaFlag,AX
+    975              bPauseBetweenCyclesHasDone = cFalse;
+   \   0025   A100           MOV       A,#0
+   \   0027   9E....         MOV       bPauseBetweenCyclesHasDone,A
+    976          
+    977              mDATWrite(U8Bit, EEP_PerimeterAlarmState, cAlarmAwake, Immediate);
+   \   002A   8E....         MOV       A,DATDbkMirrors+66
+   \   002D   51             DEC       A
+   \   002E   AD0B           BZ        ??LAPPalEndOfAlarmCycle_Static_22
+   \   0030   A101           MOV       A,#1
+   \   0032   16....         MOVW      HL,#DATDbkMirrors+66
+   \   0035   97             MOV       [HL],A
+   \   0036   A102           MOV       A,#2
+   \   0038   9A....         CALL      DATDbkStartUpdate
+    978          }
+   \                     ??LAPPalEndOfAlarmCycle_Static_22:
+   \   003B   AF             RET       
+   \   003C                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqGraphState:
+   \   0000   ....           DW       TOSSeqGraphState
+    979          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     PerimeterAlarmManagement         72
+     WarningCycleTimer                 2
+     PauseCycleTimer                   2
+     u16AlaFlag                        2
+     u8WarningCyclesCounter            1
+     u8WarningTONCounter               1
+     bPauseBetweenCyclesHasDone        1
+     bResetDuringAlarmCycle            1
+     bDisableFrontDoorActivation       1
+     bDisableRearDoorActivation        1
+     ReadDoorsInput                   13
+     LAPPalInitialize                 19
+     LAPPalLeaveStartingStepState      9
+     LAPPalLeaveStartingStepState_Static
+                                      90
+     LAPPalIsAnybodyMaintainActiveState
+                                      11
+     LAPPalKeyIsAuthenticated          8
+     ?Subroutine0                      5
+     LAPPalLockFromTheOutside         11
+     LAPPalUnlockFromTheOutside       11
+     LAPPalRfLock                      9
+     LAPPalRfLock_Static              26
+     LAPPalInitializeDisableMode       9
+     LAPPalInitializeDisableMode_Static
+                                      58
+     LAPPalInitializeStandbyMode       9
+     LAPPalInitializeStandbyMode_Static
+                                      50
+     LAPPalRfUnlockOrKeyIsRecognised
+                                      13
+     LAPPalAlarmInhibited             19
+     LAPPAlHornPauseElapsed           10
+     LAPPalActivate                    9
+     LAPPalActivate_Static            72
+     LAPPalNewAlarmCycle               9
+     LAPPalNewAlarmCycle_Static       50
+     LAPPalHornActivationContinues    28
+     LAPPalHornActivationFinished      9
+     LAPPalHornActivationFinished_Static
+                                      32
+     LAPPalNextAlarmCycle             28
+     LAPPalStartHorn                   9
+     LAPPalStartHorn_Static           54
+     LAPPalStartHornPause              9
+     LAPPalStartHornPause_Static      47
+     LAPPalRising_RR_DOORS_SW         22
+     LAPPalRising_FR_DOORS_SW         22
+     LAPPalLeaveActiveState           12
+     LAPPalEnterActiveState           11
+     LAPPalEndOfAlarmCycle             9
+     LAPPalEndOfAlarmCycle_Static     60
+     __T_?FAR_CALL_L07                 2
+     __T_TOSSeqActivateGraph           2
+     __T_TOSWriteSignal                2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStartTimer                 2
+     __T_TOSSeqDeactivateGraph         2
+     __T_TOSSeqGraphState              2
+
+ 
+ 552 bytes in segment BCODE
+  16 bytes in segment CLTVEC
+ 320 bytes in segment CODE
+  72 bytes in segment CONST
+  12 bytes in segment NEAR_Z
+ 
+ 872 bytes of CODE  memory (+ 16 bytes shared)
+  72 bytes of CONST memory
+  12 bytes of DATA  memory
+
+Errors: none
+Warnings: none

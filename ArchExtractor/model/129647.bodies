@@ -1,0 +1,5 @@
+class IComponent
+!!!165999.python!!!	getFileList(in self : ) : string
+        pass
+!!!204015.python!!!	addPort(in self : , in inpIPort : )
+        pass

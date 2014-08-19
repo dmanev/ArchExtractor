@@ -1,0 +1,48 @@
+format 74
+
+artifactcanvas 128111 artifact_ref 169711 // DataType
+  xyz 48 310 2000
+end
+artifactcanvas 128239 artifact_ref 170095 // StkU1
+  xyz 359 18 2000
+end
+artifactcanvas 128367 artifact_ref 170223 // StkU8
+  xyz 359 108 2000
+end
+artifactcanvas 128495 artifact_ref 170351 // StkS8
+  xyz 359 195 2000
+end
+artifactcanvas 128623 artifact_ref 170479 // StkU16
+  xyz 359 302 2000
+end
+artifactcanvas 128751 artifact_ref 170607 // StkS16
+  xyz 359 421 2000
+end
+artifactcanvas 128879 artifact_ref 170735 // StkU32
+  xyz 359 524 2000
+end
+artifactcanvas 129007 artifact_ref 170863 // StkS32
+  xyz 359 627 2000
+end
+simplerelationcanvas 129135 simplerelation_ref 168687
+  from ref 128239 z 2001 to ref 128111
+end
+simplerelationcanvas 129263 simplerelation_ref 168815
+  from ref 128367 z 2001 to ref 128111
+end
+simplerelationcanvas 129391 simplerelation_ref 168943
+  from ref 128495 z 2001 to ref 128111
+end
+simplerelationcanvas 129519 simplerelation_ref 169071
+  from ref 128623 z 2001 to ref 128111
+end
+simplerelationcanvas 129647 simplerelation_ref 169199
+  from ref 128751 z 2001 to ref 128111
+end
+simplerelationcanvas 129775 simplerelation_ref 169327
+  from ref 128879 z 2001 to ref 128111
+end
+simplerelationcanvas 129903 simplerelation_ref 169455
+  from ref 129007 z 2001 to ref 128111
+end
+end

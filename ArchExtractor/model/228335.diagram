@@ -1,0 +1,36 @@
+format 74
+
+artifactcanvas 131311 artifact_ref 184175 // BasePortCriteria
+  xyz 71 126 2000
+end
+artifactcanvas 131439 artifact_ref 184047 // StkJilComponentCriteria
+  xyz 265 37 2000
+end
+artifactcanvas 131695 artifact_ref 190703 // StkJilOnCotrolCriteria
+  xyz 269 130 2000
+end
+artifactcanvas 131951 artifact_ref 203759 // StkJilProdControlCriteria
+  xyz 266 220 2000
+end
+artifactcanvas 132207 artifact_ref 204015 // StkJilTOSSignalCriteria
+  xyz 241 330 2000
+end
+artifactcanvas 132335 artifact_ref 210543 // StkJilDataCriteria
+  xyz 167 410 2000
+end
+simplerelationcanvas 131567 simplerelation_ref 182767
+  from ref 131439 z 2001 to ref 131311
+end
+simplerelationcanvas 131823 simplerelation_ref 189295
+  from ref 131695 z 2001 to ref 131311
+end
+simplerelationcanvas 132079 simplerelation_ref 202351
+  from ref 131951 z 2001 to ref 131311
+end
+simplerelationcanvas 132463 simplerelation_ref 208879
+  from ref 132207 z 2001 to ref 131311
+end
+simplerelationcanvas 132591 simplerelation_ref 209007
+  from ref 132335 z 2001 to ref 131311
+end
+end

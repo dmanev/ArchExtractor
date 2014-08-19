@@ -1,0 +1,498 @@
+format 74
+"StkParser" // EA_Model::System::Specific::STK::StkParser
+  revision 24
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Specific/STK/StkParser/"
+  python_package "StkParser"
+  classview 147823 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 154223 "StkFileParser class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 221679 "StkPortCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 234863 "StkJilFileParser class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 234991 "StkCHeaderFileParser class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 248687 "StkCImplFileParser class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 150127 "StkJilFileParser"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 158959 // <dependency>
+	relation 158703 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 158959 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 159471 // <generalisation>
+	relation 159215 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 159471 // <generalisation>
+	  b parent class_ref 156783 // StkFileParser
+      end
+
+      operation 196079 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__(${p1})
+${body}
+"
+	
+      end
+
+      operation 189423 "preprocessFile"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type "any"
+	  param in name "inpFilePath" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 156783 "StkFileParser"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 159343 // <generalisation>
+	relation 159087 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 159343 // <generalisation>
+	  b parent class_ref 128751 // BaseFileParser
+      end
+
+      classrelation 159599 // <dependency>
+	relation 159343 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 159599 // <dependency>
+	  b parent class_ref 143599 // os
+      end
+
+      classrelation 159727 // <dependency>
+	relation 159471 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 159727 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 244335 // <dependency>
+	relation 243951 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 244335 // <dependency>
+	  b parent class_ref 128239 // BaseComponent
+      end
+
+      operation 196207 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__(${p1}${v1})
+${body}
+"
+	
+      end
+
+      operation 164591 "getComponentNameList"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "fileName" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 189295 "updateComponent"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 4
+	  param in name "self" explicit_type "any"
+	  param in name "inpName" explicit_type "string"
+	  param in name "filePath" explicit_type "string"
+	  param out name "outIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}, ${p3}${v3}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 196335 "removeComment"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 218351 "StkPortCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 224879 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 224751 "registerAccessModes"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 227951 // <generalisation>
+	relation 227695 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227951 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
+      operation 218095 "extractLevelOneBlock"
+	preserve_cpp_body_indent public explicit_return_type "string"
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpText" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 228207 // <dependency>
+	relation 227951 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 228207 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 311023 // <dependency>
+	relation 310511 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 311023 // <dependency>
+	  b parent class_ref 285551 // StkDataTypeFactory
+      end
+    end
+
+    class 231407 "StkCHeaderFileParser"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 243951 // <generalisation>
+	relation 243567 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 243951 // <generalisation>
+	  b parent class_ref 156783 // StkFileParser
+      end
+
+      operation 225007 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__(${p1})
+${body}
+"
+	
+      end
+
+      operation 225135 "preprocessFile"
+	preserve_cpp_body_indent public explicit_return_type "bool"
+	nparams 2
+	  param in name "self" explicit_type "any"
+	  param in name "inpFilePath" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 245103 "StkCImpFileParser"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 261231 // <generalisation>
+	relation 260847 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 261231 // <generalisation>
+	  b parent class_ref 156783 // StkFileParser
+      end
+
+      operation 238831 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__(${p1})
+${body}
+"
+	
+      end
+
+      operation 238959 "preprocessFile"
+	preserve_cpp_body_indent public explicit_return_type "bool"
+	nparams 2
+	  param in name "self" explicit_type "any"
+	  param in name "inpFilePath" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+  end
+
+  deploymentview 141807 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 134639 "deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A3
+    end
+
+    artifact 155503 "StkFileParser"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 156783 // StkFileParser
+      end
+      simplerelation 162159
+	-_->
+	  on artifact_ref 135151 // BaseFileParser
+      end
+    end
+
+    artifact 148847 "StkJilFileParser"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 150127 // StkJilFileParser
+      end
+      simplerelation 162031
+	-_->
+	  on artifact_ref 155503 // StkFileParser
+      end
+
+      simplerelation 169583
+	-_->
+	  on artifact_ref 169967 // StkVoid
+      end
+    end
+
+    artifact 210671 "StkPortCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 218351 // StkPortCriteria
+      end
+      simplerelation 215535
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+
+    artifact 223727 "StkCHeaderFileParser"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 231407 // StkCHeaderFileParser
+      end
+      simplerelation 222063
+	-_->
+	  on artifact_ref 155503 // StkFileParser
+      end
+    end
+
+    artifact 237423 "StkCImplFileParser"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 245103 // StkCImpFileParser
+      end
+    end
+  end
+
+  package_ref 195055 // StkCFileCriteria
+
+  package_ref 195183 // StkJilFileCriteria
+end

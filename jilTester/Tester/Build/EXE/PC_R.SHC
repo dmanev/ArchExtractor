@@ -1,0 +1,11 @@
+INSTALLXCAR_VERSION V01.40b
+INSTALLXCAR_DIRECTORY No_directory
+XCARDLL_STARTANDRUN true
+AddButton	"Inputs"	"bench.exe"	"..\..\TOOLS\COMMON\XCAR\BENCH\DIN.bvl"
+AddButton	"Outputs"	"bench.exe"	"..\..\TOOLS\COMMON\XCAR\BENCH\DOU.bvl"
+AddButton	"Diagnostic"	"bench.exe"	"..\..\TOOLS\COMMON\XCAR\BENCH\Diagnostic.bvl"
+AddButton	"TFC_DIAG"	"bench.exe"	"..\..\TOOLS\COMMON\XCAR\BENCH\TFC.bvl"
+AddButton	"QView"	"QuickView.exe"	""
+
+AddList	"Models"	"interpreteur.exe"	"..\..\TOOLS\COMMON\XCAR\SCRIPT\COMMON\models.mvl"
+

@@ -1,0 +1,659 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:43 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_ORD.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\TOS_ORD.LST -o                        #
+#                    ..\EXE\TARGET_D\TOS_ORD.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_ORD.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\TOS_ORD.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\TOS_ORD.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\TOS_ORD.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      STK
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    TOS_ORD
+     12          //               TOS Task management with no preemption
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Jul 24 2009 14:45:16  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ORD.C-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ORD.C-arc  $
+     19          // 
+     20          //    Rev 1.1   Jul 24 2009 14:45:16   amanevd
+     21          // Cm005466: ListOfReadyTasks,
+     22          // ListOfSelectableTasks moved in fast memory
+     23          // 
+     24          //    Rev 1.0   04 Feb 2009 17:03:06   adzhelp
+     25          // Initial revision.
+     26          */
+     27          //******************************************************************************
+     28          
+     29          //------------------------------------------------------------------------------
+     30          // Body Identification
+     31          //------------------------------------------------------------------------------
+     32          #define TOS_ORD "TOS_ORD"
+     33          
+     34          //------------------------------------------------------------------------------
+     35          // Included files to resolve specific definitions in this file
+     36          //------------------------------------------------------------------------------
+     37          #include "deftypes.h"
+     38          #include "tos_ord.h"
+     39          #include "ldb_tos.h"
+     40          #include "lib.h"
+     41          #ifdef TOS_PERF_CNT_ENABLE
+     42           #include "TOS_PerfCnt.h"
+     43          #endif
+     44          
+     45          
+     46          #if cTOSNbMode >= 2
+     47           #error "This TOS_ORD version do not support TOS mode management"
+     48          #endif
+     49          
+     50          //------------------------------------------------------------------------------
+     51          // Local constants
+     52          //------------------------------------------------------------------------------
+     53          // Most prioritary task mask
+     54          #define cMaxTaskID    (((tTOSTaskID) 0x01UL) << (cTOSNbTask - ((tTOSTaskID)2UL) ))
+     55          
+     56          //------------------------------------------------------------------------------
+     57          // Local macros
+     58          //------------------------------------------------------------------------------
+     59          #ifndef NO_DYNAMIC_DATA
+     60            #define DATA_TYPE
+     61          #else
+     62            #define DATA_TYPE static
+     63          //----- Scheduler stack management -----
+     64            #define mClearSchedulerStack()                                         \
+     65              (s8SchedulerStackLevel = ((S8)-1))
+     66          
+     67          // Scheduler stack treat only tSchedulerStack type
+     68            #define mPushToSchedulerStack(Type,Data)                               \
+     69              {                                                                    \
+     70                  mLIBassert(sizeof(Type) == sizeof(tTOSTaskID));                  \
+     71                  s8SchedulerStackLevel++;                                           \
+     72                  mLIBassert(s8SchedulerStackLevel < (S8)(cTOSSchedulerStackSize));  \
+     73                  SchedulerStack[s8SchedulerStackLevel] = ((Type)(Data));            \
+     74              }
+     75          
+     76            #define mPopFromSchedulerStack(Type,Data)                              \
+     77              {                                                                    \
+     78                  mLIBassert(s8SchedulerStackLevel >= 0);                            \
+     79                  (Data) = ((Type)SchedulerStack[s8SchedulerStackLevel]);            \
+     80                  s8SchedulerStackLevel--;                                           \
+     81              }
+     82          
+     83            #define cTOSSchedulerStackSize (cTOSMaxTaskNumber + cTOSOffsetSchedulerStackSize)
+     84          #endif
+     85          
+     86          //------------------------------------------------------------------------------
+     87          // Local types
+     88          //------------------------------------------------------------------------------
+     89          #ifdef NO_DYNAMIC_DATA
+     90          typedef tTOSTaskID tSchedulerStack[cTOSSchedulerStackSize];
+     91          #endif
+     92          
+     93          // -----------------------------------------------------------------------------
+     94          // Local data
+     95          //------------------------------------------------------------------------------
+     96          // List of ready tasks
+     97          #define	ListeTachesPretes    ListOfReadyTasks
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+     98          static MEM_FAST volatile tTOSTaskID ListOfReadyTasks;
+   \                     ListOfReadyTasks:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+     99          
+    100          //List of all selectable tasks
+    101          #define ListeTachesEligibles   ListOfSelectableTasks
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    102          static MEM_FAST tTOSTaskID ListOfSelectableTasks;
+   \                     ListOfSelectableTasks:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+    103          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    104          static    BOOL          bSuspFlagOS;
+   \                     bSuspFlagOS:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    105          static    tTOSItState   ITStateOS;
+   \                     ITStateOS:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    106          
+    107          #ifdef USE_DISABLE_ALL_INTERRUPTS
+    108          static    BOOL          bSuspFlagAll;
+    109          static    tTOSItState   ITStateAll;
+    110          #endif
+    111          
+    112          #ifdef NO_DYNAMIC_DATA
+    113          static    tSchedulerStack SchedulerStack;
+    114          static    S8              s8SchedulerStackLevel;
+    115          #endif
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Constant local data
+    119          //------------------------------------------------------------------------------
+    120          
+    121          //------------------------------------------------------------------------------
+    122          // Exported data
+    123          //------------------------------------------------------------------------------
+    124          
+    125          //------------------------------------------------------------------------------
+    126          // Constant exported data
+    127          //------------------------------------------------------------------------------
+    128          
+    129          //------------------------------------------------------------------------------
+    130          // Local function prototypes
+    131          //------------------------------------------------------------------------------
+    132          
+    133          //==============================================================================
+    134          //=========================== LOCAL FUNCTIONS ==================================
+    135          //==============================================================================
+    136          
+    137          //==============================================================================
+    138          //=========================== EXPORTED FUNCTIONS ===============================
+    139          //==============================================================================
+    140          
+    141          //==============================================================================
+    142          // DESCRIPTION:         See component header file
+    143          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    144          void TOSActivateTask(const tTOSTaskID TaskId)
+   \                     TOSActivateTask:
+    145          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   D4             MOVW      DE,AX
+    146              TOSSuspendOSInterrupts();
+   \   0002   9A....         CALL      TOSSuspendOSInterrupts
+    147              ListOfReadyTasks |= TaskId;
+   \   0005   89..           MOVW      AX,S:ListOfReadyTasks
+   \   0007   30             XCH       A,X
+   \   0008   616C           OR        A,E
+   \   000A   30             XCH       A,X
+   \   000B   616D           OR        A,D
+   \   000D   99..           MOVW      S:ListOfReadyTasks,AX
+    148              TOSResumeOSInterrupts();
+   \   000F   9A....         CALL      TOSResumeOSInterrupts
+    149          }
+   \   0012   B4             POP       DE
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    150          
+    151          //==============================================================================
+    152          // DESCRIPTION:         See component header file
+    153          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    154          void TOSOrdSuspendTask(const tTOSTaskID TaskId)
+   \                     TOSOrdSuspendTask:
+    155          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    156              ListOfReadyTasks &= (tTOSTaskID)(~TaskId);
+   \   0000   30             XCH       A,X
+   \   0001   7DFF           XOR       A,#255
+   \   0003   30             XCH       A,X
+   \   0004   7DFF           XOR       A,#255
+   \   0006   D6             MOVW      HL,AX
+   \   0007   89..           MOVW      AX,S:ListOfReadyTasks
+   \   0009   30             XCH       A,X
+   \   000A   615E           AND       A,L
+   \   000C   30             XCH       A,X
+   \   000D   615F           AND       A,H
+   \   000F   99..           MOVW      S:ListOfReadyTasks,AX
+    157          }
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    158          
+    159          //==============================================================================
+    160          // DESCRIPTION:         See component header file
+    161          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    162          void TOSSuspendOSInterrupts(void)
+   \                     TOSSuspendOSInterrupts:
+    163          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    164              TOSInternalGetAndDisableOSInterrupts(ITStateOS);
+   \   0000   A100           MOV       A,#0
+   \   0002   F01E           MOV R1,PSW
+   \   0004   5D80           AND R1,#0x80
+   \   0006   7B1E           DI
+   \   0008   9E....         MOV       ITStateOS,A
+    165              // This assert will fail if you have called twice TOSSuspendOSInterrupts()
+    166              mLIBassert((bSuspFlagOS = !bSuspFlagOS) == cTrue);
+   \   000B   8E....         MOV       A,bSuspFlagOS
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD06           BNZ       ??TOSHalt_0
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       bSuspFlagOS,A
+   \   0017   AF             RET       
+   \                     ??TOSHalt_0:
+   \   0018   A100           MOV       A,#0
+   \   001A   9E....         MOV       bSuspFlagOS,A
+   \   001D   9B....         BR        N:LIBAssertionFailed
+   \   0020                  REQUIRE ?CL78K_V4_6_L00
+    167          }
+    168          
+    169          //==============================================================================
+    170          // DESCRIPTION:         See component header file
+    171          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    172          void TOSResumeOSInterrupts(void)
+   \                     TOSResumeOSInterrupts:
+    173          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    174              // This assert will fail if you have called twice TOSResumeOSInterrupts()
+    175              mLIBassert((bSuspFlagOS = !bSuspFlagOS) == cFalse);
+   \   0000   8E....         MOV       A,bSuspFlagOS
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD0A           BNZ       ??TOSHalt_1
+   \   0007   A101           MOV       A,#1
+   \   0009   9E....         MOV       bSuspFlagOS,A
+   \   000C   9A....         CALL      LIBAssertionFailed
+   \   000F   FA05           BR        ??TOSHalt_2
+   \                     ??TOSHalt_1:
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       bSuspFlagOS,A
+    176              TOSInternalSetOSInterruptsState(ITStateOS);
+   \                     ??TOSHalt_2:
+   \   0016   7B1E           DI
+   \   0018   8E....         MOV       A,ITStateOS
+   \   001B   4D00           CMP       A,#0
+   \   001D   AD02           BZ        ??TOSHalt_3
+   \   001F   7A1E           EI
+    177          }
+   \                     ??TOSHalt_3:
+   \   0021   AF             RET       
+   \   0022                  REQUIRE ?CL78K_V4_6_L00
+    178          
+    179          #ifdef USE_DISABLE_ALL_INTERRUPTS
+    180          //==============================================================================
+    181          // DESCRIPTION:         See component header file
+    182          //==============================================================================
+    183          void TOSSuspendAllInterrupts(void)
+    184          {
+    185              TOSInternalGetAndDisableAllInterrupts(ITStateAll);
+    186              // This assert will fail if you have called twice TOSSuspendAllInterrupts()
+    187              mLIBassert((bSuspFlagAll = !bSuspFlagAll) == cTrue);
+    188          }
+    189          
+    190          //==============================================================================
+    191          // DESCRIPTION:         See component header file
+    192          //==============================================================================
+    193          void TOSResumeAllInterrupts(void)
+    194          {
+    195              // This assert fail if you have called twice TOSResumeAllInterrupts()
+    196              mLIBassert((bSuspFlagAll = !bSuspFlagAll) == cFalse);
+    197              TOSInternalSetAllInterruptsState(ITStateAll);
+    198          }
+    199          #endif
+    200          
+    201          //==============================================================================
+    202          // DESCRIPTION:         See component header file
+    203          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    204          void TOSShutdown(const U16 u16ErrorCode)
+   \                     TOSShutdown:
+    205          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   D4             MOVW      DE,AX
+    206              TOSSuspendOSInterrupts();
+   \   0002   9A....         CALL      TOSSuspendOSInterrupts
+    207              // In case of fatal error LAPShutdownHook() must provoke a reset.
+    208              LAPShutdownHook(u16ErrorCode);
+   \   0005   C4             MOVW      AX,DE
+   \   0006   9A....         CALL      LAPShutdownHook
+    209              TOSResumeOSInterrupts();
+   \   0009   9A....         CALL      TOSResumeOSInterrupts
+    210          }
+   \   000C   B4             POP       DE
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    211          
+    212          //==============================================================================
+    213          // DESCRIPTION:         See component header file
+    214          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    215          void TOSInternalStart(void)
+   \                     TOSInternalStart:
+    216          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    217              bSuspFlagOS                      = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bSuspFlagOS,A
+    218          #ifdef USE_DISABLE_ALL_INTERRUPTS
+    219              bSuspFlagAll                     = cFalse;
+    220          	if(bSuspFlagAll){} //to avoid a warning in release mode
+    221          #endif
+    222          	if(bSuspFlagOS){} //to avoid a warning in release mode
+    223          
+    224              ListOfReadyTasks     = 0;
+   \   0005   EE..0000       MOVW      S:ListOfReadyTasks,#0
+    225              ListOfSelectableTasks  = (tTOSTaskID)(((cMaxTaskID-((tTOSTaskID)1U))<< ((tTOSTaskID)1U)) + ((tTOSTaskID)1U));
+   \   0009   EE..FF1F       MOVW      S:ListOfSelectableTasks,#8191
+    226              
+    227          #ifdef NO_DYNAMIC_DATA
+    228              mClearSchedulerStack();
+    229          #endif
+    230              
+    231              // Application initialization (TOS, LAP, DAT and LDB)
+    232              LAPStartupHook();
+   \   000D   9A....         CALL      LAPStartupHook
+    233          
+    234              // Interrupts authorization
+    235              TOSEnableOSInterrupts();
+   \   0010   7A1E           EI
+    236          
+    237              mLDBInitCPUTrace(cLDBCPUTraceMainLoop);
+    238          
+    239              //Infinite loop
+    240              for(;;)
+    241              {
+    242                  // before the idle task execution a scheduling is made too
+    243                  // execute the pending task
+    244                  TOSSchedule();
+   \                     ??TOSInternalStart_0:
+   \   0012   9A....         CALL      TOSSchedule
+    245          
+    246                  // Idle task execution
+    247                  {
+    248          #ifdef TOS_NO_IDLE_TASK_TRACE
+    249                      TOSTaskList[0]();
+    250          #else
+    251                      mLDBEnterCPUTrace(cLDBCPUTraceIdleTask);
+    252                      TOSTaskList[0]();
+   \   0015   02....         MOVW      AX,TOSTaskList
+   \   0018   D6             MOVW      HL,AX
+   \   0019   9A....         CALL      ?IND_CALL_L06
+   \   001C   FAF4           BR        ??TOSInternalStart_0
+   \   001E                  REQUIRE ?CL78K_V4_6_L00
+    253                      mLDBExitCPUTrace();
+    254          #endif
+    255                  }
+    256              }
+    257          }
+    258          
+    259          //==============================================================================
+    260          // DESCRIPTION:         See component header file
+    261          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    262          void TOSSchedule(void)
+   \                     TOSSchedule:
+    263          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 2
+   \   0002   B7             PUSH      HL
+   \   0003   FA4C           BR        ??TOSHalt_4
+    264          
+    265              mLDBEnterCPUTrace(cLDBCPUTraceScheduler);
+    266              while( (ListOfReadyTasks & ListOfSelectableTasks) != ((tTOSTaskID)0U) )
+    267              {
+    268          
+    269                  DATA_TYPE tTOSTaskID PreviousListOfSelectableTasks;
+    270                  
+    271          		U8 u8TaskID;
+    272          
+    273                  DATA_TYPE tTOSTaskID          TOSTaskID;
+    274                  // save selectable task list
+    275                  PreviousListOfSelectableTasks = ListOfSelectableTasks;
+    276          
+    277                  // search most priority pending task
+    278                  
+    279          		u8TaskID = cTOSNbTask - (U8)1U;
+    280          
+    281                  TOSTaskID = cMaxTaskID;
+    282          
+    283                  while( (TOSTaskID & ListOfReadyTasks) == ((tTOSTaskID)0U) )
+    284                  {
+    285          			u8TaskID--;
+   \                     ??TOSSchedule_0:
+   \   0005   87             MOV       A,[HL]
+   \   0006   51             DEC       A
+   \   0007   97             MOV       [HL],A
+    286          
+    287                      TOSTaskID >>= 1U;
+   \   0008   C2             MOVW      AX,BC
+   \   0009   21             CLR1      CY
+   \   000A   25             RORC      A,0x1
+   \   000B   30             XCH       A,X
+   \   000C   25             RORC      A,0x1
+   \   000D   30             XCH       A,X
+   \   000E   D2             MOVW      BC,AX
+    288                  }
+   \                     ??TOSSchedule_1:
+   \   000F   89..           MOVW      AX,S:ListOfReadyTasks
+   \   0011   30             XCH       A,X
+   \   0012   615A           AND       A,C
+   \   0014   30             XCH       A,X
+   \   0015   615B           AND       A,B
+   \   0017   6168           OR        A,X
+   \   0019   ADEA           BZ        ??TOSSchedule_0
+    289          
+    290                  // Suppress task from the pending task list
+    291                  TOSSuspendOSInterrupts();
+   \   001B   9A....         CALL      TOSSuspendOSInterrupts
+    292                  ListOfReadyTasks -=  TOSTaskID;
+   \   001E   89..           MOVW      AX,S:ListOfReadyTasks
+   \   0020   30             XCH       A,X
+   \   0021   611A           SUB       A,C
+   \   0023   30             XCH       A,X
+   \   0024   613B           SUBC      A,B
+   \   0026   99..           MOVW      S:ListOfReadyTasks,AX
+    293                  TOSResumeOSInterrupts();
+   \   0028   9A....         CALL      TOSResumeOSInterrupts
+    294          
+    295                  // update selectable task list
+    296                  TOSTaskID <<= 1U;
+    297                  TOSTaskID --;
+    298                  ListOfSelectableTasks = (tTOSTaskID)~TOSTaskID;
+   \   002B   C2             MOVW      AX,BC
+   \   002C   21             CLR1      CY
+   \   002D   30             XCH       A,X
+   \   002E   27             ROLC      A,0x1
+   \   002F   30             XCH       A,X
+   \   0030   27             ROLC      A,0x1
+   \   0031   90             DECW      AX
+   \   0032   30             XCH       A,X
+   \   0033   7DFF           XOR       A,#255
+   \   0035   30             XCH       A,X
+   \   0036   7DFF           XOR       A,#255
+   \   0038   99..           MOVW      S:ListOfSelectableTasks,AX
+    299          
+    300          #ifdef NO_DYNAMIC_DATA      // Save context before call new task
+    301                  mPushToSchedulerStack(tTOSTaskID,PreviousListOfSelectableTasks)
+    302          #endif
+    303                  // task function calling
+    304                  {
+    305          			mLDBEnterCPUTrace((REG)(u8TaskID + cLDBCPUTraceIdleTask));
+    306          
+    307          			(TOSTaskList[u8TaskID])();
+   \   003A   891C           MOVW      AX,SP
+   \   003C   D6             MOVW      HL,AX
+   \   003D   87             MOV       A,[HL]
+   \   003E   A002           MOV       X,#2
+   \   0040   3188           MULU      X
+   \   0042   CA....         ADDW      AX,#TOSTaskList
+   \   0045   D6             MOVW      HL,AX
+   \   0046   87             MOV       A,[HL]
+   \   0047   70             MOV       X,A
+   \   0048   AE01           MOV       A,[HL+0x01]
+   \   004A   D6             MOVW      HL,AX
+   \   004B   9A....         CALL      ?IND_CALL_L06
+    308          
+    309                      mLDBExitCPUTrace();
+    310                  }
+    311          #ifdef NO_DYNAMIC_DATA
+    312                  // Restore context
+    313                  mPopFromSchedulerStack(tTOSTaskID,PreviousListOfSelectableTasks)
+    314          #endif
+    315          
+    316                  // restore selectable task list
+    317                  ListOfSelectableTasks = PreviousListOfSelectableTasks;
+   \   004E   C4             MOVW      AX,DE
+   \   004F   99..           MOVW      S:ListOfSelectableTasks,AX
+   \                     ??TOSHalt_4:
+   \   0051   89..           MOVW      AX,S:ListOfReadyTasks
+   \   0053   30             XCH       A,X
+   \   0054   5E..           AND       A,S:ListOfSelectableTasks
+   \   0056   30             XCH       A,X
+   \   0057   5E..           AND       A,S:ListOfSelectableTasks+1
+   \   0059   6168           OR        A,X
+   \   005B   AD0E           BZ        ??TOSHalt_5
+   \   005D   89..           MOVW      AX,S:ListOfSelectableTasks
+   \   005F   D4             MOVW      DE,AX
+   \   0060   891C           MOVW      AX,SP
+   \   0062   D6             MOVW      HL,AX
+   \   0063   A10D           MOV       A,#13
+   \   0065   97             MOV       [HL],A
+   \   0066   120010         MOVW      BC,#4096
+   \   0069   FAA4           BR        ??TOSSchedule_1
+    318              }
+    319              mLDBExitCPUTrace();
+    320          }
+   \                     ??TOSHalt_5:
+   \   006B   B0             POP       AX
+   \   006C   B4             POP       DE
+   \   006D   B2             POP       BC
+   \   006E   AF             RET       
+   \   006F                  REQUIRE ?CL78K_V4_6_L00
+    321          
+    322          //==============================================================================
+    323          // DESCRIPTION:         See component header file
+    324          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    325          void TOSHalt(void)
+   \                     TOSHalt:
+    326          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    327              //Use intermediate variable for QAC due to volatile type
+    328              tTOSTaskID TaskList;
+    329          
+    330              //Disable interrupt using TOS service
+    331              TOSDisableOSInterrupts();
+   \   0000   FA06           BR        ??TOSHalt_6
+    332          
+    333              #ifndef TOS_NO_IDLE_MODE_TRACE
+    334              mLDBEnterCPUTrace(cLDBCPUTraceIdleState);
+    335              #endif
+    336          
+    337              TaskList = ListOfReadyTasks;
+    338          
+    339              while(TaskList == (tTOSTaskID)0UL)
+    340              {
+    341                  //No pending task: go to halt mode
+    342                  LDBWaitForCallBack();
+   \                     ??TOSHalt_7:
+   \   0002   9A....         CALL      LDBWaitForCallBack
+    343          
+    344                  //IT are executed
+    345                  TOSToggleOSInterrupts();
+   \   0005   7A1E           EI
+   \   0007   00             nop
+   \                     ??TOSHalt_6:
+   \   0008   7B1E           DI
+    346          
+    347                  //Re evaluate TaskList, because the interrupt can have activated a task
+    348                  TaskList = ListOfReadyTasks;
+   \   000A   89..           MOVW      AX,S:ListOfReadyTasks
+    349              }
+   \   000C   6168           OR        A,X
+   \   000E   ADF2           BZ        ??TOSHalt_7
+    350          
+    351              #ifndef TOS_NO_IDLE_MODE_TRACE
+    352              mLDBExitCPUTrace();
+    353              #endif
+    354          
+    355              //Enable interrupt using TOS service
+    356              TOSEnableOSInterrupts();
+   \   0010   7A1E           EI
+    357          }
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+
+   Segment part sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     ListOfReadyTasks          2
+     ListOfSelectableTasks     2
+     bSuspFlagOS               1
+     ITStateOS                 1
+     TOSActivateTask          20
+     TOSOrdSuspendTask        18
+     TOSSuspendOSInterrupts   32
+     TOSResumeOSInterrupts    34
+     TOSShutdown              14
+     TOSInternalStart         30
+     TOSSchedule             111
+     TOSHalt                  19
+
+ 
+ 278 bytes in segment CODE
+   2 bytes in segment NEAR_Z
+   4 bytes in segment SADDR_Z
+ 
+ 278 bytes of CODE memory
+   6 bytes of DATA memory
+
+Errors: none
+Warnings: none

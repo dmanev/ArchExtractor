@@ -1,0 +1,388 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_DIN
+// -----------------------------------------------------------------------------
+// $Date:   Jun 23 2009 17:26:00  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_DIN/DAT_DINP.JIL-arc  $
+// $Revision:   1.6  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_DIN/DAT_DINP.JIL-arc$
+// 
+//    Rev 1.6   Jun 23 2009 17:26:00   adzhelp
+// Cm005124: Comment updated (no code change)
+// 
+//    Rev 1.5   Apr 17 2009 15:21:48   adzhelp
+// Cm003619: Comments updated
+// 
+//    Rev 1.4   Mar 19 2009 17:28:16   adzhelp
+// Cm003619: Code review correction
+// 
+//    Rev 1.3   Mar 19 2009 11:42:20   adzhelp
+// Cm003619: Digital inputs configured according to HSI and ordered to port positions
+// 
+//    Rev 1.2   Jan 27 2009 10:53:40   STANDARD
+// Cm003619: Bit/byte postions corrections
+// 
+//    Rev 1.1   Nov 20 2008 14:25:20   ailievb
+// Cm003619: DAT_DIN integration
+// 
+//    Rev 1.0   10 Nov 2008 10:16:18   ailievb
+// Initial revision.
+//******************************************************************************
+
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_DINp_JIL
+#define I_DAT_DINp_JIL (1)
+
+/*
+---------------------------------------------------------------------------
+The DirectInputManager object in in charge of the direct input sampling.
+A debucing alogorithm is used for all inputs.
+---------------------------------------------------------------------------
+DirectInputManager
+{
+    SamplingPeriodMs = 10;     // <-- Sampling period in ms in active state
+    BufferLength = 1;          // <-- Size of LDB buffer in active state
+    SleepBufferLength = 1;     // <-- Size of LDB buffer in sleep state
+    DefaultFilterDelayMs = 30; // <-- Default Filter Delay in ms
+
+    // Choose one type of filter : Variable or Fixed
+
+    // Variable => You can set the FilterDelay input by input
+    Filter = Variable;
+
+    // Fixed => You cannot set the FilterDelay input by input
+    //          The possible FilterDelay are 3 or 5*SamplingPeriodMs
+    //          The debbucing alogorithm is faster.
+    //          The inputs are not processed bit per bit but word by word. 
+    //          Set the word size according to the CPU bus size 
+    //          1 for 8 bits, 2 for 16bit, 4 for 32 bits.
+    Filter = Fixed {WordSize = 1;};
+
+    // Choose the wake up mode : Polling or Interrupt or NoWakeUp
+
+    // NoWakeUp -> The sampling is only running in active state.
+    WakeUp = NoWakeUp;
+
+    // In sleep mode the part of input buffer is read periodically.
+    // Set the sleep mode sampling period with Polling/SamplingPeriodMs 
+    // When a transition is detected, DAT_DIN request active sleep mode
+    // and restart the nominal Sampling.
+    // If the wake-up is not confirmed by DAT_PIN the system returns in sleep
+    WakeUp = Polling { SamplingPeriodMs = 40;};
+
+    // In sleep mode the sampling is stopped.
+    // When a interrupt occurs, DAT_DIN request active sleep mode
+    // and restart the nominal Sampling.
+    // If the wake-up is not confirmed by DAT_PIN the system returns in sleep
+    WakeUp = Interrupt; 
+};
+------------------------------------------------------------------------ */
+DirectInputManager
+{
+    SamplingPeriodMs = 5;     // <-- Sampling period in ms in active state
+    BufferLength = 9;          // <-- Size of LDB buffer in active state
+    SleepBufferLength = 9;     // <-- Size of LDB buffer in sleep state
+    DefaultFilterDelayMs = 25; // <-- Default Filter Delay in ms
+
+    Filter = Fixed {WordSize = 1;};
+
+    WakeUp = Polling { SamplingPeriodMs = 40;};
+};
+
+
+Component DAT_DINp
+{
+    /* 
+    -----------------------------------------------------------------------
+    Direct Input
+    -----------------------------------------------------------------------
+    Data DataName
+    {
+       Type         = U1; 
+       ResetValue   = 0; 
+       BytePosition = 0;
+       BitPosition  = 0;
+
+       // You can set the Filter Delay or use the default value.
+       // Use the default value :
+       Specialization = DirectInput;
+
+       // set the Filter Delay:
+       Specialization = DirectInput {FilterDelayMs = 50;};
+    };
+    -------------------------------------------------------------------- */
+
+    // Logical inputs ordered according to port positions //
+
+    /// Byte 0 - Port 0 ///
+    
+    // P01
+    Data AIRBAG_CRASH // DOOR LOCK: air bag crash
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 0;
+       BitPosition  = 1;
+       Specialization = DirectInput;
+    };
+
+    // P05
+    Data DI_DATA_IMMOBILIZER // IMMOBILZER: Liaison transpondeur (used by DIAG)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 0;
+       BitPosition  = 5;
+       Specialization = DirectInput;
+    };
+    
+    /// Byte 1 - Port 1 ///
+
+    // P14
+    Data HAZARD_SW // FLASHER INCICATORS: Hazard Flasher Switch/After sales alarm (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 1;
+       BitPosition  = 4;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 2 - Port 3 ///
+    
+    // P30
+    Data DI_VERLOG  // IMMOBILZER: Liaison verlog moteur (ECM) (used by DIAG)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 2;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // P31
+    Data RR_AUTOSTOP_SW // REAR WIPER: Rear wiper Auto stop switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 2;
+       BitPosition  = 1;
+       Specialization = DirectInput;
+    };
+    
+    // P32
+    Data FR_AUTOSTOP_SW // FRONT WIPERS: Front wiper auto stop (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 2;
+       BitPosition  = 2;
+       Specialization = DirectInput;
+    };
+    
+    // P33
+    Data DI_VEHICLE_SPEED // DOOR LOCK: vehicle speed
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 2;
+       BitPosition  = 3;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 3 - Port 4 ///
+
+    // P40
+    Data DEFROSTER_SW // REAR DEFROSTER: Defroster switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 3;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // P42
+    Data R_FLASHER_SW // FLASHER INCICATORS: Right Flasher Switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 3;
+       BitPosition  = 2;
+       Specialization = DirectInput;
+    };
+
+    // P43
+    Data L_FLASHER_SW // FLASHER INCICATORS: Left Flasher Switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 3;
+       BitPosition  = 3;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 4 - Port 5 ///
+    
+	// P50
+    Data FR_WASHER_SW // FRONT WASHER: Front washer switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 4;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // P51
+    Data SEATBELT_REMINDER_SW // SOUND WARNINGS: Seat belt reminder (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 4;
+       BitPosition  = 1;
+       Specialization = DirectInput;
+    };
+    
+    // P53
+    Data POSITION_LIGHTS // SOUND WARNINGS: Position light / DIMMERS
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 4;
+       BitPosition  = 3;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 5 - Port 6 ///
+
+    // P60
+    // FR_FOG_SW is connected to HIGH_LOW_BEAM
+    Data HIGH_LOW_BEAM // SOUND WARNINGS: Low beam high beam & FR FOG switches
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 5;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // P61
+    Data RR_FOG_SW // REAR FOG:	REAR FOG SWITCH
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 5;
+       BitPosition  = 1;
+       Specialization = DirectInput;
+    };
+
+    // P62
+    Data RR_WASHER_SW  // REAR WASHER/SYSTEM: Rear  Washer  switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 5;
+       BitPosition  = 2;
+       Specialization = DirectInput;
+    };
+	 
+    // P63
+    Data RR_WIPER_INT_SW // REAR WIPER:	REAR WIPER switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 5;
+       BitPosition  = 3;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 6 - Port 12 ///
+    // P120
+    Data PWR_IGN  // POWER SUPPLY: Ignition switch/wake-upreveil BCM
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 6;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // P123
+    Data FR_DOORS_SW // OPENING STATUS	Front door switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 6;
+       BitPosition  = 3;
+       Specialization = DirectInput;
+    };
+    
+    // P124
+    Data DOOR_LOCK_SW // DOOR LOCK: Door lock switch (reversed in LDB)
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 6;
+       BitPosition  = 4;
+       Specialization = DirectInput;
+    };
+
+    /// Byte 7 - Port 14 ///
+
+    // P140
+    Data DI_ENGINE_RPM // REAR DEFROSTER: Engine RPM
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 7;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    // --------------------------------------------------------------------
+    // Analog inputs converted to digital inputs //
+
+    /// Byte 8 ///
+
+    Data RR_DOORS_SW // OPENING STATUS: Rear door & trunck & hood switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 8;
+       BitPosition  = 0;
+       Specialization = DirectInput;
+    };
+
+    Data DOOR_UNLOCK_SW // DOOR LOCK: Door lock/unlock  switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 8;
+       BitPosition  = 1;
+       Specialization = DirectInput;
+    };
+
+    Data FR_WIPER_INT_SW // FRONT WIPERS: Front wiper Cadance switch
+    {
+       Type         = U1;
+       ResetValue   = 0;
+       BytePosition = 8;
+       BitPosition  = 2;
+       Specialization = DirectInput;        
+    };
+
+};
+
+#endif // I_DAT_DINp_JIL

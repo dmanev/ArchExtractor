@@ -1,0 +1,2510 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:13 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_BUZ.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_BUZ.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_BUZ.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_BUZ.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_BUZ.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_BUZ.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_BUZ.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    The component is responsible for the generation of sequences 
+     13          //               for controlling an audio producing device to generate sounds 
+     14          //               and melodies, that are described in the parameterization file 
+     15          //               DAT_BUZx.H
+     16          // -----------------------------------------------------------------------------
+     17          // $Date:   Mar 02 2010 10:51:52  $
+     18          // $Archive::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_BUZ/DAT_BUZ.c-arc  $
+     19          // $Revision:   1.5  $
+     20          // -----------------------------------------------------------------------------
+     21          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_BUZ/DAT_BUZ.c-arc  $
+     22          // 
+     23          //    Rev 1.5   Mar 02 2010 10:51:52   adzhelp
+     24          // Cm006814: TPS_BUZ_CLI, TPS_CLI, SBR_TIMEOUT_TM_TP normalized
+     25          // 
+     26          //    Rev 1.4   Oct 19 2009 12:42:18   amarinm1
+     27          // Cm005858: Code review corrections, binary code not affected.
+     28          // 
+     29          //    Rev 1.3   Oct 13 2009 17:22:54   amarinm1
+     30          // Cm003273: Comment added for C-Cover justification.
+     31          // 
+     32          //    Rev 1.2   Apr 29 2009 12:00:24   adzhelp
+     33          // Cm003273: Functions moved to banked memory area
+     34          // 
+     35          //    Rev 1.1   Mar 20 2009 18:11:06   amarinm1
+     36          // Cm003273: Changes for integration.
+     37          // 
+     38          //    Rev 1.0   Feb 24 2009 12:25:42   amarinm1
+     39          // Initial revision.
+     40          //******************************************************************************
+     41          #endif
+     42          
+     43          //------------------------------------------------------------------------------
+     44          // Body Identification
+     45          //------------------------------------------------------------------------------
+     46          #define dat_buz  "dat_buz"
+     47          
+     48          // #define DEBUG_BUZ
+     49          
+     50          //------------------------------------------------------------------------------
+     51          // Included files to resolve specific definitions in this file
+     52          //------------------------------------------------------------------------------
+     53          #include "deftypes.h"
+     54          #include "ldb.h"
+     55          #include "tos.h"
+     56          #include "dat.h"
+     57          
+     58          // component header
+     59          #include "dat_buz.h"
+     60          
+     61          // melodies parameterizations
+     62          #include "dat_buzx.h"
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerSilence[1]
+   \                     aBuzzerSilence:
+   \   0000                  DS 6
+   \   0006                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerFlasherClick[1]
+   \                     aBuzzerFlasherClick:
+   \   0000                  DS 6
+   \   0006                  REQUIRE `?<Initializer for aBuzzerFlasherClick>`
+   \   0006                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerFlasherClack[1]
+   \                     aBuzzerFlasherClack:
+   \   0000                  DS 6
+   \   0006                  REQUIRE `?<Initializer for aBuzzerFlasherClack>`
+   \   0006                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerLWS[2]
+   \                     aBuzzerLWS:
+   \   0000                  DS 12
+   \   000C                  REQUIRE `?<Initializer for aBuzzerLWS>`
+   \   000C                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerSeatBelt[1]
+   \                     aBuzzerSeatBelt:
+   \   0000                  DS 6
+   \   0006                  REQUIRE `?<Initializer for aBuzzerSeatBelt>`
+   \   0006                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerOverSpeed[2]
+   \                     aBuzzerOverSpeed:
+   \   0000                  DS 12
+   \   000C                  REQUIRE `?<Initializer for aBuzzerOverSpeed>`
+   \   000C                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tPERIOD_DESC __near aBuzzerExtLight[1]
+   \                     aBuzzerExtLight:
+   \   0000                  DS 6
+   \   0006                  REQUIRE `?<Initializer for aBuzzerExtLight>`
+   \   0006                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_I, align 2, align-sorted
+   \   static tMELODY_DESC __near DATBuzMelodies[7]
+   \                     DATBuzMelodies:
+   \   0000                  DS 56
+   \   0038                  REQUIRE `?<Initializer for DATBuzMelodies>`
+   \   0038                  REQUIRE __INIT_NEAR_I
+     63          
+     64          
+     65          #ifdef DEBUG_BUZ
+     66              #include<stdio.h>
+     67          #endif
+     68          
+     69          //------------------------------------------------------------------------------
+     70          // Local constants
+     71          //------------------------------------------------------------------------------
+     72          #define cTPS_BUZ_CLI_Stepx100           ((U16)615)
+     73          #define cTPS_BUZ_CLI_StepMultiplier     ((U16)100)
+     74          #define cTPS_BUZ_CLI_StepMultiplierHalf ((U16)50)
+     75          #define cTPS_CLI_Step                   ((U16)100)
+     76          #define cNumberOfMsInSecond             ((U32)1000)
+     77          #define cSeatBeltSoundTotalTimeInMs     ((U32)900)
+     78          #define cSeatBeltSoundHalfTimeInMs      ((U32)450)
+     79          #define cBuzzerTaskPeriodMs             5UL
+     80          
+     81          //------------------------------------------------------------------------------
+     82          // Local macros
+     83          //------------------------------------------------------------------------------
+     84          
+     85          //TBD: MB: This macro to be optimized, when the real tick value is determined, 
+     86          // because it is executed within interrupt and the mul/div operations may take 
+     87          // significant time 
+     88          // instead, the parameterization may come with ready-to-use values
+     89          
+     90          #define mConvertMsIntoBuzzerTicks(x)    \
+     91              (U32)((((U32)(x)*1000UL)/cDATBuzTaskTimeInUs)/*+1*/)
+     92          
+     93          
+     94          //------------------------------------------------------------------------------
+     95          // Local types
+     96          //------------------------------------------------------------------------------
+     97          
+     98          // This is an example:
+     99          // typedef Expression   tTypeName;
+    100          
+    101          //------------------------------------------------------------------------------
+    102          // Local data
+    103          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    104          static tMsg    BuzzerMsg;
+   \                     BuzzerMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    105          static U8      u8SoundBuffer;
+   \                     u8SoundBuffer:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    106          static BOOL    bDATBuzAbnormalVoltage;
+   \                     bDATBuzAbnormalVoltage:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    107          static BOOL    bDATBuzStarted;
+   \                     bDATBuzStarted:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    108          
+    109          // industrialization request
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    110          static BOOL    bIndusBuzzerFreqFlag;
+   \                     bIndusBuzzerFreqFlag:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    111          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    112          static tTOSAlarm BuzzerTaskAlarm;
+   \                     BuzzerTaskAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    113                
+    114          //------------------------------------------------------------------------------
+    115          // Constant local data
+    116          //------------------------------------------------------------------------------
+    117          
+    118          // This is an example:
+    119          // static const tType  cConstantName;
+    120          
+    121          //------------------------------------------------------------------------------
+    122          // Exported data
+    123          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    124          tSoundStruct    DATBuzBuffer[cNumberOfBuffers];
+   \                     DATBuzBuffer:
+   \   0000                  DS 80
+   \   0050                  REQUIRE __INIT_NEAR_Z
+    125          
+    126          //------------------------------------------------------------------------------
+    127          // Constant exported data
+    128          //------------------------------------------------------------------------------
+    129          
+    130          // This is an example:
+    131          // Reduce to minimum the usage of extern constant data members!!!
+    132          // extern const tType  cLAYCmpConstantName;
+    133          // extern const U32    cu32LAYCmpConstantName;
+    134          
+    135          //------------------------------------------------------------------------------
+    136          // Local function prototypes
+    137          //------------------------------------------------------------------------------
+    138          static MEM_TYPE void ContinuePlayingBrokenSound( void );
+    139          static MEM_TYPE U8   GetCurrentHighestPriorityBuffer( void );
+    140          
+    141          #ifdef X90_PROJECT
+    142          static MEM_TYPE void DATBuzTask_Static(void);
+    143          static MEM_TYPE void DATBuzSetBuzzRequest_Static(const tSOUND SoundRequestP, const BOOL bSoundStateP);
+    144          static MEM_TYPE void DATBuzInit_Static(void);
+    145          static MEM_TYPE void DATBuzStart_Static(void);
+    146          static MEM_TYPE void DATBuzStop_Static(void);
+    147          static MEM_TYPE void DATBuzDiagBuzzStart_Static(const U16 u16FreqP);
+    148          static MEM_TYPE void DATBuzNormalVoltage_Static(void);
+    149          static MEM_TYPE void DATBuzAbnormalVoltage_Static(void);
+    150          static MEM_TYPE void DATBuzDiagBuzzStop_Static(void);
+    151          #endif
+    152          
+    153          //==============================================================================
+    154          //=========================== LOCAL FUNCTIONS ==================================
+    155          //==============================================================================
+    156          
+    157          
+    158          //==============================================================================
+    159          // DESCRIPTION:         < short description of the function >
+    160          //
+    161          // PARAMETERS:          < type,usage and constraints for all parameters >
+    162          //
+    163          // RETURN VALUE:        < type and usage >
+    164          //
+    165          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    166          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    167          static MEM_TYPE void ContinuePlayingBrokenSound( void )
+   \                     ContinuePlayingBrokenSound:
+    168          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    169              u8SoundBuffer = GetCurrentHighestPriorityBuffer();
+   \   0000   16....         MOVW      HL,#LWRD(GetCurrentHighestPriorityBuffer)
+   \   0003   A4..           MOV       E,#BYTE3(GetCurrentHighestPriorityBuffer)
+   \   0005   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0006   9E....         MOV       u8SoundBuffer,A
+    170              
+    171              //continue playing the broken sound
+    172              if ( DATBuzBuffer[u8SoundBuffer].DATBuzState == DATBUZ_PROCESS_SOUND_PAUSE )
+   \   0009   A010           MOV       X,#16
+   \   000B   3188           MULU      X
+   \   000D   CA....         ADDW      AX,#DATBuzBuffer+2
+   \   0010   D6             MOVW      HL,AX
+   \   0011   87             MOV       A,[HL]
+   \   0012   4D03           CMP       A,#3
+   \   0014   BD1E           BNZ       ??DATBuzDiagBuzzStop_Static_0
+    173              {
+    174                  //Continue to play lower priority buzzer that was interrupted
+    175                  //QACJ 0310: amarinm1: This is the expected type by the function. It is later casted to its original type.
+    176                  BuzzerMsg.pBuffer = (U8*)DATBuzBuffer[u8SoundBuffer].Buffer;
+   \   0016   8E....         MOV       A,u8SoundBuffer
+   \   0019   A010           MOV       X,#16
+   \   001B   3188           MULU      X
+   \   001D   CA....         ADDW      AX,#DATBuzBuffer
+   \   0020   03....         MOVW      BuzzerMsg,AX
+    177                  LDBSendWithoutAddr (cLDBChannelBuz, (tMsg *)&BuzzerMsg);
+   \   0023   10....         MOVW      AX,#BuzzerMsg
+   \   0026   16....         MOVW      HL,#LWRD(LDBBuzSendWithoutAddr)
+   \   0029   A4..           MOV       E,#BYTE3(LDBBuzSendWithoutAddr)
+   \   002B   ..             CALLT     [__T_?FAR_CALL_L07]
+    178                  LDBControl (cLDBChannelBuz, cLDBBuzStartSound);
+   \   002C   A102           MOV       A,#2
+   \   002E   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0031   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0033   ..             CALLT     [__T_?FAR_CALL_L07]
+    179              }
+    180              else
+    181              {
+    182                  // Do nothing
+    183              }
+    184          }
+   \                     ??DATBuzDiagBuzzStop_Static_0:
+   \   0034   AF             RET       
+   \   0035                  REQUIRE ?CL78K_V4_6_L00
+    185          
+    186          //==============================================================================
+    187          // DESCRIPTION:         < short description of the function >
+    188          //
+    189          // PARAMETERS:          < type,usage and constraints for all parameters >
+    190          //
+    191          // RETURN VALUE:        < type and usage >
+    192          //
+    193          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    194          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    195          static MEM_TYPE U8 GetCurrentHighestPriorityBuffer( void )
+   \                     GetCurrentHighestPriorityBuffer:
+    196          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    197              U8 u8ResultL;
+    198          
+    199              //---------------------------------------------------------------------
+    200              // Find highest priority sound to be played
+    201          
+    202              if (DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay != 
+    203                          eBUZZER_Silence)
+   \   0000   8E....         MOV       A,DATBuzBuffer+14
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD03           BZ        ??DATBuzDiagBuzzStop_Static_1
+    204              {
+    205                  u8ResultL = cBufferFlashers;
+   \   0007   A100           MOV       A,#0
+   \   0009   AF             RET       
+    206              }
+    207              else if (DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay != 
+    208                          eBUZZER_Silence)
+   \                     ??DATBuzDiagBuzzStop_Static_1:
+   \   000A   8E....         MOV       A,DATBuzBuffer+30
+   \   000D   4D00           CMP       A,#0
+   \   000F   AD08           BZ        ??DATBuzDiagBuzzStop_Static_2
+    209              {
+    210                  DATBuzBuffer[cBufferFlashers].DATBuzState = DATBUZ_IDLE;
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       DATBuzBuffer+2,A
+    211                  
+    212                  u8ResultL = cBufferLWS;
+   \   0016   A101           MOV       A,#1
+   \   0018   AF             RET       
+    213              }
+    214              else if (DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay != 
+    215                          eBUZZER_Silence)
+   \                     ??DATBuzDiagBuzzStop_Static_2:
+   \   0019   8E....         MOV       A,DATBuzBuffer+46
+   \   001C   4D00           CMP       A,#0
+   \   001E   AD0C           BZ        ??DATBuzDiagBuzzStop_Static_3
+    216              {
+    217                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+   \   0020   A100           MOV       A,#0
+   \   0022   9E....         MOV       DATBuzBuffer+2,A
+    218                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+   \   0025   16....         MOVW      HL,#DATBuzBuffer+18
+   \   0028   97             MOV       [HL],A
+    219                  
+    220                  u8ResultL = cBufferSeatBelt;
+   \   0029   A102           MOV       A,#2
+   \   002B   AF             RET       
+    221              }
+    222              else if (DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay != 
+    223                          eBUZZER_Silence)
+   \                     ??DATBuzDiagBuzzStop_Static_3:
+   \   002C   8E....         MOV       A,DATBuzBuffer+62
+   \   002F   4D00           CMP       A,#0
+   \   0031   AD10           BZ        ??DATBuzDiagBuzzStop_Static_4
+    224              {
+    225                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+   \   0033   A100           MOV       A,#0
+   \   0035   9E....         MOV       DATBuzBuffer+2,A
+    226                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+   \   0038   16....         MOVW      HL,#DATBuzBuffer+18
+   \   003B   97             MOV       [HL],A
+    227                  DATBuzBuffer[cBufferSeatBelt].DATBuzState  = DATBUZ_IDLE;
+   \   003C   16....         MOVW      HL,#DATBuzBuffer+34
+   \   003F   97             MOV       [HL],A
+    228          
+    229                  u8ResultL = cBufferOverSpeed;
+   \   0040   A103           MOV       A,#3
+   \   0042   AF             RET       
+    230              }
+    231              else if (DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay != 
+    232                          eBUZZER_Silence)
+   \                     ??DATBuzDiagBuzzStop_Static_4:
+   \   0043   8E....         MOV       A,DATBuzBuffer+78
+   \   0046   4D00           CMP       A,#0
+   \   0048   A100           MOV       A,#0
+   \   004A   9E....         MOV       DATBuzBuffer+2,A
+   \   004D   16....         MOVW      HL,#DATBuzBuffer+18
+   \   0050   97             MOV       [HL],A
+   \   0051   16....         MOVW      HL,#DATBuzBuffer+34
+   \   0054   97             MOV       [HL],A
+   \   0055   16....         MOVW      HL,#DATBuzBuffer+50
+   \   0058   BD04           BNZ       ??DATBuzDiagBuzzStop_Static_5
+    233              {
+    234                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+    235                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+    236                  DATBuzBuffer[cBufferSeatBelt].DATBuzState  = DATBUZ_IDLE;
+    237                  DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_IDLE;
+    238          
+    239                  u8ResultL = cBufferExtLights;
+    240              }
+    241              else
+    242              {
+    243                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+   \   005A   97             MOV       [HL],A
+    244                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+    245                  DATBuzBuffer[cBufferSeatBelt].DATBuzState  = DATBUZ_IDLE;
+    246                  DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_IDLE;
+    247                  DATBuzBuffer[cBufferExtLights].DATBuzState = DATBUZ_IDLE;
+   \   005B   16....         MOVW      HL,#DATBuzBuffer+66
+   \                     ??DATBuzDiagBuzzStop_Static_5:
+   \   005E   97             MOV       [HL],A
+    248          
+    249                  u8ResultL = cBufferExtLights;
+   \   005F   A104           MOV       A,#4
+    250              }
+    251          
+    252              //---------------------------------------------------------------------
+    253          
+    254              return u8ResultL;
+   \   0061   AF             RET       
+   \   0062                  REQUIRE ?CL78K_V4_6_L00
+    255          }
+    256          
+    257          
+    258          //==============================================================================
+    259          //=========================== EXPORTED FUNCTIONS ===============================
+    260          //==============================================================================
+    261          
+    262          
+    263          //==============================================================================
+    264          // DESCRIPTION:         < short description of the function >
+    265          //
+    266          // PARAMETERS:          < type,usage and constraints for all parameters >
+    267          //
+    268          // RETURN VALUE:        < type and usage >
+    269          //
+    270          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    271          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    272          BOOL DATBuzIsSoundPlaying(void)
+   \                     DATBuzIsSoundPlaying:
+    273          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    274              // DATBuzState keeps the next state to process so when a sound is being
+    275              // played the next state is DATBUZ_PROCESS_SOUND_PAUSE
+    276              const BOOL bResult = (BOOL)
+    277                  (   (   (DATBuzBuffer[u8SoundBuffer].DATBuzState == DATBUZ_PROCESS_SOUND_PAUSE)
+    278                       && (bDATBuzAbnormalVoltage == cFalse)   )
+    279                   || (bIndusBuzzerFreqFlag == cTrue)
+    280                  );
+   \   0000   8E....         MOV       A,u8SoundBuffer
+   \   0003   A010           MOV       X,#16
+   \   0005   3188           MULU      X
+   \   0007   CA....         ADDW      AX,#DATBuzBuffer+2
+   \   000A   D6             MOVW      HL,AX
+   \   000B   87             MOV       A,[HL]
+   \   000C   4D03           CMP       A,#3
+   \   000E   BD07           BNZ       ??DATBuzDiagBuzzStop_Static_36
+   \   0010   8E....         MOV       A,bDATBuzAbnormalVoltage
+   \   0013   4D00           CMP       A,#0
+   \   0015   AD06           BZ        ??DATBuzDiagBuzzStop_Static_37
+   \                     ??DATBuzDiagBuzzStop_Static_36:
+   \   0017   8E....         MOV       A,bIndusBuzzerFreqFlag
+   \   001A   51             DEC       A
+   \   001B   BD03           BNZ       ??DATBuzDiagBuzzStop_Static_38
+   \                     ??DATBuzDiagBuzzStop_Static_37:
+   \   001D   A101           MOV       A,#1
+   \   001F   AF             RET       
+   \                     ??DATBuzDiagBuzzStop_Static_38:
+   \   0020   A100           MOV       A,#0
+    281          
+    282              return bResult;
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+    283          }
+    284          
+    285          
+    286          //==============================================================================
+    287          // DESCRIPTION:         < short description of the function >
+    288          //
+    289          // PARAMETERS:          < type,usage and constraints for all parameters >
+    290          //
+    291          // RETURN VALUE:        < type and usage >
+    292          //
+    293          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    294          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    295          void DATBuzSetBuzzRequest(const tSOUND SoundRequestP, const BOOL bSoundStateP)
+   \                     DATBuzSetBuzzRequest:
+    296          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    297          #ifdef X90_PROJECT
+    298              DATBuzSetBuzzRequest_Static(SoundRequestP, bSoundStateP);
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzSetBuzzRequest_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzSetBuzzRequest_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    299          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    300          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    301          static MEM_TYPE void DATBuzSetBuzzRequest_Static(const tSOUND SoundRequestP, const BOOL bSoundStateP)
+   \                     DATBuzSetBuzzRequest_Static:
+    302          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    303          #endif
+    304              U16 u16TempL;
+    305          
+    306              switch(SoundRequestP)
+   \   0001   4D01           CMP       A,#1
+   \   0003   AD26           BZ        ??DATBuzDiagBuzzStop_Static_6
+   \   0005   4D02           CMP       A,#2
+   \   0007   BD03           BNZ       $+5
+   \   0009   9B....         BR        N:??DATBuzDiagBuzzStop_Static_7
+   \   000C   4D03           CMP       A,#3
+   \   000E   BD03           BNZ       $+5
+   \   0010   9B....         BR        N:??DATBuzDiagBuzzStop_Static_8
+   \   0013   4D04           CMP       A,#4
+   \   0015   BD03           BNZ       $+5
+   \   0017   9B....         BR        N:??DATBuzDiagBuzzStop_Static_9
+   \   001A   4D05           CMP       A,#5
+   \   001C   BD03           BNZ       $+5
+   \   001E   9B....         BR        N:??DATBuzDiagBuzzStop_Static_10
+   \   0021   4D06           CMP       A,#6
+   \   0023   BD03           BNZ       $+5
+   \   0025   9B....         BR        N:??DATBuzDiagBuzzStop_Static_11
+   \   0028   9B....         BR        N:??DATBuzDiagBuzzStop_Static_12
+    307              {
+    308              case eBUZZER_FlasherClick:
+    309                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_6:
+   \   002B   63             MOV       A,B
+   \   002C   51             DEC       A
+   \   002D   BD62           BNZ       ??DATBuzDiagBuzzStop_Static_13
+    310                  {
+    311                      DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay = eBUZZER_FlasherClick;
+   \   002F   A101           MOV       A,#1
+   \   0031   16....         MOVW      HL,#DATBuzBuffer+14
+   \   0034   97             MOV       [HL],A
+    312                      DATBuzBuffer[cBufferFlashers].DATBuzState = DATBUZ_PROCESS_START;
+   \   0035   9E....         MOV       DATBuzBuffer+2,A
+    313                      DATBuzBuffer[cBufferFlashers].ticks_to_elapse = 0;
+   \   0038   100000         MOVW      AX,#0
+   \   003B   03....         MOVW      DATBuzBuffer+6,AX
+   \   003E   03....         MOVW      DATBuzBuffer+4,AX
+    314          
+    315          
+    316                      // The active time needs to be dynamicly updated
+    317                      u16TempL = cTPS_BUZ_CLI_Stepx100 * (U16)mDATRead(U8Bit, NEEP_TPS_BUZ_CLI, Default);
+   \   0041   126702         MOVW      BC,#615
+   \   0044   8E....         MOV       A,DATPeeCalibrationData+23
+   \   0047   70             MOV       X,A
+   \   0048   A100           MOV       A,#0
+   \   004A   ..             CALLT     [__T_?I_MUL_L02]
+   \   004B   D6             MOVW      HL,AX
+    318                      
+    319                      // Round the integer
+    320                      if ( (U16)(u16TempL % cTPS_BUZ_CLI_StepMultiplier) > cTPS_BUZ_CLI_StepMultiplierHalf )
+   \   004C   126400         MOVW      BC,#100
+   \   004F   3182           DIVUW     C
+   \   0051   C2             MOVW      AX,BC
+   \   0052   EA3300         CMPW      AX,#51
+   \   0055   8D05           BC        ??DATBuzDiagBuzzStop_Static_14
+    321                      {
+    322                          u16TempL += cTPS_BUZ_CLI_StepMultiplier;
+   \   0057   C6             MOVW      AX,HL
+   \   0058   CA6400         ADDW      AX,#100
+   \   005B   D6             MOVW      HL,AX
+    323                      }
+    324                      u16TempL /= cTPS_BUZ_CLI_StepMultiplier;
+    325          
+    326                      DATBuzMelodies[eBUZZER_FlasherClick].Sound.Motive[0].ActiveTime = u16TempL;
+   \                     ??DATBuzDiagBuzzStop_Static_14:
+   \   005C   C6             MOVW      AX,HL
+   \   005D   A264           MOV       C,#100
+   \   005F   3182           DIVUW     C
+   \   0061   D4             MOVW      DE,AX
+   \   0062   02....         MOVW      AX,DATBuzMelodies+8
+   \   0065   D6             MOVW      HL,AX
+   \   0066   C4             MOVW      AX,DE
+   \   0067   BE03           MOV       [HL+0x03],A
+   \   0069   60             MOV       A,X
+   \   006A   BE02           MOV       [HL+0x02],A
+    327          
+    328                      
+    329                      // Note: the following strategy is applied in order to ensure that
+    330                      // a lower priority sound is not started during the sound pause
+    331                      // when the flashers are active.
+    332          
+    333                      // The inactive time is the rest of the click
+    334                      DATBuzMelodies[eBUZZER_FlasherClick].Sound.Motive[0].InactiveTime =
+    335                         (cTPS_CLI_Step * (U16)mDATRead(U8Bit, NEEP_TPS_CLI, Default)) - 
+    336                         DATBuzMelodies[eBUZZER_FlasherClick].Sound.Motive[0].ActiveTime;
+   \   006C   02....         MOVW      AX,DATBuzMelodies+8
+   \   006F   D6             MOVW      HL,AX
+   \   0070   AE02           MOV       A,[HL+0x02]
+   \   0072   70             MOV       X,A
+   \   0073   AE03           MOV       A,[HL+0x03]
+   \   0075   D6             MOVW      HL,AX
+   \   0076   8E....         MOV       A,DATPeeCalibrationData+24
+   \   0079   A064           MOV       X,#100
+   \   007B   3188           MULU      X
+   \   007D   30             XCH       A,X
+   \   007E   611E           SUB       A,L
+   \   0080   30             XCH       A,X
+   \   0081   613F           SUBC      A,H
+   \   0083   D4             MOVW      DE,AX
+   \   0084   02....         MOVW      AX,DATBuzMelodies+8
+   \                     ??DATBuzSetBuzzRequest_Static_0:
+   \   0087   D6             MOVW      HL,AX
+   \   0088   C4             MOVW      AX,DE
+   \   0089   BE05           MOV       [HL+0x05],A
+   \   008B   60             MOV       A,X
+   \   008C   BE04           MOV       [HL+0x04],A
+   \   008E   9B....         BR        N:??DATBuzDiagBuzzStop_Static_15
+    337                  }
+    338                  else
+    339                  {
+    340                      DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_13:
+   \   0091   A100           MOV       A,#0
+   \   0093   16....         MOVW      HL,#DATBuzBuffer+14
+   \   0096   97             MOV       [HL],A
+    341                      DATBuzBuffer[cBufferFlashers].DATBuzState = DATBUZ_IDLE;
+   \   0097   9E....         MOV       DATBuzBuffer+2,A
+    342                      
+    343                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+   \   009A   A103           MOV       A,#3
+   \   009C   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   009F   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   00A1   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   00A2   9B....         BR        N:??DATBuzDiagBuzzStop_Static_15
+    344                  }
+    345                  break;
+    346          
+    347              case eBUZZER_FlasherClack:
+    348                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_7:
+   \   00A5   63             MOV       A,B
+   \   00A6   51             DEC       A
+   \   00A7   BD5C           BNZ       ??DATBuzDiagBuzzStop_Static_16
+    349                  {
+    350                      DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay = eBUZZER_FlasherClack;
+   \   00A9   A102           MOV       A,#2
+   \   00AB   16....         MOVW      HL,#DATBuzBuffer+14
+   \   00AE   97             MOV       [HL],A
+    351                      DATBuzBuffer[cBufferFlashers].DATBuzState = DATBUZ_PROCESS_START;
+   \   00AF   A101           MOV       A,#1
+   \   00B1   9E....         MOV       DATBuzBuffer+2,A
+    352                      DATBuzBuffer[cBufferFlashers].ticks_to_elapse = 0;
+   \   00B4   100000         MOVW      AX,#0
+   \   00B7   03....         MOVW      DATBuzBuffer+6,AX
+   \   00BA   03....         MOVW      DATBuzBuffer+4,AX
+    353          
+    354          
+    355                      // The active time needs to be dynamicly updated
+    356                      u16TempL = cTPS_BUZ_CLI_Stepx100 * (U16)mDATRead(U8Bit, NEEP_TPS_BUZ_CLI, Default);
+   \   00BD   126702         MOVW      BC,#615
+   \   00C0   8E....         MOV       A,DATPeeCalibrationData+23
+   \   00C3   70             MOV       X,A
+   \   00C4   A100           MOV       A,#0
+   \   00C6   ..             CALLT     [__T_?I_MUL_L02]
+   \   00C7   D6             MOVW      HL,AX
+    357                      
+    358                      // Round the integer
+    359                      if ( (U16)(u16TempL % cTPS_BUZ_CLI_StepMultiplier) > cTPS_BUZ_CLI_StepMultiplierHalf )
+   \   00C8   126400         MOVW      BC,#100
+   \   00CB   3182           DIVUW     C
+   \   00CD   C2             MOVW      AX,BC
+   \   00CE   EA3300         CMPW      AX,#51
+   \   00D1   8D05           BC        ??DATBuzDiagBuzzStop_Static_17
+    360                      {
+    361                          u16TempL += cTPS_BUZ_CLI_StepMultiplier;
+   \   00D3   C6             MOVW      AX,HL
+   \   00D4   CA6400         ADDW      AX,#100
+   \   00D7   D6             MOVW      HL,AX
+    362                      }
+    363                      u16TempL /= cTPS_BUZ_CLI_StepMultiplier;
+    364          
+    365                      DATBuzMelodies[eBUZZER_FlasherClack].Sound.Motive[0].ActiveTime = u16TempL;
+   \                     ??DATBuzDiagBuzzStop_Static_17:
+   \   00D8   C6             MOVW      AX,HL
+   \   00D9   A264           MOV       C,#100
+   \   00DB   3182           DIVUW     C
+   \   00DD   D4             MOVW      DE,AX
+   \   00DE   02....         MOVW      AX,DATBuzMelodies+16
+   \   00E1   D6             MOVW      HL,AX
+   \   00E2   C4             MOVW      AX,DE
+   \   00E3   BE03           MOV       [HL+0x03],A
+   \   00E5   60             MOV       A,X
+   \   00E6   BE02           MOV       [HL+0x02],A
+    366          
+    367          
+    368                      // Note: the following strategy is applied in order to ensure that
+    369                      // a lower priority sound is not started during the sound pause
+    370                      // when the flashers are active.
+    371          
+    372                      // The inactive time is the rest of the click
+    373                      DATBuzMelodies[eBUZZER_FlasherClack].Sound.Motive[0].InactiveTime =
+    374                         (cTPS_CLI_Step * (U16)mDATRead(U8Bit, NEEP_TPS_CLI, Default)) - 
+    375                         DATBuzMelodies[eBUZZER_FlasherClack].Sound.Motive[0].ActiveTime;
+   \   00E8   02....         MOVW      AX,DATBuzMelodies+16
+   \   00EB   D6             MOVW      HL,AX
+   \   00EC   AE02           MOV       A,[HL+0x02]
+   \   00EE   70             MOV       X,A
+   \   00EF   AE03           MOV       A,[HL+0x03]
+   \   00F1   D6             MOVW      HL,AX
+   \   00F2   8E....         MOV       A,DATPeeCalibrationData+24
+   \   00F5   A064           MOV       X,#100
+   \   00F7   3188           MULU      X
+   \   00F9   30             XCH       A,X
+   \   00FA   611E           SUB       A,L
+   \   00FC   30             XCH       A,X
+   \   00FD   613F           SUBC      A,H
+   \   00FF   D4             MOVW      DE,AX
+   \   0100   02....         MOVW      AX,DATBuzMelodies+16
+   \   0103   FA82           BR        ??DATBuzSetBuzzRequest_Static_0
+    376                  }
+    377                  else
+    378                  {
+    379                      DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_16:
+   \   0105   A100           MOV       A,#0
+   \   0107   16....         MOVW      HL,#DATBuzBuffer+14
+   \   010A   97             MOV       [HL],A
+    380                      DATBuzBuffer[cBufferFlashers].DATBuzState = DATBUZ_IDLE;
+   \   010B   9E....         MOV       DATBuzBuffer+2,A
+    381          
+    382                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+   \                     ??DATBuzSetBuzzRequest_Static_1:
+   \   010E   A103           MOV       A,#3
+   \   0110   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0113   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0115   ..             CALLT     [__T_?FAR_CALL_L07]
+    383                      ContinuePlayingBrokenSound();
+   \   0116   16....         MOVW      HL,#LWRD(ContinuePlayingBrokenSound)
+   \   0119   A4..           MOV       E,#BYTE3(ContinuePlayingBrokenSound)
+   \   011B   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   011C   9B....         BR        N:??DATBuzDiagBuzzStop_Static_15
+    384                  }
+    385                  break;
+    386              
+    387              case eBUZZER_LockWithSpeed:
+    388                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_8:
+   \   011F   63             MOV       A,B
+   \   0120   51             DEC       A
+   \   0121   BD18           BNZ       ??DATBuzDiagBuzzStop_Static_18
+    389                  {
+    390                      DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay = eBUZZER_LockWithSpeed;
+   \   0123   A103           MOV       A,#3
+   \   0125   16....         MOVW      HL,#DATBuzBuffer+30
+   \   0128   97             MOV       [HL],A
+    391                      DATBuzBuffer[cBufferLWS].DATBuzState = DATBUZ_PROCESS_START;
+   \   0129   A101           MOV       A,#1
+   \   012B   16....         MOVW      HL,#DATBuzBuffer+18
+   \   012E   97             MOV       [HL],A
+    392                      DATBuzBuffer[cBufferLWS].ticks_to_elapse = 0;
+   \   012F   100000         MOVW      AX,#0
+   \   0132   03....         MOVW      DATBuzBuffer+22,AX
+   \   0135   03....         MOVW      DATBuzBuffer+20,AX
+   \   0138   9B....         BR        N:??DATBuzDiagBuzzStop_Static_15
+    393                  }
+    394                  else
+    395                  {
+    396                      DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_18:
+   \   013B   A100           MOV       A,#0
+   \   013D   16....         MOVW      HL,#DATBuzBuffer+30
+   \   0140   97             MOV       [HL],A
+    397                      DATBuzBuffer[cBufferLWS].DATBuzState = DATBUZ_IDLE;
+   \   0141   16....         MOVW      HL,#DATBuzBuffer+18
+   \                     ??DATBuzSetBuzzRequest_Static_2:
+   \   0144   97             MOV       [HL],A
+    398          
+    399                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+   \   0145   FAC7           BR        ??DATBuzSetBuzzRequest_Static_1
+    400                      ContinuePlayingBrokenSound();
+    401                  }
+    402                  break;
+    403              
+    404              case eBUZZER_SeatBelt:
+    405                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_9:
+   \   0147   63             MOV       A,B
+   \   0148   51             DEC       A
+   \   0149   BD66           BNZ       ??DATBuzDiagBuzzStop_Static_19
+    406                  {
+    407                      DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay = eBUZZER_SeatBelt;
+   \   014B   A104           MOV       A,#4
+   \   014D   16....         MOVW      HL,#DATBuzBuffer+46
+   \   0150   97             MOV       [HL],A
+    408                      DATBuzBuffer[cBufferSeatBelt].DATBuzState = DATBUZ_PROCESS_START;
+   \   0151   A101           MOV       A,#1
+   \   0153   16....         MOVW      HL,#DATBuzBuffer+34
+   \   0156   97             MOV       [HL],A
+    409                      DATBuzBuffer[cBufferSeatBelt].ticks_to_elapse = 0;
+   \   0157   100000         MOVW      AX,#0
+   \   015A   03....         MOVW      DATBuzBuffer+38,AX
+   \   015D   03....         MOVW      DATBuzBuffer+36,AX
+    410          
+    411                      // There is a duration timeout for the SeatBelt warning that needs
+    412                      // to be dynamicly updated.
+    413                      DATBuzMelodies[eBUZZER_SeatBelt].Repetitions = (U8)
+    414                      ( ((U32)mDATRead(U8Bit, NEEP_SBR_TIMEOUT_TM_TP, Default) * cNumberOfMsInSecond) / 
+    415                                  cSeatBeltSoundTotalTimeInMs );
+   \   0160   B1             PUSH      AX
+   \   0161   108403         MOVW      AX,#900
+   \   0164   B1             PUSH      AX
+   \   0165   100000         MOVW      AX,#0
+   \   0168   B1             PUSH      AX
+   \   0169   10E803         MOVW      AX,#1000
+   \   016C   B1             PUSH      AX
+   \   016D   8E....         MOV       A,DATPeeCalibrationData+21
+   \   0170   120000         MOVW      BC,#0
+   \   0173   70             MOV       X,A
+   \   0174   63             MOV       A,B
+   \   0175   ..             CALLT     [__T_?L_MUL_L03]
+   \   0176   ..             CALLT     [__T_?UL_DIV_L03]
+   \   0177   60             MOV       A,X
+   \   0178   9E....         MOV       DATBuzMelodies+38,A
+    416          
+    417                      // To round the integer divisiion
+    418                      if ( (((U32)mDATRead(U8Bit, NEEP_SBR_TIMEOUT_TM_TP, Default) * cNumberOfMsInSecond) % 
+    419                                  cSeatBeltSoundTotalTimeInMs) > cSeatBeltSoundHalfTimeInMs ) 
+   \   017B   100000         MOVW      AX,#0
+   \   017E   B1             PUSH      AX
+   \   017F   108403         MOVW      AX,#900
+   \   0182   B1             PUSH      AX
+   \   0183   100000         MOVW      AX,#0
+   \   0186   B1             PUSH      AX
+   \   0187   10E803         MOVW      AX,#1000
+   \   018A   B1             PUSH      AX
+   \   018B   8E....         MOV       A,DATPeeCalibrationData+21
+   \   018E   120000         MOVW      BC,#0
+   \   0191   70             MOV       X,A
+   \   0192   63             MOV       A,B
+   \   0193   ..             CALLT     [__T_?L_MUL_L03]
+   \   0194   9A....         CALL      ?UL_MOD_L03
+   \   0197   B5             PUSH      DE
+   \   0198   D4             MOVW      DE,AX
+   \   0199   64             MOV       A,E
+   \   019A   1DC3           SUB       A,#451
+   \   019C   65             MOV       A,D
+   \   019D   3D01           SUBC      A,#1
+   \   019F   62             MOV       A,C
+   \   01A0   3D00           SUBC      A,#0
+   \   01A2   63             MOV       A,B
+   \   01A3   3D00           SUBC      A,#0
+   \   01A5   B4             POP       DE
+   \   01A6   8D65           BC        ??DATBuzDiagBuzzStop_Static_15
+    420                      {
+    421                          DATBuzMelodies[eBUZZER_SeatBelt].Repetitions++;
+   \   01A8   8E....         MOV       A,DATBuzMelodies+38
+   \   01AB   41             INC       A
+   \   01AC   9E....         MOV       DATBuzMelodies+38,A
+   \   01AF   FA5C           BR        ??DATBuzDiagBuzzStop_Static_15
+    422                      }
+    423                  }
+    424                  else
+    425                  {
+    426                      DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_19:
+   \   01B1   A100           MOV       A,#0
+   \   01B3   16....         MOVW      HL,#DATBuzBuffer+46
+   \   01B6   97             MOV       [HL],A
+    427                      DATBuzBuffer[cBufferSeatBelt].DATBuzState = DATBUZ_IDLE;
+   \   01B7   16....         MOVW      HL,#DATBuzBuffer+34
+   \   01BA   FA88           BR        ??DATBuzSetBuzzRequest_Static_2
+    428          
+    429                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+    430                      ContinuePlayingBrokenSound();
+    431                  }
+    432                  break;
+    433              
+    434              case eBUZZER_OverSpeed:
+    435                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_10:
+   \   01BC   63             MOV       A,B
+   \   01BD   51             DEC       A
+   \   01BE   BD17           BNZ       ??DATBuzDiagBuzzStop_Static_20
+    436                  {
+    437                      DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay = eBUZZER_OverSpeed;
+   \   01C0   A105           MOV       A,#5
+   \   01C2   16....         MOVW      HL,#DATBuzBuffer+62
+   \   01C5   97             MOV       [HL],A
+    438                      DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_PROCESS_START;
+   \   01C6   A101           MOV       A,#1
+   \   01C8   16....         MOVW      HL,#DATBuzBuffer+50
+   \   01CB   97             MOV       [HL],A
+    439                      DATBuzBuffer[cBufferOverSpeed].ticks_to_elapse = 0;
+   \   01CC   100000         MOVW      AX,#0
+   \   01CF   03....         MOVW      DATBuzBuffer+54,AX
+   \   01D2   03....         MOVW      DATBuzBuffer+52,AX
+   \   01D5   FA36           BR        ??DATBuzDiagBuzzStop_Static_15
+    440                  }
+    441                  else
+    442                  {
+    443                      DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_20:
+   \   01D7   A100           MOV       A,#0
+   \   01D9   16....         MOVW      HL,#DATBuzBuffer+62
+   \   01DC   97             MOV       [HL],A
+    444                      DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_IDLE;
+   \   01DD   16....         MOVW      HL,#DATBuzBuffer+50
+   \   01E0   9B....         BR        N:??DATBuzSetBuzzRequest_Static_2
+    445          
+    446                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+    447                      ContinuePlayingBrokenSound();
+    448                  }
+    449                  break;
+    450              
+    451              case eBUZZER_ExtLights:
+    452                  if (bSoundStateP == cTrue)
+   \                     ??DATBuzDiagBuzzStop_Static_11:
+   \   01E3   63             MOV       A,B
+   \   01E4   51             DEC       A
+   \   01E5   BD17           BNZ       ??DATBuzDiagBuzzStop_Static_21
+    453                  {
+    454                      DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay = eBUZZER_ExtLights;
+   \   01E7   A106           MOV       A,#6
+   \   01E9   16....         MOVW      HL,#DATBuzBuffer+78
+   \   01EC   97             MOV       [HL],A
+    455                      DATBuzBuffer[cBufferExtLights].DATBuzState = DATBUZ_PROCESS_START;
+   \   01ED   A101           MOV       A,#1
+   \   01EF   16....         MOVW      HL,#DATBuzBuffer+66
+   \   01F2   97             MOV       [HL],A
+    456                      DATBuzBuffer[cBufferExtLights].ticks_to_elapse = 0;
+   \   01F3   100000         MOVW      AX,#0
+   \   01F6   03....         MOVW      DATBuzBuffer+70,AX
+   \   01F9   03....         MOVW      DATBuzBuffer+68,AX
+   \   01FC   FA0F           BR        ??DATBuzDiagBuzzStop_Static_15
+    457                  }
+    458                  else
+    459                  {
+    460                      DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_21:
+   \   01FE   A100           MOV       A,#0
+   \   0200   16....         MOVW      HL,#DATBuzBuffer+78
+   \   0203   97             MOV       [HL],A
+    461                      DATBuzBuffer[cBufferExtLights].DATBuzState = DATBUZ_IDLE;
+   \   0204   16....         MOVW      HL,#DATBuzBuffer+66
+   \   0207   9B....         BR        N:??DATBuzSetBuzzRequest_Static_2
+    462          
+    463                      LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+    464                      ContinuePlayingBrokenSound();
+    465                  }
+    466                  break;
+    467          
+    468              //CCOV: amarinm1: Default case for invalid buzz requests. Cannot be covered because of the Assert.
+    469              default:
+    470                  mLIBassert(cFalse);
+   \                     ??DATBuzDiagBuzzStop_Static_12:
+   \   020A   9A....         CALL      LIBAssertionFailed
+    471              }
+    472          }
+   \                     ??DATBuzDiagBuzzStop_Static_15:
+   \   020D   B2             POP       BC
+   \   020E   AF             RET       
+   \   020F                  REQUIRE ?CL78K_V4_6_L00
+    473          
+    474          
+    475          //==============================================================================
+    476          // DESCRIPTION:         < short description of the function >
+    477          //
+    478          // PARAMETERS:          < type,usage and constraints for all parameters >
+    479          //
+    480          // RETURN VALUE:        < type and usage >
+    481          //
+    482          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    483          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    484          void DATBuzInit(void)
+   \                     DATBuzInit:
+    485          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    486          #ifdef X90_PROJECT
+    487              DATBuzInit_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzInit_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzInit_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    488          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    489          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    490          static MEM_TYPE void DATBuzInit_Static(void)
+   \                     DATBuzInit_Static:
+    491          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    492          #endif
+    493          
+    494              u8SoundBuffer   = cBufferExtLights; //lowest priority buzzer
+   \   0000   A104           MOV       A,#4
+   \   0002   9E....         MOV       u8SoundBuffer,A
+    495              BuzzerMsg.Lng   = sizeof(DATBuzBuffer[0].Buffer);
+   \   0005   100200         MOVW      AX,#2
+   \   0008   03....         MOVW      BuzzerMsg+2,AX
+    496              bDATBuzStarted  = cFalse;
+   \   000B   9E....         MOV       bDATBuzStarted,A
+    497          
+    498              DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay  = eBUZZER_Silence;
+   \   000E   16....         MOVW      HL,#DATBuzBuffer+14
+   \   0011   97             MOV       [HL],A
+    499              DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay       = eBUZZER_Silence;
+   \   0012   16....         MOVW      HL,#DATBuzBuffer+30
+   \   0015   97             MOV       [HL],A
+    500              DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay  = eBUZZER_Silence;
+   \   0016   16....         MOVW      HL,#DATBuzBuffer+46
+   \   0019   97             MOV       [HL],A
+    501              DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay = eBUZZER_Silence;
+   \   001A   16....         MOVW      HL,#DATBuzBuffer+62
+   \   001D   97             MOV       [HL],A
+    502              DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay = eBUZZER_Silence;
+   \   001E   16....         MOVW      HL,#DATBuzBuffer+78
+   \   0021   97             MOV       [HL],A
+    503          
+    504              DATBuzBuffer[cBufferFlashers].ticks_to_elapse  = 0;
+   \   0022   70             MOV       X,A
+   \   0023   03....         MOVW      DATBuzBuffer+6,AX
+   \   0026   03....         MOVW      DATBuzBuffer+4,AX
+    505              DATBuzBuffer[cBufferLWS].ticks_to_elapse       = 0;
+   \   0029   03....         MOVW      DATBuzBuffer+22,AX
+   \   002C   03....         MOVW      DATBuzBuffer+20,AX
+    506              DATBuzBuffer[cBufferSeatBelt].ticks_to_elapse  = 0;
+   \   002F   03....         MOVW      DATBuzBuffer+38,AX
+   \   0032   03....         MOVW      DATBuzBuffer+36,AX
+    507              DATBuzBuffer[cBufferOverSpeed].ticks_to_elapse = 0;
+   \   0035   03....         MOVW      DATBuzBuffer+54,AX
+   \   0038   03....         MOVW      DATBuzBuffer+52,AX
+    508              DATBuzBuffer[cBufferExtLights].ticks_to_elapse = 0;
+   \   003B   03....         MOVW      DATBuzBuffer+70,AX
+   \   003E   03....         MOVW      DATBuzBuffer+68,AX
+    509          
+    510              bDATBuzAbnormalVoltage = cFalse;
+   \   0041   9E....         MOV       bDATBuzAbnormalVoltage,A
+    511          
+    512              bIndusBuzzerFreqFlag = cFalse;
+   \   0044   9E....         MOV       bIndusBuzzerFreqFlag,A
+    513          }
+   \   0047   AF             RET       
+   \   0048                  REQUIRE ?CL78K_V4_6_L00
+    514          
+    515          
+    516          //==============================================================================
+    517          // DESCRIPTION:         < short description of the function >
+    518          //
+    519          // PARAMETERS:          < type,usage and constraints for all parameters >
+    520          //
+    521          // RETURN VALUE:        < type and usage >
+    522          //
+    523          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    524          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    525          void DATBuzStart(void)
+   \                     DATBuzStart:
+    526          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    527          #ifdef X90_PROJECT
+    528              DATBuzStart_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzStart_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzStart_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    529          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    530          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    531          static MEM_TYPE void DATBuzStart_Static(void)
+   \                     DATBuzStart_Static:
+    532          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    533          #endif
+    534          
+    535              if(bDATBuzStarted == cFalse)
+   \   0001   8E....         MOV       A,bDATBuzStarted
+   \   0004   4D00           CMP       A,#0
+   \   0006   BD2E           BNZ       ??DATBuzDiagBuzzStop_Static_22
+    536              {
+    537                  bDATBuzStarted = cTrue;
+   \   0008   A101           MOV       A,#1
+   \   000A   9E....         MOV       bDATBuzStarted,A
+    538          
+    539                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+   \   000D   A100           MOV       A,#0
+   \   000F   9E....         MOV       DATBuzBuffer+2,A
+    540                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+   \   0012   16....         MOVW      HL,#DATBuzBuffer+18
+   \   0015   97             MOV       [HL],A
+    541                  DATBuzBuffer[cBufferSeatBelt].DATBuzState  = DATBUZ_IDLE;
+   \   0016   16....         MOVW      HL,#DATBuzBuffer+34
+   \   0019   97             MOV       [HL],A
+    542                  DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_IDLE;
+   \   001A   16....         MOVW      HL,#DATBuzBuffer+50
+   \   001D   97             MOV       [HL],A
+    543                  DATBuzBuffer[cBufferExtLights].DATBuzState = DATBUZ_IDLE;
+   \   001E   16....         MOVW      HL,#DATBuzBuffer+66
+   \   0021   97             MOV       [HL],A
+    544          
+    545                  LDBControl( cLDBChannelBuz, cLDBBuzEnable );
+   \   0022   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0025   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0027   ..             CALLT     [__T_?FAR_CALL_L07]
+    546          
+    547                  BuzzerTaskAlarm.TaskID = cTOSTaskIdDATBuzTask;
+   \   0028   100800         MOVW      AX,#8
+   \   002B   03....         MOVW      BuzzerTaskAlarm,AX
+    548                  TOSSetRelAlarm(&BuzzerTaskAlarm, 0, mTOSConvMsEnTickAlarm(cBuzzerTaskPeriodMs));
+   \   002E   10....         MOVW      AX,#BuzzerTaskAlarm
+   \   0031   A301           MOV       B,#1
+   \   0033   9A....         CALL      TOSSetRelAlarm_Interne
+    549              }
+    550          }
+   \                     ??DATBuzDiagBuzzStop_Static_22:
+   \   0036   B2             POP       BC
+   \   0037   AF             RET       
+   \   0038                  REQUIRE ?CL78K_V4_6_L00
+    551          
+    552          
+    553          //==============================================================================
+    554          // DESCRIPTION:         < short description of the function >
+    555          //
+    556          // PARAMETERS:          < type,usage and constraints for all parameters >
+    557          //
+    558          // RETURN VALUE:        < type and usage >
+    559          //
+    560          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    561          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    562          void DATBuzStop(void)
+   \                     DATBuzStop:
+    563          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    564          #ifdef X90_PROJECT
+    565              DATBuzStop_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzStop_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzStop_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    566          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    567          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    568          static MEM_TYPE void DATBuzStop_Static(void)
+   \                     DATBuzStop_Static:
+    569          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    570          #endif
+    571          
+    572              if ( bDATBuzStarted == cTrue )
+   \   0000   8E....         MOV       A,bDATBuzStarted
+   \   0003   51             DEC       A
+   \   0004   BD3A           BNZ       ??DATBuzDiagBuzzStop_Static_23
+    573              {
+    574                  bDATBuzStarted = cFalse;
+   \   0006   A100           MOV       A,#0
+   \   0008   9E....         MOV       bDATBuzStarted,A
+    575                  
+    576                  DATBuzBuffer[cBufferFlashers].DATBuzState  = DATBUZ_IDLE;
+   \   000B   9E....         MOV       DATBuzBuffer+2,A
+    577                  DATBuzBuffer[cBufferLWS].DATBuzState       = DATBUZ_IDLE;
+   \   000E   16....         MOVW      HL,#DATBuzBuffer+18
+   \   0011   97             MOV       [HL],A
+    578                  DATBuzBuffer[cBufferSeatBelt].DATBuzState  = DATBUZ_IDLE;
+   \   0012   16....         MOVW      HL,#DATBuzBuffer+34
+   \   0015   97             MOV       [HL],A
+    579                  DATBuzBuffer[cBufferOverSpeed].DATBuzState = DATBUZ_IDLE;
+   \   0016   16....         MOVW      HL,#DATBuzBuffer+50
+   \   0019   97             MOV       [HL],A
+    580                  DATBuzBuffer[cBufferExtLights].DATBuzState = DATBUZ_IDLE;
+   \   001A   16....         MOVW      HL,#DATBuzBuffer+66
+   \   001D   97             MOV       [HL],A
+    581          
+    582                  DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay  = eBUZZER_Silence;
+   \   001E   16....         MOVW      HL,#DATBuzBuffer+14
+   \   0021   97             MOV       [HL],A
+    583                  DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay       = eBUZZER_Silence;
+   \   0022   16....         MOVW      HL,#DATBuzBuffer+30
+   \   0025   97             MOV       [HL],A
+    584                  DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay  = eBUZZER_Silence;
+   \   0026   16....         MOVW      HL,#DATBuzBuffer+46
+   \   0029   97             MOV       [HL],A
+    585                  DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay = eBUZZER_Silence;
+   \   002A   16....         MOVW      HL,#DATBuzBuffer+62
+   \   002D   97             MOV       [HL],A
+    586                  DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay = eBUZZER_Silence;
+   \   002E   16....         MOVW      HL,#DATBuzBuffer+78
+   \   0031   97             MOV       [HL],A
+    587          
+    588                  LDBControl( cLDBChannelBuz, cLDBBuzDisable );
+   \   0032   A101           MOV       A,#1
+   \   0034   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0037   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0039   ..             CALLT     [__T_?FAR_CALL_L07]
+    589          
+    590                  TOSCancelAlarm(&BuzzerTaskAlarm);
+   \   003A   10....         MOVW      AX,#BuzzerTaskAlarm
+   \   003D   9A....         CALL      TOSCancelAlarm
+    591              }
+    592          }
+   \                     ??DATBuzDiagBuzzStop_Static_23:
+   \   0040   AF             RET       
+   \   0041                  REQUIRE ?CL78K_V4_6_L00
+    593          
+    594          
+    595          //==============================================================================
+    596          // DESCRIPTION:         < short description of the function >
+    597          //
+    598          // PARAMETERS:          < type,usage and constraints for all parameters >
+    599          //
+    600          // RETURN VALUE:        < type and usage >
+    601          //
+    602          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    603          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    604          void DATBuzTask(void)
+   \                     DATBuzTask:
+    605          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    606          #ifdef X90_PROJECT
+    607              DATBuzTask_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzTask_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzTask_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    608          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    609          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    610          static MEM_TYPE void DATBuzTask_Static(void)
+   \                     DATBuzTask_Static:
+    611          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    612          #endif
+    613                     //CCOV: amarinm1: Cannot be covered in normal operating conditions.
+    614              if (   (bDATBuzStarted         == cTrue) 
+    615                  && (bDATBuzAbnormalVoltage == cFalse)   
+    616                  && (bIndusBuzzerFreqFlag   == cFalse)   )
+   \   0001   8E....         MOV       A,bDATBuzStarted
+   \   0004   51             DEC       A
+   \   0005   AD03           BZ        $+5
+   \   0007   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+   \   000A   8E....         MOV       A,bDATBuzAbnormalVoltage
+   \   000D   4D00           CMP       A,#0
+   \   000F   AD03           BZ        $+5
+   \   0011   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+   \   0014   8E....         MOV       A,bIndusBuzzerFreqFlag
+   \   0017   4D00           CMP       A,#0
+   \   0019   AD03           BZ        $+5
+   \   001B   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+    617              {
+    618          
+    619                  //---------------------------------------------------------------------
+    620                  // Find highest priority sound to be played
+    621          
+    622                  u8SoundBuffer = GetCurrentHighestPriorityBuffer();
+   \   001E   16....         MOVW      HL,#LWRD(GetCurrentHighestPriorityBuffer)
+   \   0021   A4..           MOV       E,#BYTE3(GetCurrentHighestPriorityBuffer)
+   \   0023   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0024   9E....         MOV       u8SoundBuffer,A
+    623                  
+    624                  //---------------------------------------------------------------------
+    625          
+    626                  //---------------------------------------------------------------------
+    627                  // ticks_to_elapse automatically delays the necessary amount of time 
+    628                  // until the next action of the state machine
+    629                  
+    630                  if( DATBuzBuffer[u8SoundBuffer].ticks_to_elapse != 0UL )
+   \   0027   A010           MOV       X,#16
+   \   0029   3188           MULU      X
+   \   002B   CA....         ADDW      AX,#DATBuzBuffer
+   \   002E   D4             MOVW      DE,AX
+   \   002F   D6             MOVW      HL,AX
+   \   0030   AE06           MOV       A,[HL+0x06]
+   \   0032   72             MOV       C,A
+   \   0033   AE07           MOV       A,[HL+0x07]
+   \   0035   73             MOV       B,A
+   \   0036   AE04           MOV       A,[HL+0x04]
+   \   0038   70             MOV       X,A
+   \   0039   AE05           MOV       A,[HL+0x05]
+   \   003B   B5             PUSH      DE
+   \   003C   6160           OR        X,A
+   \   003E   62             MOV       A,C
+   \   003F   6160           OR        X,A
+   \   0041   63             MOV       A,B
+   \   0042   6160           OR        X,A
+   \   0044   B4             POP       DE
+   \   0045   AD29           BZ        ??DATBuzDiagBuzzStop_Static_25
+    631                  {
+    632                      DATBuzBuffer[u8SoundBuffer].ticks_to_elapse--;
+   \   0047   10FFFF         MOVW      AX,#65535
+   \   004A   D2             MOVW      BC,AX
+   \   004B   B3             PUSH      BC
+   \   004C   B1             PUSH      AX
+   \   004D   84             INCW      DE
+   \   004E   84             INCW      DE
+   \   004F   84             INCW      DE
+   \   0050   84             INCW      DE
+   \   0051   C4             MOVW      AX,DE
+   \   0052   D6             MOVW      HL,AX
+   \   0053   B0             POP       AX
+   \   0054   B2             POP       BC
+   \   0055   07             XCH       A,[HL]
+   \   0056   0F             ADD       A,[HL]
+   \   0057   97             MOV       [HL],A
+   \   0058   60             MOV       A,X
+   \   0059   DE01           XCH       A,[HL+0x01]
+   \   005B   2901           ADDC      A,[HL+0x01]
+   \   005D   BE01           MOV       [HL+0x01],A
+   \   005F   63             MOV       A,B
+   \   0060   DE02           XCH       A,[HL+0x02]
+   \   0062   2902           ADDC      A,[HL+0x02]
+   \   0064   BE02           MOV       [HL+0x02],A
+   \   0066   60             MOV       A,X
+   \   0067   DE03           XCH       A,[HL+0x03]
+   \   0069   2903           ADDC      A,[HL+0x03]
+   \   006B   BE03           MOV       [HL+0x03],A
+   \   006D   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+    633                  }
+    634                  else //ticks are reaching 0, calculate the new buzzer state
+    635                  {
+    636                      //-----------------------------------------------------------------
+    637                      //print debug information
+    638          
+    639                      #ifdef DEBUG_BUZ
+    640                      printf ("\n\rState: ");
+    641                      switch (DATBuzState)
+    642                      {
+    643                          case DATBUZ_IDLE:
+    644                                  printf ("DATBUZ_IDLE");
+    645                              break;
+    646                          case DATBUZ_PROCESS_START:
+    647                                  printf ("DATBUZ_PROCESS_START");
+    648                              break;
+    649                          case DATBUZ_PROCESS_SOUND_PERIOD:
+    650                                  printf ("DATBUZ_PROCESS_SOUND_PERIOD");
+    651                              break;
+    652                          case DATBUZ_PROCESS_SOUND_PAUSE:
+    653                                  printf ("DATBUZ_PROCESS_SOUND_PAUSE");
+    654                              break;
+    655                          case DATBUZ_PROCESS_MELODY_PAUSE:
+    656                                  printf ("DATBUZ_PROCESS_MELODY_PAUSE");
+    657                              break;
+    658                          case DATBUZ_PROCESS_FINISHED:
+    659                                  printf ("DATBUZ_PROCESS_FINISHED");
+    660                              break;
+    661                      }
+    662                      #endif   
+    663          
+    664                      //-----------------------------------------------------------------
+    665                      //Buzzer state machine
+    666          
+    667                      switch( DATBuzBuffer[u8SoundBuffer].DATBuzState )
+   \                     ??DATBuzDiagBuzzStop_Static_25:
+   \   0070   B5             PUSH      DE
+   \   0071   B6             POP       HL
+   \   0072   AE02           MOV       A,[HL+0x02]
+   \   0074   4D00           CMP       A,#0
+   \   0076   AD23           BZ        ??DATBuzDiagBuzzStop_Static_26
+   \   0078   4D01           CMP       A,#1
+   \   007A   AD31           BZ        ??DATBuzDiagBuzzStop_Static_27
+   \   007C   4D02           CMP       A,#2
+   \   007E   BD03           BNZ       $+5
+   \   0080   9B....         BR        N:??DATBuzDiagBuzzStop_Static_28
+   \   0083   4D03           CMP       A,#3
+   \   0085   BD03           BNZ       $+5
+   \   0087   9B....         BR        N:??DATBuzDiagBuzzStop_Static_29
+   \   008A   4D04           CMP       A,#4
+   \   008C   BD03           BNZ       $+5
+   \   008E   9B....         BR        N:??DATBuzDiagBuzzStop_Static_30
+   \   0091   4D05           CMP       A,#5
+   \   0093   BD03           BNZ       $+5
+   \   0095   9B....         BR        N:??DATBuzDiagBuzzStop_Static_31
+   \   0098   9B....         BR        N:??DATBuzDiagBuzzStop_Static_32
+    668                      {
+    669          
+    670                      case DATBUZ_IDLE:
+    671          
+    672                          DATBuzBuffer[u8SoundBuffer].ticks_to_elapse = 0;
+   \                     ??DATBuzDiagBuzzStop_Static_26:
+   \   009B   84             INCW      DE
+   \   009C   84             INCW      DE
+   \   009D   84             INCW      DE
+   \   009E   84             INCW      DE
+   \   009F   C4             MOVW      AX,DE
+   \   00A0   D6             MOVW      HL,AX
+   \   00A1   A100           MOV       A,#0
+   \   00A3   BE01           MOV       [HL+0x01],A
+   \   00A5   97             MOV       [HL],A
+   \   00A6   BE03           MOV       [HL+0x03],A
+   \   00A8   BE02           MOV       [HL+0x02],A
+   \   00AA   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+    673          
+    674                          break;
+    675          
+    676          
+    677                      case DATBUZ_PROCESS_START:
+    678          
+    679                          // copy the data for the sound to be played
+    680                          DATBuzBuffer[u8SoundBuffer].sound                 = 
+    681                              DATBuzBuffer[u8SoundBuffer].DATBuzSoundToPlay;
+   \                     ??DATBuzDiagBuzzStop_Static_27:
+   \   00AD   B5             PUSH      DE
+   \   00AE   B6             POP       HL
+   \   00AF   E6             XCHW      AX,HL
+   \   00B0   CA0E00         ADDW      AX,#14
+   \   00B3   E6             XCHW      AX,HL
+   \   00B4   87             MOV       A,[HL]
+   \   00B5   B5             PUSH      DE
+   \   00B6   B6             POP       HL
+   \   00B7   E6             XCHW      AX,HL
+   \   00B8   CA0A00         ADDW      AX,#10
+   \   00BB   E6             XCHW      AX,HL
+   \   00BC   97             MOV       [HL],A
+    682          
+    683                          DATBuzBuffer[u8SoundBuffer].melody_repetitions    = 
+    684                              //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    685                              DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Repetitions;
+   \   00BD   A008           MOV       X,#8
+   \   00BF   3188           MULU      X
+   \   00C1   CA....         ADDW      AX,#DATBuzMelodies+6
+   \   00C4   D6             MOVW      HL,AX
+   \   00C5   87             MOV       A,[HL]
+   \   00C6   B5             PUSH      DE
+   \   00C7   B6             POP       HL
+   \   00C8   E6             XCHW      AX,HL
+   \   00C9   CA0B00         ADDW      AX,#11
+   \   00CC   E6             XCHW      AX,HL
+   \   00CD   97             MOV       [HL],A
+    686                          
+    687                          DATBuzBuffer[u8SoundBuffer].sound_repetitions     = 
+    688                              //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    689                              DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Sound.Repetitions;
+   \   00CE   C4             MOVW      AX,DE
+   \   00CF   D6             MOVW      HL,AX
+   \   00D0   AE0A           MOV       A,[HL+0x0A]
+   \   00D2   A008           MOV       X,#8
+   \   00D4   3188           MULU      X
+   \   00D6   CA....         ADDW      AX,#DATBuzMelodies+3
+   \   00D9   D6             MOVW      HL,AX
+   \   00DA   87             MOV       A,[HL]
+   \   00DB   B5             PUSH      DE
+   \   00DC   B6             POP       HL
+   \   00DD   E6             XCHW      AX,HL
+   \   00DE   CA0C00         ADDW      AX,#12
+   \   00E1   E6             XCHW      AX,HL
+   \   00E2   97             MOV       [HL],A
+    690                          
+    691                          DATBuzBuffer[u8SoundBuffer].sound_index           = 0;
+   \   00E3   C4             MOVW      AX,DE
+   \   00E4   A100           MOV       A,#0
+   \   00E6   86             INCW      HL
+   \   00E7   97             MOV       [HL],A
+    692                          
+    693                          DATBuzBuffer[u8SoundBuffer].pmotive               = (tPERIOD_DESC*)
+    694                              //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    695                              DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Sound.Motive;
+   \   00E8   65             MOV       A,D
+   \   00E9   D6             MOVW      HL,AX
+   \   00EA   AE0A           MOV       A,[HL+0x0A]
+   \   00EC   A008           MOV       X,#8
+   \   00EE   3188           MULU      X
+   \   00F0   CA....         ADDW      AX,#DATBuzMelodies
+   \   00F3   D6             MOVW      HL,AX
+   \   00F4   87             MOV       A,[HL]
+   \   00F5   70             MOV       X,A
+   \   00F6   AE01           MOV       A,[HL+0x01]
+   \   00F8   D2             MOVW      BC,AX
+   \   00F9   C4             MOVW      AX,DE
+   \   00FA   D6             MOVW      HL,AX
+   \   00FB   C2             MOVW      AX,BC
+   \   00FC   BE09           MOV       [HL+0x09],A
+   \   00FE   60             MOV       A,X
+   \   00FF   BE08           MOV       [HL+0x08],A
+    696          
+    697                          // jump to next state for sound playing
+    698                          DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_SOUND_PERIOD;
+   \   0101   A102           MOV       A,#2
+   \                     ??DATBuzTask_Static_0:
+   \   0103   84             INCW      DE
+   \   0104   84             INCW      DE
+   \                     ??DATBuzTask_Static_1:
+   \   0105   95             MOV       [DE],A
+   \   0106   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+    699                      
+    700                          break;
+    701          
+    702          
+    703                      case DATBUZ_PROCESS_SOUND_PERIOD:
+    704          
+    705                          // --- start playing the sound ---
+    706                  
+    707                          // load the sound into LDB (mDATBuzFillFrequencyForLDB)
+    708                          DATBuzBuffer[u8SoundBuffer].Buffer[0] = 
+    709                              DATBuzBuffer[u8SoundBuffer].pmotive[DATBuzBuffer[u8SoundBuffer].sound_index].Frequency;
+   \                     ??DATBuzDiagBuzzStop_Static_28:
+   \   0109   B7             PUSH      HL
+   \   010A   AE0D           MOV       A,[HL+0x0D]
+   \   010C   A006           MOV       X,#6
+   \   010E   3188           MULU      X
+   \   0110   D2             MOVW      BC,AX
+   \   0111   AE08           MOV       A,[HL+0x08]
+   \   0113   70             MOV       X,A
+   \   0114   AE09           MOV       A,[HL+0x09]
+   \   0116   E2             XCHW      AX,BC
+   \   0117   30             XCH       A,X
+   \   0118   610A           ADD       A,C
+   \   011A   30             XCH       A,X
+   \   011B   612B           ADDC      A,B
+   \   011D   D6             MOVW      HL,AX
+   \   011E   87             MOV       A,[HL]
+   \   011F   70             MOV       X,A
+   \   0120   AE01           MOV       A,[HL+0x01]
+   \   0122   B6             POP       HL
+   \   0123   BE01           MOV       [HL+0x01],A
+   \   0125   60             MOV       A,X
+   \   0126   97             MOV       [HL],A
+    710          
+    711                          //QACJ 0310: amarinm1: This is the expected type by the function. It is later casted to its original type.
+    712                          BuzzerMsg.pBuffer = (U8*)DATBuzBuffer[u8SoundBuffer].Buffer;
+   \   0127   C4             MOVW      AX,DE
+   \   0128   03....         MOVW      BuzzerMsg,AX
+    713                          LDBSendWithoutAddr(cLDBChannelBuz, (tMsg*)&BuzzerMsg);
+   \   012B   10....         MOVW      AX,#BuzzerMsg
+   \   012E   16....         MOVW      HL,#LWRD(LDBBuzSendWithoutAddr)
+   \   0131   A4..           MOV       E,#BYTE3(LDBBuzSendWithoutAddr)
+   \   0133   ..             CALLT     [__T_?FAR_CALL_L07]
+    714          
+    715                          // start the loaded sound
+    716                          LDBControl(cLDBChannelBuz, cLDBBuzStartSound);
+   \   0134   A102           MOV       A,#2
+   \   0136   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0139   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   013B   ..             CALLT     [__T_?FAR_CALL_L07]
+    717                  
+    718                          DATBuzBuffer[u8SoundBuffer].ticks_to_elapse = 
+    719                              mConvertMsIntoBuzzerTicks(
+    720                              DATBuzBuffer[u8SoundBuffer].pmotive[DATBuzBuffer[u8SoundBuffer].sound_index].ActiveTime);
+   \   013C   8E....         MOV       A,u8SoundBuffer
+   \   013F   A010           MOV       X,#16
+   \   0141   3188           MULU      X
+   \   0143   CA....         ADDW      AX,#DATBuzBuffer
+   \   0146   D4             MOVW      DE,AX
+   \   0147   100000         MOVW      AX,#0
+   \   014A   B1             PUSH      AX
+   \   014B   108813         MOVW      AX,#5000
+   \   014E   B1             PUSH      AX
+   \   014F   100000         MOVW      AX,#0
+   \   0152   B1             PUSH      AX
+   \   0153   10E803         MOVW      AX,#1000
+   \   0156   B1             PUSH      AX
+   \   0157   C4             MOVW      AX,DE
+   \   0158   D6             MOVW      HL,AX
+   \   0159   AE0D           MOV       A,[HL+0x0D]
+   \   015B   A006           MOV       X,#6
+   \   015D   3188           MULU      X
+   \   015F   D2             MOVW      BC,AX
+   \   0160   AE08           MOV       A,[HL+0x08]
+   \   0162   70             MOV       X,A
+   \   0163   AE09           MOV       A,[HL+0x09]
+   \   0165   E2             XCHW      AX,BC
+   \   0166   30             XCH       A,X
+   \   0167   610A           ADD       A,C
+   \   0169   30             XCH       A,X
+   \   016A   612B           ADDC      A,B
+   \   016C   D6             MOVW      HL,AX
+   \   016D   AE02           MOV       A,[HL+0x02]
+   \   016F   70             MOV       X,A
+   \   0170   AE03           MOV       A,[HL+0x03]
+   \   0172   120000         MOVW      BC,#0
+   \   0175   ..             CALLT     [__T_?L_MUL_L03]
+   \   0176   ..             CALLT     [__T_?UL_DIV_L03]
+   \   0177   B3             PUSH      BC
+   \   0178   B1             PUSH      AX
+   \   0179   B5             PUSH      DE
+   \   017A   B6             POP       HL
+   \   017B   86             INCW      HL
+   \   017C   86             INCW      HL
+   \   017D   86             INCW      HL
+   \   017E   86             INCW      HL
+   \   017F   B0             POP       AX
+   \   0180   B2             POP       BC
+   \   0181   BE01           MOV       [HL+0x01],A
+   \   0183   60             MOV       A,X
+   \   0184   97             MOV       [HL],A
+   \   0185   C2             MOVW      AX,BC
+   \   0186   BE03           MOV       [HL+0x03],A
+   \   0188   60             MOV       A,X
+   \   0189   BE02           MOV       [HL+0x02],A
+    721          
+    722                          DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_SOUND_PAUSE;
+   \   018B   A103           MOV       A,#3
+   \   018D   9B....         BR        N:??DATBuzTask_Static_0
+    723                          
+    724                          break;
+    725          
+    726          
+    727                      case DATBUZ_PROCESS_SOUND_PAUSE:
+    728          
+    729                          // stop the sound
+    730                          LDBControl (cLDBChannelBuz, cLDBBuzCancelSound);
+   \                     ??DATBuzDiagBuzzStop_Static_29:
+   \   0190   A103           MOV       A,#3
+   \   0192   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0195   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0197   ..             CALLT     [__T_?FAR_CALL_L07]
+    731          
+    732                          DATBuzBuffer[u8SoundBuffer].ticks_to_elapse = 
+    733                              mConvertMsIntoBuzzerTicks(
+    734                              DATBuzBuffer[u8SoundBuffer].pmotive[DATBuzBuffer[u8SoundBuffer].sound_index].InactiveTime);
+   \   0198   8E....         MOV       A,u8SoundBuffer
+   \   019B   A010           MOV       X,#16
+   \   019D   3188           MULU      X
+   \   019F   CA....         ADDW      AX,#DATBuzBuffer
+   \   01A2   D4             MOVW      DE,AX
+   \   01A3   100000         MOVW      AX,#0
+   \   01A6   B1             PUSH      AX
+   \   01A7   108813         MOVW      AX,#5000
+   \   01AA   B1             PUSH      AX
+   \   01AB   100000         MOVW      AX,#0
+   \   01AE   B1             PUSH      AX
+   \   01AF   10E803         MOVW      AX,#1000
+   \   01B2   B1             PUSH      AX
+   \   01B3   C4             MOVW      AX,DE
+   \   01B4   D6             MOVW      HL,AX
+   \   01B5   AE0D           MOV       A,[HL+0x0D]
+   \   01B7   A006           MOV       X,#6
+   \   01B9   3188           MULU      X
+   \   01BB   D2             MOVW      BC,AX
+   \   01BC   AE08           MOV       A,[HL+0x08]
+   \   01BE   70             MOV       X,A
+   \   01BF   AE09           MOV       A,[HL+0x09]
+   \   01C1   E2             XCHW      AX,BC
+   \   01C2   30             XCH       A,X
+   \   01C3   610A           ADD       A,C
+   \   01C5   30             XCH       A,X
+   \   01C6   612B           ADDC      A,B
+   \   01C8   D6             MOVW      HL,AX
+   \   01C9   AE04           MOV       A,[HL+0x04]
+   \   01CB   70             MOV       X,A
+   \   01CC   AE05           MOV       A,[HL+0x05]
+   \   01CE   120000         MOVW      BC,#0
+   \   01D1   ..             CALLT     [__T_?L_MUL_L03]
+   \   01D2   ..             CALLT     [__T_?UL_DIV_L03]
+   \   01D3   B3             PUSH      BC
+   \   01D4   B1             PUSH      AX
+   \   01D5   B5             PUSH      DE
+   \   01D6   B6             POP       HL
+   \   01D7   86             INCW      HL
+   \   01D8   86             INCW      HL
+   \   01D9   86             INCW      HL
+   \   01DA   86             INCW      HL
+   \   01DB   B0             POP       AX
+   \   01DC   B2             POP       BC
+   \   01DD   BE01           MOV       [HL+0x01],A
+   \   01DF   60             MOV       A,X
+   \   01E0   97             MOV       [HL],A
+   \   01E1   C2             MOVW      AX,BC
+   \   01E2   BE03           MOV       [HL+0x03],A
+   \   01E4   60             MOV       A,X
+   \   01E5   BE02           MOV       [HL+0x02],A
+    735                  
+    736                          // prepare next state
+    737          
+    738                          DATBuzBuffer[u8SoundBuffer].sound_index++;
+   \   01E7   C4             MOVW      AX,DE
+   \   01E8   CA0D00         ADDW      AX,#13
+   \   01EB   D6             MOVW      HL,AX
+   \   01EC   87             MOV       A,[HL]
+   \   01ED   41             INC       A
+   \   01EE   97             MOV       [HL],A
+    739          
+    740                          if( DATBuzBuffer[u8SoundBuffer].sound_index < 
+    741                              //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    742                              DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Sound.NumFrequencies
+    743                            ) 
+   \   01EF   C4             MOVW      AX,DE
+   \   01F0   D6             MOVW      HL,AX
+   \   01F1   AE0A           MOV       A,[HL+0x0A]
+   \   01F3   A008           MOV       X,#8
+   \   01F5   3188           MULU      X
+   \   01F7   CA....         ADDW      AX,#DATBuzMelodies+2
+   \   01FA   D6             MOVW      HL,AX
+   \   01FB   87             MOV       A,[HL]
+   \   01FC   70             MOV       X,A
+   \   01FD   B5             PUSH      DE
+   \   01FE   B6             POP       HL
+   \   01FF   E6             XCHW      AX,HL
+   \   0200   CA0D00         ADDW      AX,#13
+   \   0203   E6             XCHW      AX,HL
+   \   0204   87             MOV       A,[HL]
+   \   0205   6148           CMP       A,X
+   \   0207   9D11           BNC       ??DATBuzDiagBuzzStop_Static_33
+    744                          {
+    745          
+    746                              // process the next frequency after the pause is finished
+    747                              DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_SOUND_PERIOD;
+   \                     ??DATBuzTask_Static_2:
+   \   0209   8E....         MOV       A,u8SoundBuffer
+   \   020C   A010           MOV       X,#16
+   \   020E   3188           MULU      X
+   \   0210   CA....         ADDW      AX,#DATBuzBuffer+2
+   \   0213   D6             MOVW      HL,AX
+   \   0214   A102           MOV       A,#2
+   \   0216   97             MOV       [HL],A
+   \   0217   9B....         BR        N:??DATBuzDiagBuzzStop_Static_24
+    748                      
+    749                          }
+    750                          else // we have played the sound sequence 
+    751                          {
+    752                              // one because we start counting the repetitions from 1
+    753                              if (DATBuzBuffer[u8SoundBuffer].sound_repetitions > 1) 
+   \                     ??DATBuzDiagBuzzStop_Static_33:
+   \   021A   C4             MOVW      AX,DE
+   \   021B   D6             MOVW      HL,AX
+   \   021C   AE0C           MOV       A,[HL+0x0C]
+   \   021E   4D02           CMP       A,#2
+   \   0220   8D19           BC        ??DATBuzDiagBuzzStop_Static_34
+    754                              {
+    755          
+    756                                  DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_SOUND_PERIOD;
+   \   0222   A102           MOV       A,#2
+   \   0224   B5             PUSH      DE
+   \   0225   B6             POP       HL
+   \   0226   86             INCW      HL
+   \   0227   86             INCW      HL
+   \   0228   97             MOV       [HL],A
+    757                                  DATBuzBuffer[u8SoundBuffer].sound_repetitions--;
+   \   0229   65             MOV       A,D
+   \   022A   CA0C00         ADDW      AX,#12
+   \   022D   D6             MOVW      HL,AX
+   \   022E   87             MOV       A,[HL]
+   \   022F   51             DEC       A
+   \   0230   97             MOV       [HL],A
+    758                                  // start over the sounds again if there is repetition
+    759                                  DATBuzBuffer[u8SoundBuffer].sound_index = 0;
+   \   0231   C4             MOVW      AX,DE
+   \   0232   CA0D00         ADDW      AX,#13
+   \   0235   D4             MOVW      DE,AX
+   \   0236   A100           MOV       A,#0
+   \   0238   9B....         BR        N:??DATBuzTask_Static_1
+    760                              }
+    761                              else
+    762                              {
+    763                                  DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_MELODY_PAUSE;
+   \                     ??DATBuzDiagBuzzStop_Static_34:
+   \   023B   A104           MOV       A,#4
+   \   023D   9B....         BR        N:??DATBuzTask_Static_0
+    764                              }
+    765                          }
+    766          
+    767                          break;
+    768          
+    769          
+    770                      case DATBUZ_PROCESS_MELODY_PAUSE:
+    771          
+    772                          // 2 because melody repetitions are count from 1
+    773                          // and there is no need to wait the last pause time
+    774                          if(DATBuzBuffer[u8SoundBuffer].melody_repetitions > 1) 
+   \                     ??DATBuzDiagBuzzStop_Static_30:
+   \   0240   AE0B           MOV       A,[HL+0x0B]
+   \   0242   4D02           CMP       A,#2
+   \   0244   8D66           BC        ??DATBuzDiagBuzzStop_Static_35
+    775                          {
+    776                              // wait the pause to elapse
+    777                              DATBuzBuffer[u8SoundBuffer].ticks_to_elapse = 
+    778                                  //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    779                                  mConvertMsIntoBuzzerTicks(DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Pause);
+   \   0246   100000         MOVW      AX,#0
+   \   0249   B1             PUSH      AX
+   \   024A   108813         MOVW      AX,#5000
+   \   024D   B1             PUSH      AX
+   \   024E   100000         MOVW      AX,#0
+   \   0251   B1             PUSH      AX
+   \   0252   10E803         MOVW      AX,#1000
+   \   0255   B1             PUSH      AX
+   \   0256   AE0A           MOV       A,[HL+0x0A]
+   \   0258   A008           MOV       X,#8
+   \   025A   3188           MULU      X
+   \   025C   CA....         ADDW      AX,#DATBuzMelodies+4
+   \   025F   D6             MOVW      HL,AX
+   \   0260   87             MOV       A,[HL]
+   \   0261   70             MOV       X,A
+   \   0262   AE01           MOV       A,[HL+0x01]
+   \   0264   120000         MOVW      BC,#0
+   \   0267   ..             CALLT     [__T_?L_MUL_L03]
+   \   0268   ..             CALLT     [__T_?UL_DIV_L03]
+   \   0269   B3             PUSH      BC
+   \   026A   B1             PUSH      AX
+   \   026B   B5             PUSH      DE
+   \   026C   B6             POP       HL
+   \   026D   86             INCW      HL
+   \   026E   86             INCW      HL
+   \   026F   86             INCW      HL
+   \   0270   86             INCW      HL
+   \   0271   B0             POP       AX
+   \   0272   B2             POP       BC
+   \   0273   BE01           MOV       [HL+0x01],A
+   \   0275   60             MOV       A,X
+   \   0276   97             MOV       [HL],A
+   \   0277   C2             MOVW      AX,BC
+   \   0278   BE03           MOV       [HL+0x03],A
+   \   027A   60             MOV       A,X
+   \   027B   BE02           MOV       [HL+0x02],A
+    780          
+    781                              // load again parameters for melody repetition
+    782                              DATBuzBuffer[u8SoundBuffer].sound_repetitions  = 
+    783                                  //QACJ 3689: amarinm1: The indexer(.sound) is set only through members of its enumerated type the highest value of which is the size of DATBuzMelodies.
+    784                                  DATBuzMelodies[DATBuzBuffer[u8SoundBuffer].sound].Sound.Repetitions;
+   \   027D   C4             MOVW      AX,DE
+   \   027E   D6             MOVW      HL,AX
+   \   027F   AE0A           MOV       A,[HL+0x0A]
+   \   0281   A008           MOV       X,#8
+   \   0283   3188           MULU      X
+   \   0285   CA....         ADDW      AX,#DATBuzMelodies+3
+   \   0288   D6             MOVW      HL,AX
+   \   0289   87             MOV       A,[HL]
+   \   028A   B5             PUSH      DE
+   \   028B   B6             POP       HL
+   \   028C   E6             XCHW      AX,HL
+   \   028D   CA0C00         ADDW      AX,#12
+   \   0290   E6             XCHW      AX,HL
+   \   0291   97             MOV       [HL],A
+    785          
+    786                              DATBuzBuffer[u8SoundBuffer].sound_index = 0;
+   \   0292   C4             MOVW      AX,DE
+   \   0293   A100           MOV       A,#0
+   \   0295   86             INCW      HL
+   \   0296   97             MOV       [HL],A
+    787                          
+    788                              // check for infinite melody
+    789                              if(    DATBuzBuffer[u8SoundBuffer].melody_repetitions != 
+    790                                  cDATBuzRepetitionsInfinite
+    791                                )
+   \   0297   65             MOV       A,D
+   \   0298   D6             MOVW      HL,AX
+   \   0299   AE0B           MOV       A,[HL+0x0B]
+   \   029B   41             INC       A
+   \   029C   BD03           BNZ       $+5
+   \   029E   9B....         BR        N:??DATBuzTask_Static_2
+    792                              {
+    793                                  // decrease melodies left to play
+    794                                  DATBuzBuffer[u8SoundBuffer].melody_repetitions--;
+   \   02A1   65             MOV       A,D
+   \   02A2   CA0B00         ADDW      AX,#11
+   \   02A5   D4             MOVW      DE,AX
+   \   02A6   85             MOV       A,[DE]
+   \   02A7   51             DEC       A
+   \   02A8   95             MOV       [DE],A
+   \   02A9   9B....         BR        N:??DATBuzTask_Static_2
+    795                              }
+    796                          
+    797                              // start over again
+    798                              DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_SOUND_PERIOD;
+    799                          }
+    800                          else
+    801                          {
+    802                              // no need to process the last pause
+    803                              DATBuzBuffer[u8SoundBuffer].ticks_to_elapse = 0;
+   \                     ??DATBuzDiagBuzzStop_Static_35:
+   \   02AC   A100           MOV       A,#0
+   \   02AE   B5             PUSH      DE
+   \   02AF   B6             POP       HL
+   \   02B0   86             INCW      HL
+   \   02B1   86             INCW      HL
+   \   02B2   86             INCW      HL
+   \   02B3   86             INCW      HL
+   \   02B4   BE01           MOV       [HL+0x01],A
+   \   02B6   97             MOV       [HL],A
+   \   02B7   BE03           MOV       [HL+0x03],A
+   \   02B9   BE02           MOV       [HL+0x02],A
+    804                              DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_PROCESS_FINISHED;
+   \   02BB   A105           MOV       A,#5
+   \   02BD   9B....         BR        N:??DATBuzTask_Static_0
+    805                          }
+    806          
+    807                          break;
+    808          
+    809          
+    810                      case DATBUZ_PROCESS_FINISHED:
+    811          
+    812                          DATBuzBuffer[u8SoundBuffer].DATBuzSoundToPlay = eBUZZER_Silence;
+   \                     ??DATBuzDiagBuzzStop_Static_31:
+   \   02C0   C4             MOVW      AX,DE
+   \   02C1   CA0E00         ADDW      AX,#14
+   \   02C4   D6             MOVW      HL,AX
+   \   02C5   A100           MOV       A,#0
+   \   02C7   97             MOV       [HL],A
+    813                          DATBuzBuffer[u8SoundBuffer].DATBuzState = DATBUZ_IDLE;
+   \   02C8   84             INCW      DE
+   \   02C9   84             INCW      DE
+   \   02CA   95             MOV       [DE],A
+    814          
+    815                          u8SoundBuffer = GetCurrentHighestPriorityBuffer();
+   \   02CB   16....         MOVW      HL,#LWRD(GetCurrentHighestPriorityBuffer)
+   \   02CE   A4..           MOV       E,#BYTE3(GetCurrentHighestPriorityBuffer)
+   \   02D0   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   02D1   9E....         MOV       u8SoundBuffer,A
+    816          
+    817                          //continue playing the broken sound
+    818                          if ( DATBuzBuffer[u8SoundBuffer].DATBuzState == DATBUZ_PROCESS_SOUND_PAUSE )
+   \   02D4   A010           MOV       X,#16
+   \   02D6   3188           MULU      X
+   \   02D8   CA....         ADDW      AX,#DATBuzBuffer+2
+   \   02DB   D6             MOVW      HL,AX
+   \   02DC   87             MOV       A,[HL]
+   \   02DD   4D03           CMP       A,#3
+   \   02DF   BD60           BNZ       ??DATBuzDiagBuzzStop_Static_24
+    819                          {
+    820                              //Continue to play lower priority buzzer that was interrupted
+    821                              //QACJ 0310: amarinm1: This is the expected type by the function. It is later casted to its original type.
+    822                              BuzzerMsg.pBuffer = (U8*)DATBuzBuffer[u8SoundBuffer].Buffer;
+   \   02E1   8E....         MOV       A,u8SoundBuffer
+   \   02E4   A010           MOV       X,#16
+   \   02E6   3188           MULU      X
+   \   02E8   CA....         ADDW      AX,#DATBuzBuffer
+   \   02EB   03....         MOVW      BuzzerMsg,AX
+    823                              LDBSendWithoutAddr (cLDBChannelBuz, (tMsg *)&BuzzerMsg);
+   \   02EE   10....         MOVW      AX,#BuzzerMsg
+   \   02F1   16....         MOVW      HL,#LWRD(LDBBuzSendWithoutAddr)
+   \   02F4   A4..           MOV       E,#BYTE3(LDBBuzSendWithoutAddr)
+   \   02F6   ..             CALLT     [__T_?FAR_CALL_L07]
+    824                              LDBControl (cLDBChannelBuz, cLDBBuzStartSound);
+   \   02F7   A102           MOV       A,#2
+   \   02F9   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   02FC   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   02FE   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   02FF   FA40           BR        ??DATBuzDiagBuzzStop_Static_24
+    825                          }
+    826          
+    827                          break;
+    828          
+    829                      //CCOV: amarinm1: Cannot be entered in normal operating conditions.
+    830                      default:
+    831                          mLIBassert(cFalse);
+   \                     ??DATBuzDiagBuzzStop_Static_32:
+   \   0301   9A....         CALL      LIBAssertionFailed
+    832          
+    833                          //SPLUS checklist.
+    834                          //Lessons learned, point 1.2.5
+    835                          //In all the state machines with switch/cases the default  
+    836                          //case reinitialize the state machine.            
+    837          
+    838                          LDBControl(cLDBChannelBuz, cLDBBuzCancelSound);
+   \   0304   A103           MOV       A,#3
+   \   0306   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0309   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   030B   ..             CALLT     [__T_?FAR_CALL_L07]
+    839          
+    840                          DATBuzBuffer[cBufferFlashers].DATBuzSoundToPlay  = 
+    841                              eBUZZER_Silence;
+   \   030C   A100           MOV       A,#0
+   \   030E   16....         MOVW      HL,#DATBuzBuffer+14
+   \   0311   97             MOV       [HL],A
+    842                          DATBuzBuffer[cBufferLWS].DATBuzSoundToPlay       = 
+    843                              eBUZZER_Silence;
+   \   0312   16....         MOVW      HL,#DATBuzBuffer+30
+   \   0315   97             MOV       [HL],A
+    844                          DATBuzBuffer[cBufferSeatBelt].DATBuzSoundToPlay  = 
+    845                              eBUZZER_Silence;
+   \   0316   16....         MOVW      HL,#DATBuzBuffer+46
+   \   0319   97             MOV       [HL],A
+    846                          DATBuzBuffer[cBufferOverSpeed].DATBuzSoundToPlay = 
+    847                              eBUZZER_Silence;
+   \   031A   16....         MOVW      HL,#DATBuzBuffer+62
+   \   031D   97             MOV       [HL],A
+    848                          DATBuzBuffer[cBufferExtLights].DATBuzSoundToPlay = 
+    849                              eBUZZER_Silence;
+   \   031E   16....         MOVW      HL,#DATBuzBuffer+78
+   \   0321   97             MOV       [HL],A
+    850          
+    851                          DATBuzBuffer[cBufferFlashers].ticks_to_elapse  = 0;
+   \   0322   70             MOV       X,A
+   \   0323   03....         MOVW      DATBuzBuffer+6,AX
+   \   0326   03....         MOVW      DATBuzBuffer+4,AX
+    852                          DATBuzBuffer[cBufferLWS].ticks_to_elapse       = 0;
+   \   0329   03....         MOVW      DATBuzBuffer+22,AX
+   \   032C   03....         MOVW      DATBuzBuffer+20,AX
+    853                          DATBuzBuffer[cBufferSeatBelt].ticks_to_elapse  = 0;
+   \   032F   03....         MOVW      DATBuzBuffer+38,AX
+   \   0332   03....         MOVW      DATBuzBuffer+36,AX
+    854                          DATBuzBuffer[cBufferOverSpeed].ticks_to_elapse = 0;
+   \   0335   03....         MOVW      DATBuzBuffer+54,AX
+   \   0338   03....         MOVW      DATBuzBuffer+52,AX
+    855                          DATBuzBuffer[cBufferExtLights].ticks_to_elapse = 0;
+   \   033B   03....         MOVW      DATBuzBuffer+70,AX
+   \   033E   03....         MOVW      DATBuzBuffer+68,AX
+    856          
+    857                          break;
+    858                      
+    859                      } //end switch
+    860                  }
+    861              }
+    862              else
+    863              { 
+    864                  // we go without doing anything
+    865              }
+    866          }
+   \                     ??DATBuzDiagBuzzStop_Static_24:
+   \   0341   B2             POP       BC
+   \   0342   AF             RET       
+   \   0343                  REQUIRE ?CL78K_V4_6_L00
+    867          
+    868          
+    869          //==============================================================================
+    870          // DESCRIPTION:         < short description of the function >
+    871          //
+    872          // PARAMETERS:          < type,usage and constraints for all parameters >
+    873          //
+    874          // RETURN VALUE:        < type and usage >
+    875          //
+    876          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    877          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    878          void DATBuzNormalVoltage(void)
+   \                     DATBuzNormalVoltage:
+    879          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    880          #ifdef X90_PROJECT
+    881              DATBuzNormalVoltage_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzNormalVoltage_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzNormalVoltage_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    882          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    883          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    884          static MEM_TYPE void DATBuzNormalVoltage_Static(void)
+   \                     DATBuzNormalVoltage_Static:
+    885          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    886          #endif
+    887          
+    888              bDATBuzAbnormalVoltage = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bDATBuzAbnormalVoltage,A
+    889          
+    890              // restart the component again
+    891              LDBControl(cLDBChannelBuz, cLDBBuzEnable);
+   \   0005   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0008   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   000A   ..             CALLT     [__T_?FAR_CALL_L07]
+    892          
+    893              ContinuePlayingBrokenSound();
+   \   000B   16....         MOVW      HL,#LWRD(ContinuePlayingBrokenSound)
+   \   000E   A4..           MOV       E,#BYTE3(ContinuePlayingBrokenSound)
+   \   0010   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    894          
+    895              // the sound that has been played upon abnormal voltage detection
+    896              // was interrupted immediately, and will continue to be played 
+    897              // from where it was stopped.
+    898          }
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    899          
+    900          
+    901          //==============================================================================
+    902          // DESCRIPTION:         < short description of the function >
+    903          //
+    904          // PARAMETERS:          < type,usage and constraints for all parameters >
+    905          //
+    906          // RETURN VALUE:        < type and usage >
+    907          //
+    908          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    909          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    910          void DATBuzAbnormalVoltage(void)
+   \                     DATBuzAbnormalVoltage:
+    911          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    912          #ifdef X90_PROJECT
+    913              DATBuzAbnormalVoltage_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzAbnormalVoltage_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzAbnormalVoltage_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    914          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    915          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    916          static MEM_TYPE void DATBuzAbnormalVoltage_Static(void)
+   \                     DATBuzAbnormalVoltage_Static:
+    917          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    918          #endif
+    919          
+    920              bDATBuzAbnormalVoltage = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bDATBuzAbnormalVoltage,A
+    921          
+    922              // stop the sound in progress
+    923              LDBControl(cLDBChannelBuz, cLDBBuzDisable);
+   \   0005   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0008   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   000A   ..             CALLT     [__T_?FAR_CALL_L07]
+    924          }
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    925          
+    926          
+    927          //==============================================================================
+    928          // DESCRIPTION:         < short description of the function >
+    929          //
+    930          // PARAMETERS:          < type,usage and constraints for all parameters >
+    931          //
+    932          // RETURN VALUE:        < type and usage >
+    933          //
+    934          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    935          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    936          void DATBuzDiagBuzzStart(const U16 u16FreqP)
+   \                     DATBuzDiagBuzzStart:
+    937          {    
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    938          #ifdef X90_PROJECT
+    939              DATBuzDiagBuzzStart_Static(u16FreqP);
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzDiagBuzzStart_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzDiagBuzzStart_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    940          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    941          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    942          static MEM_TYPE void DATBuzDiagBuzzStart_Static(const U16 u16FreqP)
+   \                     DATBuzDiagBuzzStart_Static:
+    943          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 6
+   \   0000   B7             PUSH      HL
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+    944          #endif
+    945          
+    946              tMsg    BuzzMsgL;
+    947              U16     Buff[cDATBuzBufferSize];
+    948              Buff[0] = u16FreqP;
+   \   0003   D6             MOVW      HL,AX
+   \   0004   891C           MOVW      AX,SP
+   \   0006   E6             XCHW      AX,HL
+   \   0007   BE01           MOV       [HL+0x01],A
+   \   0009   60             MOV       A,X
+   \   000A   97             MOV       [HL],A
+    949              //QACJ 0310: amarinm1: This is the expected type by the function. It is later casted to its original type.
+    950              BuzzMsgL.pBuffer = (U8*)Buff;
+   \   000B   891C           MOVW      AX,SP
+   \   000D   BE03           MOV       [HL+0x03],A
+   \   000F   60             MOV       A,X
+   \   0010   BE02           MOV       [HL+0x02],A
+    951              BuzzMsgL.Lng = sizeof(Buff);
+   \   0012   891C           MOVW      AX,SP
+   \   0014   80             INCW      AX
+   \   0015   80             INCW      AX
+   \   0016   D6             MOVW      HL,AX
+   \   0017   A100           MOV       A,#0
+   \   0019   BE03           MOV       [HL+0x03],A
+   \   001B   A102           MOV       A,#2
+   \   001D   BE02           MOV       [HL+0x02],A
+    952              LDBSendWithoutAddr(cLDBChannelBuz, (tMsg*)&BuzzMsgL);
+   \   001F   891C           MOVW      AX,SP
+   \   0021   80             INCW      AX
+   \   0022   80             INCW      AX
+   \   0023   16....         MOVW      HL,#LWRD(LDBBuzSendWithoutAddr)
+   \   0026   A4..           MOV       E,#BYTE3(LDBBuzSendWithoutAddr)
+   \   0028   ..             CALLT     [__T_?FAR_CALL_L07]
+    953          
+    954              // start the loaded sound
+    955              LDBControl(cLDBChannelBuz, cLDBBuzStartSound);
+   \   0029   A102           MOV       A,#2
+   \   002B   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   002E   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0030   ..             CALLT     [__T_?FAR_CALL_L07]
+    956          
+    957              // set flag
+    958              bIndusBuzzerFreqFlag = cTrue;
+   \   0031   A101           MOV       A,#1
+   \   0033   9E....         MOV       bIndusBuzzerFreqFlag,A
+    959          }
+   \   0036   B0             POP       AX
+   \   0037   B0             POP       AX
+   \   0038   B0             POP       AX
+   \   0039   AF             RET       
+   \   003A                  REQUIRE ?CL78K_V4_6_L00
+    960          
+    961          
+    962          //==============================================================================
+    963          // DESCRIPTION:         < short description of the function >
+    964          //
+    965          // PARAMETERS:          < type,usage and constraints for all parameters >
+    966          //
+    967          // RETURN VALUE:        < type and usage >
+    968          //
+    969          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    970          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    971          void DATBuzDiagBuzzStop(void)
+   \                     DATBuzDiagBuzzStop:
+    972          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    973          #ifdef X90_PROJECT
+    974              DATBuzDiagBuzzStop_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATBuzDiagBuzzStop_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATBuzDiagBuzzStop_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    975          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    976          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    977          static MEM_TYPE void DATBuzDiagBuzzStop_Static(void)
+   \                     DATBuzDiagBuzzStop_Static:
+    978          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    979          #endif
+    980          
+    981              // stop the loaded sound
+    982              LDBControl(cLDBChannelBuz, cLDBBuzCancelSound);
+   \   0000   A103           MOV       A,#3
+   \   0002   16....         MOVW      HL,#LWRD(LDBBuzControl)
+   \   0005   A4..           MOV       E,#BYTE3(LDBBuzControl)
+   \   0007   ..             CALLT     [__T_?FAR_CALL_L07]
+    983          
+    984              ContinuePlayingBrokenSound();
+   \   0008   16....         MOVW      HL,#LWRD(ContinuePlayingBrokenSound)
+   \   000B   A4..           MOV       E,#BYTE3(ContinuePlayingBrokenSound)
+   \   000D   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    985          
+    986              // unset flag 
+    987              bIndusBuzzerFreqFlag = cFalse;
+   \   000E   A100           MOV       A,#0
+   \   0010   9E....         MOV       bIndusBuzzerFreqFlag,A
+    988          }
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerFlasherClick>`:
+   \   0000   34089600       DW 2100, 150, 0
+   \          0000    
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerFlasherClack>`:
+   \   0000   02089600       DW 2050, 150, 0
+   \          0000    
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerLWS>`:
+   \   0000   A00B9600       DW 2976, 150, 0, 1953, 150, 0
+   \          0000A107
+   \          96000000
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerSeatBelt>`:
+   \   0000   E8036400       DW 1000, 100, 800
+   \          2003    
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerOverSpeed>`:
+   \   0000   60092C01       DW 2400, 300, 300, 1600, 150, 50
+   \          2C014006
+   \          96003200
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for aBuzzerExtLight>`:
+   \   0000   60096400       DW 2400, 100, 100
+   \          6400    
+
+   \                                 In  segment NEAR_ID, align 2, align-sorted
+   \                     `?<Initializer for DATBuzMelodies>`:
+   \   0000   ....           DW aBuzzerSilence
+   \   0002   0100           DB 1, 0
+   \   0004   0000           DW 0
+   \   0006   0000           DB 0, 0
+   \   0008   ....           DW aBuzzerFlasherClick
+   \   000A   0101           DB 1, 1
+   \   000C   0000           DW 0
+   \   000E   0100           DB 1, 0
+   \   0010   ....           DW aBuzzerFlasherClack
+   \   0012   0101           DB 1, 1
+   \   0014   0000           DW 0
+   \   0016   0100           DB 1, 0
+   \   0018   ....           DW aBuzzerLWS
+   \   001A   0201           DB 2, 1
+   \   001C   0000           DW 0
+   \   001E   0100           DB 1, 0
+   \   0020   ....           DW aBuzzerSeatBelt
+   \   0022   0101           DB 1, 1
+   \   0024   0000           DW 0
+   \   0026   FF00           DB 255, 0
+   \   0028   ....           DW aBuzzerOverSpeed
+   \   002A   020D           DB 2, 13
+   \   002C   A073           DW 29600
+   \   002E   FF00           DB 255, 0
+   \   0030   ....           DW aBuzzerExtLight
+   \   0032   0104           DB 1, 4
+   \   0034   5802           DW 600
+   \   0036   0400           DB 4, 0
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_MUL_L02:
+   \   0000   ....           DW       ?I_MUL_L02
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?L_MUL_L03:
+   \   0000   ....           DW       ?L_MUL_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?UL_DIV_L03:
+   \   0000   ....           DW       ?UL_DIV_L03
+
+   Segment part sizes:
+
+     Function/Label                         Bytes
+     --------------                         -----
+     aBuzzerSilence                            6
+     aBuzzerFlasherClick                       6
+     aBuzzerFlasherClack                       6
+     aBuzzerLWS                               12
+     aBuzzerSeatBelt                           6
+     aBuzzerOverSpeed                         12
+     aBuzzerExtLight                           6
+     DATBuzMelodies                           56
+     BuzzerMsg                                 4
+     u8SoundBuffer                             1
+     bDATBuzAbnormalVoltage                    1
+     bDATBuzStarted                            1
+     bIndusBuzzerFreqFlag                      1
+     BuzzerTaskAlarm                           4
+     DATBuzBuffer                             80
+     ContinuePlayingBrokenSound               53
+     GetCurrentHighestPriorityBuffer
+                                              98
+     DATBuzIsSoundPlaying                     35
+     DATBuzSetBuzzRequest                      9
+     DATBuzSetBuzzRequest_Static             527
+     DATBuzInit                                9
+     DATBuzInit_Static                        72
+     DATBuzStart                               9
+     DATBuzStart_Static                       56
+     DATBuzStop                                9
+     DATBuzStop_Static                        65
+     DATBuzTask                                9
+     DATBuzTask_Static                       835
+     DATBuzNormalVoltage                       9
+     DATBuzNormalVoltage_Static               18
+     DATBuzAbnormalVoltage                     9
+     DATBuzAbnormalVoltage_Static             12
+     DATBuzDiagBuzzStart                       9
+     DATBuzDiagBuzzStart_Static               58
+     DATBuzDiagBuzzStop                        9
+     DATBuzDiagBuzzStop_Static                20
+     ?<Initializer for aBuzzerFlasherClick>    6
+     ?<Initializer for aBuzzerFlasherClack>    6
+     ?<Initializer for aBuzzerLWS>            12
+     ?<Initializer for aBuzzerSeatBelt>        6
+     ?<Initializer for aBuzzerOverSpeed>      12
+     ?<Initializer for aBuzzerExtLight>        6
+     ?<Initializer for DATBuzMelodies>        56
+     __T_?FAR_FAST_CALL_L07                    2
+     __T_?FAR_CALL_L07                         2
+     __T_?I_MUL_L02                            2
+     __T_?L_MUL_L03                            2
+     __T_?UL_DIV_L03                           2
+
+ 
+ 1 814 bytes in segment BCODE
+    10 bytes in segment CLTVEC
+   116 bytes in segment CODE
+   104 bytes in segment NEAR_I
+   104 bytes in segment NEAR_ID
+    98 bytes in segment NEAR_Z
+ 
+ 1 930 bytes of CODE  memory (+ 10 bytes shared)
+   104 bytes of CONST memory
+   202 bytes of DATA  memory
+
+Errors: none
+Warnings: none

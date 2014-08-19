@@ -1,0 +1,152 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef lap_frw
+   extern const tTOSSeqGraphType LAPFrwEngineProtection;
+   extern const tTOSSeqGraphType LAPFrwIntermittentWipe;
+   extern const tTOSSeqGraphType LAPFrwWashing;
+   extern const tTOSSeqGraphType LAPFrwControl; 
+#endif
+
+#ifdef lap_frw
+   extern void     LAPFrwArbitration(void);
+   extern BOOL LAPFrwDisableTimeoutHasElapsed(void);
+   extern void     LAPFrwDisableWiping(void);
+   extern BOOL LAPFrwEPStopPositionIsDetected(void);
+   extern void     LAPFrwEnableWiping(void);
+   extern BOOL LAPFrwINTConditionsToStopArePresent(void);
+   extern BOOL LAPFrwINTPauseHasElapsed(void);
+   extern BOOL LAPFrwINTRequestIsOff(void);
+   extern BOOL LAPFrwINTRequestIsOn(void);
+   extern void     LAPFrwINTStartWiping(void);
+   extern void     LAPFrwINTStopTimer(void);
+   extern void     LAPFrwINTStopWiping(void);
+   extern void     LAPFrwInitWashProlongation(void);
+   extern BOOL LAPFrwInitialWipingTimeoutHasElapsed(void);
+   extern BOOL LAPFrwOutputIsActive(void);
+   extern BOOL LAPFrwOutputIsInactive(void);
+   extern void     LAPFrwPrepareToStopWashProlongation(void);
+   extern void     LAPFrwSetWashPressType(void);
+   extern void     LAPFrwStartWashPressTimer(void);
+   extern void     LAPFrwStartWashWait(void);
+   extern void     LAPFrwStartWashWiping(void);
+   extern void     LAPFrwStopProtectionMode(void);
+   extern void     LAPFrwStopWashWiping(void);
+   extern void     LAPFrwTryWiping(void);
+   extern BOOL LAPFrwWashCycleIsFinished(void);
+   extern BOOL LAPFrwWashExtraWipeBegining(void);
+   extern void     LAPFrwWashProlongation(void);
+   extern BOOL LAPFrwWashRequestIsOff(void);
+   extern BOOL LAPFrwWashRequestIsOn(void);
+   extern BOOL LAPFrwWashStopPositionIsDetected(void);
+   extern BOOL LAPFrwWashWaitHasElapsed(void);
+   extern BOOL LAPFrwWipingIsNotRequested(void);
+   extern BOOL LAPFrwWipingTimeoutHasElapsed(void);
+   extern void     TOSSeqNop(void);
+   extern BOOL TOSSeqTrueEval(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef lap_frw
+  const tTOSSeqGraphType LAPFrwWashing =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFrwWashing",
+    {
+#endif
+  /*   0*/  {LAPFrwWashRequestIsOn,LAPFrwStartWashWait,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPFrwWashWaitHasElapsed,LAPFrwStartWashWiping,mTOSSeqRuleNumber(8),mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPFrwWashRequestIsOff,LAPFrwInitWashProlongation,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)},
+  /*   3*/  {LAPFrwWashRequestIsOn,LAPFrwStartWashPressTimer,mTOSSeqRuleNumber(4),mTOSSeqRuleNumber(2)},
+  /*   4*/  {LAPFrwWashExtraWipeBegining,LAPFrwWashProlongation,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(3)},
+  /*   5*/  {LAPFrwWashCycleIsFinished,LAPFrwPrepareToStopWashProlongation,cTOSSeqInvalidRule,mTOSSeqRuleNumber(6)},
+  /*   6*/  {LAPFrwWashRequestIsOn,LAPFrwStartWashPressTimer,mTOSSeqRuleNumber(7),mTOSSeqRuleNumber(2)},
+  /*   7*/  {LAPFrwWashStopPositionIsDetected,LAPFrwStopWashWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*   8*/  {LAPFrwWashRequestIsOff,LAPFrwSetWashPressType,cTOSSeqInvalidRule,mTOSSeqRuleNumber(9)},
+  /*   9*/  {LAPFrwWashWaitHasElapsed,LAPFrwStartWashWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef lap_frw
+  const tTOSSeqGraphType LAPFrwEngineProtection =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFrwEngineProtection",
+    {
+#endif
+  /*   0*/  {LAPFrwOutputIsActive,LAPFrwEnableWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPFrwOutputIsInactive,TOSSeqNop,mTOSSeqRuleNumber(2),mTOSSeqRuleNumber(0)},
+  /*   2*/  {LAPFrwEPStopPositionIsDetected,LAPFrwEnableWiping,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(1)},
+  /*   3*/  {LAPFrwInitialWipingTimeoutHasElapsed,LAPFrwDisableWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*   4*/  {LAPFrwWipingIsNotRequested,LAPFrwStopProtectionMode,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(0)},
+  /*   5*/  {LAPFrwDisableTimeoutHasElapsed,LAPFrwTryWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(6)},
+  /*   6*/  {LAPFrwEPStopPositionIsDetected,LAPFrwEnableWiping,mTOSSeqRuleNumber(7),mTOSSeqRuleNumber(1)},
+  /*   7*/  {LAPFrwWipingTimeoutHasElapsed,LAPFrwDisableWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef lap_frw
+  const tTOSSeqGraphType LAPFrwIntermittentWipe =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFrwIntermittentWipe",
+    {
+#endif
+  /*   0*/  {LAPFrwINTRequestIsOn,LAPFrwINTStartWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPFrwINTConditionsToStopArePresent,LAPFrwINTStopWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPFrwINTRequestIsOff,LAPFrwINTStopTimer,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(0)},
+  /*   3*/  {LAPFrwINTPauseHasElapsed,LAPFrwINTStartWiping,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef lap_frw
+  const tTOSSeqGraphType LAPFrwControl =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFrwControl",
+    {
+#endif
+  /*   0*/  {TOSSeqTrueEval,LAPFrwArbitration,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

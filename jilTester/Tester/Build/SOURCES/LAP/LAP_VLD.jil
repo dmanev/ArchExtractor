@@ -1,0 +1,190 @@
+//*****************************************************************************
+// Company:      Johnson Controls Inc.
+// ----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// ----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// ----------------------------------------------------------------------------
+// Component:    LAP_VLD
+// ----------------------------------------------------------------------------
+// $Date:   Mar 10 2010 12:46:50  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_VLD/LAP_VLD.jil-arc  $
+// $Revision:   1.8  $
+// ----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_VLD/LAP_VLD.jil-arc  $
+// 
+//    Rev 1.8   Mar 10 2010 12:46:50   amanevd
+// Cm007212: Code review corrections
+// 
+//    Rev 1.7   Feb 25 2010 17:02:58   adzhelp
+// Cm007212:  HWP: Implementation of SC detection of Verlog LED in sleep mode mode to LAP_DLK
+// 
+//    Rev 1.6   Feb 25 2010 15:00:44   adzhelp
+// Cm007634: VERLOG LED protection moved to LAP_DLK
+// 
+//    Rev 1.5   Feb 24 2010 15:47:08   adzhelp
+// Cm007212:  HWP: Implementation of SC detection of Verlog LED in sleep mode
+// 
+//    Rev 1.4   Nov 04 2009 17:52:12   amanevd
+// Cm005566: Simplified Protection
+// 
+//    Rev 1.3   Apr 29 2009 13:14:22   amanevd
+// Cm003272 - Intermediate part 3 
+// - PRS compliance
+// 
+//    Rev 1.2   Apr 24 2009 17:17:16   amanevd
+// Cm003272 - Finishing part 2 - pre-integration
+// 
+//    Rev 1.1   Apr 22 2009 19:23:58   amanevd
+// Cm003272 - Finishing part 1 - pre-integration
+// 
+//    Rev 1.0   Feb 23 2009 16:33:02   amanevd
+// Initial revision.
+//
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+//    Includes non re entry
+//-----------------------------------------------------------------------------
+
+#ifndef I_LAP_VLD_JIL
+#define I_LAP_VLD_JIL (1)
+
+
+//-----------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//-----------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_VLD
+{
+    //-----------------------------------------------------------------------------
+    //    Task TaskName                           // Declaration of Task
+    //    {
+    //        Id            = "IdName";             --> this field is optional
+    //        Fct           = "FonctionName";       --> this field is optional
+    //        GraphGroup    = GraphGroupReference;  --> this field is optional
+    //        Resource      = ResourceReference;    --> this field is optional
+    //        Npg           = NpgReference;         --> this field is optional
+    //        Priority      = Priority;             --> this field is optional
+    //
+    //    };
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    Graph GraphName                         // Declaration of Graph
+    //    {
+    //        Id            = "IdName";             --> this field is optional
+    //        GraphGroup    = GraphGroupReference;  --> this field is optional
+    //        NbInstances   = NbInstances;          --> this field is optional
+    //    };
+    //-----------------------------------------------------------------------------
+    Graph LAPVldPatternManagement
+    {
+        GraphGroup = GraphGroupSleep;
+    };
+
+    //-----------------------------------------------------------------------------
+    //    GraphGroup GraphGroupName                // Declaration of GraphGroup
+    //    {
+    //        Macro         = "MacroName";          --> this field is optional
+    //        Default       = TRUE;                 --> this field is optional
+    //        Graph         = Graph1;               --> this field is optional
+    //        Graph         = Graph2;               --> this field is optional
+    //        Graph         = ...;                  --> this field is optional
+    //    };
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    Resource ResourceName                   // Declaration of Resource
+    //                                            // (for Pre-emptive TOS only)
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+    //                                           // group (for Pre-emptive TOS only)
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    TaskPriority TaskName
+    //    {
+    //        Priority = Priority;                  --> this field is optional
+    //
+    //        Npg = NonPreemptiveGroupReference;    --> this field is optional
+    //                                                  (for Pre-emptive TOS only)
+    //    };
+    //
+    //    !!this table should be used into LAP_SUP.jil only, it permit to set all
+    //    task priority and non pre-emptive group in one unique file, "TaskName" 
+    //    must be the task name declared for the "Task" table
+    //
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    Signal SignalName;                      // Declaration of Signal
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+    //-----------------------------------------------------------------------------
+    //    OnControl = CallBack                    // Declaration of Control consumed 
+    //    {
+    //         Ctrl = "ControlName";
+    //         Fct = "FonctionName";
+    //    }; 
+    //    
+    //    OnControl = CallBackActivateTask
+    //    {
+    //         Ctrl = "ControlName";
+    //         Task = TaskReference;
+    //    };
+    //
+    //    OnControl = CallBackSetSignal
+    //    {
+    //        Ctrl = "ControlName";
+    //        Signal = SignalReference;
+    //    }; 
+    //-----------------------------------------------------------------------------
+    OnControl = CallBack
+    {
+        Ctrl = "LAPInitialize";
+        Fct  = "LAPVldInitialize";
+    };
+
+    //-----------------------------------------------------------------------------
+    //    In                                      // Declaration of Data flow
+    //    {
+    //        Data = "DataName";
+    //        Type = U1 or U8, U16, U32, S8, S16, S32;
+    //        or
+    //        Type = U1Array or U8Array, ..., S32Array
+    //        {
+    //                Size = ItemNumber;
+    //        };
+    //    };
+    //
+    //    Out
+    //    {
+    //        ...(see In)
+    //    };
+    //-----------------------------------------------------------------------------
+};
+//-----------------------------------------------------------------------------
+//  End of component declaration
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+//  End of includes non re entry
+//-----------------------------------------------------------------------------
+#endif // I_LAP_VLD_JIL
+
+
+
+

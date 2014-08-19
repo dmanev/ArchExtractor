@@ -1,0 +1,472 @@
+format 74
+"StkJilFileCriteria" // EA_Model::System::Specific::STK::StkParser::StkJilFileCriteria
+  revision 12
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Specific/STK/StkParser/StkJilFileCriteria/"
+  python_package "StkJilFileCriteria"
+  classview 187631 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 221551 "StkJilDataCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 214767 "StkJilTOSSignalCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 214639 "StkJilProdControlCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 201327 "StkJilOnControlCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 194799 "StkJilComponentCriteria class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 218223 "StkJilDataCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 226671 // <dependency>
+	relation 226415 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 226671 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 226799 // <dependency>
+	relation 226543 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 226799 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      classrelation 227055 // <dependency>
+	relation 226799 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 227055 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      classrelation 227183 // <dependency>
+	relation 226927 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 227183 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      operation 217967 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 228079 // <generalisation>
+	relation 227823 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 228079 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      classrelation 228335 // <dependency>
+	relation 228079 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 228335 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
+      classrelation 229871 // <dependency>
+	relation 229487 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 229871 // <dependency>
+	  b parent class_ref 164335 // DataElement
+      end
+    end
+
+    class 211567 "StkJilTOSSignalCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 219119 // <dependency>
+	relation 218863 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 219119 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 219887 // <dependency>
+	relation 219631 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 219887 // <dependency>
+	  b parent class_ref 211695 // StkTOSSignalIf
+      end
+
+      classrelation 220015 // <dependency>
+	relation 219759 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 220015 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      operation 211439 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 227823 // <generalisation>
+	relation 227567 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227823 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+    end
+
+    class 198383 "StkJilOnControlCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 204911 // <dependency>
+	relation 204655 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 204911 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      operation 202863 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 211567 // <dependency>
+	relation 211311 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 211567 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      classrelation 211951 // <dependency>
+	relation 211695 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 211951 // <dependency>
+	  b parent class_ref 204911 // StkControlIf
+      end
+
+      classrelation 227439 // <generalisation>
+	relation 227183 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227439 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+    end
+
+    class 211439 "StkJilProdControlCriteria"
+      visibility protected 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 218607 // <dependency>
+	relation 218351 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 218607 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 218735 // <dependency>
+	relation 218479 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 218735 // <dependency>
+	  b parent class_ref 204911 // StkControlIf
+      end
+
+      classrelation 218863 // <dependency>
+	relation 218607 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 218863 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      operation 211055 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 227695 // <generalisation>
+	relation 227439 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227695 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+    end
+
+    class 191855 "StkJilComponentCriteria"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 195951 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpTextContent" explicit_type "char"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 198255 // <dependency>
+	relation 197999 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 198255 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
+      classrelation 227311 // <generalisation>
+	relation 227055 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227311 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+    end
+  end
+
+  deploymentview 161775 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 228335 "deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A3
+    end
+
+    artifact 210543 "StkJilDataCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 218223 // StkJilDataCriteria
+      end
+      simplerelation 209007
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+
+    artifact 204015 "StkJilTOSSignalCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 211567 // StkJilTOSSignalCriteria
+      end
+      simplerelation 208879
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+
+    artifact 203759 "StkJilProdControlCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 211439 // StkJilProdControlCriteria
+      end
+      simplerelation 202351
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+
+    artifact 190703 "StkJilOnCotrolCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 198383 // StkJilOnControlCriteria
+      end
+      simplerelation 189295
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+
+    artifact 184047 "StkJilComponentCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 191855 // StkJilComponentCriteria
+      end
+      simplerelation 182767
+	-_->
+	  on artifact_ref 184175 // BasePortCriteria
+      end
+    end
+  end
+end

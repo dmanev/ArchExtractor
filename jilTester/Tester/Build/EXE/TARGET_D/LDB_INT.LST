@@ -1,0 +1,248 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:48 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_INT.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_INT.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_INT.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_INT.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_INT.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_INT.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_INT.C
+      1          /*============================================================================
+      2            Project ......................... STANDARD
+      3            Component ....................... LDB_INT
+      4            File revision.................... :   1.0  $
+      5            Last modification date .......... $Modtime:   Jul 24 2009 14:37:36  $
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20            
+     21            -------------------------------------------------------------------------
+     22            cmp.c file review : 
+     23          
+     24          
+     25            ==========================================================================*/
+     26          
+     27          /*--------------------------------------------------------------------------
+     28            Body Identification
+     29            --------------------------------------------------------------------------*/
+     30          
+     31          #define LDB_INT   "LDB_INT"
+     32          
+     33          /*-------------------------------------------------------------------------
+     34            Included files
+     35          
+     36            #include <system_file_name.h>
+     37            #include "project_file_name.h"
+     38            --------------------------------------------------------------------------*/
+     39          
+     40          #include "ldb_int.h"
+
+   \                                 In  segment NEAR_A, at 0xffe8
+   \   union <unnamed> volatile __sfr _A_PR0
+   \                     _A_PR0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffea
+   \   union <unnamed> volatile __sfr _A_PR1
+   \                     _A_PR1:
+   \   0000                  DS 2
+     41          
+     42          
+     43          /*--------------------------------------------------------------------------
+     44            Local constants
+     45          
+     46            #define cConstantName   ((tType) ConstantValue)
+     47            --------------------------------------------------------------------------*/
+     48          
+     49          
+     50          /*--------------------------------------------------------------------------
+     51            Local macros
+     52          
+     53            #define mMacroName   (MacroDefinition)
+     54            --------------------------------------------------------------------------*/
+     55          
+     56          
+     57          /*--------------------------------------------------------------------------
+     58            Local types
+     59          
+     60            struct  sStructureName { ... };
+     61            union   uUnionName { ... };
+     62            enum    eEnumerationName { ... };
+     63            typedef Expression tTypeName;
+     64            --------------------------------------------------------------------------*/
+     65          
+     66          
+     67          /*--------------------------------------------------------------------------
+     68            Local data
+     69          
+     70            static  tType   VariableName;
+     71            static  tType*  pVariableName; 
+     72            --------------------------------------------------------------------------*/
+     73          
+     74          
+     75          /*--------------------------------------------------------------------------
+     76            Constant local data
+     77          
+     78            static const tType  VariableName;
+     79            --------------------------------------------------------------------------*/
+     80          
+     81          
+     82          /*--------------------------------------------------------------------------
+     83            Exported data
+     84          
+     85            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     86            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     87            --------------------------------------------------------------------------*/
+     88          
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     89          MEM_FAST volatile tLDBIntStateGroup1 LDBIntGroup1;
+   \                     LDBIntGroup1:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+     90          MEM_FAST volatile U8             LDBIntLevel;
+   \                     LDBIntLevel:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_SADDR_Z
+     91          
+     92          #ifdef TRACE_CPU_ACTIVE
+     93              // This data must be defined by LDB
+     94          MEM_FAST volatile tLDBHandleCPU LDBHandleCPU;
+     95           
+     96          #endif
+     97          
+     98          /*--------------------------------------------------------------------------
+     99            Constant exported data
+    100           
+    101            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    102            --------------------------------------------------------------------------*/
+    103          
+    104          
+    105          /*--------------------------------------------------------------------------
+    106            Local function prototypes
+    107            
+    108            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    109            --------------------------------------------------------------------------*/
+    110          
+    111          
+    112          /*============================================================================
+    113            =========================== LOCAL FUNCTIONS ================================
+    114            ==========================================================================*/
+    115          
+    116          /*============================================================================
+    117            DESCRIPTION :
+    118            
+    119            PARAMETERS (Type,Name,Min,Max) :   none
+    120          
+    121            RETURN VALUE :   none
+    122           
+    123            DESIGN INFORMATION :   refer to Detailed Design Document
+    124            ==========================================================================*/
+    125          //static type FunctionName(...)
+    126          
+    127          
+    128          /*============================================================================
+    129            =========================== EXPORTED FUNCTIONS =============================
+    130            ==========================================================================*/
+    131          
+    132          /*============================================================================
+    133            DESCRIPTION :
+    134            
+    135            PARAMETERS (Type,Name,Min,Max) :  none
+    136          
+    137            RETURN VALUE :  none
+    138           
+    139            DESIGN INFORMATION :  refer to Detailed Design Document
+    140          ============================================================================*/
+    141          /*type FunctionName(...)
+    142          {
+    143          }*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    144          void LDBIntInit(void)
+   \                     LDBIntInit:
+    145          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    146              // After Startup all interrupts are disable
+    147              LDBIntGroup1.Reg.MK0H = 0xFF;
+   \   0000   11..FF         MOV       S:LDBIntGroup1,#255
+    148              LDBIntGroup1.Reg.MK1L = 0xFF;
+   \   0003   11..FF         MOV       S:LDBIntGroup1+1,#255
+    149              LDBIntLevel = 0;
+   \   0006   11..00         MOV       S:LDBIntLevel,#0
+    150          
+    151              // Priority Initialisation
+    152              PR0L = cLDBIntPR0L;
+   \   0009   13E8FF         MOV       0xFFE8,#255
+    153              PR0H = cLDBIntPR0H;
+   \   000C   13E93F         MOV       0xFFE9,#63
+    154              PR1L = cLDBIntPR1L;
+   \   000F   13EAFF         MOV       0xFFEA,#255
+    155          #ifdef cLDBHarMicro78K0_F0536    
+    156              PR1H = cLDBIntPR1H;
+   \   0012   13EBF3         MOV       0xFFEB,#243
+    157          #endif
+    158          }
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+   \   0016                  REQUIRE _A_PR0
+   \   0016                  REQUIRE _A_PR1
+    159          
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     _A_PR0            2
+     _A_PR1            2
+     LDBIntGroup1      2
+     LDBIntLevel       1
+     LDBIntInit       22
+
+ 
+ 22 bytes in segment CODE
+  4 bytes in segment NEAR_A
+  3 bytes in segment SADDR_Z
+ 
+ 22 bytes of CODE memory
+  3 bytes of DATA memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none

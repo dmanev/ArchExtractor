@@ -1,0 +1,25 @@
+class AEModel
+!!!276463.python!!!	__init__(inout self : , in inpInfrastructureFactory : InfrastructureFactory)
+        if(isinstance(inpInfrastructureFactory, 
+                      Infrastructure.InfrastructureFactory.InfrastructureFactory)):
+            self.itsInfrastructureFactory = inpInfrastructureFactory;
+!!!276719.python!!!	getPackageList(in self : ) : AEPackage
+        outPackageList = None
+        outPackageList = self.itsInfrastructureFactory.getRootPackageList(outPackageList) 
+        return outPackageList
+!!!285935.python!!!	getPortInterfaceFactory(in self : ) : PortInterfaceFactory
+        outPortInterfaceFactory = self.itsPortInterfaceFactory
+
+        return outPortInterfaceFactory
+!!!286063.python!!!	getComponentFactory(in self : ) : ComponentFactory
+        outComponentFactory = self.itsComponentFactory
+
+        return outComponentFactory
+!!!286191.python!!!	getInfrastructureFactory(in self : ) : InfrastructureFactory
+        outInfrastructureFactory = self.itsInfrastructureFactory
+
+        return outInfrastructureFactory
+!!!286319.python!!!	getDataTypeFactory(in self : ) : DataTypeFactory
+        outDataTypeFactory = self.itsDataTypeFactory
+        
+        return outDataTypeFactory

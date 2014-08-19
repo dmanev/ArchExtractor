@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<xmi:XMI xmi:version="2.1" xmlns:uml="http://schema.omg.org/spec/UML/2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1">
+	<xmi:Documentation exporter="XMIR" exporterVersion="0.1"/>
+	<uml:Model name="NameToBeAdded" xmi:id="themodel" xmi:type="uml:Model">
+		<packagedElement name="Project" xmi:id="Package:1" xmi:type="uml:Package"/>
+		<packagedElement name="U1Bit" xmi:id="DataType:1" xmi:type="uml:DataType"/>
+		<packagedElement name="U8Bit" xmi:id="DataType:2" xmi:type="uml:DataType"/>
+		<packagedElement name="S8Bit" xmi:id="DataType:3" xmi:type="uml:DataType"/>
+		<packagedElement name="U16Bit" xmi:id="DataType:4" xmi:type="uml:DataType"/>
+		<packagedElement name="S16Bit" xmi:id="DataType:5" xmi:type="uml:DataType"/>
+		<packagedElement name="U32Bit" xmi:id="DataType:6" xmi:type="uml:DataType"/>
+		<packagedElement name="S32Bit" xmi:id="DataType:7" xmi:type="uml:DataType"/>
+	</uml:Model>
+</xmi:XMI>

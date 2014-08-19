@@ -1,0 +1,299 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:05 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_SIG.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\TOS_SIG.LST -o                           #
+#                    ..\EXE\TARGET_R\TOS_SIG.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_SIG.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\TOS_SIG.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\TOS_SIG.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\TOS_SIG.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      STK
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    TOS_SIG
+     12          //               TOS signals management
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Sep 17 2009 10:27:10  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SIG.C-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SIG.C-arc  $
+     19          // 
+     20          //    Rev 1.1   Sep 17 2009 10:27:10   adzhelp
+     21          // Cm003277: Functions defined as CALLT_TYPE
+     22          // 
+     23          //    Rev 1.0   04 Feb 2009 17:03:08   adzhelp
+     24          // Initial revision.
+     25          */
+     26          //******************************************************************************
+     27          
+     28          //------------------------------------------------------------------------------
+     29          // Body Identification
+     30          //------------------------------------------------------------------------------
+     31          #define TOS_SIG "TOS_SIG"
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Included files to resolve specific definitions in this file
+     35          //------------------------------------------------------------------------------
+     36          #include "tos_sig.h"
+     37          #include "lib.h"
+     38          
+     39          //------------------------------------------------------------------------------
+     40          // Local constants
+     41          //------------------------------------------------------------------------------
+     42          #define cSizeEventTable         ((cTOSSigMaxSignalNumber + 7UL) / 8UL)
+     43          #define cNoEvent                0
+     44          
+     45          //------------------------------------------------------------------------------
+     46          // Local macros
+     47          //------------------------------------------------------------------------------
+     48          #define mGetIndex( SignalID )   ( (SignalID) >> 3 )
+     49          #define mGetMask( SignalID )    ( (U8) ( (U8)1 << ((SignalID) & 7) ) )
+     50          
+     51          //------------------------------------------------------------------------------
+     52          // Local types
+     53          //------------------------------------------------------------------------------
+     54          
+     55          // -----------------------------------------------------------------------------
+     56          // Local data
+     57          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     58          static U8 u8EventTable[cSizeEventTable];    // container for events
+   \                     u8EventTable:
+   \   0000                  DS 6
+   \   0006                  REQUIRE __INIT_NEAR_Z
+     59          
+     60          //------------------------------------------------------------------------------
+     61          // Constant local data
+     62          //------------------------------------------------------------------------------
+     63          
+     64          //------------------------------------------------------------------------------
+     65          // Exported data
+     66          //------------------------------------------------------------------------------
+     67          
+     68          //------------------------------------------------------------------------------
+     69          // Constant exported data
+     70          //------------------------------------------------------------------------------
+     71          
+     72          //------------------------------------------------------------------------------
+     73          // Local function prototypes
+     74          //------------------------------------------------------------------------------
+     75          
+     76          //==============================================================================
+     77          //=========================== LOCAL FUNCTIONS ==================================
+     78          //==============================================================================
+     79          
+     80          //==============================================================================
+     81          //=========================== EXPORTED FUNCTIONS ===============================
+     82          //==============================================================================
+     83          
+     84          //==============================================================================
+     85          // DESCRIPTION:         See component header file
+     86          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     87          void TOSSigInitialize( void )
+   \                     TOSSigInitialize:
+     88          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#u8EventTable
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+     89              mLIBmemset( u8EventTable, cNoEvent, sizeof(u8EventTable) );
+   \   0005   140600         MOVW      DE,#6
+   \   0008   120000         MOVW      BC,#0
+   \   000B   9A....         CALL      memset
+     90          }
+   \   000E   B4             POP       DE
+   \   000F   B2             POP       BC
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+     91          
+     92          //==============================================================================
+     93          // DESCRIPTION:         See component header file
+     94          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     95          CALLT_TYPE BOOL TOSReadSignal(const tTOSSignalID SignalId )
+   \                     TOSReadSignal:
+     96          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D4             MOVW      DE,AX
+     97              BOOL bActiveSignal;
+     98          
+     99              TOSSuspendOSInterrupts();
+   \   0003   9A....         CALL      TOSSuspendOSInterrupts
+    100              if( (u8EventTable[ mGetIndex(SignalId) ] & mGetMask(SignalId)) != 0 )
+   \   0006   64             MOV       A,E
+   \   0007   5D07           AND       A,#7
+   \   0009   70             MOV       X,A
+   \   000A   A101           MOV       A,#1
+   \   000C   ..             CALLT     [__T_?C_LSH_L01]
+   \   000D   72             MOV       C,A
+   \   000E   C4             MOVW      AX,DE
+   \   000F   21             CLR1      CY
+   \   0010   25             RORC      A,0x1
+   \   0011   30             XCH       A,X
+   \   0012   25             RORC      A,0x1
+   \   0013   30             XCH       A,X
+   \   0014   21             CLR1      CY
+   \   0015   25             RORC      A,0x1
+   \   0016   30             XCH       A,X
+   \   0017   25             RORC      A,0x1
+   \   0018   30             XCH       A,X
+   \   0019   21             CLR1      CY
+   \   001A   25             RORC      A,0x1
+   \   001B   30             XCH       A,X
+   \   001C   25             RORC      A,0x1
+   \   001D   30             XCH       A,X
+   \   001E   CA....         ADDW      AX,#u8EventTable
+   \   0021   D6             MOVW      HL,AX
+   \   0022   87             MOV       A,[HL]
+   \   0023   615A           AND       A,C
+   \   0025   AD12           BZ        ??TOSWriteSignal_0
+    101              {
+    102                  u8EventTable[ mGetIndex(SignalId) ] &= (U8) ~mGetMask(SignalId);
+   \   0027   64             MOV       A,E
+   \   0028   5D07           AND       A,#7
+   \   002A   70             MOV       X,A
+   \   002B   A101           MOV       A,#1
+   \   002D   ..             CALLT     [__T_?C_LSH_L01]
+   \   002E   7DFF           XOR       A,#255
+   \   0030   72             MOV       C,A
+   \   0031   87             MOV       A,[HL]
+   \   0032   615A           AND       A,C
+   \   0034   97             MOV       [HL],A
+    103                  bActiveSignal = cTrue;
+   \   0035   A201           MOV       C,#1
+   \   0037   FA02           BR        ??TOSWriteSignal_1
+    104              }
+    105              else
+    106              {
+    107                  bActiveSignal = cFalse;
+   \                     ??TOSWriteSignal_0:
+   \   0039   A200           MOV       C,#0
+    108              }
+    109              TOSResumeOSInterrupts();
+   \                     ??TOSWriteSignal_1:
+   \   003B   9A....         CALL      TOSResumeOSInterrupts
+    110          
+    111              return bActiveSignal;
+   \   003E   62             MOV       A,C
+   \   003F   B4             POP       DE
+   \   0040   B2             POP       BC
+   \   0041   AF             RET       
+   \   0042                  REQUIRE ?CL78K_V4_6_L00
+    112          }
+    113          
+    114          //==============================================================================
+    115          // DESCRIPTION:         See component header file
+    116          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    117          CALLT_TYPE void TOSWriteSignal(const tTOSSignalID SignalId )
+   \                     TOSWriteSignal:
+    118          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D4             MOVW      DE,AX
+    119              TOSSuspendOSInterrupts();
+   \   0003   9A....         CALL      TOSSuspendOSInterrupts
+    120              u8EventTable[ mGetIndex(SignalId) ] |= mGetMask(SignalId);
+   \   0006   64             MOV       A,E
+   \   0007   5D07           AND       A,#7
+   \   0009   70             MOV       X,A
+   \   000A   A101           MOV       A,#1
+   \   000C   ..             CALLT     [__T_?C_LSH_L01]
+   \   000D   72             MOV       C,A
+   \   000E   C4             MOVW      AX,DE
+   \   000F   21             CLR1      CY
+   \   0010   25             RORC      A,0x1
+   \   0011   30             XCH       A,X
+   \   0012   25             RORC      A,0x1
+   \   0013   30             XCH       A,X
+   \   0014   21             CLR1      CY
+   \   0015   25             RORC      A,0x1
+   \   0016   30             XCH       A,X
+   \   0017   25             RORC      A,0x1
+   \   0018   30             XCH       A,X
+   \   0019   21             CLR1      CY
+   \   001A   25             RORC      A,0x1
+   \   001B   30             XCH       A,X
+   \   001C   25             RORC      A,0x1
+   \   001D   30             XCH       A,X
+   \   001E   CA....         ADDW      AX,#u8EventTable
+   \   0021   D6             MOVW      HL,AX
+   \   0022   87             MOV       A,[HL]
+   \   0023   616A           OR        A,C
+   \   0025   97             MOV       [HL],A
+    121              TOSResumeOSInterrupts();
+   \   0026   9A....         CALL      TOSResumeOSInterrupts
+    122          }
+   \   0029   B4             POP       DE
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?C_LSH_L01:
+   \   0000   ....           DW       ?C_LSH_L01
+
+   Segment part sizes:
+
+     Function/Label   Bytes
+     --------------   -----
+     u8EventTable        6
+     TOSSigInitialize   17
+     TOSReadSignal      66
+     TOSWriteSignal     44
+     __T_?C_LSH_L01      2
+
+ 
+   2 bytes in segment CLTVEC
+ 127 bytes in segment CODE
+   6 bytes in segment NEAR_Z
+ 
+ 127 bytes of CODE memory (+ 2 bytes shared)
+   6 bytes of DATA memory
+
+Errors: none
+Warnings: none

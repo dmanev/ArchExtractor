@@ -1,0 +1,9 @@
+-o "..\..\..\Build\EXE\TARGET_R\_in_flash.int"
+-Fintel-extended
+-glog_zone
+-gappli_state
+-gchecksum
+-Z(CONST)LOG_ZONE=17EB0-17FFF
+-Z(CONST)APPLI_STATE=67F8
+-Z(CONST)CHECKSUM=67F4
+-l "..\..\..\Build\EXE\TARGET_R\_in_flash.map"

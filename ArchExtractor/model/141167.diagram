@@ -1,0 +1,57 @@
+format 74
+
+classcanvas 128111 class_ref 137071 // User
+  class_drawing_mode default show_context_mode default show_stereotype_properties default
+  xyz 48 140 2000
+end
+usecasecanvas 128239 usecase_ref 128111 // Create UML model
+  xyzwh 239 355 3005 64 32 label_xy 220 387
+end
+usecasecanvas 128367 usecase_ref 128239 // Extract architecture data
+  xyzwh 499 337 3005 64 32 label_xy 466 369
+end
+usecasecanvas 128495 usecase_ref 128367 // Perform analysis
+  xyzwh 227 235 3011 64 32 label_xy 214 267
+end
+usecasecanvas 128751 usecase_ref 128495 // Prepare File criteria
+  xyzwh 419 217 3005 64 32 label_xy 398 249
+end
+usecasecanvas 128879 usecase_ref 128623 // Prepare analysis criteria
+  xyzwh 219 145 3011 64 32 label_xy 185 177
+end
+usecasecanvas 129135 usecase_ref 128751 // Prepare component criteria
+  xyzwh 495 153 3017 64 32 label_xy 453 185
+end
+usecasecanvas 129391 usecase_ref 128879 // Prepare connector criteria
+  xyzwh 407 91 3017 64 32 label_xy 369 123
+end
+usecasecanvas 129647 usecase_ref 129007 // Scan source files
+  xyzwh 385 309 3017 64 32 label_xy 371 341
+end
+subject 130287 "Architecture Extractor"
+  xyzwh 119 16 2000 564 470
+subject 130415 "GUI"
+  xyzwh 165 53 2005 470 242
+simplerelationcanvas 128623 simplerelation_ref 141679
+  from ref 128495 z 3012 to ref 128239
+end
+simplerelationcanvas 129007 simplerelation_ref 141807
+  from ref 128879 z 3012 to ref 128751
+end
+simplerelationcanvas 129263 simplerelation_ref 142319
+  from ref 128879 z 3018 to ref 129135
+end
+simplerelationcanvas 129519 simplerelation_ref 142191
+  from ref 128879 z 3018 to ref 129391
+end
+simplerelationcanvas 129775 simplerelation_ref 141935
+  from ref 129647 z 3018 to ref 128367
+end
+simplerelationcanvas 129903 simplerelation_ref 142063
+  from ref 128495 z 3018 to ref 129647
+end
+line 130031 ----
+  from ref 128111 z 3012 to ref 128879
+line 130159 ----
+  from ref 128111 z 3012 to ref 128495
+end

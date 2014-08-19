@@ -1,0 +1,2572 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:00 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_EEP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_EEP.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_EEP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_EEP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_EEP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_EEP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_EEP.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      SW0032
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    This component manages the sharing of the access to the EEPROM
+     12          //               from several processes.
+     13          // -----------------------------------------------------------------------------
+     14          // QACJ - (0288): Specific comment characters needed for PVCS compatibility
+     15          // $Date:   04 Feb 2009 17:02:50  $
+     16          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/DAT_EEP.C-arc  $
+     17          // $Revision:   1.0  $
+     18          // -----------------------------------------------------------------------------
+     19          // QACJ - (2017): Comment style needed for our toolkit
+     20          /* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/DAT_EEP.C-arc  $
+     21          // 
+     22          //    Rev 1.0   04 Feb 2009 17:02:50   adzhelp
+     23          // Initial revision.
+     24          */
+     25          //******************************************************************************
+     26          
+     27          //------------------------------------------------------------------------------
+     28          // Body Identification
+     29          //------------------------------------------------------------------------------
+     30          #define DAT_EEP  "DAT_EEP"
+     31          
+     32          //------------------------------------------------------------------------------
+     33          // Included files to resolve specific definitions in this file
+     34          //
+     35          // #include <system_file_name.h>
+     36          // #include "project_file_name.h"
+     37          //------------------------------------------------------------------------------
+     38          #include "LIB.h"
+     39          #include "TOS.h"
+     40          #include "LDB.h"
+     41          #ifdef _QAC_
+     42          #include "DAT.h"
+     43          #endif
+     44          #include "DAT_EEP.h"
+     45          
+     46          //------------------------------------------------------------------------------
+     47          // Local constants
+     48          //
+     49          // #define cConstantName   ((tType) ConstantValue)
+     50          //------------------------------------------------------------------------------
+     51          
+     52          #define cInvalidProcessHandle ((tDATEepProcessHandle) 0xFFU)
+     53          
+     54          //------------------------------------------------------------------------------
+     55          // Local macros
+     56          //
+     57          // #define mMacroName   (MacroDefinition)
+     58          //------------------------------------------------------------------------------
+     59          #define mConvAdress16ToAdr8( Adr16 ) (tAddress)((Adr16) << 1U)
+     60          
+     61          
+     62          #if ((cDATEepPageSize > 2) && ((cDATEepPageSize % 2) == 0))
+     63          
+     64          #define mIsDataIdentical(pSourceData, pReadData, lng) \
+     65                          (mLIBmemcmp((pReadData), (pSourceData), lng) == 0)
+     66          
+     67          #define mGetTransferSize(address) GetMaxBurstTransferSize(address)
+     68          #define DAT_EEP_BURST_MODE_ACTIVE
+     69          
+     70          #elif (cDATEepPageSize == 2)
+     71          
+     72          #define mIsDataIdentical(pSourceData, pReadData, lng) \
+     73                          ((pReadData)[0] == (pSourceData)[0]) 
+     74          
+     75          #define mGetTransferSize(address)    ((LDBPARAM_TYPE_LNGMSG)2)
+     76          
+     77          #else
+     78          
+     79          #error "cDATEepPageSize: incorrect value. 2 is min value.\
+     80              For the max value check the EEPROM specification!.\
+     81              The value must be devisable by 2"
+     82          
+     83          #endif
+     84          
+     85          
+     86          #ifdef TOSSuspendAllInterupts
+     87            #define  mSuspendIT()\
+     88            TOSSuspendAllInterupts() // Ancienne version de TOS_ORD (TOS.h Rev 1.12)
+     89          #else
+     90            #define  mSuspendIT()\
+     91            TOSSuspendOSInterrupts() // Nouvelle version de TOS_ORD (TOS.h Rev 1.13)
+     92          #endif
+     93          
+     94          #ifdef TOSResumeAllInterupts
+     95            #define  mResumeIT()\
+     96            TOSResumeAllInterupts() // Ancienne version de TOS_ORD (TOS.h Rev 1.12)
+     97          #else
+     98            #define  mResumeIT()\
+     99            TOSResumeOSInterrupts() // Nouvelle version de TOS_ORD (TOS.h Rev 1.13)
+    100          #endif
+    101          
+    102          #ifdef TOSDisableOSInterrupts
+    103            #define mDisableIT()\
+    104            TOSDisableOSInterrupts() // Nouvelle version de TOS_ORD (TOS.h Rev 1.13)
+    105          #else
+    106            #define mDisableIT()\
+    107            TOSDisableAllInterupts() // Ancienne version de TOS_ORD (TOS.h Rev 1.12)
+    108          #endif
+    109          
+    110          #ifdef TOSEnableOSInterrupts
+    111            #define mEnableIT()\
+    112            TOSEnableOSInterrupts() // Nouvelle version de TOS_ORD (TOS.h Rev 1.13)
+    113          #else
+    114            #define mEnableIT()\
+    115            TOSEnableAllInterupts() // Ancienne version de TOS_ORD (TOS.h Rev 1.12)
+    116          #endif
+    117          //------------------------------------------------------------------------------
+    118          // Local types
+    119          //
+    120          // typedef Expression   tTypeName;
+    121          //------------------------------------------------------------------------------
+    122          
+    123          // States of main machine
+    124          typedef enum
+    125          {
+    126              cStateReady,
+    127              cStateReading,
+    128              cStateComparing,
+    129              cStateUnLocking,
+    130              cStateChecking,
+    131              cStateWriting,
+    132              cStateLocking,
+    133              cStateUnprotecting
+    134          } tState;
+    135          
+    136          
+    137          // Paramaters of Command machine
+    138          typedef enum
+    139          {
+    140              cCmdRead,
+    141              cCmdWrite,
+    142              cCmdLock,
+    143              cCmdUnlock,
+    144              cCmdUnprotect
+    145          } tCommandType;
+    146          
+    147          typedef struct
+    148          {
+    149              tMsg         Msg;
+    150              U16          Adress;
+    151              tCommandType Type;
+    152          } tCommand;
+    153          
+    154          // States of command machine
+    155          typedef enum
+    156          {
+    157              cCommandStateFree,
+    158              cCommandStateFrozen,
+    159              cCommandStateProcessing,
+    160              cCommandStateFinished
+    161          } tCommandState;
+    162          
+    163          #if cDATEepExtendedNumberOfProcess <= 8U
+    164          typedef U8 tActiveProcessList;
+    165          #else
+    166              #if cDATEepExtendedNumberOfProcess <= 16U
+    167          typedef U16 tActiveProcessList;
+    168              #else
+    169                  #if cDATEepExtendedNumberOfProcess <= 32U
+    170          typedef U32 tActiveProcessList;
+    171                  #else
+    172                      #error "Too many processes"
+    173                  #endif
+    174              #endif
+    175          #endif
+    176          
+    177          // -----------------------------------------------------------------------------
+    178          // Local data
+    179          //
+    180          // static  tType   u8VariableName;  
+    181          // static  tType*  pu8VariableName; 
+    182          //------------------------------------------------------------------------------
+    183          
+    184          // Process schedule
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    185          static tDATEepProcessHandle ActiveProcessHandle;
+   \                     ActiveProcessHandle:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    186          static tActiveProcessList   ActiveProcessList;
+   \                     ActiveProcessList:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    187          
+    188          // Main state machine
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    189          static tState        State;
+   \                     State:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    190          static U8            WriteRetryCounter;
+   \                     WriteRetryCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    191          static U16			 ReadBuffer[cDATEepPageSize / 2];
+   \                     ReadBuffer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    192          static U16*          UserBuffer;
+   \                     UserBuffer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    193          static tDATEepOffset OffsetFromUserBuffer;
+   \                     OffsetFromUserBuffer:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    194          static tDATEepOffset LastOffset;
+   \                     LastOffset:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    195          
+    196          // Command state machine
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    197          static volatile tCommandState  CommandState;
+   \                     CommandState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    198          static tCommand             Command;
+   \                     Command:
+   \   0000                  DS 8
+   \   0008                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    199          static tTOSTimer            CommandTempo;
+   \                     CommandTempo:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    200          static tTOSAlarm            Alarm;
+   \                     Alarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    201          
+    202          
+    203          
+    204          //------------------------------------------------------------------------------
+    205          // Constant local data
+    206          //
+    207          // static const tType  VariableName;
+    208          //------------------------------------------------------------------------------
+    209          
+
+   \                                 In  segment CONST, align 2
+    210          static const tDATEepBloc BlocList[cDATEepExtendedNumberOfProcess ] =
+   \                     BlocList:
+   \   0000   0000           DW 0
+   \   0002   0600           DB 6, 0
+   \   0004   0600           DW 6
+   \   0006   0E00           DB 14, 0
+   \   0008   2E00           DW 46
+   \   000A   0200           DB 2, 0
+   \   000C   6000           DW 96
+   \   000E   0B00           DB 11, 0
+   \   0010   FD00           DW 253
+   \   0012   0200           DB 2, 0
+   \   0014   1400           DW 20
+   \   0016   1A01           DB 26, 1
+   \   0018   3000           DW 48
+   \   001A   0801           DB 8, 1
+   \   001C   3800           DW 56
+   \   001E   2801           DB 40, 1
+   \   0020   6B00           DW 107
+   \   0022   4E01           DB 78, 1
+   \   0024   B900           DW 185
+   \   0026   4401           DB 68, 1
+   \   0028   0000           DW 0
+   \   002A   0002           DB 0, 2
+    211              { mDATEepProcessInformationTable() };
+    212          
+    213          //QACJ 3218: Coding rule mismatch with static scopes.
+
+   \                                 In  segment CONST, align 2
+    214          static const tpfCallBack CallBackList[cDATEepExtendedNumberOfCallBack] = 
+   \                     CallBackList:
+   \   0000   ........       DW DATSbkCallBackEep, DATDbkCallBackEep, DATDeaCallBackEep
+   \          ....    
+    215          	{ mDATEepExtendedCallBackList() };
+    216          //------------------------------------------------------------------------------
+    217          // Exported data
+    218          //
+    219          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    220          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    221          //------------------------------------------------------------------------------
+    222          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    223          U16 DATEepBuffer[cDATEepBufferSize];
+   \                     DATEepBuffer:
+   \   0000                  DS 78
+   \   004E                  REQUIRE __INIT_NEAR_Z
+    224          
+    225          //------------------------------------------------------------------------------
+    226          // Constant exported data
+    227          //
+    228          //             (LAY: 3 characters to identify the layer)
+    229          //             (Cmp: 3 characters to identify this component)
+    230          // 
+    231          // const tType   LAYCmpVariableName;
+    232          //------------------------------------------------------------------------------
+    233          
+    234          //------------------------------------------------------------------------------
+    235          // Local function prototypes
+    236          // 
+    237          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    238          //------------------------------------------------------------------------------
+    239          
+    240          //==============================================================================
+    241          //=========================== LOCAL FUNCTIONS ==================================
+    242          //==============================================================================
+    243          
+    244          //==============================================================================
+    245          // DESCRIPTION : Calls the callback function of the active process
+    246          //
+    247          // PARAMETERS (Type,Name,Min,Max) : 
+    248          //    BOOL StatusOk: cTrue if the last operation is a success, cFalse otherwise.
+    249          //
+    250          // RETURN VALUE :   none
+    251          //
+    252          // DESIGN INFORMATION : 
+    253          //==============================================================================
+    254          static void CallUser(BOOL StatusOk)
+    255          {
+    256              U8 CallBackIndex;
+    257          
+    258              mLIBassert( ActiveProcessHandle < cDATEepExtendedNumberOfProcess );
+    259              CallBackIndex = BlocList[ActiveProcessHandle].CallBackNumber;
+    260          
+    261              mLIBassert( CallBackIndex < cDATEepExtendedNumberOfCallBack );
+    262              CallBackList[CallBackIndex]( ActiveProcessHandle, StatusOk );
+    263          }
+    264          
+    265          
+    266          //==============================================================================
+    267          // DESCRIPTION : Translate the contents of the Command variable into LDB call
+    268          //
+    269          // PARAMETERS (Type,Name,Min,Max) :   none
+    270          //
+    271          // RETURN VALUE :   none
+    272          //
+    273          // DESIGN INFORMATION : 
+    274          //==============================================================================
+    275          static void SendCommand( void )
+    276          {
+    277              mLIBassert( CommandState == cCommandStateProcessing );
+    278          
+    279              TOSStartTimer( &CommandTempo );
+    280          
+    281              switch( Command.Type )
+    282              {
+    283              case( cCmdRead ) :
+    284                  // This is a read command
+    285                  LDBReceiveWithAddr( cLDBChannelEep, mConvAdress16ToAdr8(Command.Adress), &Command.Msg );
+    286                  break;
+    287          
+    288              case( cCmdWrite ) :
+    289                  // This is a write command
+    290                  LDBSendWithAddr( cLDBChannelEep, mConvAdress16ToAdr8(Command.Adress), &Command.Msg );
+    291                  break;
+    292          
+    293              case( cCmdLock ) :
+    294                  // This is a lock command
+    295                  LDBControl(cLDBChannelEep, cLDBEepLock );
+    296                  break;
+    297          
+    298              case( cCmdUnlock ) :
+    299                  // This is an unlock command
+    300                  LDBControl(cLDBChannelEep, cLDBEepUnLock );
+    301                  break;
+    302          
+    303          #ifdef cLIBStkUnprotect_Used
+    304              case( cCmdUnprotect ) :
+    305                  // This is an unprotect command
+    306                  LDBControl(cLDBChannelEep, cLDBEepUnprotect );
+    307                  break;
+    308          #endif // cLIBStkUnprotect_Used
+    309          
+    310              default:
+    311                  
+    312                  mLIBassert(cFalse);
+    313                  break;
+    314              }
+    315          }
+    316          
+    317          //==============================================================================
+    318          // DESCRIPTION : Send the LDB command that is prepared in the Command variable
+    319          //
+    320          // PARAMETERS (Type,Name,Min,Max) :   none
+    321          //
+    322          // RETURN VALUE :   none
+    323          //
+    324          // DESIGN INFORMATION : 
+    325          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    326          static void StartCommand( void )
+   \                     StartCommand:
+    327          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    328              BOOL IsAccessible;
+    329          
+    330              mLIBassert( CommandState == cCommandStateFree );
+   \   0002   8E....         MOV       A,CommandState
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD03           BZ        ??DATEepIsProcessing_0
+   \   0009   9A....         CALL      LIBAssertionFailed
+    331          
+    332              if( Command.Type == cCmdRead )
+   \                     ??DATEepIsProcessing_0:
+   \   000C   8E....         MOV       A,Command+6
+   \   000F   4D00           CMP       A,#0
+   \   0011   BD0E           BNZ       ??DATEepIsProcessing_1
+    333              {
+    334                  // The Command state machine enter in the processing state
+    335                  CommandState = cCommandStateProcessing;
+   \   0013   A102           MOV       A,#2
+   \   0015   9E....         MOV       CommandState,A
+    336                  SendCommand();
+   \   0018   8E....         MOV       A,CommandState
+   \   001B   4D02           CMP       A,#2
+   \   001D   BD14           BNZ       ??DATEepIsProcessing_2
+   \   001F   FA15           BR        ??DATEepIsProcessing_3
+    337              }
+    338              else
+    339              {
+    340                  // For all commands exclude Read we must
+    341                  // check if the EEPROM is accesible
+    342                  IsAccessible = DATPeeIsEepromAccessible();
+    343          
+    344                  if( IsAccessible == cTrue )
+   \                     ??DATEepIsProcessing_1:
+   \   0021   9A....         CALL      DATPeeIsEepromAccessible
+   \   0024   51             DEC       A
+   \   0025   BD5F           BNZ       ??DATEepIsProcessing_4
+    345                  {
+    346                      // The Command state machine enter in the processing state
+    347                      CommandState = cCommandStateProcessing;
+   \   0027   A102           MOV       A,#2
+   \   0029   9E....         MOV       CommandState,A
+    348                      SendCommand();
+   \   002C   8E....         MOV       A,CommandState
+   \   002F   4D02           CMP       A,#2
+   \   0031   AD03           BZ        ??DATEepIsProcessing_3
+   \                     ??DATEepIsProcessing_2:
+   \   0033   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_3:
+   \   0036   10....         MOVW      AX,#CommandTempo
+   \   0039   ..             CALLT     [__T_TOSStartTimer]
+   \   003A   8E....         MOV       A,Command+6
+   \   003D   4D00           CMP       A,#0
+   \   003F   AD0E           BZ        ??DATEepIsProcessing_5
+   \   0041   4D01           CMP       A,#1
+   \   0043   AD1C           BZ        ??DATEepIsProcessing_6
+   \   0045   4D02           CMP       A,#2
+   \   0047   AD2A           BZ        ??DATEepIsProcessing_7
+   \   0049   4D03           CMP       A,#3
+   \   004B   AD30           BZ        ??DATEepIsProcessing_8
+   \   004D   FA32           BR        ??DATEepIsProcessing_9
+   \                     ??DATEepIsProcessing_5:
+   \   004F   12....         MOVW      BC,#Command
+   \   0052   02....         MOVW      AX,Command+4
+   \   0055   30             XCH       A,X
+   \   0056   27             ROLC      A,0x1
+   \   0057   30             XCH       A,X
+   \   0058   27             ROLC      A,0x1
+   \   0059   16....         MOVW      HL,#LWRD(LDBEepReceiveWithAddr)
+   \   005C   A4..           MOV       E,#BYTE3(LDBEepReceiveWithAddr)
+   \                     ??StartCommand_0:
+   \   005E   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   005F   FA2A           BR        ??DATEepIsProcessing_10
+   \                     ??DATEepIsProcessing_6:
+   \   0061   12....         MOVW      BC,#Command
+   \   0064   02....         MOVW      AX,Command+4
+   \   0067   21             CLR1      CY
+   \   0068   30             XCH       A,X
+   \   0069   27             ROLC      A,0x1
+   \   006A   30             XCH       A,X
+   \   006B   27             ROLC      A,0x1
+   \   006C   16....         MOVW      HL,#LWRD(LDBEepSendWithAddr)
+   \   006F   A4..           MOV       E,#BYTE3(LDBEepSendWithAddr)
+   \   0071   FAEB           BR        ??StartCommand_0
+   \                     ??DATEepIsProcessing_7:
+   \   0073   A100           MOV       A,#0
+   \                     ??StartCommand_1:
+   \   0075   16....         MOVW      HL,#LWRD(LDBEepControl)
+   \   0078   A4..           MOV       E,#BYTE3(LDBEepControl)
+   \   007A   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   007B   FA0E           BR        ??DATEepIsProcessing_10
+   \                     ??DATEepIsProcessing_8:
+   \   007D   A101           MOV       A,#1
+   \   007F   FAF4           BR        ??StartCommand_1
+   \                     ??DATEepIsProcessing_9:
+   \   0081   9A....         CALL      LIBAssertionFailed
+   \   0084   FA05           BR        ??DATEepIsProcessing_10
+    349                  }
+    350                  else
+    351                  {
+    352                      // The Command state machine enter in the frozen state
+    353                      CommandState = cCommandStateFrozen;
+   \                     ??DATEepIsProcessing_4:
+   \   0086   A101           MOV       A,#1
+   \   0088   9E....         MOV       CommandState,A
+    354                  }
+    355              }
+    356          }
+   \                     ??DATEepIsProcessing_10:
+   \   008B   B4             POP       DE
+   \   008C   B2             POP       BC
+   \   008D   AF             RET       
+   \   008E                  REQUIRE ?CL78K_V4_6_L00
+    357          #ifdef DAT_EEP_BURST_MODE_ACTIVE
+    358          //==============================================================================
+    359          // DESCRIPTION : Calculate number of bytes that could be written (read) with 
+    360          // single LDB call.
+    361          //
+    362          // PARAMETERS (Type,Name,Min,Max) :   Start address (in words)
+    363          //
+    364          // RETURN VALUE :   Number of bytes that could be fit in EEPROM page starting
+    365          // from u16Addr.
+    366          //
+    367          // DESIGN INFORMATION : 
+    368          //==============================================================================
+    369          static LDBPARAM_TYPE_LNGMSG GetMaxBurstTransferSize(U16 u16Addr)
+    370          {
+    371              LDBPARAM_TYPE_LNGMSG result;
+    372          
+    373              U16 u16Address = (U16)(u16Addr * 2);
+    374              U16 u16Size = (U16)((LastOffset - OffsetFromUserBuffer) * 2);
+    375          
+    376              // Physical EEPROM could read pages aligned on cDATEepPageSize boundaries
+    377              // If the size exceed cDATEepPageSize data from the begining of the page
+    378              // would be read instead data byte from address cDATEepPageSize+1.
+    379              U16 u16DataOffset = (U16)(u16Address % cDATEepPageSize);
+    380              
+    381              if ((u16DataOffset + u16Size) > cDATEepPageSize)
+    382              {
+    383                  result = (LDBPARAM_TYPE_LNGMSG)(cDATEepPageSize - u16DataOffset);
+    384              }
+    385              else
+    386              {
+    387                  result = ((LDBPARAM_TYPE_LNGMSG)u16Size);
+    388              }
+    389          
+    390              return result;
+    391          }
+    392          #endif
+    393          //==============================================================================
+    394          // DESCRIPTION : Update the component when a LDB command is complete.
+    395          //
+    396          // PARAMETERS (Type,Name,Min,Max) :   none
+    397          //
+    398          // RETURN VALUE :   none
+    399          //
+    400          // DESIGN INFORMATION : 
+    401          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    402          static void EndOfCommand( void )
+   \                     EndOfCommand:
+    403          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    404              tDATEepOffset  ReadDataLng;
+    405          
+    406              switch( State )
+   \   0002   8E....         MOV       A,State
+   \   0005   4D01           CMP       A,#1
+   \   0007   AD26           BZ        ??DATEepIsProcessing_11
+   \   0009   4D02           CMP       A,#2
+   \   000B   BD03           BNZ       $+5
+   \   000D   9B....         BR        N:??DATEepIsProcessing_12
+   \   0010   4D03           CMP       A,#3
+   \   0012   BD03           BNZ       $+5
+   \   0014   9B....         BR        N:??DATEepIsProcessing_13
+   \   0017   4D04           CMP       A,#4
+   \   0019   BD03           BNZ       $+5
+   \   001B   9B....         BR        N:??DATEepIsProcessing_14
+   \   001E   4D05           CMP       A,#5
+   \   0020   BD03           BNZ       $+5
+   \   0022   9B....         BR        N:??DATEepIsProcessing_15
+   \   0025   4D06           CMP       A,#6
+   \   0027   BD03           BNZ       $+5
+   \   0029   9B....         BR        N:??DATEepIsProcessing_16
+   \   002C   9B....         BR        N:??DATEepIsProcessing_17
+    407              {
+    408                  // ------------------------------------------------------
+    409                  //                 Reading State
+    410                  // ------------------------------------------------------
+    411              case( cStateReading   ) :
+    412          
+    413                  ReadDataLng = (tDATEepOffset)(Command.Msg.Lng / 2);
+   \                     ??DATEepIsProcessing_11:
+   \   002F   02....         MOVW      AX,Command+2
+   \   0032   21             CLR1      CY
+   \   0033   25             RORC      A,0x1
+   \   0034   60             MOV       A,X
+   \   0035   25             RORC      A,0x1
+   \   0036   72             MOV       C,A
+    414          
+    415                  OffsetFromUserBuffer = OffsetFromUserBuffer + ReadDataLng;
+   \   0037   8E....         MOV       A,OffsetFromUserBuffer
+   \   003A   610A           ADD       A,C
+   \   003C   9E....         MOV       OffsetFromUserBuffer,A
+    416                  
+    417                  if( OffsetFromUserBuffer < LastOffset )
+   \   003F   48....         CMP       A,LastOffset
+   \   0042   9D27           BNC       ??DATEepIsProcessing_18
+    418                  {
+    419                      // Read the next block
+    420          
+    421                      //QACJ 0506: The Buffer is always checked against NULL on assigment
+    422                      Command.Msg.pBuffer = &(Command.Msg.pBuffer[Command.Msg.Lng]);
+   \   0044   8E....         MOV       A,Command+3
+   \   0047   30             XCH       A,X
+   \   0048   08....         ADD       A,Command
+   \   004B   30             XCH       A,X
+   \   004C   28....         ADDC      A,Command+1
+   \   004F   03....         MOVW      Command,AX
+    423                      Command.Adress = Command.Adress + ReadDataLng;
+   \   0052   62             MOV       A,C
+   \   0053   A000           MOV       X,#0
+   \   0055   08....         ADD       A,Command+4
+   \   0058   30             XCH       A,X
+   \   0059   28....         ADDC      A,Command+5
+   \   005C   03....         MOVW      Command+4,AX
+    424                      Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   005F   100200         MOVW      AX,#2
+   \   0062   03....         MOVW      Command+2,AX
+    425          
+    426                      StartCommand();
+   \   0065   9A....         CALL      StartCommand
+   \   0068   9B....         BR        N:??DATEepIsProcessing_19
+    427                  }
+    428                  else
+    429                  {
+    430                      // There is no more data to process
+    431                      State = cStateReady;
+   \                     ??DATEepIsProcessing_18:
+   \   006B   A100           MOV       A,#0
+   \   006D   9E....         MOV       State,A
+    432                      CallUser( cTrue );
+   \   0070   8E....         MOV       A,ActiveProcessHandle
+   \   0073   4D0B           CMP       A,#11
+   \   0075   8D03           BC        ??DATEepIsProcessing_20
+   \   0077   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_20:
+   \   007A   8E....         MOV       A,ActiveProcessHandle
+   \   007D   A004           MOV       X,#4
+   \   007F   3188           MULU      X
+   \   0081   CA....         ADDW      AX,#BlocList+3
+   \   0084   D6             MOVW      HL,AX
+   \   0085   87             MOV       A,[HL]
+   \   0086   72             MOV       C,A
+   \   0087   4D03           CMP       A,#3
+   \   0089   8D03           BC        ??DATEepIsProcessing_21
+   \   008B   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_21:
+   \   008E   A301           MOV       B,#1
+   \                     ??EndOfCommand_0:
+   \   0090   8E....         MOV       A,ActiveProcessHandle
+   \   0093   74             MOV       E,A
+   \   0094   62             MOV       A,C
+   \   0095   A002           MOV       X,#2
+   \   0097   3188           MULU      X
+   \   0099   CA....         ADDW      AX,#CallBackList
+   \   009C   D6             MOVW      HL,AX
+   \   009D   87             MOV       A,[HL]
+   \   009E   70             MOV       X,A
+   \   009F   AE01           MOV       A,[HL+0x01]
+   \   00A1   D6             MOVW      HL,AX
+   \   00A2   64             MOV       A,E
+   \   00A3   9A....         CALL      ?IND_CALL_L06
+    433                  }
+   \   00A6   9B....         BR        N:??DATEepIsProcessing_19
+    434                  break;
+    435          
+    436                  // ------------------------------------------------------
+    437                  //                 Comparing State
+    438                  // ------------------------------------------------------
+    439              case( cStateComparing ) :
+    440          
+    441                  //QACJ 3416: No side effect because the function change nothing
+    442                  //QACJ 0506: The UserBuffer is always checked against NULL on assigment
+    443                  if( mIsDataIdentical((&UserBuffer[OffsetFromUserBuffer]), 
+    444          						        ReadBuffer, Command.Msg.Lng) )
+   \                     ??DATEepIsProcessing_12:
+   \   00A9   8E....         MOV       A,OffsetFromUserBuffer
+   \   00AC   A002           MOV       X,#2
+   \   00AE   3188           MULU      X
+   \   00B0   30             XCH       A,X
+   \   00B1   08....         ADD       A,UserBuffer
+   \   00B4   30             XCH       A,X
+   \   00B5   28....         ADDC      A,UserBuffer+1
+   \   00B8   D6             MOVW      HL,AX
+   \   00B9   87             MOV       A,[HL]
+   \   00BA   70             MOV       X,A
+   \   00BB   AE01           MOV       A,[HL+0x01]
+   \   00BD   D6             MOVW      HL,AX
+   \   00BE   02....         MOVW      AX,ReadBuffer
+   \   00C1   30             XCH       A,X
+   \   00C2   611E           SUB       A,L
+   \   00C4   30             XCH       A,X
+   \   00C5   613F           SUBC      A,H
+   \   00C7   6168           OR        A,X
+   \   00C9   BD5A           BNZ       ??DATEepIsProcessing_22
+    445                  {
+    446                      ReadDataLng = (tDATEepOffset)(Command.Msg.Lng / 2);
+   \   00CB   02....         MOVW      AX,Command+2
+   \   00CE   21             CLR1      CY
+   \   00CF   25             RORC      A,0x1
+   \   00D0   60             MOV       A,X
+   \   00D1   25             RORC      A,0x1
+   \   00D2   72             MOV       C,A
+    447          
+    448                      OffsetFromUserBuffer = OffsetFromUserBuffer + ReadDataLng;
+   \   00D3   8E....         MOV       A,OffsetFromUserBuffer
+   \   00D6   610A           ADD       A,C
+   \   00D8   9E....         MOV       OffsetFromUserBuffer,A
+    449          
+    450                      if( OffsetFromUserBuffer < LastOffset )
+   \   00DB   48....         CMP       A,LastOffset
+   \   00DE   9D1F           BNC       ??DATEepIsProcessing_23
+    451                      {
+    452                          // Read the next block
+    453          
+    454                          Command.Adress = Command.Adress + ReadDataLng;
+   \   00E0   62             MOV       A,C
+   \   00E1   A000           MOV       X,#0
+   \   00E3   08....         ADD       A,Command+4
+   \   00E6   30             XCH       A,X
+   \   00E7   28....         ADDC      A,Command+5
+   \   00EA   03....         MOVW      Command+4,AX
+    455                          Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   00ED   100200         MOVW      AX,#2
+   \   00F0   03....         MOVW      Command+2,AX
+    456                          Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \   00F3   10....         MOVW      AX,#ReadBuffer
+   \   00F6   03....         MOVW      Command,AX
+    457          
+    458                          StartCommand();
+   \   00F9   9A....         CALL      StartCommand
+   \   00FC   9B....         BR        N:??DATEepIsProcessing_19
+    459                      }
+    460                      else
+    461                      {
+    462                          // There is no more data to process
+    463                          State = cStateReady;
+   \                     ??DATEepIsProcessing_23:
+   \   00FF   A100           MOV       A,#0
+   \   0101   9E....         MOV       State,A
+    464                          CallUser( cTrue );
+   \   0104   8E....         MOV       A,ActiveProcessHandle
+   \   0107   4D0B           CMP       A,#11
+   \   0109   8D03           BC        ??DATEepIsProcessing_24
+   \   010B   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_24:
+   \   010E   8E....         MOV       A,ActiveProcessHandle
+   \   0111   A004           MOV       X,#4
+   \   0113   3188           MULU      X
+   \   0115   CA....         ADDW      AX,#BlocList+3
+   \   0118   D6             MOVW      HL,AX
+   \   0119   87             MOV       A,[HL]
+   \   011A   72             MOV       C,A
+   \   011B   4D03           CMP       A,#3
+   \   011D   8D03           BC        ??DATEepIsProcessing_25
+   \   011F   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_25:
+   \   0122   9B....         BR        N:??DATEepIsProcessing_21
+    465                      }
+    466                  }
+    467                  else
+    468                  {
+    469                      State = cStateReady;
+   \                     ??DATEepIsProcessing_22:
+   \   0125   A100           MOV       A,#0
+   \   0127   9E....         MOV       State,A
+    470                      CallUser( cFalse );
+   \   012A   8E....         MOV       A,ActiveProcessHandle
+   \   012D   4D0B           CMP       A,#11
+   \   012F   8D03           BC        ??DATEepIsProcessing_26
+   \   0131   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_26:
+   \   0134   8E....         MOV       A,ActiveProcessHandle
+   \   0137   A004           MOV       X,#4
+   \   0139   3188           MULU      X
+   \   013B   CA....         ADDW      AX,#BlocList+3
+   \   013E   D6             MOVW      HL,AX
+   \   013F   87             MOV       A,[HL]
+   \   0140   72             MOV       C,A
+   \   0141   4D03           CMP       A,#3
+   \   0143   8D03           BC        ??DATEepIsProcessing_27
+   \   0145   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_27:
+   \   0148   A300           MOV       B,#0
+   \   014A   9B....         BR        N:??EndOfCommand_0
+    471                  }
+    472                  break;
+    473          
+    474                  // ------------------------------------------------------
+    475                  //                 Checking State
+    476                  // ------------------------------------------------------
+    477              case( cStateChecking  ) :
+    478          
+    479                  //QACJ 3416: No side effect because the function change nothing
+    480                  if( mIsDataIdentical((&UserBuffer[OffsetFromUserBuffer]), 
+    481          						        ReadBuffer, Command.Msg.Lng) )
+   \                     ??DATEepIsProcessing_14:
+   \   014D   8E....         MOV       A,OffsetFromUserBuffer
+   \   0150   A002           MOV       X,#2
+   \   0152   3188           MULU      X
+   \   0154   30             XCH       A,X
+   \   0155   08....         ADD       A,UserBuffer
+   \   0158   30             XCH       A,X
+   \   0159   28....         ADDC      A,UserBuffer+1
+   \   015C   D6             MOVW      HL,AX
+   \   015D   87             MOV       A,[HL]
+   \   015E   70             MOV       X,A
+   \   015F   AE01           MOV       A,[HL+0x01]
+   \   0161   D6             MOVW      HL,AX
+   \   0162   02....         MOVW      AX,ReadBuffer
+   \   0165   30             XCH       A,X
+   \   0166   611E           SUB       A,L
+   \   0168   30             XCH       A,X
+   \   0169   613F           SUBC      A,H
+   \   016B   6168           OR        A,X
+   \   016D   BD50           BNZ       ??DATEepIsProcessing_28
+    482                  {
+    483                      WriteRetryCounter = 0;
+   \   016F   A100           MOV       A,#0
+   \   0171   9E....         MOV       WriteRetryCounter,A
+    484          
+    485                      ReadDataLng = (tDATEepOffset)(Command.Msg.Lng / 2);
+   \   0174   02....         MOVW      AX,Command+2
+   \   0177   21             CLR1      CY
+   \   0178   25             RORC      A,0x1
+   \   0179   60             MOV       A,X
+   \   017A   25             RORC      A,0x1
+   \   017B   72             MOV       C,A
+    486          
+    487                      OffsetFromUserBuffer = OffsetFromUserBuffer + ReadDataLng;
+   \   017C   8E....         MOV       A,OffsetFromUserBuffer
+   \   017F   610A           ADD       A,C
+   \   0181   9E....         MOV       OffsetFromUserBuffer,A
+    488          
+    489                      if( OffsetFromUserBuffer < LastOffset )
+   \   0184   48....         CMP       A,LastOffset
+   \   0187   9D25           BNC       ??DATEepIsProcessing_29
+    490                      {
+    491                          // Read the next block
+    492          
+    493                          Command.Adress = Command.Adress + ReadDataLng;
+   \   0189   62             MOV       A,C
+   \   018A   A000           MOV       X,#0
+   \   018C   08....         ADD       A,Command+4
+   \   018F   30             XCH       A,X
+   \   0190   28....         ADDC      A,Command+5
+   \   0193   03....         MOVW      Command+4,AX
+    494                          Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   0196   100200         MOVW      AX,#2
+   \   0199   03....         MOVW      Command+2,AX
+    495                          Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \   019C   10....         MOVW      AX,#ReadBuffer
+   \   019F   03....         MOVW      Command,AX
+    496          
+    497                          Command.Type = cCmdRead;
+   \   01A2   A100           MOV       A,#0
+   \   01A4   16....         MOVW      HL,#Command+6
+   \   01A7   97             MOV       [HL],A
+    498          
+    499                          StartCommand();
+   \   01A8   9A....         CALL      StartCommand
+   \   01AB   9B....         BR        N:??DATEepIsProcessing_19
+    500                      }
+    501                      else
+    502                      {
+    503                          // There is no more data to process
+    504                          // Write cycle is terminate
+    505                          State = cStateLocking;
+   \                     ??DATEepIsProcessing_29:
+   \   01AE   A106           MOV       A,#6
+   \   01B0   9E....         MOV       State,A
+    506                          Command.Type = cCmdLock;
+   \   01B3   A102           MOV       A,#2
+   \   01B5   16....         MOVW      HL,#Command+6
+   \   01B8   97             MOV       [HL],A
+    507                          StartCommand();
+   \   01B9   9A....         CALL      StartCommand
+   \   01BC   9B....         BR        N:??DATEepIsProcessing_19
+    508                      }
+    509                  }
+    510                  else
+    511                  {
+    512                      if( WriteRetryCounter < cDATEepMaxWriteRetryNumber )
+   \                     ??DATEepIsProcessing_28:
+   \   01BF   8E....         MOV       A,WriteRetryCounter
+   \   01C2   4D05           CMP       A,#5
+   \   01C4   9DE8           BNC       ??DATEepIsProcessing_29
+    513                      {
+    514                          // The maximum number of retry is not reached
+    515                          // A write cycle is done for this data
+    516          
+    517                          State = cStateWriting;
+   \   01C6   A105           MOV       A,#5
+   \   01C8   9E....         MOV       State,A
+    518                          WriteRetryCounter++;
+   \   01CB   8E....         MOV       A,WriteRetryCounter
+   \   01CE   41             INC       A
+   \   01CF   9E....         MOV       WriteRetryCounter,A
+    519          
+    520                          Command.Msg.pBuffer  = (U8*)&UserBuffer[OffsetFromUserBuffer];
+   \   01D2   8E....         MOV       A,OffsetFromUserBuffer
+   \   01D5   A002           MOV       X,#2
+   \   01D7   3188           MULU      X
+   \   01D9   30             XCH       A,X
+   \   01DA   08....         ADD       A,UserBuffer
+   \   01DD   30             XCH       A,X
+   \   01DE   28....         ADDC      A,UserBuffer+1
+   \   01E1   03....         MOVW      Command,AX
+    521                          Command.Type = cCmdWrite;
+   \   01E4   A101           MOV       A,#1
+   \   01E6   16....         MOVW      HL,#Command+6
+   \   01E9   97             MOV       [HL],A
+    522          
+    523                          StartCommand();
+   \   01EA   9A....         CALL      StartCommand
+   \   01ED   FA74           BR        ??DATEepIsProcessing_19
+    524                      }
+    525                      else
+    526                      {
+    527                          // The max number of retry is reached
+    528                          // Write cycle is terminate
+    529                          State = cStateLocking;
+    530          
+    531                          Command.Type = cCmdLock;
+    532                          StartCommand();
+    533                      }
+    534                  }
+    535                  break;
+    536          
+    537                  // ------------------------------------------------------
+    538                  //                 Writing State
+    539                  // ------------------------------------------------------
+    540              case( cStateWriting   ) :
+    541                  // The data write is terminated
+    542                  // A read cycle is done to verify
+    543                  Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \                     ??DATEepIsProcessing_15:
+   \   01EF   10....         MOVW      AX,#ReadBuffer
+   \   01F2   03....         MOVW      Command,AX
+    544                  
+    545                  Command.Type = cCmdRead;
+   \   01F5   A100           MOV       A,#0
+   \   01F7   16....         MOVW      HL,#Command+6
+   \   01FA   97             MOV       [HL],A
+    546          
+    547                  State = cStateChecking;
+   \   01FB   A104           MOV       A,#4
+   \   01FD   9E....         MOV       State,A
+    548                  StartCommand();
+   \   0200   9A....         CALL      StartCommand
+   \   0203   FA5E           BR        ??DATEepIsProcessing_19
+    549                  break;
+    550          
+    551                  // ------------------------------------------------------
+    552                  //                 Unlocking
+    553                  // ------------------------------------------------------
+    554              case( cStateUnLocking ) :
+    555                  State = cStateChecking;
+   \                     ??DATEepIsProcessing_13:
+   \   0205   A104           MOV       A,#4
+   \   0207   9E....         MOV       State,A
+    556                  Command.Type = cCmdRead;
+   \   020A   A100           MOV       A,#0
+   \   020C   16....         MOVW      HL,#Command+6
+   \   020F   97             MOV       [HL],A
+    557                  StartCommand();
+   \   0210   9A....         CALL      StartCommand
+   \   0213   FA4E           BR        ??DATEepIsProcessing_19
+    558                  break;
+    559          
+    560                  // ------------------------------------------------------
+    561                  //                 Locking
+    562                  // ------------------------------------------------------
+    563              case( cStateLocking ) :
+    564                  State = cStateReady;
+   \                     ??DATEepIsProcessing_16:
+   \   0215   A100           MOV       A,#0
+   \   0217   9E....         MOV       State,A
+    565                  if( WriteRetryCounter < cDATEepMaxWriteRetryNumber )
+   \   021A   8E....         MOV       A,WriteRetryCounter
+   \   021D   4D05           CMP       A,#5
+   \   021F   8E....         MOV       A,ActiveProcessHandle
+   \   0222   9D1E           BNC       ??DATEepIsProcessing_30
+    566                  {
+    567                      CallUser( cTrue );
+   \   0224   4D0B           CMP       A,#11
+   \   0226   8D03           BC        ??DATEepIsProcessing_31
+   \   0228   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_31:
+   \   022B   8E....         MOV       A,ActiveProcessHandle
+   \   022E   A004           MOV       X,#4
+   \   0230   3188           MULU      X
+   \   0232   CA....         ADDW      AX,#BlocList+3
+   \   0235   D6             MOVW      HL,AX
+   \   0236   87             MOV       A,[HL]
+   \   0237   72             MOV       C,A
+   \   0238   4D03           CMP       A,#3
+   \   023A   8D03           BC        ??DATEepIsProcessing_32
+   \   023C   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_32:
+   \   023F   9B....         BR        N:??DATEepIsProcessing_21
+    568                  }
+    569                  else
+    570                  {
+    571                      CallUser( cFalse );
+   \                     ??DATEepIsProcessing_30:
+   \   0242   4D0B           CMP       A,#11
+   \   0244   8D03           BC        ??DATEepIsProcessing_33
+   \   0246   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_33:
+   \   0249   8E....         MOV       A,ActiveProcessHandle
+   \   024C   A004           MOV       X,#4
+   \   024E   3188           MULU      X
+   \   0250   CA....         ADDW      AX,#BlocList+3
+   \   0253   D6             MOVW      HL,AX
+   \   0254   87             MOV       A,[HL]
+   \   0255   72             MOV       C,A
+   \   0256   4D03           CMP       A,#3
+   \   0258   8D03           BC        ??DATEepIsProcessing_34
+   \   025A   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_34:
+   \   025D   9B....         BR        N:??DATEepIsProcessing_27
+    572                  }
+    573                  break;
+    574          
+    575                  // ------------------------------------------------------
+    576                  //                 Removing the EEPROM protection if needed
+    577                  // ------------------------------------------------------
+    578          #ifdef cLIBStkUnprotect_Used
+    579                  case( cStateUnprotecting ) :
+    580                  {
+    581                    State = cStateReady;
+    582                    CallUser( cTrue );
+    583                  }
+    584                  break;
+    585          #endif // cLIBStkUnprotect_Used
+    586          
+    587                  // ------------------------------------------------------
+    588                  //                 Error State
+    589                  // ------------------------------------------------------
+    590              default :
+    591                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_17:
+   \   0260   9A....         CALL      LIBAssertionFailed
+    592                  break;
+    593              }
+    594          }
+   \                     ??DATEepIsProcessing_19:
+   \   0263   B4             POP       DE
+   \   0264   B2             POP       BC
+   \   0265   AF             RET       
+   \   0266                  REQUIRE ?CL78K_V4_6_L00
+    595          
+    596          
+    597          //==============================================================================
+    598          // DESCRIPTION : Periodical trigger of the state machine
+    599          //
+    600          // PARAMETERS (Type,Name,Min,Max) :   none
+    601          //
+    602          // RETURN VALUE :   none
+    603          //
+    604          // DESIGN INFORMATION : 
+    605          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    606          static void CommandStateMachine(void)
+   \                     CommandStateMachine:
+    607          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    608              BOOL bResult;
+    609              BOOL IsAccessible;
+    610          
+    611              switch( CommandState )
+   \   0002   8E....         MOV       A,CommandState
+   \   0005   4D00           CMP       A,#0
+   \   0007   BD03           BNZ       $+5
+   \   0009   9B....         BR        N:??DATEepIsProcessing_35
+   \   000C   4D01           CMP       A,#1
+   \   000E   AD0B           BZ        ??DATEepIsProcessing_36
+   \   0010   4D02           CMP       A,#2
+   \   0012   AD6A           BZ        ??DATEepIsProcessing_37
+   \   0014   4D03           CMP       A,#3
+   \   0016   AD7F           BZ        ??DATEepIsProcessing_38
+   \   0018   9B....         BR        N:??DATEepIsProcessing_39
+    612              {
+    613              case(cCommandStateFrozen):
+    614          
+    615                  IsAccessible = DATPeeIsEepromAccessible();
+    616          
+    617                  if( IsAccessible == (BOOL) cTrue )
+   \                     ??DATEepIsProcessing_36:
+   \   001B   9A....         CALL      DATPeeIsEepromAccessible
+   \   001E   51             DEC       A
+   \   001F   AD03           BZ        $+5
+   \   0021   9B....         BR        N:??DATEepIsProcessing_35
+    618                  {
+    619                      // The state machine can leave the frozen state
+    620                      CommandState = cCommandStateProcessing;
+   \   0024   A102           MOV       A,#2
+   \   0026   9E....         MOV       CommandState,A
+    621                      SendCommand();
+   \   0029   8E....         MOV       A,CommandState
+   \   002C   4D02           CMP       A,#2
+   \   002E   AD03           BZ        ??DATEepIsProcessing_40
+   \   0030   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_40:
+   \   0033   10....         MOVW      AX,#CommandTempo
+   \   0036   ..             CALLT     [__T_TOSStartTimer]
+   \   0037   8E....         MOV       A,Command+6
+   \   003A   4D00           CMP       A,#0
+   \   003C   AD0E           BZ        ??DATEepIsProcessing_41
+   \   003E   4D01           CMP       A,#1
+   \   0040   AD1C           BZ        ??DATEepIsProcessing_42
+   \   0042   4D02           CMP       A,#2
+   \   0044   AD2A           BZ        ??DATEepIsProcessing_43
+   \   0046   4D03           CMP       A,#3
+   \   0048   AD30           BZ        ??DATEepIsProcessing_44
+   \   004A   FA55           BR        ??DATEepIsProcessing_39
+   \                     ??DATEepIsProcessing_41:
+   \   004C   12....         MOVW      BC,#Command
+   \   004F   02....         MOVW      AX,Command+4
+   \   0052   30             XCH       A,X
+   \   0053   27             ROLC      A,0x1
+   \   0054   30             XCH       A,X
+   \   0055   27             ROLC      A,0x1
+   \   0056   16....         MOVW      HL,#LWRD(LDBEepReceiveWithAddr)
+   \   0059   A4..           MOV       E,#BYTE3(LDBEepReceiveWithAddr)
+   \                     ??CommandStateMachine_0:
+   \   005B   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   005C   FA46           BR        ??DATEepIsProcessing_35
+   \                     ??DATEepIsProcessing_42:
+   \   005E   12....         MOVW      BC,#Command
+   \   0061   02....         MOVW      AX,Command+4
+   \   0064   21             CLR1      CY
+   \   0065   30             XCH       A,X
+   \   0066   27             ROLC      A,0x1
+   \   0067   30             XCH       A,X
+   \   0068   27             ROLC      A,0x1
+   \   0069   16....         MOVW      HL,#LWRD(LDBEepSendWithAddr)
+   \   006C   A4..           MOV       E,#BYTE3(LDBEepSendWithAddr)
+   \   006E   FAEB           BR        ??CommandStateMachine_0
+   \                     ??DATEepIsProcessing_43:
+   \   0070   A100           MOV       A,#0
+   \                     ??CommandStateMachine_1:
+   \   0072   16....         MOVW      HL,#LWRD(LDBEepControl)
+   \   0075   A4..           MOV       E,#BYTE3(LDBEepControl)
+   \   0077   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0078   FA2A           BR        ??DATEepIsProcessing_35
+   \                     ??DATEepIsProcessing_44:
+   \   007A   A101           MOV       A,#1
+   \   007C   FAF4           BR        ??CommandStateMachine_1
+    622                  }
+    623                  break;
+    624          
+    625              case(cCommandStateProcessing):
+    626          
+    627          #ifdef cLDBEepCheckWriteCompletion
+    628                  if( Command.Type == cCmdWrite )
+   \                     ??DATEepIsProcessing_37:
+   \   007E   8E....         MOV       A,Command+6
+   \   0081   51             DEC       A
+   \   0082   BD08           BNZ       ??DATEepIsProcessing_45
+    629                  {
+    630                      LDBControl(cLDBChannelEep, cLDBEepCheckWriteCompletion);
+   \   0084   A102           MOV       A,#2
+   \   0086   16....         MOVW      HL,#LWRD(LDBEepControl)
+   \   0089   A4..           MOV       E,#BYTE3(LDBEepControl)
+   \   008B   ..             CALLT     [__T_?FAR_CALL_L07]
+    631                  }
+    632          #endif
+    633          
+    634          #ifdef cLIBStkUnprotect_Used
+    635                  if( Command.Type == cCmdUnprotect )
+    636                  {
+    637                      LDBControl(cLDBChannelEep, cLDBEepUnprotect);
+    638                  }
+    639          #endif // cLIBStkUnprotect_Used
+    640          
+    641                  bResult = TOSIsTimerElapsed( &CommandTempo, 
+    642          	        mTOSConvMsInTimerTick(cDATEepTimeoutLdbMs));
+    643          
+    644                  if( bResult != cFalse )
+   \                     ??DATEepIsProcessing_45:
+   \   008C   10....         MOVW      AX,#CommandTempo
+   \   008F   120A00         MOVW      BC,#10
+   \   0092   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0093   4D00           CMP       A,#0
+   \   0095   AD0D           BZ        ??DATEepIsProcessing_35
+    645                  {
+    646                      // The time-out is reach
+    647                      // the command is finised
+    648                      CommandState = cCommandStateFree;
+   \                     ??DATEepIsProcessing_38:
+   \   0097   A100           MOV       A,#0
+   \   0099   9E....         MOV       CommandState,A
+    649                      EndOfCommand();
+   \   009C   9A....         CALL      EndOfCommand
+   \   009F   FA03           BR        ??DATEepIsProcessing_35
+    650                  }
+    651                  break;
+    652          
+    653              case(cCommandStateFinished):
+    654                  // the command is finised
+    655                  CommandState = cCommandStateFree;
+    656                  EndOfCommand();
+    657                  break;
+    658          
+    659              case(cCommandStateFree):
+    660                  break;
+    661          
+    662              default:
+    663                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_39:
+   \   00A1   9A....         CALL      LIBAssertionFailed
+    664                  break;
+    665              }
+    666          }
+   \                     ??DATEepIsProcessing_35:
+   \   00A4   B4             POP       DE
+   \   00A5   B2             POP       BC
+   \   00A6   AF             RET       
+   \   00A7                  REQUIRE ?CL78K_V4_6_L00
+    667          
+    668          //==============================================================================
+    669          // DESCRIPTION : Process scheduling engine. Passes from one active process to another.
+    670          //
+    671          // PARAMETERS (Type,Name,Min,Max) :   none
+    672          //
+    673          // RETURN VALUE :   none
+    674          //
+    675          // DESIGN INFORMATION : 
+    676          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    677          static void ScheduleProcess(void)
+   \                     ScheduleProcess:
+    678          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    679              // No process are working
+    680              if( ActiveProcessList != (tActiveProcessList) 0 )
+   \   0002   02....         MOVW      AX,ActiveProcessList
+   \   0005   6168           OR        A,X
+   \   0007   BD03           BNZ       $+5
+   \   0009   9B....         BR        N:??DATEepIsProcessing_46
+    681              {
+    682                  // One process or more are waiting
+    683                  // we must select the next active process
+    684                  tActiveProcessList ActiveProcessMask;
+    685          
+    686                  // Request ActiveSleep Mode
+    687                  TOSSendControl( cTOSControlActiveSleepRequest );
+   \   000C   A101           MOV       A,#1
+   \   000E   ..             CALLT     [__T_TOSSendControl]
+    688                  
+    689                  ActiveProcessHandle = 0;
+   \   000F   A100           MOV       A,#0
+   \   0011   9E....         MOV       ActiveProcessHandle,A
+    690                  ActiveProcessMask   = 1;
+   \   0014   140100         MOVW      DE,#1
+    691                  while((ActiveProcessMask & ActiveProcessList) == (tActiveProcessList) 0)
+   \   0017   16....         MOVW      HL,#ActiveProcessList
+   \   001A   318625         BT        [HL].0, ??DATEepIsProcessing_47
+    692                  {
+    693                      ActiveProcessHandle ++;
+   \                     ??ScheduleProcess_0:
+   \   001D   8E....         MOV       A,ActiveProcessHandle
+   \   0020   41             INC       A
+   \   0021   9E....         MOV       ActiveProcessHandle,A
+    694                      ActiveProcessMask <<= 1;
+   \   0024   C4             MOVW      AX,DE
+   \   0025   21             CLR1      CY
+   \   0026   30             XCH       A,X
+   \   0027   27             ROLC      A,0x1
+   \   0028   30             XCH       A,X
+   \   0029   27             ROLC      A,0x1
+   \   002A   D4             MOVW      DE,AX
+   \   002B   02....         MOVW      AX,ActiveProcessList
+   \   002E   30             XCH       A,X
+   \   002F   615C           AND       A,E
+   \   0031   30             XCH       A,X
+   \   0032   615D           AND       A,D
+   \   0034   6168           OR        A,X
+   \   0036   ADE5           BZ        ??ScheduleProcess_0
+    695                  }
+    696          
+    697                  mLIBassert( ActiveProcessHandle<cDATEepExtendedNumberOfProcess );
+   \   0038   8E....         MOV       A,ActiveProcessHandle
+   \   003B   4D0B           CMP       A,#11
+   \   003D   8D03           BC        ??DATEepIsProcessing_47
+   \   003F   9A....         CALL      LIBAssertionFailed
+    698          
+    699                  // The process request is clear
+    700                  // Modif YM le 09/01/2003: EPT URD 42 DEV 315
+    701                  // TOSSuspendAllInterupts();
+    702          
+    703                  mDisableIT();
+   \                     ??DATEepIsProcessing_47:
+   \   0042   C4             MOVW      AX,DE
+   \   0043   7B1E           DI
+    704          
+    705                  ActiveProcessList &= ~( ActiveProcessMask );
+   \   0045   30             XCH       A,X
+   \   0046   7DFF           XOR       A,#255
+   \   0048   30             XCH       A,X
+   \   0049   7DFF           XOR       A,#255
+   \   004B   30             XCH       A,X
+   \   004C   58....         AND       A,ActiveProcessList
+   \   004F   30             XCH       A,X
+   \   0050   58....         AND       A,ActiveProcessList+1
+   \   0053   03....         MOVW      ActiveProcessList,AX
+    706          
+    707                  mEnableIT();
+   \   0056   7A1E           EI
+    708          
+    709                  CallUser( cTrue );
+   \   0058   8E....         MOV       A,ActiveProcessHandle
+   \   005B   4D0B           CMP       A,#11
+   \   005D   8D03           BC        ??DATEepIsProcessing_48
+   \   005F   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_48:
+   \   0062   8E....         MOV       A,ActiveProcessHandle
+   \   0065   A004           MOV       X,#4
+   \   0067   3188           MULU      X
+   \   0069   CA....         ADDW      AX,#BlocList+3
+   \   006C   D6             MOVW      HL,AX
+   \   006D   87             MOV       A,[HL]
+   \   006E   72             MOV       C,A
+   \   006F   4D03           CMP       A,#3
+   \   0071   8D03           BC        ??DATEepIsProcessing_49
+   \   0073   9A....         CALL      LIBAssertionFailed
+   \                     ??DATEepIsProcessing_49:
+   \   0076   A301           MOV       B,#1
+   \   0078   8E....         MOV       A,ActiveProcessHandle
+   \   007B   74             MOV       E,A
+   \   007C   62             MOV       A,C
+   \   007D   A002           MOV       X,#2
+   \   007F   3188           MULU      X
+   \   0081   CA....         ADDW      AX,#CallBackList
+   \   0084   D6             MOVW      HL,AX
+   \   0085   87             MOV       A,[HL]
+   \   0086   70             MOV       X,A
+   \   0087   AE01           MOV       A,[HL+0x01]
+   \   0089   D6             MOVW      HL,AX
+   \   008A   64             MOV       A,E
+   \   008B   9A....         CALL      ?IND_CALL_L06
+    710          
+    711                  // In this state the alaram is start
+    712                  TOSSetRelAlarm(
+    713                                 &Alarm,
+    714                                 0,
+    715                                 (tTOSTickAlarm) mTOSConvUsInAlarmTick(cDATEepPeriodAlarmUs)
+    716                                );
+   \   008E   10....         MOVW      AX,#Alarm
+   \   0091   A301           MOV       B,#1
+   \   0093   9A....         CALL      TOSSetRelAlarm_Interne
+    717              }
+    718          }
+   \                     ??DATEepIsProcessing_46:
+   \   0096   B4             POP       DE
+   \   0097   B2             POP       BC
+   \   0098   AF             RET       
+   \   0099                  REQUIRE ?CL78K_V4_6_L00
+    719          
+    720          
+    721          
+    722          //==============================================================================
+    723          //=========================== EXPORTED FUNCTIONS ===============================
+    724          //==============================================================================
+    725          
+    726          //==============================================================================
+    727          // DESCRIPTION : Request of activation of a process
+    728          //
+    729          // PARAMETERS (Type,Name,Min,Max) : 
+    730          //    tDATEepProcessHandle ProcessHandle: Indentifier of the process to activate
+    731          //
+    732          // RETURN VALUE :   none
+    733          //
+    734          // DESIGN INFORMATION : Result in a call of the process callback when teh EEPROM is
+    735          //    available
+    736          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    737          void DATEepProcessRequest(tDATEepProcessHandle ProcessHandle)
+   \                     DATEepProcessRequest:
+    738          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    739              mLIBassert( ProcessHandle<cDATEepExtendedNumberOfProcess );
+   \   0002   4D0B           CMP       A,#11
+   \   0004   8D03           BC        ??DATEepIsProcessing_50
+   \   0006   9A....         CALL      LIBAssertionFailed
+    740          
+    741              // Modif YM le 09/01/2003: EPT URD 42 DEV 315
+    742              // TOSSuspendAllInterupts();
+    743          
+    744              mSuspendIT();
+   \                     ??DATEepIsProcessing_50:
+   \   0009   9A....         CALL      TOSSuspendOSInterrupts
+    745          
+    746              ActiveProcessList |= ( ((tActiveProcessList)1UL) << ProcessHandle );
+   \   000C   100100         MOVW      AX,#1
+   \   000F   ..             CALLT     [__T_?I_LSH_L02]
+   \   0010   30             XCH       A,X
+   \   0011   68....         OR        A,ActiveProcessList
+   \   0014   30             XCH       A,X
+   \   0015   68....         OR        A,ActiveProcessList+1
+   \   0018   03....         MOVW      ActiveProcessList,AX
+    747          
+    748              mResumeIT();
+   \   001B   9A....         CALL      TOSResumeOSInterrupts
+    749          
+    750              if( ActiveProcessHandle == cInvalidProcessHandle )
+   \   001E   8E....         MOV       A,ActiveProcessHandle
+   \   0021   4DFF           CMP       A,#255
+   \   0023   BD06           BNZ       ??DATEepIsProcessing_51
+    751              {
+    752                  TOSActivateTask( cTOSTaskIdDATEepTask );
+   \   0025   100100         MOVW      AX,#1
+   \   0028   9A....         CALL      TOSActivateTask
+    753              }
+    754          }
+   \                     ??DATEepIsProcessing_51:
+   \   002B   B2             POP       BC
+   \   002C   AF             RET       
+   \   002D                  REQUIRE ?CL78K_V4_6_L00
+    755          
+    756          //==============================================================================
+    757          // DESCRIPTION : Check if a process activation is pending or active.
+    758          //
+    759          // PARAMETERS (Type,Name,Min,Max) : 
+    760          //    tDATEepProcessHandle ProcessHandle: Identifier og the process to check
+    761          //
+    762          // RETURN VALUE :   none
+    763          //
+    764          // DESIGN INFORMATION : 
+    765          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    766          BOOL DATEepIsActivate(tDATEepProcessHandle ProcessHandle)
+   \                     DATEepIsActivate:
+    767          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   70             MOV       X,A
+    768              BOOL IsActivate;
+    769          
+    770              if( ActiveProcessHandle == ProcessHandle )
+   \   0002   8E....         MOV       A,ActiveProcessHandle
+   \   0005   6148           CMP       A,X
+   \   0007   BD04           BNZ       ??DATEepIsProcessing_52
+    771              {
+    772                  // This process is currently working
+    773                  IsActivate = cTrue;
+   \                     ??DATEepIsActivate_0:
+   \   0009   A101           MOV       A,#1
+   \   000B   FA14           BR        ??DATEepIsProcessing_53
+    774              }
+    775              
+    776              else if ( (ActiveProcessList & ( ((tActiveProcessList)1U) << ProcessHandle ))
+    777                        != (tActiveProcessList)0U)
+   \                     ??DATEepIsProcessing_52:
+   \   000D   60             MOV       A,X
+   \   000E   72             MOV       C,A
+   \   000F   100100         MOVW      AX,#1
+   \   0012   ..             CALLT     [__T_?I_LSH_L02]
+   \   0013   30             XCH       A,X
+   \   0014   58....         AND       A,ActiveProcessList
+   \   0017   30             XCH       A,X
+   \   0018   58....         AND       A,ActiveProcessList+1
+   \   001B   6168           OR        A,X
+   \   001D   BDEA           BNZ       ??DATEepIsActivate_0
+    778              {
+    779                  // This process is not actually working,
+    780                  // This process is present in the waiting list.
+    781                  IsActivate = cTrue;
+    782              }
+    783              else
+    784              {
+    785                  // This process is not actually working,
+    786                  // This process is not present in the waiting list.
+    787                  IsActivate = cFalse;
+   \   001F   A100           MOV       A,#0
+    788              }
+    789          
+    790              return IsActivate;
+   \                     ??DATEepIsProcessing_53:
+   \   0021   B2             POP       BC
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+    791          }
+    792          
+    793          
+    794          //==============================================================================
+    795          // DESCRIPTION : Free the currently active process so as to let the others run.
+    796          //
+    797          // PARAMETERS (Type,Name,Min,Max) :   none
+    798          //
+    799          // RETURN VALUE :   none
+    800          //
+    801          // DESIGN INFORMATION :
+    802          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    803          void DATEepTerminateProcess(void)
+   \                     DATEepTerminateProcess:
+    804          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    805              mLIBassert( State == cStateReady );
+   \   0000   8E....         MOV       A,State
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD03           BZ        ??DATEepIsProcessing_54
+   \   0007   9A....         CALL      LIBAssertionFailed
+    806          
+    807              ActiveProcessHandle = cInvalidProcessHandle;
+   \                     ??DATEepIsProcessing_54:
+   \   000A   A1FF           MOV       A,#255
+   \   000C   9E....         MOV       ActiveProcessHandle,A
+    808              TOSCancelAlarm( &Alarm );
+   \   000F   10....         MOVW      AX,#Alarm
+   \   0012   9A....         CALL      TOSCancelAlarm
+    809          
+    810              if( ActiveProcessList != (tActiveProcessList)0U )
+   \   0015   02....         MOVW      AX,ActiveProcessList
+   \   0018   6168           OR        A,X
+   \   001A   AD06           BZ        ??DATEepIsProcessing_55
+    811              {
+    812                  TOSActivateTask( cTOSTaskIdDATEepTask );
+   \   001C   100100         MOVW      AX,#1
+   \   001F   9A....         CALL      TOSActivateTask
+    813              }
+    814          }
+   \                     ??DATEepIsProcessing_55:
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+    815          //==============================================================================
+    816          // DESCRIPTION : Read a buffer from the EEPROM in a zone belonging to the active process
+    817          //
+    818          // PARAMETERS (Type,Name,Min,Max) : 
+    819          //    U16* pBuff:        Buffer for output.
+    820          //
+    821          //    tDATEepOffset Ad:  Address to read, relative to the EEPROM zone of the process.
+    822          //						 (in 16 bit word)
+    823          //    tDATEepOffset Sz:  Size to read in bytes (in 16 bit word)
+    824          //
+    825          // RETURN VALUE :   none
+    826          //
+    827          // DESIGN INFORMATION : Use this only from an active process.
+    828          //    Make sure the buffer is big enough for the size
+    829          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    830          void DATEepRead( U16* pBuff, tDATEepOffset Ad, tDATEepOffset Sz )
+   \                     DATEepRead:
+    831          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   D4             MOVW      DE,AX
+    832              mLIBassert( State == cStateReady );
+   \   0002   8E....         MOV       A,State
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD03           BZ        ??DATEepIsProcessing_56
+   \   0009   9A....         CALL      LIBAssertionFailed
+    833          
+    834              if( (ActiveProcessHandle != cInvalidProcessHandle) && (pBuff != NULL) )
+   \                     ??DATEepIsProcessing_56:
+   \   000C   8E....         MOV       A,ActiveProcessHandle
+   \   000F   4DFF           CMP       A,#255
+   \   0011   AD4E           BZ        ??DATEepIsProcessing_57
+   \   0013   C4             MOVW      AX,DE
+   \   0014   6168           OR        A,X
+   \   0016   AD49           BZ        ??DATEepIsProcessing_57
+    835              {
+    836                  mLIBassert( ActiveProcessHandle < cDATEepExtendedNumberOfProcess );
+   \   0018   8E....         MOV       A,ActiveProcessHandle
+   \   001B   4D0B           CMP       A,#11
+   \   001D   8D03           BC        ??DATEepIsProcessing_58
+   \   001F   9A....         CALL      LIBAssertionFailed
+    837          
+    838                  State = cStateReading;
+   \                     ??DATEepIsProcessing_58:
+   \   0022   A101           MOV       A,#1
+   \   0024   9E....         MOV       State,A
+    839          
+    840                  LastOffset = Sz;
+   \   0027   62             MOV       A,C
+   \   0028   9E....         MOV       LastOffset,A
+    841                  OffsetFromUserBuffer = 0;
+   \   002B   A100           MOV       A,#0
+   \   002D   9E....         MOV       OffsetFromUserBuffer,A
+    842          
+    843                  Command.Adress  = Ad + BlocList[ActiveProcessHandle].Offset;
+   \   0030   8E....         MOV       A,ActiveProcessHandle
+   \   0033   A004           MOV       X,#4
+   \   0035   3188           MULU      X
+   \   0037   CA....         ADDW      AX,#BlocList
+   \   003A   D6             MOVW      HL,AX
+   \   003B   87             MOV       A,[HL]
+   \   003C   70             MOV       X,A
+   \   003D   AE01           MOV       A,[HL+0x01]
+   \   003F   D6             MOVW      HL,AX
+   \   0040   63             MOV       A,B
+   \   0041   72             MOV       C,A
+   \   0042   67             MOV       A,H
+   \   0043   30             XCH       A,X
+   \   0044   610A           ADD       A,C
+   \   0046   30             XCH       A,X
+   \   0047   2D00           ADDC      A,#0
+   \   0049   03....         MOVW      Command+4,AX
+    844                  Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   004C   100200         MOVW      AX,#2
+   \   004F   03....         MOVW      Command+2,AX
+    845                  Command.Msg.pBuffer = (U8*)pBuff;
+   \   0052   C4             MOVW      AX,DE
+   \   0053   03....         MOVW      Command,AX
+    846                  Command.Type = cCmdRead;
+   \   0056   A100           MOV       A,#0
+   \   0058   16....         MOVW      HL,#Command+6
+   \   005B   97             MOV       [HL],A
+    847          
+    848                  StartCommand();
+   \   005C   9A....         CALL      StartCommand
+   \   005F   FA03           BR        ??DATEepIsProcessing_59
+    849              }
+    850              else
+    851              {
+    852                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_57:
+   \   0061   9A....         CALL      LIBAssertionFailed
+    853              }
+    854          }
+   \                     ??DATEepIsProcessing_59:
+   \   0064   B4             POP       DE
+   \   0065   AF             RET       
+   \   0066                  REQUIRE ?CL78K_V4_6_L00
+    855          //==============================================================================
+    856          // DESCRIPTION : Write a buffer into the EEPROM in a zone belonging to the 
+    857          // active process
+    858          //
+    859          // PARAMETERS (Type,Name,Min,Max) : 
+    860          //    U16* pBuff:       Buffer containing the source data.
+    861          //    tDATEepOffset Ad: Adress where the data must be written (in 16 bit word).
+    862          //    tDATEepOffset Sz: Size of the data (in 16 bit word).
+    863          //
+    864          // RETURN VALUE :   none
+    865          //
+    866          // DESIGN INFORMATION : Use this only from an active process
+    867          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    868          void DATEepWrite  (U16* pBuff, tDATEepOffset Ad, tDATEepOffset Sz)
+   \                     DATEepWrite:
+    869          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   D4             MOVW      DE,AX
+    870              mLIBassert( State == cStateReady );
+   \   0002   8E....         MOV       A,State
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD03           BZ        ??DATEepIsProcessing_60
+   \   0009   9A....         CALL      LIBAssertionFailed
+    871          
+    872              if( (ActiveProcessHandle != cInvalidProcessHandle) && (pBuff != NULL) )
+   \                     ??DATEepIsProcessing_60:
+   \   000C   8E....         MOV       A,ActiveProcessHandle
+   \   000F   4DFF           CMP       A,#255
+   \   0011   BD03           BNZ       $+5
+   \   0013   9B....         BR        N:??DATEepIsProcessing_61
+   \   0016   C4             MOVW      AX,DE
+   \   0017   6168           OR        A,X
+   \   0019   AD7B           BZ        ??DATEepIsProcessing_61
+    873              {
+    874                  mLIBassert( ActiveProcessHandle < cDATEepExtendedNumberOfProcess );
+   \   001B   8E....         MOV       A,ActiveProcessHandle
+   \   001E   4D0B           CMP       A,#11
+   \   0020   8D03           BC        ??DATEepIsProcessing_62
+   \   0022   9A....         CALL      LIBAssertionFailed
+    875          
+    876                  if( (Sz+Ad) <= BlocList[ActiveProcessHandle].Size )
+   \                     ??DATEepIsProcessing_62:
+   \   0025   63             MOV       A,B
+   \   0026   76             MOV       L,A
+   \   0027   62             MOV       A,C
+   \   0028   A000           MOV       X,#0
+   \   002A   610E           ADD       A,L
+   \   002C   30             XCH       A,X
+   \   002D   2D00           ADDC      A,#0
+   \   002F   B1             PUSH      AX
+   \   0030   8E....         MOV       A,ActiveProcessHandle
+   \   0033   A004           MOV       X,#4
+   \   0035   3188           MULU      X
+   \   0037   CA....         ADDW      AX,#BlocList+2
+   \   003A   D6             MOVW      HL,AX
+   \   003B   87             MOV       A,[HL]
+   \   003C   70             MOV       X,A
+   \   003D   B6             POP       HL
+   \   003E   67             MOV       A,H
+   \   003F   7D80           XOR       A,#128
+   \   0041   77             MOV       H,A
+   \   0042   60             MOV       A,X
+   \   0043   A080           MOV       X,#128
+   \   0045   611E           SUB       A,L
+   \   0047   60             MOV       A,X
+   \   0048   613F           SUBC      A,H
+   \   004A   8D4A           BC        ??DATEepIsProcessing_61
+    877                  {
+    878                      State = cStateUnLocking;
+   \   004C   A103           MOV       A,#3
+   \   004E   9E....         MOV       State,A
+    879          
+    880                      LastOffset = Sz;
+   \   0051   62             MOV       A,C
+   \   0052   9E....         MOV       LastOffset,A
+    881                      OffsetFromUserBuffer = 0;
+   \   0055   A100           MOV       A,#0
+   \   0057   9E....         MOV       OffsetFromUserBuffer,A
+    882          
+    883                      Command.Adress  = Ad + BlocList[ActiveProcessHandle].Offset;
+   \   005A   8E....         MOV       A,ActiveProcessHandle
+   \   005D   A004           MOV       X,#4
+   \   005F   3188           MULU      X
+   \   0061   CA....         ADDW      AX,#BlocList
+   \   0064   D6             MOVW      HL,AX
+   \   0065   87             MOV       A,[HL]
+   \   0066   70             MOV       X,A
+   \   0067   AE01           MOV       A,[HL+0x01]
+   \   0069   D6             MOVW      HL,AX
+   \   006A   63             MOV       A,B
+   \   006B   72             MOV       C,A
+   \   006C   67             MOV       A,H
+   \   006D   30             XCH       A,X
+   \   006E   610A           ADD       A,C
+   \   0070   30             XCH       A,X
+   \   0071   2D00           ADDC      A,#0
+   \   0073   03....         MOVW      Command+4,AX
+    884                      Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   0076   100200         MOVW      AX,#2
+   \   0079   03....         MOVW      Command+2,AX
+    885                      Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \   007C   10....         MOVW      AX,#ReadBuffer
+   \   007F   03....         MOVW      Command,AX
+    886                      Command.Type = cCmdUnlock;
+   \   0082   A103           MOV       A,#3
+   \   0084   16....         MOVW      HL,#Command+6
+   \   0087   97             MOV       [HL],A
+    887          
+    888                      UserBuffer = pBuff;
+   \   0088   C4             MOVW      AX,DE
+   \   0089   03....         MOVW      UserBuffer,AX
+    889          
+    890                      WriteRetryCounter = 0;
+   \   008C   A100           MOV       A,#0
+   \   008E   9E....         MOV       WriteRetryCounter,A
+    891          
+    892                      StartCommand();
+   \   0091   9A....         CALL      StartCommand
+   \   0094   FA03           BR        ??DATEepIsProcessing_63
+    893                  }
+    894                  else
+    895                  {
+    896                      mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_61:
+   \   0096   9A....         CALL      LIBAssertionFailed
+    897                  }
+    898              }
+    899              else
+    900              {
+    901                  mLIBassert(cFalse);
+    902              }
+    903          }
+   \                     ??DATEepIsProcessing_63:
+   \   0099   B4             POP       DE
+   \   009A   AF             RET       
+   \   009B                  REQUIRE ?CL78K_V4_6_L00
+    904          
+    905          //==============================================================================
+    906          // DESCRIPTION : Compare the contents of the EEPROM in a zone belonging to a process
+    907          //    with a RAM area
+    908          //
+    909          // PARAMETERS (Type,Name,Min,Max) : 
+    910          //    U16* pBuff:               Buffer containing the reference data.
+    911          //    tDATEepOffset Ad:  Adress where to begin the comparison, relative to the beginning
+    912          //       of the zone belonging to the process.
+    913          //    tDATEepOffset Sz: Size to compare in bytes.
+    914          //
+    915          // RETURN VALUE :   none
+    916          //
+    917          // DESIGN INFORMATION : Use this only from an active process
+    918          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    919          void DATEepCompare(U16* pBuff, tDATEepOffset Ad, tDATEepOffset Sz)
+   \                     DATEepCompare:
+    920          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   D4             MOVW      DE,AX
+    921              mLIBassert( State == cStateReady );
+   \   0002   8E....         MOV       A,State
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD03           BZ        ??DATEepIsProcessing_64
+   \   0009   9A....         CALL      LIBAssertionFailed
+    922          
+    923              if( (ActiveProcessHandle != cInvalidProcessHandle) && (pBuff != NULL) )
+   \                     ??DATEepIsProcessing_64:
+   \   000C   8E....         MOV       A,ActiveProcessHandle
+   \   000F   4DFF           CMP       A,#255
+   \   0011   AD54           BZ        ??DATEepIsProcessing_65
+   \   0013   C4             MOVW      AX,DE
+   \   0014   6168           OR        A,X
+   \   0016   AD4F           BZ        ??DATEepIsProcessing_65
+    924              {
+    925                  mLIBassert( ActiveProcessHandle < cDATEepExtendedNumberOfProcess );
+   \   0018   8E....         MOV       A,ActiveProcessHandle
+   \   001B   4D0B           CMP       A,#11
+   \   001D   8D03           BC        ??DATEepIsProcessing_66
+   \   001F   9A....         CALL      LIBAssertionFailed
+    926          
+    927                  State = cStateComparing;
+   \                     ??DATEepIsProcessing_66:
+   \   0022   A102           MOV       A,#2
+   \   0024   9E....         MOV       State,A
+    928          
+    929                  LastOffset = Sz;
+   \   0027   62             MOV       A,C
+   \   0028   9E....         MOV       LastOffset,A
+    930                  OffsetFromUserBuffer = 0;
+   \   002B   A100           MOV       A,#0
+   \   002D   9E....         MOV       OffsetFromUserBuffer,A
+    931          
+    932                  Command.Adress  = Ad + BlocList[ActiveProcessHandle].Offset;
+   \   0030   8E....         MOV       A,ActiveProcessHandle
+   \   0033   A004           MOV       X,#4
+   \   0035   3188           MULU      X
+   \   0037   CA....         ADDW      AX,#BlocList
+   \   003A   D6             MOVW      HL,AX
+   \   003B   87             MOV       A,[HL]
+   \   003C   70             MOV       X,A
+   \   003D   AE01           MOV       A,[HL+0x01]
+   \   003F   D6             MOVW      HL,AX
+   \   0040   63             MOV       A,B
+   \   0041   72             MOV       C,A
+   \   0042   67             MOV       A,H
+   \   0043   30             XCH       A,X
+   \   0044   610A           ADD       A,C
+   \   0046   30             XCH       A,X
+   \   0047   2D00           ADDC      A,#0
+   \   0049   03....         MOVW      Command+4,AX
+    933                  Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   004C   100200         MOVW      AX,#2
+   \   004F   03....         MOVW      Command+2,AX
+    934                  Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \   0052   10....         MOVW      AX,#ReadBuffer
+   \   0055   03....         MOVW      Command,AX
+    935                  Command.Type = cCmdRead;
+   \   0058   A100           MOV       A,#0
+   \   005A   16....         MOVW      HL,#Command+6
+   \   005D   97             MOV       [HL],A
+    936          
+    937                  UserBuffer = pBuff;
+   \   005E   C4             MOVW      AX,DE
+   \   005F   03....         MOVW      UserBuffer,AX
+    938          
+    939                  StartCommand();
+   \   0062   9A....         CALL      StartCommand
+   \   0065   FA03           BR        ??DATEepIsProcessing_67
+    940              }
+    941              else
+    942              {
+    943                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_65:
+   \   0067   9A....         CALL      LIBAssertionFailed
+    944              }
+    945          }
+   \                     ??DATEepIsProcessing_67:
+   \   006A   B4             POP       DE
+   \   006B   AF             RET       
+   \   006C                  REQUIRE ?CL78K_V4_6_L00
+    946          
+    947          //==============================================================================
+    948          // DESCRIPTION : Read the EEPROM without process mapping
+    949          //
+    950          // PARAMETERS (Type,Name,Min,Max) :
+    951          //    U16* pBuff:               Buffer where to write the data to.
+    952          //    tDATEepOffset Ad:  Adress where to read from the EEPROM, relative to the beginning
+    953          //       of the zone belonging to the process.
+    954          //    tDATEepOffset Sz: Size to write in bytes.
+    955          //
+    956          // RETURN VALUE :   none
+    957          //
+    958          // DESIGN INFORMATION : Use this only from the supervisor process when active
+    959          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    960          void DATEepAbsoluteRead (U16* pBuff, U16 Ad, tDATEepOffset Sz)
+   \                     DATEepAbsoluteRead:
+    961          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001                  ; Total Auto size: 2
+    962              mLIBassert( State == cStateReady );
+   \   0001   8E....         MOV       A,State
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD03           BZ        ??DATEepIsProcessing_68
+   \   0008   9A....         CALL      LIBAssertionFailed
+    963          
+    964              if( (ActiveProcessHandle == cDATEepProcessSupervisor) && (pBuff != NULL) )
+   \                     ??DATEepIsProcessing_68:
+   \   000B   8E....         MOV       A,ActiveProcessHandle
+   \   000E   4D0A           CMP       A,#10
+   \   0010   BD35           BNZ       ??DATEepIsProcessing_69
+   \   0012   891C           MOVW      AX,SP
+   \   0014   D6             MOVW      HL,AX
+   \   0015   87             MOV       A,[HL]
+   \   0016   70             MOV       X,A
+   \   0017   AE01           MOV       A,[HL+0x01]
+   \   0019   6168           OR        A,X
+   \   001B   AD2A           BZ        ??DATEepIsProcessing_69
+    965              {
+    966                  State = cStateReading;
+   \   001D   A101           MOV       A,#1
+   \   001F   9E....         MOV       State,A
+    967          
+    968                  LastOffset = Sz;
+   \   0022   65             MOV       A,D
+   \   0023   9E....         MOV       LastOffset,A
+    969                  OffsetFromUserBuffer = 0;
+   \   0026   A100           MOV       A,#0
+   \   0028   9E....         MOV       OffsetFromUserBuffer,A
+    970          
+    971                  Command.Adress  = Ad;
+   \   002B   C2             MOVW      AX,BC
+   \   002C   03....         MOVW      Command+4,AX
+    972                  Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   002F   100200         MOVW      AX,#2
+   \   0032   03....         MOVW      Command+2,AX
+    973                  Command.Msg.pBuffer = (U8*)pBuff;
+   \   0035   87             MOV       A,[HL]
+   \   0036   70             MOV       X,A
+   \   0037   AE01           MOV       A,[HL+0x01]
+   \   0039   03....         MOVW      Command,AX
+    974                  Command.Type = cCmdRead;
+   \   003C   A100           MOV       A,#0
+   \   003E   16....         MOVW      HL,#Command+6
+   \   0041   97             MOV       [HL],A
+    975          
+    976                  StartCommand();
+   \   0042   9A....         CALL      StartCommand
+   \   0045   FA03           BR        ??DATEepIsProcessing_70
+    977              }
+    978              else
+    979              {
+    980                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_69:
+   \   0047   9A....         CALL      LIBAssertionFailed
+    981              }
+    982          }
+   \                     ??DATEepIsProcessing_70:
+   \   004A   B0             POP       AX
+   \   004B   AF             RET       
+   \   004C                  REQUIRE ?CL78K_V4_6_L00
+    983          
+    984          //==============================================================================
+    985          // DESCRIPTION : Write into the EEPROM without process mapping
+    986          //
+    987          // PARAMETERS (Type,Name,Min,Max) : 
+    988          //    U16* pBuff:               Buffer containing the source data.
+    989          //    U16 Ad:                       Adress where to write to. 0 is the beginning of the EEPROM
+    990          //    tDATEepOffset Sz   Size to write
+    991          //
+    992          // RETURN VALUE :   none
+    993          //
+    994          // DESIGN INFORMATION : Use this only from the supervisor process when active
+    995          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    996          void DATEepAbsoluteWrite(U16* pBuff, U16 Ad, tDATEepOffset Sz)
+   \                     DATEepAbsoluteWrite:
+    997          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001                  ; Total Auto size: 2
+    998              mLIBassert( State == cStateReady );
+   \   0001   8E....         MOV       A,State
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD03           BZ        ??DATEepIsProcessing_71
+   \   0008   9A....         CALL      LIBAssertionFailed
+    999          
+   1000              if( (ActiveProcessHandle == cDATEepProcessSupervisor) && (pBuff != NULL) )
+   \                     ??DATEepIsProcessing_71:
+   \   000B   8E....         MOV       A,ActiveProcessHandle
+   \   000E   4D0A           CMP       A,#10
+   \   0010   BD43           BNZ       ??DATEepIsProcessing_72
+   \   0012   891C           MOVW      AX,SP
+   \   0014   D6             MOVW      HL,AX
+   \   0015   87             MOV       A,[HL]
+   \   0016   70             MOV       X,A
+   \   0017   AE01           MOV       A,[HL+0x01]
+   \   0019   6168           OR        A,X
+   \   001B   AD38           BZ        ??DATEepIsProcessing_72
+   1001              {
+   1002                  State = cStateUnLocking;
+   \   001D   A103           MOV       A,#3
+   \   001F   9E....         MOV       State,A
+   1003          
+   1004                  LastOffset = Sz;
+   \   0022   65             MOV       A,D
+   \   0023   9E....         MOV       LastOffset,A
+   1005                  OffsetFromUserBuffer  = 0;
+   \   0026   A100           MOV       A,#0
+   \   0028   9E....         MOV       OffsetFromUserBuffer,A
+   1006          
+   1007                  Command.Adress  = Ad;
+   \   002B   C2             MOVW      AX,BC
+   \   002C   03....         MOVW      Command+4,AX
+   1008                  Command.Msg.Lng = mGetTransferSize(Command.Adress);
+   \   002F   100200         MOVW      AX,#2
+   \   0032   03....         MOVW      Command+2,AX
+   1009                  Command.Msg.pBuffer = (U8*)ReadBuffer;
+   \   0035   10....         MOVW      AX,#ReadBuffer
+   \   0038   03....         MOVW      Command,AX
+   1010                  Command.Type = cCmdUnlock;
+   \   003B   A103           MOV       A,#3
+   \   003D   16....         MOVW      HL,#Command+6
+   \   0040   97             MOV       [HL],A
+   1011          
+   1012                  UserBuffer = pBuff;
+   \   0041   891C           MOVW      AX,SP
+   \   0043   D6             MOVW      HL,AX
+   \   0044   87             MOV       A,[HL]
+   \   0045   70             MOV       X,A
+   \   0046   AE01           MOV       A,[HL+0x01]
+   \   0048   03....         MOVW      UserBuffer,AX
+   1013          
+   1014                  WriteRetryCounter = 0;
+   \   004B   A100           MOV       A,#0
+   \   004D   9E....         MOV       WriteRetryCounter,A
+   1015          
+   1016                  StartCommand();
+   \   0050   9A....         CALL      StartCommand
+   \   0053   FA03           BR        ??DATEepIsProcessing_73
+   1017              }
+   1018              else
+   1019              {
+   1020                  mLIBassert(cFalse);
+   \                     ??DATEepIsProcessing_72:
+   \   0055   9A....         CALL      LIBAssertionFailed
+   1021              }
+   1022          }
+   \                     ??DATEepIsProcessing_73:
+   \   0058   B0             POP       AX
+   \   0059   AF             RET       
+   \   005A                  REQUIRE ?CL78K_V4_6_L00
+   1023          
+   1024          //==============================================================================
+   1025          // DESCRIPTION : Command for unprotecting the EEPROM.
+   1026          //
+   1027          // PARAMETERS (Type,Name,Min,Max) :   none
+   1028          //
+   1029          // RETURN VALUE :   none
+   1030          //
+   1031          // DESIGN INFORMATION : This updates the Command contect and provokes the LDB
+   1032          //    command
+   1033          //==============================================================================
+   1034          #ifdef cLIBStkUnprotect_Used
+   1035          void DATEepUnprotect (void)
+   1036          {
+   1037              mLIBassert( State == cStateReady );
+   1038          
+   1039              State = cStateUnprotecting;
+   1040          
+   1041              Command.Type          = cCmdUnprotect;
+   1042              // The other fields of Command are not reset because unuseful
+   1043          
+   1044              StartCommand();
+   1045          }
+   1046          #endif // cLIBStkUnprotect_Used
+   1047          
+   1048          
+   1049          //==============================================================================
+   1050          // DESCRIPTION : Callback used by LDB_EEP for indicating the completion of a LDBControl
+   1051          //    operation
+   1052          //
+   1053          // PARAMETERS (Type,Name,Min,Max) : 
+   1054          //    tCtrl Ctrl:          The type of control that is complete.
+   1055          //    tStatus Status  Status of the operation (value of cLDBCorrect for success).
+   1056          //
+   1057          // RETURN VALUE :   none
+   1058          //
+   1059          // DESIGN INFORMATION : 
+   1060          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1061          void DATEepCallBackEndCtrl (tCtrl Ctrl, tStatus Status)
+   \                     DATEepCallBackEndCtrl:
+   1062          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1063              BOOL IsCommandToFinish;
+   1064          
+   1065              //QACJ 3199: API change refused yet - we keep non static parameters
+   1066              Status = Status;
+   1067              Ctrl = Ctrl;
+   1068          
+   1069              IsCommandToFinish = cTrue;
+   1070          
+   1071          #ifdef cLDBEepCheckWriteCompletion
+   1072              if( Ctrl == cLDBEepCheckWriteCompletion )
+   \   0000   4D02           CMP       A,#2
+   \   0002   63             MOV       A,B
+   \   0003   BD07           BNZ       ??DATEepIsProcessing_74
+   1073              {
+   1074                  // The write operation is not complete before LDB calls the Tx Callback
+   1075                  mLIBassert(Status==cLDBCorrect);
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD15           BZ        ??DATEepIsProcessing_75
+   \   0009   9B....         BR        N:LIBAssertionFailed
+   1076                  IsCommandToFinish = cFalse;
+   1077              }
+   1078          #endif // cLDBEepCheckWriteCompletion
+   1079          
+   1080          #ifdef cLIBStkUnprotect_Used
+   1081              if( Status == cLDBEepControlInProgress )
+   1082              {
+   1083                  // The command is not over while the callback says
+   1084                  //    cLDBEepControlInProgress. linited to the unprotect service
+   1085                  mLIBassert(Ctrl == cLDBEepUnprotect);
+   1086                  IsCommandToFinish = cFalse;
+   1087              }
+   1088          #endif // cLIBStkUnprotect_Used
+   1089              
+   1090              if (IsCommandToFinish != cFalse)
+   1091              {
+   1092                  mLIBassert(Status==cLDBCorrect);
+   \                     ??DATEepIsProcessing_74:
+   \   000C   4D00           CMP       A,#0
+   \   000E   AD03           BZ        ??DATEepIsProcessing_76
+   \   0010   9A....         CALL      LIBAssertionFailed
+   1093                  CommandState = cCommandStateFinished;
+   \                     ??DATEepIsProcessing_76:
+   \   0013   A103           MOV       A,#3
+   \   0015   9E....         MOV       CommandState,A
+   1094                  TOSActivateTask( cTOSTaskIdDATEepTask );
+   \   0018   100100         MOVW      AX,#1
+   \   001B   9A....         CALL      TOSActivateTask
+   1095              }
+   1096          }
+   \                     ??DATEepIsProcessing_75:
+   \   001E   AF             RET       
+   \   001F                  REQUIRE ?CL78K_V4_6_L00
+   1097          
+   1098          //==============================================================================
+   1099          // DESCRIPTION : DATEepCallBackTxWithAddr
+   1100          //
+   1101          // PARAMETERS (Type,Name,Min,Max) : 
+   1102          //    tAddress Unused:  Address targetted by the write request that is complete
+   1103          //    tStatus Status:      Status of the write operation. cLDBCorrect for success.
+   1104          //
+   1105          // RETURN VALUE :   none
+   1106          //
+   1107          // DESIGN INFORMATION : 
+   1108          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1109          void DATEepCallBackTxWithAddr (tAddress Unused, tStatus Status)
+   \                     DATEepCallBackTxWithAddr:
+   1110          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1111              mLIBassert(Status==cLDBCorrect);
+   \   0000   63             MOV       A,B
+   \   0001   4D00           CMP       A,#0
+   \   0003   AD03           BZ        ??DATEepIsProcessing_77
+   \   0005   9A....         CALL      LIBAssertionFailed
+   1112              //QACJ 3199: API change refused yet - we keep non static parameters
+   1113              Status = Status;
+   1114              //QACJ 3199: API change refused yet - we keep non static parameters
+   1115              Unused = Unused;
+   1116          
+   1117              CommandState = cCommandStateFinished;
+   \                     ??DATEepIsProcessing_77:
+   \   0008   A103           MOV       A,#3
+   \   000A   9E....         MOV       CommandState,A
+   1118              TOSActivateTask( cTOSTaskIdDATEepTask );
+   \   000D   100100         MOVW      AX,#1
+   \   0010   9B....         BR        N:TOSActivateTask
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+   1119          }
+   1120          
+   1121          //==============================================================================
+   1122          // DESCRIPTION : Callback used by LDB_EEP for indicating the completion of a read
+   1123          //    operation.
+   1124          //
+   1125          // PARAMETERS (Type,Name,Min,Max) : 
+   1126          //    tAddress Unused:  Address targetted by the read request that is complete
+   1127          //    tStatus Status:      Status of the read operation. cLDBCorrect for success.
+   1128          //
+   1129          // RETURN VALUE :   none
+   1130          //
+   1131          // DESIGN INFORMATION : 
+   1132          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1133          void DATEepCallBackRxWithAddr (tAddress Unused, tStatus Status)
+   \                     DATEepCallBackRxWithAddr:
+   1134          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1135              mLIBassert(Status==cLDBCorrect);
+   \   0000   63             MOV       A,B
+   \   0001   4D00           CMP       A,#0
+   \   0003   AD03           BZ        ??DATEepIsProcessing_78
+   \   0005   9A....         CALL      LIBAssertionFailed
+   1136              //QACJ 3199: API change refused yet - we keep non static parameters
+   1137              Status = Status;
+   1138              //QACJ 3199: API change refused yet - we keep non static parameters
+   1139              Unused = Unused;
+   1140          
+   1141              CommandState = cCommandStateFinished;
+   \                     ??DATEepIsProcessing_78:
+   \   0008   A103           MOV       A,#3
+   \   000A   9E....         MOV       CommandState,A
+   1142              TOSActivateTask( cTOSTaskIdDATEepTask );
+   \   000D   100100         MOVW      AX,#1
+   \   0010   9B....         BR        N:TOSActivateTask
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+   1143          }
+   1144          
+   1145          //==============================================================================
+   1146          // DESCRIPTION : DAT_EEP task
+   1147          //
+   1148          // PARAMETERS (Type,Name,Min,Max) :   none
+   1149          //
+   1150          // RETURN VALUE :   none
+   1151          //
+   1152          // DESIGN INFORMATION : 
+   1153          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1154          void DATEepTask(void)
+   \                     DATEepTask:
+   1155          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1156              if( ActiveProcessHandle != cInvalidProcessHandle )
+   \   0000   8E....         MOV       A,ActiveProcessHandle
+   \   0003   4DFF           CMP       A,#255
+   \   0005   AD03           BZ        ??DATEepIsProcessing_79
+   1157              {
+   1158                  CommandStateMachine();
+   \   0007   9B....         BR        N:CommandStateMachine
+   1159              }
+   1160              else
+   1161              {
+   1162                  ScheduleProcess();
+   \                     ??DATEepIsProcessing_79:
+   \   000A   9B....         BR        N:ScheduleProcess
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1163              }
+   1164          }
+   1165          
+   1166          //==============================================================================
+   1167          // DESCRIPTION : Initialize DAT_EEP
+   1168          //
+   1169          // PARAMETERS (Type,Name,Min,Max) :   none
+   1170          //
+   1171          // RETURN VALUE :   none
+   1172          //
+   1173          // DESIGN INFORMATION : 
+   1174          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1175          void DATEepInit(void)
+   \                     DATEepInit:
+   1176          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1177              ActiveProcessList = 0;
+   \   0000   100000         MOVW      AX,#0
+   \   0003   03....         MOVW      ActiveProcessList,AX
+   1178              State = cStateReady;
+   \   0006   9E....         MOV       State,A
+   1179              ActiveProcessHandle = cInvalidProcessHandle;
+   \   0009   A1FF           MOV       A,#255
+   \   000B   9E....         MOV       ActiveProcessHandle,A
+   1180              CommandState = cCommandStateFree;
+   \   000E   A100           MOV       A,#0
+   \   0010   9E....         MOV       CommandState,A
+   1181              Alarm.TaskID = cTOSTaskIdDATEepTask;
+   \   0013   80             INCW      AX
+   \   0014   03....         MOVW      Alarm,AX
+   1182          }
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+   1183          
+   1184          //==============================================================================
+   1185          // DESCRIPTION : Sends the MaintainActiveSleep signal unless DAT_EEP is inactive
+   1186          //
+   1187          // PARAMETERS (Type,Name,Min,Max) :   none
+   1188          //
+   1189          // RETURN VALUE :   none
+   1190          //
+   1191          // DESIGN INFORMATION : 
+   1192          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1193          void DATEepIsMaintainActiveSleepState( void )
+   \                     DATEepIsMaintainActiveSleepState:
+   1194          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1195              BOOL IsProcessing = (BOOL) DATEepIsProcessing();
+   \   0000   8E....         MOV       A,ActiveProcessHandle
+   \   0003   4DFF           CMP       A,#255
+   \   0005   AD05           BZ        ??DATEepIsProcessing_80
+   1196          
+   1197              if( IsProcessing != cFalse )
+   1198              {
+   1199                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveSleepState);
+   \                     ??DATEepIsMaintainActiveSleepState_0:
+   \   0007   102800         MOVW      AX,#40
+   \   000A   ..             CALLT     [__T_TOSWriteSignal]
+   \   000B   AF             RET       
+   1200              }
+   \                     ??DATEepIsProcessing_80:
+   \   000C   02....         MOVW      AX,ActiveProcessList
+   \   000F   6168           OR        A,X
+   \   0011   BDF4           BNZ       ??DATEepIsMaintainActiveSleepState_0
+   1201          }
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+   1202          
+   1203          
+   1204          //==============================================================================
+   1205          // DESCRIPTION : Checks if any process is pending or active
+   1206          //
+   1207          // PARAMETERS (Type,Name,Min,Max) :   none
+   1208          //
+   1209          // RETURN VALUE :   none
+   1210          //
+   1211          // DESIGN INFORMATION : 
+   1212          //==============================================================================
+   1213          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1214          BOOL DATEepIsProcessing(void)
+   \                     DATEepIsProcessing:
+   1215          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1216              BOOL IsProcessingReturn;
+   1217          
+   1218              if (ActiveProcessHandle != cInvalidProcessHandle)
+   \   0000   8E....         MOV       A,ActiveProcessHandle
+   \   0003   4DFF           CMP       A,#255
+   \   0005   AD03           BZ        ??DATEepIsProcessing_81
+   1219              {
+   1220                  // A process is active
+   1221                  IsProcessingReturn = cTrue;
+   \                     ??DATEepIsProcessing_82:
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   1222              }
+   1223              else if (!(ActiveProcessList == (tActiveProcessList)0))
+   \                     ??DATEepIsProcessing_81:
+   \   000A   02....         MOVW      AX,ActiveProcessList
+   \   000D   6168           OR        A,X
+   \   000F   BDF6           BNZ       ??DATEepIsProcessing_82
+   1224              {
+   1225                  // A process has requested activity but is not schedulled yed
+   1226                  IsProcessingReturn = cTrue;
+   1227              }
+   1228              else
+   1229              {
+   1230                  // This block erradicates a QAC warning
+   1231                  IsProcessingReturn = cFalse;
+   \   0011   A100           MOV       A,#0
+   1232              }
+   1233          
+   1234              return IsProcessingReturn;
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+   1235          }
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_LSH_L02:
+   \   0000   ....           DW       ?I_LSH_L02
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+   1236          
+   1237          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     ActiveProcessHandle               1
+     ActiveProcessList                 2
+     State                             1
+     WriteRetryCounter                 1
+     ReadBuffer                        2
+     UserBuffer                        2
+     OffsetFromUserBuffer              1
+     LastOffset                        1
+     CommandState                      1
+     Command                           8
+     CommandTempo                      2
+     Alarm                             4
+     BlocList                         44
+     CallBackList                      6
+     DATEepBuffer                     78
+     StartCommand                    142
+     EndOfCommand                    614
+     CommandStateMachine             167
+     ScheduleProcess                 153
+     DATEepProcessRequest             45
+     DATEepIsActivate                 35
+     DATEepTerminateProcess           35
+     DATEepRead                      102
+     DATEepWrite                     155
+     DATEepCompare                   108
+     DATEepAbsoluteRead               76
+     DATEepAbsoluteWrite              90
+     DATEepCallBackEndCtrl            31
+     DATEepCallBackTxWithAddr         19
+     DATEepCallBackRxWithAddr         19
+     DATEepTask                       13
+     DATEepInit                       24
+     DATEepIsMaintainActiveSleepState
+                                      20
+     DATEepIsProcessing               20
+     __T_TOSStartTimer                 2
+     __T_?FAR_CALL_L07                 2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSSendControl                2
+     __T_?I_LSH_L02                    2
+     __T_TOSWriteSignal                2
+
+ 
+    12 bytes in segment CLTVEC
+ 1 868 bytes in segment CODE
+    50 bytes in segment CONST
+   104 bytes in segment NEAR_Z
+ 
+ 1 868 bytes of CODE  memory (+ 12 bytes shared)
+    50 bytes of CONST memory
+   104 bytes of DATA  memory
+
+Errors: none
+Warnings: none

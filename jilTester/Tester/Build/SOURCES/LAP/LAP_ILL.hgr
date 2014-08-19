@@ -1,0 +1,84 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef LAP_ILL
+   extern const tTOSSeqGraphType LAPIllInternalLightsManagement;
+   extern const tTOSSeqGraphType LAPIllInternalLightsController; 
+#endif
+
+#ifdef LAP_ILL
+   extern BOOL LAPIllGradualOffIsInProgress(void);
+   extern BOOL LAPIllLightsAreOff(void);
+   extern void     LAPIllLightsGraduallyOffExecution(void);
+   extern BOOL LAPIllLightsGraduallyOffRequestIsTrue(void);
+   extern void     LAPIllLightsOffExecution(void);
+   extern BOOL LAPIllLightsOffRequestIsTrue(void);
+   extern void     LAPIllLightsOnExecution(void);
+   extern BOOL LAPIllLightsOnRequestIsTrue(void);
+   extern void     LAPIllManagement(void);
+   extern BOOL TOSSeqEvalVrai(void);
+   extern void     TOSSeqNop(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef LAP_ILL
+  const tTOSSeqGraphType LAPIllInternalLightsController =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPIllInternalLightsController",
+    {
+#endif
+  /*   0*/  {LAPIllLightsOnRequestIsTrue,LAPIllLightsOnExecution,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPIllLightsOffRequestIsTrue,LAPIllLightsOffExecution,mTOSSeqRuleNumber(2),mTOSSeqRuleNumber(0)},
+  /*   2*/  {LAPIllLightsGraduallyOffRequestIsTrue,LAPIllLightsGraduallyOffExecution,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)},
+  /*   3*/  {LAPIllLightsOnRequestIsTrue,LAPIllLightsOnExecution,mTOSSeqRuleNumber(4),mTOSSeqRuleNumber(1)},
+  /*   4*/  {LAPIllGradualOffIsInProgress,LAPIllLightsGraduallyOffExecution,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(3)},
+  /*   5*/  {LAPIllLightsAreOff,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef LAP_ILL
+  const tTOSSeqGraphType LAPIllInternalLightsManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPIllInternalLightsManagement",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,LAPIllManagement,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

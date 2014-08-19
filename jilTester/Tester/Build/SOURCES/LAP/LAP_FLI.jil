@@ -1,0 +1,262 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    LAP_FLI
+// -----------------------------------------------------------------------------
+// $Date:   Mar 17 2010 13:55:08  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_FLI/LAP_FLI.jil-arc  $
+// $Revision:   1.8  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_FLI/LAP_FLI.jil-arc  $
+// 
+//    Rev 1.8   Mar 17 2010 13:55:08   amanevd
+// Cm006814: Code review corrections
+// 
+//    Rev 1.7   Nov 04 2009 17:01:20   adzhelp
+// Cm005566: Implementation of HW Protection
+// 
+//    Rev 1.6   Sep 14 2009 15:34:30   amarinm1
+// Cm006191, Cm005603: Crash warning management was changed according to both TCRs.
+// 
+//    Rev 1.5   Apr 29 2009 14:15:12   adzhelp
+// Cm003263: Signals LAPFliEventRfLockAll LAPFliEventRfUnlockAll added
+// 
+//    Rev 1.4   Apr 22 2009 16:33:20   amarinm1
+// Cm003263: Definition of the signal LAPFliAIRBAG_CRASH_UNLOCK moved here from Test.jil because it will be used only in the component.
+// 
+//    Rev 1.3   Apr 16 2009 15:44:36   amarinm1
+// Cm003263: Signal definitions were moved to Test.jil
+// 
+//    Rev 1.2   Apr 15 2009 12:34:42   amarinm1
+// Cm003263 & Cm004774: Callback controls for TFC tests were added;
+// Cm003263: Strategy for receiving crash unlock command is changed (control -> signal).
+// 
+//    Rev 1.1   Mar 30 2009 15:17:04   amarinm1
+// Cm004676: Both graphs were assigned to GraphGroup20Ms. Also some useless code was removed.
+// 
+//    Rev 1.0   Feb 05 2009 12:07:50   amarinm1
+// Initial revision.
+//
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_LAP_FLI_JIL
+#define I_LAP_FLI_JIL (1)
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_FLI 
+{
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+    Graph LAPFliInput
+    {
+        GraphGroup = GraphGroup20Ms;
+    };
+
+    Graph LAPFliLampsState
+    {
+        GraphGroup = GraphGroup20Ms;
+    };
+
+    Graph LAPFliProtectionManagement
+    {
+    };
+
+
+//------------------------------------------------------------------------------
+//    GraphGroup GraphGroupName                // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+    Signal LAPFliCrashUnlockFinished;
+    Signal LAPFliEventRfLockAll;
+    Signal LAPFliEventRfUnlockAll;    
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPInitialize";
+        Fct = "LAPFliInitialize";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPEnterActiveState";
+        Fct = "LAPFliEnterActiveState";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPLeaveActiveState";
+        Fct = "LAPFliLeaveActiveState";
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "IsAnybodyMaintainActiveState";
+        Fct = "LAPFliIsAnybodyMaintainActiveState";
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "LeftFlashingForTFC";
+        Fct = "LAPFliLeftFlashingForTFC";
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "RightFlashingForTFC";
+        Fct = "LAPFliRightFlashingForTFC";
+    };
+
+    OnControl = SetSignal
+    {
+        Ctrl = "RKE_LOCK_REQUEST";
+        Signal = LAPFliEventRfLockAll;
+    };
+
+	OnControl = SetSignal
+    {
+        Ctrl = "RKE_UNLOCK_REQUEST";
+        Signal = LAPFliEventRfUnlockAll;
+    };
+
+	OnControl = SetSignal
+    {
+        Ctrl = "CrashUnlockFinished";
+        Signal = LAPFliCrashUnlockFinished;
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "CrashUnlockFinished";
+        Fct = "LAPFliInputManagement";
+    };
+
+
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U32, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+
+
+
+};
+
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_LAP_FLI_JIL */
+
+

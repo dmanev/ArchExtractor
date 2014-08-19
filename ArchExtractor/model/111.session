@@ -1,0 +1,54 @@
+window_sizes 1615 1026 431 1178 782 170
+diagrams
+  classdiagram_ref 261871 // PortInterfaceFactory class diag
+    942 625 100 4 0 0
+  classdiagram_ref 160751 // Component class diag
+    1178 782 100 3 0 0
+  classdiagram_ref 167535 // ClientServerInterface class diag
+    1178 782 100 4 0 0
+  classdiagram_ref 174319 // ParamData class diag
+    1178 782 100 4 0 0
+  classdiagram_ref 215023 // Operation class diag
+    1178 782 100 4 0 0
+  classdiagram_ref 174191 // DataType class diag
+    1178 782 100 4 0 0
+  classdiagram_ref 187887 // CompositeDataType class diag
+    1178 782 100 4 0 0
+  active  classdiagram_ref 282223 // XMIConverter class diag
+    1178 782 100 3 0 0
+  usecasediagram_ref 141167 // Use Case diag
+    942 625 100 3 0 0
+  classdiagram_ref 128111 // class diag
+    942 625 100 2 0 0
+end
+show_stereotypes
+selected classdiagram_ref 282223 // XMIConverter class diag
+open
+  usecaseview_ref 128111 // Use Case View
+  classview_ref 134767 // Class View
+  classview_ref 128111 // Class View
+  class_ref 129519 // IAnalyzer
+  
+package_ref 161775 // SwComponent
+  
+package_ref 168303 // Infrastructure
+  sequencediagram_ref 188271 // BaseFileParser.fulfillComponentData() seq diag
+  classview_ref 194159 // Class view
+  deploymentview_ref 168303 // deploy view
+  classview_ref 141295 // Class view
+  deploymentview_ref 141679 // deploy view
+  classdiagram_ref 234991 // StkCHeaderFileParser class diag
+  class_ref 156783 // StkFileParser
+  class_ref 218351 // StkPortCriteria
+  class_ref 231407 // StkCHeaderFileParser
+  deploymentview_ref 141807 // deploy view
+  classview_ref 187503 // Class view
+  classdiagram_ref 214639 // StkJilProdControlCriteria class diag
+  classview_ref 167663 // Class view
+  deploymentview_ref 141935 // deploy view
+  class_ref 258415 // StkPortInterfaceFactory
+  class_ref 211695 // StkTOSSignalIf
+  class_ref 238063 // StkDATControlIf
+  deploymentview_ref 155119 // deploy view
+end
+end

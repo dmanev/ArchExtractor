@@ -1,0 +1,21 @@
+class FactoryProvider
+!!!252911.python!!!	getPortInterfaceFactory(in self : ) : PortInterfaceFactory
+        outPortInterfaceFactory = None
+        if((self.itsSuccessor) and isinstance(self.itsSuccessor, FactoryProvider)):
+            outPortInterfaceFactory = self.itsSuccessor.getPortInterfaceFactory()
+        return outPortInterfaceFactory
+!!!260335.python!!!	getComponentFactory(in self : ) : ComponentFactory
+        outComponentFactory = None
+        if((self.itsSuccessor) and isinstance(self.itsSuccessor, FactoryProvider)):
+            outComponentFactory = self.itsSuccessor.getComponentFactory()
+        return outComponentFactory
+!!!268015.python!!!	getInfrastructureFactory(in self : ) : InfrastructureFactory
+        outInfrastructureFactory = None
+        if((self.itsSuccessor) and isinstance(self.itsSuccessor, FactoryProvider)):
+            outInfrastructureFactory = self.itsSuccessor.getInfrastructureFactory()
+        return outInfrastructureFactory
+!!!285807.python!!!	getDataTypeFactory(in self : ) : DataTypeFactory
+        outDataTypeFactory = None
+        if((self.itsSuccessor) and isinstance(self.itsSuccessor, FactoryProvider)):
+            outDataTypeFactory = self.itsSuccessor.getDataTypeFactory()
+        return outDataTypeFactory

@@ -1,0 +1,108 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date:   27 Oct 2008 09:22:26  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+
+   Rev 1.0   27 Oct 2008 09:22:26   avidoly
+Initial revision.
+
+   Rev 1.2   10 Mar 2005 16:30:22   abarbae
+PON URD42 DEV 2514 / PON URD42 BODY_SW 851 : Update component template for compatibility with VSS 
+*/
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef LAP_FLI
+   extern const tTOSSeqGraphType LAPFliLampsState;
+   extern const tTOSSeqGraphType LAPFliInput;
+   extern const tTOSSeqGraphType LAPFliProtectionManagement; 
+#endif
+
+#ifdef LAP_FLI
+   extern void     LAPFliInputManagement(void);
+   extern void     LAPFliLampsOff(void);
+   extern BOOL LAPFliLampsOffTimeIsElapsed(void);
+   extern void     LAPFliLampsOn(void);
+   extern BOOL LAPFliLampsOnTimeIsElapsed(void);
+   extern BOOL LAPFliLampsRequestHasChanged(void);
+   extern void     LAPFliMeasureCurrent(void);
+   extern BOOL LAPFliMeasureCurrentOk(void);
+   extern void     LAPFliProtectionTask(void);
+   extern BOOL TOSSeqEvalVrai(void);
+   extern BOOL TOSSeqTrueEval(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef LAP_FLI
+  const tTOSSeqGraphType LAPFliLampsState =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFliLampsState",
+    {
+#endif
+  /*   0*/  {LAPFliLampsRequestHasChanged,LAPFliLampsOn,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPFliLampsRequestHasChanged,LAPFliLampsOn,mTOSSeqRuleNumber(2),mTOSSeqRuleNumber(1)},
+  /*   2*/  {LAPFliLampsOnTimeIsElapsed,LAPFliLampsOff,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(3)},
+  /*   3*/  {LAPFliLampsRequestHasChanged,LAPFliLampsOn,mTOSSeqRuleNumber(4),mTOSSeqRuleNumber(1)},
+  /*   4*/  {LAPFliLampsOffTimeIsElapsed,LAPFliLampsOn,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   5*/  {LAPFliMeasureCurrentOk,LAPFliMeasureCurrent,cTOSSeqInvalidRule,mTOSSeqRuleNumber(6)},
+  /*   6*/  {LAPFliLampsRequestHasChanged,LAPFliLampsOn,mTOSSeqRuleNumber(7),mTOSSeqRuleNumber(1)},
+  /*   7*/  {LAPFliLampsOnTimeIsElapsed,LAPFliLampsOff,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef LAP_FLI
+  const tTOSSeqGraphType LAPFliInput =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFliInput",
+    {
+#endif
+  /*   0*/  {TOSSeqTrueEval,LAPFliInputManagement,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef LAP_FLI
+  const tTOSSeqGraphType LAPFliProtectionManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPFliProtectionManagement",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,LAPFliProtectionTask,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

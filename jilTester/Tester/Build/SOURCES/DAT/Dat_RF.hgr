@@ -1,0 +1,70 @@
+/****************************************************************************
+  Project ......................... AW1092
+  Component ....................... dat_rf
+  File revision.................... $Revision:   1.0  $
+  Last modification date .......... $Modtime:   Jul 03 2003 18:17:32  $
+  -------------------------------------------------------------------------
+  Copyright ... This software is JCI property. Duplication or
+                disclosure is prohibited without JCI written permission
+  ------------------------------------------------------------------------- 
+    
+  Automatic Generation by DllGraph V01.03
+
+  Generated the 14 Jan 2004 at 10:54
+
+  Source file: "Dat_Rf.gft" of 14 Jan 2004
+    
+  -------------------------------------------------------------------------
+  dat_rf.hgr file review :
+  
+   $Log:   P:/AW1092/LOGICIEL/PVCS/archives/AW1092/CMP/TEMPLATE/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+
+   Rev 1.0   Jul 03 2003 18:22:10   adm
+Initial revision.
+
+*****************************************************************************/
+
+/*--------------------------------------------------------------------------
+                        Function prototypes
+  --------------------------------------------------------------------------*/
+
+#ifndef dat_rf
+   extern const tTOSSeqGraphType DATRfReceptionManagement; 
+#endif
+
+#ifdef dat_rf
+   extern void     DATRfArmRCReceptionTimer(void);
+   extern void     DATRfLongPushDetected(void);
+   extern BOOL DATRfNewRcBlockReceived(void);
+   extern BOOL DATRfRCReceptionTimeElapsedOrLongPushReceiveTimeElapsed(void);
+   extern void     DATRfSearchWakeUpBlock(void);
+   extern void     DATRfShortPushDetectedAndArmLongPushTimer(void);
+   extern BOOL DATRfSiBlockReceivedAndLongPushWaitTimeElapsed(void);
+   extern BOOL DATRfWakeUpBlockReceived(void); 
+#endif
+
+/*--------------------------------------------------------------------------
+                        Component rules
+  --------------------------------------------------------------------------*/
+
+#ifdef dat_rf
+  const tTOSSeqGraphType DATRfReceptionManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "DATRfReceptionManagement",
+    {
+#endif
+  /*   0*/  {DATRfWakeUpBlockReceived,DATRfArmRCReceptionTimer,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {DATRfNewRcBlockReceived,DATRfShortPushDetectedAndArmLongPushTimer,mTOSSeqRuleNumber(2),mTOSSeqRuleNumber(1)},
+  /*   2*/  {DATRfSiBlockReceivedAndLongPushWaitTimeElapsed,DATRfLongPushDetected,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(0)},
+  /*   3*/  {DATRfRCReceptionTimeElapsedOrLongPushReceiveTimeElapsed,DATRfSearchWakeUpBlock,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+/****************************************************************************
+                        End of generation
+*****************************************************************************/

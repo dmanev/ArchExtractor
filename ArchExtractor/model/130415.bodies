@@ -1,0 +1,3 @@
+class IPortCriteria
+!!!182127.python!!!	execute(in self : , in inpTextContent : char, inout inpIComponent : IComponent)
+        pass

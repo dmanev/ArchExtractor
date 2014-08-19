@@ -1,0 +1,688 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:18 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_APR.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_APR.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_APR.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_APR.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_APR.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_APR.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_APR.C
+      1          //*****************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // ----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // ----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // ----------------------------------------------------------------------------
+     11          // Component:    DAT_APR
+     12          // ----------------------------------------------------------------------------
+     13          // $Date:   Mar 09 2010 15:16:22  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_APR/dat_apr.c-arc  $
+     15          // $Revision:   1.6  $
+     16          // ----------------------------------------------------------------------------  
+     17          //
+     18          //  $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_APR/dat_apr.c-arc  $
+     19          // 
+     20          //    Rev 1.6   Mar 09 2010 15:16:22   amanevd
+     21          // Cm006997: Code review correction
+     22          // 
+     23          //    Rev 1.5   Dec 03 2009 09:40:14   amanevd
+     24          // Cm006741: SKey byte order swapped
+     25          // 
+     26          //    Rev 1.4   Nov 10 2009 14:58:44   amanevd
+     27          // Cm006200: LIBLrnFnF order of arguments changed
+     28          // 
+     29          //    Rev 1.3   May 21 2009 11:09:40   amanevd
+     30          // Cm003272 - CCover justifications - NO CODE IMPACT
+     31          // 
+     32          //    Rev 1.2   Apr 29 2009 13:12:28   amanevd
+     33          // Cm003272 - Intermediate part 3 
+     34          // - PRS compliance
+     35          // 
+     36          //    Rev 1.1   Feb 04 2009 13:29:30   amanevd
+     37          // Cm003272 - Intermediate part 1
+     38          // - PRS compliance
+     39          // 
+     40          //    Rev 1.0   Jan 09 2009 14:07:06   amanevd
+     41          // Initial revision.
+     42          // 
+     43          //=============================================================================
+     44          
+     45          
+     46          //-----------------------------------------------------------------------------
+     47          //  Body Identification
+     48          //-----------------------------------------------------------------------------
+     49          #define dat_apr  "dat_apr"
+     50          
+     51          //-----------------------------------------------------------------------------
+     52          //  Included files
+     53          //
+     54          //  #include <system_file_name.h>
+     55          //  #include "project_file_name.h"
+     56          //-----------------------------------------------------------------------------
+     57          #include "tos.h"
+     58          #include "lib_lrn.h"
+     59          #include "dat.h"
+     60          #include "dat_apr.h"
+     61          //-----------------------------------------------------------------------------
+     62          //  Local constants
+     63          //
+     64          //  #define cConstantName   ((tType) ConstantValue)
+     65          //-----------------------------------------------------------------------------
+     66          // for coding the After Sale value in eeprom memory
+     67          #define cAfterSaleValueCoding     ((U8) 0x4EU)  // N of Nissan
+     68          
+     69          
+     70          #define cShift8                   ((U8) 8)
+     71          
+     72          //-----------------------------------------------------------------------------
+     73          //  Local macros
+     74          //
+     75          //  #define mMacroName   (MacroDefinition)
+     76          //-----------------------------------------------------------------------------
+     77          
+     78          
+     79          //-----------------------------------------------------------------------------
+     80          //  Local types
+     81          //
+     82          //  struct  sStructureName { ... };
+     83          //  union   uUnionName { ... };
+     84          //  enum    eEnumerationName { ... };
+     85          //  typedef Expression tTypeName;
+     86          //-----------------------------------------------------------------------------
+     87          
+     88          
+     89          //-----------------------------------------------------------------------------
+     90          //  Local data
+     91          //
+     92          //  static  tType   VariableName;
+     93          //  static  tType*  pVariableName; 
+     94          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     95          static    U8     VerlogCode[cDATTrpISKLengthInBytes];
+   \                     VerlogCode:
+   \   0000                  DS 6
+   \   0006                  REQUIRE __INIT_NEAR_Z
+     96          
+     97          //-----------------------------------------------------------------------------
+     98          //  Constant local data
+     99          //
+    100          //  static const tType  VariableName;
+    101          //-----------------------------------------------------------------------------
+    102          
+    103           
+    104          //-----------------------------------------------------------------------------
+    105          //  Exported data
+    106          //
+    107          //  tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    108          //  tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    109          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    110          tDatAprExportData DatAprExportData;
+   \                     DatAprExportData:
+   \   0000                  DS 36
+   \   0024                  REQUIRE __INIT_NEAR_Z
+    111          //-----------------------------------------------------------------------------
+    112          //  Constant exported data
+    113          //
+    114          //              (LAY: 3 characters to identify the layer)
+    115          //              (Cmp: 3 characters to identify this component)
+    116          // 
+    117          //  const tType   LAYCmpVariableName;
+    118          //-----------------------------------------------------------------------------
+    119           
+    120          //-----------------------------------------------------------------------------
+    121          //  Local function prototypes
+    122          //  
+    123          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    124          //-----------------------------------------------------------------------------
+    125          static MEM_TYPE void ReadAfterSaleCode(void);
+    126          static MEM_TYPE void TestDiagAfterSaleCode(void);
+    127          static MEM_TYPE void WriteAfterSaleCode(void);
+    128          
+    129          //=============================================================================
+    130          //=========================== LOCAL FUNCTIONS =================================
+    131          //=============================================================================
+    132          
+    133          //=============================================================================
+    134          //  DESCRIPTION : Read the After Sale code from the BCM EEPROM
+    135          //  
+    136          //  PARAMETERS (Type,Name,Min,Max) :   none
+    137          //
+    138          //  RETURN VALUE :   none
+    139          // 
+    140          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    141          //=============================================================================
+    142          
+    143          static MEM_TYPE void ReadAfterSaleCode(void)
+    144          {
+    145            U8 u8IndexL;
+    146          
+    147            for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+    148            {
+    149              DatAprExportData.AfterSaleCode[u8IndexL] = 
+    150                  (mDATReadTable(U8Bit, EEP_AfterSalesCode, u8IndexL, Default) 
+    151                      ^ cAfterSaleValueCoding);
+    152            }
+    153          }
+    154          //=============================================================================
+    155          //  DESCRIPTION : Test the After Sale code from diagnostic
+    156          //  
+    157          //  PARAMETERS (Type,Name,Min,Max) :   none
+    158          //
+    159          //  RETURN VALUE :   none
+    160          // 
+    161          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    162          //=============================================================================
+    163          
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    164          static MEM_TYPE void TestDiagAfterSaleCode(void)
+   \                     TestDiagAfterSaleCode:
+    165          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    166            U8   u8IndexL;
+    167            BOOL bCodesAreDifferentL = cFalse;
+   \   0002   891C           MOVW      AX,SP
+   \   0004   D6             MOVW      HL,AX
+   \   0005   A100           MOV       A,#0
+   \   0007   97             MOV       [HL],A
+    168          
+    169            for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+   \   0008   12....         MOVW      BC,#DatAprExportData
+   \   000B   16....         MOVW      HL,#DATDbkMirrors
+   \   000E   A006           MOV       X,#6
+    170            {
+    171              DatAprExportData.ImmobilizerSecretKey[u8IndexL] = 
+    172                  mDATReadTable(U8Bit, EEP_ImmoSecretKey, u8IndexL, Default);
+   \                     ??TestDiagAfterSaleCode_0:
+   \   0010   B7             PUSH      HL
+   \   0011   B4             POP       DE
+   \   0012   E4             XCHW      AX,DE
+   \   0013   CA6A00         ADDW      AX,#106
+   \   0016   E4             XCHW      AX,DE
+   \   0017   85             MOV       A,[DE]
+   \   0018   B3             PUSH      BC
+   \   0019   B4             POP       DE
+   \   001A   E4             XCHW      AX,DE
+   \   001B   CA0800         ADDW      AX,#8
+   \   001E   E4             XCHW      AX,DE
+   \   001F   95             MOV       [DE],A
+    173            }
+   \   0020   86             INCW      HL
+   \   0021   B3             PUSH      BC
+   \   0022   B4             POP       DE
+   \   0023   84             INCW      DE
+   \   0024   B5             PUSH      DE
+   \   0025   B2             POP       BC
+   \   0026   50             DEC       X
+   \   0027   60             MOV       A,X
+   \   0028   BDE6           BNZ       ??TestDiagAfterSaleCode_0
+    174          
+    175            LIBLrnFnG(DatAprExportData.ImmobilizerSecretKey,DatAprExportData.AfterSaleCode);
+   \   002A   10....         MOVW      AX,#DatAprExportData+8
+   \   002D   12....         MOVW      BC,#DatAprExportData+20
+   \   0030   16....         MOVW      HL,#LWRD(LIBLrnFnG)
+   \   0033   A4..           MOV       E,#BYTE3(LIBLrnFnG)
+   \   0035   ..             CALLT     [__T_?FAR_CALL_L07]
+    176          
+    177            for ( u8IndexL = 0; 
+   \   0036   A200           MOV       C,#0
+   \   0038   14....         MOVW      DE,#DatAprExportData
+    178                      (u8IndexL < cDATTrpISKLengthInBytes) 
+    179                  &&  (bCodesAreDifferentL == cFalse); 
+    180                  u8IndexL++)
+    181            {
+    182              bCodesAreDifferentL = (DatAprExportData.AfterSaleCode[u8IndexL] 
+    183                  != DatAprExportData.DiagAfterSaleCode[u8IndexL]);
+   \                     ??TestDiagAfterSaleCode_1:
+   \   003B   C4             MOVW      AX,DE
+   \   003C   D6             MOVW      HL,AX
+   \   003D   AE1A           MOV       A,[HL+0x1A]
+   \   003F   70             MOV       X,A
+   \   0040   B5             PUSH      DE
+   \   0041   B6             POP       HL
+   \   0042   E6             XCHW      AX,HL
+   \   0043   CA1400         ADDW      AX,#20
+   \   0046   E6             XCHW      AX,HL
+   \   0047   87             MOV       A,[HL]
+   \   0048   6148           CMP       A,X
+   \   004A   AD06           BZ        ??DATAprInit_0
+   \   004C   891C           MOVW      AX,SP
+   \   004E   D6             MOVW      HL,AX
+   \   004F   A101           MOV       A,#1
+   \   0051   97             MOV       [HL],A
+    184            }
+   \                     ??DATAprInit_0:
+   \   0052   42             INC       C
+   \   0053   62             MOV       A,C
+   \   0054   84             INCW      DE
+   \   0055   4D06           CMP       A,#6
+   \   0057   9D08           BNC       ??DATAprInit_1
+   \   0059   891C           MOVW      AX,SP
+   \   005B   D6             MOVW      HL,AX
+   \   005C   87             MOV       A,[HL]
+   \   005D   4D00           CMP       A,#0
+   \   005F   ADDA           BZ        ??TestDiagAfterSaleCode_1
+    185          
+    186            DatAprExportData.AfterSaleCodeRecognized = (bCodesAreDifferentL == cFalse);
+   \                     ??DATAprInit_1:
+   \   0061   891C           MOVW      AX,SP
+   \   0063   D6             MOVW      HL,AX
+   \   0064   87             MOV       A,[HL]
+   \   0065   4D00           CMP       A,#0
+   \   0067   BD04           BNZ       ??DATAprInit_2
+   \   0069   A101           MOV       A,#1
+   \   006B   FA02           BR        ??DATAprInit_3
+   \                     ??DATAprInit_2:
+   \   006D   A100           MOV       A,#0
+   \                     ??DATAprInit_3:
+   \   006F   16....         MOVW      HL,#DatAprExportData+34
+   \   0072   97             MOV       [HL],A
+    187          }
+   \   0073   B0             POP       AX
+   \   0074   B2             POP       BC
+   \   0075   AF             RET       
+   \   0076                  REQUIRE ?CL78K_V4_6_L00
+    188          //=============================================================================
+    189          //  DESCRIPTION : Encode and write the After Sale code in the BCM EEPROM
+    190          //  
+    191          //  PARAMETERS (Type,Name,Min,Max) :   none
+    192          //
+    193          //  RETURN VALUE :   none
+    194          // 
+    195          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    196          //=============================================================================
+    197          
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    198          static MEM_TYPE void WriteAfterSaleCode(void)
+   \                     WriteAfterSaleCode:
+    199          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    200            U8 u8IndexL;
+    201          
+    202            for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+   \   0002   14....         MOVW      DE,#DatAprExportData
+   \   0005   12....         MOVW      BC,#DATDbkMirrors
+   \   0008   891C           MOVW      AX,SP
+   \   000A   D6             MOVW      HL,AX
+   \   000B   A106           MOV       A,#6
+   \   000D   97             MOV       [HL],A
+    203            {
+    204              DatAprExportData.AfterSaleCode[u8IndexL] ^= cAfterSaleValueCoding;
+   \                     ??WriteAfterSaleCode_0:
+   \   000E   C4             MOVW      AX,DE
+   \   000F   CA1400         ADDW      AX,#20
+   \   0012   D6             MOVW      HL,AX
+   \   0013   87             MOV       A,[HL]
+   \   0014   7D4E           XOR       A,#78
+   \   0016   97             MOV       [HL],A
+    205              mDATWriteTable( U8Bit, 
+    206                              EEP_AfterSalesCode, 
+    207                              u8IndexL, 
+    208                              DatAprExportData.AfterSaleCode[u8IndexL], 
+    209                              Default);
+   \   0017   70             MOV       X,A
+   \   0018   B3             PUSH      BC
+   \   0019   B6             POP       HL
+   \   001A   E6             XCHW      AX,HL
+   \   001B   CA6400         ADDW      AX,#100
+   \   001E   E6             XCHW      AX,HL
+   \   001F   87             MOV       A,[HL]
+   \   0020   6148           CMP       A,X
+   \   0022   AD15           BZ        ??DATAprInit_4
+   \   0024   B5             PUSH      DE
+   \   0025   B6             POP       HL
+   \   0026   E6             XCHW      AX,HL
+   \   0027   CA1400         ADDW      AX,#20
+   \   002A   E6             XCHW      AX,HL
+   \   002B   87             MOV       A,[HL]
+   \   002C   B3             PUSH      BC
+   \   002D   B6             POP       HL
+   \   002E   E6             XCHW      AX,HL
+   \   002F   CA6400         ADDW      AX,#100
+   \   0032   E6             XCHW      AX,HL
+   \   0033   97             MOV       [HL],A
+   \   0034   A103           MOV       A,#3
+   \   0036   9A....         CALL      DATDbkStartUpdate
+    210            }
+   \                     ??DATAprInit_4:
+   \   0039   B3             PUSH      BC
+   \   003A   B6             POP       HL
+   \   003B   86             INCW      HL
+   \   003C   B7             PUSH      HL
+   \   003D   B2             POP       BC
+   \   003E   84             INCW      DE
+   \   003F   891C           MOVW      AX,SP
+   \   0041   D6             MOVW      HL,AX
+   \   0042   87             MOV       A,[HL]
+   \   0043   51             DEC       A
+   \   0044   97             MOV       [HL],A
+   \   0045   BDC7           BNZ       ??WriteAfterSaleCode_0
+    211          }
+   \   0047   B0             POP       AX
+   \   0048   B2             POP       BC
+   \   0049   AF             RET       
+   \   004A                  REQUIRE ?CL78K_V4_6_L00
+    212          
+    213          //=============================================================================
+    214          //============================ EXPORTED FUNCTIONS =============================
+    215          //=============================================================================
+    216          
+    217          //*****************************************************************************
+    218          //  DESCRIPTION         : Control DAT_APR
+    219          //
+    220          //  PARAMETERS          : None
+    221          //  (Type,Name,Min,Max) 
+    222          //
+    223          //  RETURN VALUE        : None
+    224          //
+    225          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    226          //
+    227          //*****************************************************************************
+    228          
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    229          MEM_TYPE void DATAprControl(const tCtrl CtrlP)
+   \                     DATAprControl:
+    230          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    231            switch (CtrlP)
+   \   0001   4D00           CMP       A,#0
+   \   0003   AD22           BZ        ??DATAprInit_5
+   \   0005   4D01           CMP       A,#1
+   \   0007   AD3A           BZ        ??DATAprInit_6
+   \   0009   4D02           CMP       A,#2
+   \   000B   AD49           BZ        ??DATAprInit_7
+   \   000D   4D03           CMP       A,#3
+   \   000F   AD63           BZ        ??DATAprInit_8
+   \   0011   4D04           CMP       A,#4
+   \   0013   AD6D           BZ        ??DATAprInit_9
+   \   0015   4D05           CMP       A,#5
+   \   0017   AD76           BZ        ??DATAprInit_10
+   \   0019   4D06           CMP       A,#6
+   \   001B   AD7A           BZ        ??DATAprInit_11
+   \   001D   4D07           CMP       A,#7
+   \   001F   BD03           BNZ       $+5
+   \   0021   9B....         BR        N:??DATAprInit_12
+   \   0024   9B....         BR        N:??DATAprInit_13
+    232            {
+    233            case cDATAprComputeISK:
+    234              ///////////////////////////////
+    235              // Function F(PWDTAG, IDE)
+    236              ///////////////////////////////
+    237              LIBLrnFnF(  DatAprExportData.Identifier,
+    238                          DatAprExportData.PasswordTag,
+    239                          DatAprExportData.ImmobilizerSecretKey);
+   \                     ??DATAprInit_5:
+   \   0027   10....         MOVW      AX,#DatAprExportData+8
+   \   002A   B1             PUSH      AX
+   \   002B   02....         MOVW      AX,DatAprExportData+6
+   \   002E   B1             PUSH      AX
+   \   002F   02....         MOVW      AX,DatAprExportData+4
+   \   0032   B1             PUSH      AX
+   \   0033   02....         MOVW      AX,DatAprExportData+2
+   \   0036   D2             MOVW      BC,AX
+   \   0037   02....         MOVW      AX,DatAprExportData
+   \   003A   16....         MOVW      HL,#LWRD(LIBLrnFnF)
+   \   003D   A4..           MOV       E,#BYTE3(LIBLrnFnF)
+   \   003F   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0040   9B....         BR        N:??DATAprInit_14
+    240              break;
+    241          
+    242            case cDATAprComputeRSK:
+    243              ///////////////////////////////
+    244              // Function M(IDE)
+    245              ///////////////////////////////
+    246              LIBLrnFnM(  DatAprExportData.Identifier,
+    247                          DatAprExportData.RemoteSecretKey);
+   \                     ??DATAprInit_6:
+   \   0043   10....         MOVW      AX,#DatAprExportData+14
+   \   0046   B1             PUSH      AX
+   \   0047   02....         MOVW      AX,DatAprExportData+2
+   \   004A   D2             MOVW      BC,AX
+   \   004B   02....         MOVW      AX,DatAprExportData
+   \   004E   16....         MOVW      HL,#LWRD(LIBLrnFnM)
+   \   0051   A4..           MOV       E,#BYTE3(LIBLrnFnM)
+   \   0053   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0054   FA71           BR        ??DATAprInit_14
+    248              break;
+    249          
+    250            case cDATAprComputeSKey:
+    251              ///////////////////////////////
+    252              // Function H(ISK)
+    253              ///////////////////////////////
+    254              LIBLrnFnH(  DatAprExportData.ImmobilizerSecretKey,
+    255                          VerlogCode);
+   \                     ??DATAprInit_7:
+   \   0056   10....         MOVW      AX,#DatAprExportData+8
+   \   0059   12....         MOVW      BC,#VerlogCode
+   \   005C   16....         MOVW      HL,#LWRD(LIBLrnFnH)
+   \   005F   A4..           MOV       E,#BYTE3(LIBLrnFnH)
+   \   0061   ..             CALLT     [__T_?FAR_CALL_L07]
+    256              DatAprExportData.SKey = (U16)((U16)VerlogCode[0] << cShift8) 
+    257                                              | ((U16)VerlogCode[1]);
+   \   0062   8E....         MOV       A,VerlogCode+1
+   \   0065   76             MOV       L,A
+   \   0066   8E....         MOV       A,VerlogCode
+   \   0069   A000           MOV       X,#0
+   \   006B   30             XCH       A,X
+   \   006C   616E           OR        A,L
+   \   006E   30             XCH       A,X
+   \   006F   03....         MOVW      DatAprExportData+32,AX
+   \   0072   FA53           BR        ??DATAprInit_14
+    258              break;
+    259          
+    260            case cDATAprComputeAfterSaleCode:
+    261              ///////////////////////////////
+    262              // Function G(ISK)
+    263              ///////////////////////////////
+    264              LIBLrnFnG(  DatAprExportData.ImmobilizerSecretKey,
+    265                          DatAprExportData.AfterSaleCode);
+   \                     ??DATAprInit_8:
+   \   0074   10....         MOVW      AX,#DatAprExportData+8
+   \   0077   12....         MOVW      BC,#DatAprExportData+20
+   \   007A   16....         MOVW      HL,#LWRD(LIBLrnFnG)
+   \   007D   A4..           MOV       E,#BYTE3(LIBLrnFnG)
+   \                     ??DATAprControl_0:
+   \   007F   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0080   FA45           BR        ??DATAprInit_14
+    266              break;
+    267          
+    268            case cDATAprComputeISKFromDiagAfterSaleCode:
+    269              ///////////////////////////////
+    270              // Function G-1(AfterSaleCode)
+    271              ///////////////////////////////
+    272              LIBLrnFnGInv(   DatAprExportData.DiagAfterSaleCode,
+    273                              DatAprExportData.ImmobilizerSecretKey);
+   \                     ??DATAprInit_9:
+   \   0082   10....         MOVW      AX,#DatAprExportData+26
+   \   0085   12....         MOVW      BC,#DatAprExportData+8
+   \   0088   16....         MOVW      HL,#LWRD(LIBLrnFnGInv)
+   \   008B   A4..           MOV       E,#BYTE3(LIBLrnFnGInv)
+   \   008D   FAF0           BR        ??DATAprControl_0
+    274              break;
+    275          
+    276            case cDATAprTestDiagAfterSaleCode:
+    277              TestDiagAfterSaleCode();
+   \                     ??DATAprInit_10:
+   \   008F   16....         MOVW      HL,#LWRD(TestDiagAfterSaleCode)
+   \   0092   A4..           MOV       E,#BYTE3(TestDiagAfterSaleCode)
+   \                     ??DATAprControl_1:
+   \   0094   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0095   FA30           BR        ??DATAprInit_14
+    278              break;
+    279          
+    280            case cDATAprReadAfterSaleCode:
+    281              ReadAfterSaleCode();
+   \                     ??DATAprInit_11:
+   \   0097   12....         MOVW      BC,#DatAprExportData
+   \   009A   16....         MOVW      HL,#DATDbkMirrors
+   \   009D   A006           MOV       X,#6
+   \                     ??DATAprControl_2:
+   \   009F   B7             PUSH      HL
+   \   00A0   B4             POP       DE
+   \   00A1   E4             XCHW      AX,DE
+   \   00A2   CA6400         ADDW      AX,#100
+   \   00A5   E4             XCHW      AX,DE
+   \   00A6   85             MOV       A,[DE]
+   \   00A7   7D4E           XOR       A,#78
+   \   00A9   B3             PUSH      BC
+   \   00AA   B4             POP       DE
+   \   00AB   E4             XCHW      AX,DE
+   \   00AC   CA1400         ADDW      AX,#20
+   \   00AF   E4             XCHW      AX,DE
+   \   00B0   95             MOV       [DE],A
+   \   00B1   86             INCW      HL
+   \   00B2   B3             PUSH      BC
+   \   00B3   B4             POP       DE
+   \   00B4   84             INCW      DE
+   \   00B5   B5             PUSH      DE
+   \   00B6   B2             POP       BC
+   \   00B7   50             DEC       X
+   \   00B8   60             MOV       A,X
+   \   00B9   AD0C           BZ        ??DATAprInit_14
+   \   00BB   FAE2           BR        ??DATAprControl_2
+    282              break;
+    283          
+    284            case cDATAprWriteAfterSaleCode:
+    285              WriteAfterSaleCode();
+   \                     ??DATAprInit_12:
+   \   00BD   16....         MOVW      HL,#LWRD(WriteAfterSaleCode)
+   \   00C0   A4..           MOV       E,#BYTE3(WriteAfterSaleCode)
+   \   00C2   FAD0           BR        ??DATAprControl_1
+    286              break;
+    287          
+    288            //CCOV: amanevd: Cannot be covered because this default case rises explicit assert
+    289            default:
+    290              mLIBassert(cFalse);
+   \                     ??DATAprInit_13:
+   \   00C4   9A....         CALL      LIBAssertionFailed
+    291              break;
+    292            }
+    293          }
+   \                     ??DATAprInit_14:
+   \   00C7   B2             POP       BC
+   \   00C8   AF             RET       
+   \   00C9                  REQUIRE ?CL78K_V4_6_L00
+    294          
+    295          //*****************************************************************************
+    296          //  DESCRIPTION         : Initialize DAT_APR
+    297          //
+    298          //  PARAMETERS          : None
+    299          //  (Type,Name,Min,Max) 
+    300          //
+    301          //  RETURN VALUE        : None
+    302          //
+    303          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    304          //
+    305          //*****************************************************************************
+    306          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    307          void DATAprInit(void)
+   \                     DATAprInit:
+    308          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    309          #ifndef X90_PROJECT
+    310            U8 u8IndexL;
+    311          
+    312            DatAprExportData.Identifier              = 0;
+    313            DatAprExportData.PasswordTag             = 0;
+    314            DatAprExportData.AfterSaleCodeRecognized = 0;
+    315            DatAprExportData.SKey                    = 0;
+    316          
+    317            for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+    318            {
+    319              DatAprExportData.ImmobilizerSecretKey[u8IndexL] = 0;
+    320              DatAprExportData.RemoteSecretKey[u8IndexL]      = 0;
+    321              DatAprExportData.AfterSaleCode[u8IndexL]        = 0;    
+    322              DatAprExportData.DiagAfterSaleCode[u8IndexL]    = 0;
+    323              VerlogCode[u8IndexL]           = 0;    
+    324            }
+    325          #endif
+    326          
+    327            mLIBassert(mLIBLrnGetRequiredVersion() == cLIBLrnVersion);
+   \   0000   02....         MOVW      AX,LIBLrnVersion
+   \   0003   EA0001         CMPW      AX,#256
+   \   0006   AD03           BZ        ??DATAprInit_15
+   \   0008   9A....         CALL      LIBAssertionFailed
+    328            mLIBassert(cLIBLrnSkLength == cDATTrpISKLengthInBytes);
+    329          }
+   \                     ??DATAprInit_15:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   Segment part sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     VerlogCode                6
+     DatAprExportData         36
+     TestDiagAfterSaleCode   118
+     WriteAfterSaleCode       74
+     DATAprControl           201
+     DATAprInit               12
+     __T_?FAR_CALL_L07         2
+     __T_?FAR_FAST_CALL_L07    2
+
+ 
+ 393 bytes in segment BCODE
+   4 bytes in segment CLTVEC
+  12 bytes in segment CODE
+  42 bytes in segment NEAR_Z
+ 
+ 405 bytes of CODE memory (+ 4 bytes shared)
+  42 bytes of DATA memory
+
+Errors: none
+Warnings: none

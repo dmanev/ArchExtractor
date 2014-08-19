@@ -1,0 +1,1986 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:44 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_ALA.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_ALA.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_ALA.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_ALA.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_ALA.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_ALA.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_ALA.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      RSA_X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_ALA
+     13          //               After sales alarm
+     14          // -----------------------------------------------------------------------------
+     15          // $Date:   Mar 04 2010 17:48:54  $
+     16          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_ALA/LAP_ALA.c-arc  $
+     17          // $Revision:   1.22  $
+     18          // -----------------------------------------------------------------------------
+     19          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_ALA/LAP_ALA.c-arc  $
+     20          // 
+     21          //    Rev 1.22   Mar 04 2010 17:48:54   adzhelp
+     22          // Cm006692: Trunk and hood removed from byte 2 pattern
+     23          // 
+     24          //    Rev 1.21   Feb 23 2010 14:24:10   adzhelp
+     25          // Cm007607: Active sleep state maintained after reset
+     26          // 
+     27          //    Rev 1.20   Oct 12 2009 16:03:28   akodzhh
+     28          // Cm005776, Cm005777: Comments added - QAC justification and CR 2.0 fix.
+     29          // 
+     30          //    Rev 1.19   Oct 01 2009 10:56:24   adzhelp
+     31          // Cm005776, Cm005777: Check for activation of main graph added
+     32          // 
+     33          //    Rev 1.18   Sep 29 2009 17:13:38   aangovt
+     34          // Cm005776, Cm005777: Check for configuration parameter is added
+     35          // 
+     36          //    Rev 1.17   Sep 25 2009 10:20:00   adzhelp
+     37          // Cm005776, Cm005777: Integration test changes
+     38          // 
+     39          //    Rev 1.16   Sep 15 2009 17:11:00   aangovt
+     40          // Cm005739, Cm005776, Cm005777: New graph is added for case of reset. Reading of EEP_CAR_SECURE flag in EnterActiveState is removed.
+     41          // 
+     42          //    Rev 1.15   09 Sep 2009 11:41:22   aangovt
+     43          // Cm005820: After change of doors state door state command is sent, only  if car is secured.
+     44          // 
+     45          //    Rev 1.14   Aug 25 2009 18:07:18   aangovt
+     46          // Cm005188: Code optimization - three controls, consumed by one function
+     47          // 
+     48          //    Rev 1.13   25 Aug 2009 12:28:34   aangovt
+     49          // Cm005188: Checks for doors falling edges is added.
+     50          // 
+     51          //    Rev 1.12   13 Jul 2009 09:44:30   aangovt
+     52          // Cm005188: Sleeping authorisation is added; update acording to Cm005189, Cm005431 and code review.
+     53          // 
+     54          //    Rev 1.11   May 18 2009 17:46:48   aangovt
+     55          // Update according to QAC analyse
+     56          // 
+     57          //    Rev 1.10   May 05 2009 18:13:54   aangovt
+     58          // Cm004913 - EEP_CALALARM verification at EnterActiveState is removed.
+     59          // 
+     60          //    Rev 1.9   May 05 2009 15:02:30   aangovt
+     61          // Cm004913 - EEP_CALALARM verification for sending of ARM command and DOOR STATUS is added.
+     62          // 
+     63          //    Rev 1.8   Apr 28 2009 16:40:56   aangovt
+     64          // Cm003271 Update according to UTEST and QAC analyse
+     65          // 
+     66          //    Rev 1.7   Apr 25 2009 17:17:20   aangovt
+     67          // Cm003271 Integration test corrections
+     68          // 
+     69          //    Rev 1.6   Apr 17 2009 19:35:10   aangovt
+     70          // Cm003271 - Update according to diagnostic at EnterActiveState
+     71          // 
+     72          //    Rev 1.5   Apr 17 2009 10:09:17   aangovt
+     73          // Cm003271 - Update according to prsFS_ASA-265 
+     74          // 
+     75          //    Rev 1.4   Apr 16 2009 10:48:12   aangovt
+     76          // Cm003271 - EEP parameter CAR_SECURE is used instead controls 
+     77          // 
+     78          //    Rev 1.3   Apr 14 2009 09:27:39   aangovt
+     79          // Cm003271 - checks for diagnostic session is added. 
+     80          // 
+     81          //    Rev 1.2   Mar 09 2009 13:07:21   aangovt
+     82          // Cm003271  Implementation of the Alarm functionality  
+     83          // 
+     84          //    Rev 1.1   Feb 20 2009 16:16:47   aangovt
+     85          // Cm003271  Implementation of the Alarm functionality 
+     86          // 
+     87          //    Rev 1.0   Feb 10 2009 13:55:09   aangovt
+     88          // Initial revision. 
+     89          //******************************************************************************
+     90          #endif
+     91          
+     92          //------------------------------------------------------------------------------
+     93          // Body Identification
+     94          //------------------------------------------------------------------------------
+     95          #define lap_ala  "lap_ala"
+     96          
+     97          //------------------------------------------------------------------------------
+     98          // Included files to resolve specific definitions in this file
+     99          //
+    100          // #include <system_file_name.h>
+    101          // #include "project_file_name.h"
+    102          //------------------------------------------------------------------------------
+    103          #include "dat.h"
+    104          #include "deftypes.h"
+    105          #include "lib.h"
+    106          #include "tos.h"
+    107          #include "LAP_ALA.h"
+    108          #include "LAP_ALA.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPAlarms[18]
+   \                     LAPAlarms:
+   \   0000   ........       DW LAPAlaIsNotSecure, LAPAlaSendDisarmCommand
+   \   0004   0C01           DB 12, 1
+   \   0006   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPAlaPauseIsFinished, LAPAlaSendDoorState
+   \   0010   FF03           DB 255, 3
+   \   0012   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0016   FF04           DB 255, 4
+   \   0018   ........       DW LAPAlaPauseIsFinished, TOSSeqNoAction
+   \   001C   FF05           DB 255, 5
+   \   001E   ........       DW LAPAlaDoorStateCommandIsRequested, LAPAlaSendDoorState
+   \   0022   0806           DB 8, 6
+   \   0024   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0028   FF07           DB 255, 7
+   \   002A   ........       DW LAPAlaPauseIsFinished, TOSSeqNoAction
+   \   002E   FF00           DB 255, 0
+   \   0030   ........       DW LAPAlaArmFollowedByDisarm, LAPAlaStartPauseBetweenMessage
+   \   0034   0A09           DB 10, 9
+   \   0036   ........       DW LAPAlaPauseIsFinished, TOSSeqNoAction
+   \   003A   FF00           DB 255, 0
+   \   003C   ........       DW LAPAlaNoFallingEdges, LAPAlaSetSleepingAuthorisation
+   \   0040   0B00           DB 11, 0
+   \   0042   ........       DW LAPAlaFallingEdges, LAPAlaSendDoorState
+   \   0046   FF06           DB 255, 6
+   \   0048   ........       DW LAPAlaIsCarSecure, LAPAlaSendArmCommand
+   \   004C   110D           DB 17, 13
+   \   004E   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0052   FF0E           DB 255, 14
+   \   0054   ........       DW LAPAlaPauseIsFinished, LAPAlaSendDoorState
+   \   0058   FF0F           DB 255, 15
+   \   005A   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   005E   FF10           DB 255, 16
+   \   0060   ........       DW LAPAlaPauseIsFinished, TOSSeqNoAction
+   \   0064   FF05           DB 255, 5
+   \   0066   ........       DW TOSSeqTrueEval, TOSSeqNoAction
+   \   006A   FF05           DB 255, 5
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near AlarmAfterReset[10]
+   \                     AlarmAfterReset:
+   \   0000   ........       DW LAPAlaIsNotSecure, LAPAlaSendDisarmCommand
+   \   0004   0501           DB 5, 1
+   \   0006   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPAlaPauseIsFinished, LAPAlaSendDoorState
+   \   0010   FF03           DB 255, 3
+   \   0012   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0016   FF04           DB 255, 4
+   \   0018   ........       DW LAPAlaPauseIsFinished, LAPAlaAfterResetFinished
+   \   001C   FFFF           DB 255, 255
+   \   001E   ........       DW LAPAlaIsCarSecure, LAPAlaSendArmCommand
+   \   0022   FF06           DB 255, 6
+   \   0024   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0028   FF07           DB 255, 7
+   \   002A   ........       DW LAPAlaPauseIsFinished, LAPAlaSendDoorState
+   \   002E   FF08           DB 255, 8
+   \   0030   ........       DW LAPAlaSendingIsFinished, LAPAlaStartPauseBetweenMessage
+   \   0034   FF09           DB 255, 9
+   \   0036   ........       DW LAPAlaPauseIsFinished, LAPAlaAfterResetFinished
+   \   003A   FFFF           DB 255, 255
+    109           
+    110          
+    111          //------------------------------------------------------------------------------
+    112          // Local constants
+    113          //
+    114          // #define cConstantName   ((tType) ConstantValue)
+    115          //------------------------------------------------------------------------------
+    116          
+    117          // - 1 is because TOSTimerAlapsed checks only  Delay > Timeout
+    118          
+    119          #define cPauseBetweenArmCommandAndDisarmCommand               ( mTOSConvMsInTimerTick((U32)180UL) - (tTOSTimer)1U)  
+    120          // pause is 180 ms,  because 10ms is  door state timeout and 10ms for true state
+    121          
+    122          #define cPauseBetweenArmADisarmCommandAndDoorStateCommand      mTOSConvMsInTimerTick((U32)10UL - (tTOSTimer)1U)
+    123          #define cInhibit                                   0
+    124          #define cAuthorize                                 1
+    125          
+    126          
+    127          #define cDATAlaCmdFrameLenght             ((U8)0x04U)
+    128          
+    129          #define cIgnStateIsOn                     ((U8)0x06U)
+    130          
+    131          #define cTwoTimesSent                     ((U8) 2)
+    132          
+    133          #define cByte0OfFrame                     ( 0)
+    134          #define cByte1OfFrame                     ( 1)
+    135          #define cByte2OfFrame                     ( 2)
+    136          #define cByte3OfFrame                     ( 3)
+    137          
+    138          #define cAllDoorAreClosed                 ((U8)0x00U) // all doors are closed
+    139          #define cFrontDoorsOpened                 ((U8)0x03U) // Driver door and front passenger door
+    140          #define cRearDoorsOpened                  ((U8)0x0CU)  // includes rear passenger doors(left and right)
+    141          
+    142          #define cArmCommand                       ((U8)0xC9U) // Arm command
+    143          #define cDisarmCommand                    ((U8)0xC6U) // Disarm command
+    144          #define cDoorStatusCommand                ((U8)0xDCU) // Door State
+    145          
+    146          //------------------------------------------------------------------------------
+    147          // Local macros
+    148          //
+    149          // #define mMacroName   (MacroDefinition)
+    150          //------------------------------------------------------------------------------
+    151          
+    152          //------------------------------------------------------------------------------
+    153          // Local types
+    154          //
+    155          // typedef Expression    tTypeName;
+    156          //------------------------------------------------------------------------------
+    157          
+    158          //------------------------------------------------------------------------------
+    159          // Data prefix
+    160          //
+    161          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    162          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    163          //
+    164          // -----------------------------------------------------------------------------
+    165          // Local data
+    166          //
+    167          // static  tType   u8VariableName;  
+    168          // static  tType*  pu8VariableName; 
+    169          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    170          static tTOSTimer  PauseBetweenTwoMessagesTimer;
+   \                     PauseBetweenTwoMessagesTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    171          static tTOSTimer  PauseBetweenTwoMessagesValue;
+   \                     PauseBetweenTwoMessagesValue:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    172          
+    173          
+    174          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    175          static U8     u8PreviousDoorState    = cAllDoorAreClosed;
+   \                     u8PreviousDoorState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    176          // Bit 0 : Driver door
+    177          // Bit 1 : front passenger door
+    178          // Bit 2 : passenger rear left
+    179          // Bit 3 : passenger rear right
+    180          // Bit 4 : trunk
+    181          
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    182          static BOOL   bSleepingAuthorisation = cTrue;
+   \                     bSleepingAuthorisation:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bSleepingAuthorisation>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    183          static BOOL   bSetAlarmIsRequested   = cFalse;
+   \                     bSetAlarmIsRequested:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    184          static BOOL   bUnsetAlarmIsRequested = cFalse;
+   \                     bUnsetAlarmIsRequested:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    185          static BOOL   bArmFollowedByDisarm   = cFalse;      // flag for ARM command followed by DISARM or opposite
+   \                     bArmFollowedByDisarm:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    186          static BOOL   bMemoIgnState          = cFalse;
+   \                     bMemoIgnState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    187          static U8     u8LastCommandSent      = 0;
+   \                     u8LastCommandSent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    188          static BOOL   bFallingEdgeForDS      = cFalse;     // flag for falling edge of Power Ignition or doors for DOOR STATE command
+   \                     bFallingEdgeForDS:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    189          static BOOL   bStateAfterReset;
+   \                     bStateAfterReset:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    190           
+    191          
+    192           
+    193          //------------------------------------------------------------------------------
+    194          // Constant local data
+    195          //
+    196          // static const tType  VariableName;
+    197          //------------------------------------------------------------------------------
+    198          
+    199          //------------------------------------------------------------------------------
+    200          // Exported data
+    201          //
+    202          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    203          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    204          //------------------------------------------------------------------------------
+    205          
+    206          //------------------------------------------------------------------------------
+    207          // Constant exported data
+    208          //
+    209          //             (LAY: 3 characters to identify the layer)
+    210          //             (Cmp: 3 characters to identify this component)
+    211          // 
+    212          // const tType   LAYCmpVariableName;
+    213          //------------------------------------------------------------------------------
+    214          
+    215          //------------------------------------------------------------------------------
+    216          // Local function prototypes
+    217          // 
+    218          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    219          //------------------------------------------------------------------------------
+    220          static U8 ReadDoorsInput(void);
+    221          static BOOL DoorStateHasChanged(void);
+    222          static void ChecksumCalculation(void);
+    223          
+    224          #ifdef X90_PROJECT
+    225          static MEM_TYPE void LAPAlaSendArmCommand_Static(void);
+    226          static MEM_TYPE BOOL LAPAlaDoorStateCommandIsRequested_Static(void);
+    227          static MEM_TYPE BOOL LAPAlaArmFollowedByDisarm_Static(void);
+    228          static MEM_TYPE BOOL LAPAlaPauseIsFinished_Static(void);
+    229          static MEM_TYPE void LAPAlaSendDisarmCommand_Static(void);
+    230          static MEM_TYPE void LAPAlaSendDoorState_Static(void);
+    231          static MEM_TYPE void LAPAlaDiagEnable_Static(void);
+    232          static MEM_TYPE void LAPAlaDiagDisable_Static(void);
+    233          #endif
+    234          
+    235          //==============================================================================
+    236          //=========================== LOCAL FUNCTIONS ==================================
+    237          //==============================================================================
+    238          
+    239          // [LOCAL_FUNCTIONS_END] 
+    240          //==============================================================================
+    241          // DESCRIPTION : 
+    242          //
+    243          // PARAMETERS (Type,Name,Min,Max) :   Present Door State
+    244          //
+    245          // RETURN VALUE :   U8
+    246          //
+    247          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    248          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    249          static U8 ReadDoorsInput(void)
+   \                     ReadDoorsInput:
+    250          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    251              U8 u8ReturnValueL;
+    252              u8ReturnValueL = cAllDoorAreClosed;
+   \   0000   A000           MOV       X,#0
+    253           
+    254              if(mDATRead(U1Bit, FR_DOORS_SW, Default) != 0)
+   \   0002   3133..02       BF        S:DATDinInputBuffers+6.3, ??LAPAlaAfterResetFinished_0
+    255              {
+    256                  u8ReturnValueL |= cFrontDoorsOpened;
+   \   0006   A003           MOV       X,#3
+    257              }
+    258              if(mDATRead(U1Bit, RR_DOORS_SW, Default) != 0)
+   \                     ??LAPAlaAfterResetFinished_0:
+   \   0008   3103..04       BF        S:DATDinInputBuffers+8.0, ??LAPAlaAfterResetFinished_1
+    259              {
+    260                  u8ReturnValueL |= cRearDoorsOpened;
+   \   000C   60             MOV       A,X
+   \   000D   6D0C           OR        A,#12
+   \   000F   70             MOV       X,A
+    261              }
+    262          
+    263              return u8ReturnValueL;
+   \                     ??LAPAlaAfterResetFinished_1:
+   \   0010   60             MOV       A,X
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    264          }
+    265          //==============================================================================
+    266          // DESCRIPTION : check for doors state changes
+    267          //
+    268          // PARAMETERS (Type,Name,Min,Max) :   none
+    269          //
+    270          // RETURN VALUE :   BOOL
+    271          //
+    272          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    273          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    274          static BOOL DoorStateHasChanged(void)
+   \                     DoorStateHasChanged:
+    275          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    276              U8    u8ActualDoorStateL;
+    277              BOOL  bResultL;  
+    278          	
+    279               
+    280              u8ActualDoorStateL = ReadDoorsInput();
+   \   0000   A000           MOV       X,#0
+   \   0002   3133..02       BF        S:DATDinInputBuffers+6.3, ??LAPAlaAfterResetFinished_2
+   \   0006   A003           MOV       X,#3
+   \                     ??LAPAlaAfterResetFinished_2:
+   \   0008   3103..04       BF        S:DATDinInputBuffers+8.0, ??LAPAlaAfterResetFinished_3
+   \   000C   60             MOV       A,X
+   \   000D   6D0C           OR        A,#12
+   \   000F   70             MOV       X,A
+    281          	
+    282              if (u8ActualDoorStateL == u8PreviousDoorState) 
+   \                     ??LAPAlaAfterResetFinished_3:
+   \   0010   60             MOV       A,X
+   \   0011   48....         CMP       A,u8PreviousDoorState
+   \   0014   BD03           BNZ       ??LAPAlaAfterResetFinished_4
+    283              {
+    284                  bResultL = cFalse;
+   \   0016   A100           MOV       A,#0
+   \   0018   AF             RET       
+    285              }
+    286              else
+    287              {
+    288                  bResultL = cTrue;
+   \                     ??LAPAlaAfterResetFinished_4:
+   \   0019   A101           MOV       A,#1
+    289              }
+    290              return bResultL;
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    291          	
+    292          }
+    293          //==============================================================================
+    294          // DESCRIPTION : Checksum Calculation for 4th byte of alarm command
+    295          //
+    296          // PARAMETERS (Type,Name,Min,Max) :   none
+    297          //
+    298          // RETURN VALUE :   none
+    299          //
+    300          // DESIGN INFORMATION : Byte 4 = sum Ai x 2^(n-i) => for n=3 : Byte 4 = Value_of_Byte1*4 + Value_of_Byte2*2 + Value_of_Byte3
+    301          //                               i=1
+    302          //prsFS_ASA-386, prsFS_ASA-387, prsFS_ASA-388
+    303          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    304          static void ChecksumCalculation(void)
+   \                     ChecksumCalculation:
+    305          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    306              U8  u8ChecksumL;
+    307              U8  u8CounterL;
+    308          	
+    309              u8ChecksumL = 0;
+   \   0002   A300           MOV       B,#0
+    310              for (u8CounterL=0; u8CounterL < cByte3OfFrame; u8CounterL++)
+   \   0004   A400           MOV       E,#0
+   \   0006   16....         MOVW      HL,#AlaCmdFrame
+    311              {
+    312                  u8ChecksumL += (U8) (mDATReadTable(U8Bit, AlaCmdFrame, u8CounterL, Default) << (U8)(cDATAlaCmdFrameLenght - u8CounterL - cTwoTimesSent));
+   \                     ??ChecksumCalculation_0:
+   \   0009   A102           MOV       A,#2
+   \   000B   611C           SUB       A,E
+   \   000D   72             MOV       C,A
+   \   000E   87             MOV       A,[HL]
+   \   000F   70             MOV       X,A
+   \   0010   A100           MOV       A,#0
+   \   0012   ..             CALLT     [__T_?I_LSH_L02]
+   \   0013   60             MOV       A,X
+   \   0014   6103           ADD       B,A
+    313              }
+   \   0016   44             INC       E
+   \   0017   64             MOV       A,E
+   \   0018   86             INCW      HL
+   \   0019   4D03           CMP       A,#3
+   \   001B   8DEC           BC        ??ChecksumCalculation_0
+    314          	
+    315              mDATWriteTable(U8Bit, AlaCmdFrame, cByte3OfFrame, u8ChecksumL, Default);
+   \   001D   63             MOV       A,B
+   \   001E   9E....         MOV       AlaCmdFrame+3,A
+    316          }
+   \   0021   B4             POP       DE
+   \   0022   B2             POP       BC
+   \   0023   AF             RET       
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    317          
+    318          //==============================================================================
+    319          
+    320          //=============================================================================
+    321          //============================ EXPORTED FUNCTIONS =============================
+    322          //=============================================================================
+    323          //==============================================================================
+    324          // DESCRIPTION : Pause between  two alarm messages
+    325          //
+    326          // PARAMETERS (Type,Name,Min,Max) :   none
+    327          //
+    328          // RETURN VALUE :   none
+    329          //
+    330          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    331          void LAPAlaStartPauseBetweenMessage(void)
+   \                     LAPAlaStartPauseBetweenMessage:
+    332          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    333              TOSStartTimer(&PauseBetweenTwoMessagesTimer);
+   \   0000   10....         MOVW      AX,#PauseBetweenTwoMessagesTimer
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+    334          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    335          //==============================================================================
+    336          // DESCRIPTION : Door state command request
+    337          //
+    338          // PARAMETERS (Type,Name,Min,Max) :   none
+    339          //
+    340          // RETURN VALUE :   BOOL
+    341          //
+    342          // DESIGN INFORMATION : prsFS_ASA-262, prsFS_ASA-263
+    343          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    344          BOOL LAPAlaDoorStateCommandIsRequested(void)
+   \                     LAPAlaDoorStateCommandIsRequested:
+    345          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    346          #ifdef X90_PROJECT
+    347              return LAPAlaDoorStateCommandIsRequested_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaDoorStateCommandIsRequested_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaDoorStateCommandIsRequested_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    348          }
+    349          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    350          static MEM_TYPE BOOL LAPAlaDoorStateCommandIsRequested_Static(void)
+   \                     LAPAlaDoorStateCommandIsRequested_Static:
+    351          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    352          #endif
+    353          
+    354              BOOL bReturnValueL = cFalse;
+   \   0001   A200           MOV       C,#0
+    355              BOOL bDoorStateHasChangedL;
+    356              BOOL bCarSecuredL; 
+    357          
+    358              bCarSecuredL = mDATRead(U1Bit, EEP_CAR_SECURE, Default);
+   \   0003   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0006   31F704         BF        [HL].7, ??LAPAlaAfterResetFinished_20
+   \   0009   A301           MOV       B,#1
+   \   000B   FA02           BR        ??LAPAlaAfterResetFinished_21
+   \                     ??LAPAlaAfterResetFinished_20:
+   \   000D   A300           MOV       B,#0
+    359          
+    360            
+    361              bDoorStateHasChangedL = DoorStateHasChanged();
+   \                     ??LAPAlaAfterResetFinished_21:
+   \   000F   9A....         CALL      DoorStateHasChanged
+   \   0012   70             MOV       X,A
+    362              if( (bMemoIgnState != (mDATRead(U1Bit,PWR_IGN,Defaut)))  
+    363              || 	 ((bDoorStateHasChangedL == cTrue) && (bCarSecuredL == cTrue) ))
+   \   0013   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0015   5D01           AND       A,#1
+   \   0017   48....         CMP       A,bMemoIgnState
+   \   001A   BD08           BNZ       ??LAPAlaAfterResetFinished_22
+   \   001C   60             MOV       A,X
+   \   001D   51             DEC       A
+   \   001E   BD11           BNZ       ??LAPAlaAfterResetFinished_23
+   \   0020   63             MOV       A,B
+   \   0021   51             DEC       A
+   \   0022   BD0D           BNZ       ??LAPAlaAfterResetFinished_23
+    364              {
+    365                  bReturnValueL = cTrue;
+   \                     ??LAPAlaAfterResetFinished_22:
+   \   0024   100000         MOVW      AX,#0
+   \   0027   A201           MOV       C,#1
+    366                  PauseBetweenTwoMessagesValue = cPauseBetweenArmADisarmCommandAndDoorStateCommand;
+   \   0029   03....         MOVW      PauseBetweenTwoMessagesValue,AX
+    367                  u8LastCommandSent = cDoorStatusCommand;
+   \   002C   A1DC           MOV       A,#220
+   \   002E   9E....         MOV       u8LastCommandSent,A
+    368              }
+    369              
+    370              bMemoIgnState = mDATRead(U1Bit, PWR_IGN, Defaut);
+   \                     ??LAPAlaAfterResetFinished_23:
+   \   0031   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0033   5D01           AND       A,#1
+   \   0035   9E....         MOV       bMemoIgnState,A
+    371              u8PreviousDoorState = ReadDoorsInput();
+   \   0038   9A....         CALL      ReadDoorsInput
+   \   003B   9E....         MOV       u8PreviousDoorState,A
+    372          
+    373          
+    374              return bReturnValueL;
+   \   003E   62             MOV       A,C
+   \   003F   B2             POP       BC
+   \   0040   AF             RET       
+   \   0041                  REQUIRE ?CL78K_V4_6_L00
+    375          
+    376          }
+    377          //==============================================================================
+    378          // DESCRIPTION : Arm command followed of Disarm and vice versa
+    379          //
+    380          // PARAMETERS (Type,Name,Min,Max) :   none
+    381          //
+    382          // RETURN VALUE :   BOOL
+    383          //
+    384          // DESIGN INFORMATION : _ReqId_ :  prsFS_ASA-370
+    385          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    386          BOOL LAPAlaArmFollowedByDisarm(void)
+   \                     LAPAlaArmFollowedByDisarm:
+    387          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    388          #ifdef X90_PROJECT
+    389              return LAPAlaArmFollowedByDisarm_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaArmFollowedByDisarm_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaArmFollowedByDisarm_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    390          }
+    391          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    392          static MEM_TYPE BOOL LAPAlaArmFollowedByDisarm_Static(void)
+   \                     LAPAlaArmFollowedByDisarm_Static:
+    393          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    394          #endif
+    395          
+    396              BOOL bReturnValueL = cFalse;
+   \   0000   A000           MOV       X,#0
+    397              // ARM command is followed by DISARM command - timeout is 200ms 
+    398              //(10ms for door state request and 190 if after arm is disarm command)
+    399          
+    400              // DISARM command is followed by ARM command - timeout is 200ms 
+    401              //(10ms for door state request and 190 if after disarm is  arm command)
+    402          
+    403              if(  (u8LastCommandSent == cArmCommand) 
+    404                  &&
+    405                  (bUnsetAlarmIsRequested == cTrue)
+    406                )
+   \   0002   8E....         MOV       A,u8LastCommandSent
+   \   0005   4DC9           CMP       A,#201
+   \   0007   BD13           BNZ       ??LAPAlaAfterResetFinished_24
+   \   0009   8E....         MOV       A,bUnsetAlarmIsRequested
+   \   000C   51             DEC       A
+   \   000D   BD17           BNZ       ??LAPAlaAfterResetFinished_25
+    407              {
+    408                  PauseBetweenTwoMessagesValue = cPauseBetweenArmCommandAndDisarmCommand;
+   \                     ??LAPAlaArmFollowedByDisarm_Static_0:
+   \   000F   101100         MOVW      AX,#17
+   \   0012   03....         MOVW      PauseBetweenTwoMessagesValue,AX
+    409                  bReturnValueL = cTrue;
+   \   0015   A001           MOV       X,#1
+    410                  bArmFollowedByDisarm = cFalse;
+   \   0017   9E....         MOV       bArmFollowedByDisarm,A
+   \   001A   FA0A           BR        ??LAPAlaAfterResetFinished_25
+    411              }
+    412          
+    413              if( (u8LastCommandSent == cDisarmCommand) 
+    414                 &&
+    415                 (bSetAlarmIsRequested  == cTrue)
+    416                 )
+   \                     ??LAPAlaAfterResetFinished_24:
+   \   001C   4DC6           CMP       A,#198
+   \   001E   BD06           BNZ       ??LAPAlaAfterResetFinished_25
+   \   0020   8E....         MOV       A,bSetAlarmIsRequested
+   \   0023   51             DEC       A
+   \   0024   ADE9           BZ        ??LAPAlaArmFollowedByDisarm_Static_0
+    417              {
+    418                  PauseBetweenTwoMessagesValue = cPauseBetweenArmCommandAndDisarmCommand;
+    419                  bReturnValueL = cTrue;
+    420                  bArmFollowedByDisarm = cFalse;
+    421              }
+    422                
+    423              return bReturnValueL;
+   \                     ??LAPAlaAfterResetFinished_25:
+   \   0026   60             MOV       A,X
+   \   0027   AF             RET       
+   \   0028                  REQUIRE ?CL78K_V4_6_L00
+    424          }
+    425          //==============================================================================
+    426          // DESCRIPTION : Pause is finished
+    427          //
+    428          // PARAMETERS (Type,Name,Min,Max) :   none
+    429          //
+    430          // RETURN VALUE :   BOOL
+    431          //
+    432          // DESIGN INFORMATION :prsFS_ASA-367, prsFS_ASA-368, prsFS_ASA-369, prsFS_ASA-370
+    433          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    434          BOOL LAPAlaPauseIsFinished(void)
+   \                     LAPAlaPauseIsFinished:
+    435          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    436          #ifdef X90_PROJECT
+    437              return LAPAlaPauseIsFinished_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaPauseIsFinished_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaPauseIsFinished_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    438          }
+    439          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    440          static MEM_TYPE BOOL LAPAlaPauseIsFinished_Static(void)
+   \                     LAPAlaPauseIsFinished_Static:
+    441          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    442          #endif
+    443          
+    444              BOOL  bTempoElapsedL;
+    445              
+    446              bTempoElapsedL = TOSIsTimerElapsed(&PauseBetweenTwoMessagesTimer, PauseBetweenTwoMessagesValue);
+    447              return bTempoElapsedL;
+   \   0001   02....         MOVW      AX,PauseBetweenTwoMessagesValue
+   \   0004   D2             MOVW      BC,AX
+   \   0005   10....         MOVW      AX,#PauseBetweenTwoMessagesTimer
+   \   0008   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0009   B2             POP       BC
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    448          }
+    449          //==============================================================================
+    450          // DESCRIPTION : Sending of Arm Command to the AFS Alarm ACU, through the 'Cobra' serial link
+    451          //
+    452          // PARAMETERS (Type,Name,Min,Max) :   none
+    453          //
+    454          // RETURN VALUE :   none
+    455          //
+    456          // DESIGN INFORMATION :prsFS_ASA-375, prsFS_ASA-376, prsFS_ASA-377, prsFS_ASA-378, prsFS_ASA-379,prsFS_ASA-386, prsFS_ASA-387, prsFS_ASA-388
+    457          // prsFS_ASA-251 - BCM Reset - Component Activation, there is no special input for Reset Counter from EEP
+    458          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    459          void LAPAlaSendArmCommand(void)
+   \                     LAPAlaSendArmCommand:
+    460          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    461          #ifdef X90_PROJECT
+    462              LAPAlaSendArmCommand_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaSendArmCommand_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaSendArmCommand_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    463          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    464          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    465          static MEM_TYPE void LAPAlaSendArmCommand_Static(void)
+   \                     LAPAlaSendArmCommand_Static:
+    466          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    467          #endif
+    468              if ( mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B724         BF        [HL].3, ??LAPAlaAfterResetFinished_26
+    469              {    
+    470                  // Forbid the sleep until the end of the emission
+    471                  bSleepingAuthorisation = cFalse;
+   \   0006   A100           MOV       A,#0
+   \   0008   9E....         MOV       bSleepingAuthorisation,A
+    472          
+    473          
+    474                  // Clear the new command request;
+    475                  bSetAlarmIsRequested  = cFalse;
+   \   000B   9E....         MOV       bSetAlarmIsRequested,A
+    476          
+    477                  // Set the data to send to the alarm
+    478                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte0OfFrame, cArmCommand, Default);
+   \   000E   A1C9           MOV       A,#201
+   \   0010   9E....         MOV       AlaCmdFrame,A
+    479                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte1OfFrame, (U8)mDATReadTable(U8Bit,EEP_VehicleIdentifierNumber,1,Default) , Default);
+   \   0013   8E....         MOV       A,DATSbkMirrors+39
+   \   0016   9E....         MOV       AlaCmdFrame+1,A
+    480                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte2OfFrame, (U8)mDATReadTable(U8Bit,EEP_VehicleIdentifierNumber,0,Default), Default);
+   \   0019   8E....         MOV       A,DATSbkMirrors+38
+   \   001C   9E....         MOV       AlaCmdFrame+2,A
+    481                  ChecksumCalculation(); // This function calculate the checksum 
+   \   001F   9A....         CALL      ChecksumCalculation
+    482                                       // AND set the byte 3 of the buffer AlaCmdFrame
+    483          
+    484                  // Send the message to the alarm
+    485                  mDATControl(DATAla, SendCommand);
+   \   0022   9A....         CALL      DATAlaSendCommand
+    486                  // Sets type of  sent command
+    487                  u8LastCommandSent = cArmCommand;
+   \   0025   A1C9           MOV       A,#201
+   \   0027   9B....         BR        N:?Subroutine1
+    488                  // Pause after Arm command will be 10ms - next command is DOOR STATUS
+    489                  PauseBetweenTwoMessagesValue = cPauseBetweenArmADisarmCommandAndDoorStateCommand;
+    490                  // Checks  how many times Command is sent
+    491              }
+    492              else
+    493              {
+    494                  bSleepingAuthorisation = cTrue;
+   \                     ??LAPAlaAfterResetFinished_26:
+   \   002A                  REQUIRE ?CL78K_V4_6_L00
+   \   002A                  REQUIRE ?Subroutine2
+   \   002A                  ; // Fall through to label ?Subroutine2
+    495              }
+    496           
+    497           
+    498          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine2:
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bSleepingAuthorisation,A
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine1:
+   \   0000   9E....         MOV       u8LastCommandSent,A
+   \   0003   100000         MOVW      AX,#0
+   \   0006   03....         MOVW      PauseBetweenTwoMessagesValue,AX
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    499          //==============================================================================
+    500          // DESCRIPTION : Sending of Disarm Command to the AFS Alarm ACU, through the 'Cobra' serial link
+    501          //
+    502          // PARAMETERS (Type,Name,Min,Max) :   none
+    503          //
+    504          // RETURN VALUE :   none
+    505          //
+    506          // DESIGN INFORMATION :prsFS_ASA-255, prsFS_ASA-256, prsFS_ASA-375, prsFS_ASA-376, prsFS_ASA-377, prsFS_ASA-378, prsFS_ASA-379, prsFS_ASA-386, prsFS_ASA-387, prsFS_ASA-388
+    507          // prsFS_ASA-252 - BCM Reset - Component Activation, there is no special input for Reset Counter from EEP
+    508          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    509          void LAPAlaSendDisarmCommand(void)
+   \                     LAPAlaSendDisarmCommand:
+    510          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    511          #ifdef X90_PROJECT
+    512              LAPAlaSendDisarmCommand_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaSendDisarmCommand_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaSendDisarmCommand_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    513          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    514          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    515          static MEM_TYPE void LAPAlaSendDisarmCommand_Static(void)
+   \                     LAPAlaSendDisarmCommand_Static:
+    516          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    517          #endif
+    518          
+    519              if ( mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B724         BF        [HL].3, ??LAPAlaAfterResetFinished_27
+    520              {
+    521          
+    522                  // Forbid the sleep until the end of the emission
+    523                  bSleepingAuthorisation = cFalse;
+   \   0006   A100           MOV       A,#0
+   \   0008   9E....         MOV       bSleepingAuthorisation,A
+    524          
+    525          
+    526          
+    527                  // Clear the new command request
+    528                  bUnsetAlarmIsRequested  = cFalse;
+   \   000B   9E....         MOV       bUnsetAlarmIsRequested,A
+    529          
+    530                  // Set the data to send to the alarm
+    531                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte0OfFrame, cDisarmCommand, Default);
+   \   000E   A1C6           MOV       A,#198
+   \   0010   9E....         MOV       AlaCmdFrame,A
+    532                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte1OfFrame, mDATReadTable(U8Bit,EEP_VehicleIdentifierNumber,1,Default) , Default);
+   \   0013   8E....         MOV       A,DATSbkMirrors+39
+   \   0016   9E....         MOV       AlaCmdFrame+1,A
+    533                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte2OfFrame, mDATReadTable(U8Bit,EEP_VehicleIdentifierNumber,0,Default), Default);
+   \   0019   8E....         MOV       A,DATSbkMirrors+38
+   \   001C   9E....         MOV       AlaCmdFrame+2,A
+    534                  ChecksumCalculation(); // This function calculate the checksum 
+   \   001F   9A....         CALL      ChecksumCalculation
+    535                                   // AND set the byte 3 of the buffer AlaCmdFrame
+    536          
+    537                  // Send the message to the alarm
+    538                  mDATControl(DATAla, SendCommand);
+   \   0022   9A....         CALL      DATAlaSendCommand
+    539          
+    540          
+    541                  // Sets type of  sent command
+    542                  u8LastCommandSent = cDisarmCommand;
+   \   0025   A1C6           MOV       A,#198
+   \   0027   9B....         BR        N:?Subroutine1
+    543                  // Pause after Disarm command will be 10ms - next command is DOOR STATUS
+    544                  PauseBetweenTwoMessagesValue = cPauseBetweenArmADisarmCommandAndDoorStateCommand  ;
+    545                  // Checks  how many times Command is sent
+    546             
+    547              }
+    548              else
+    549              {
+    550                  bSleepingAuthorisation = cTrue;
+   \                     ??LAPAlaAfterResetFinished_27:
+   \   002A   9B....         BR        N:?Subroutine2
+   \   002D                  REQUIRE ?CL78K_V4_6_L00
+    551              }
+    552          
+    553          
+    554          }
+    555          //==============================================================================
+    556          // DESCRIPTION : Sending of DOOR STATE to the AFS Alarm ACU, through the 'Cobra' serial link
+    557          //
+    558          // PARAMETERS (Type,Name,Min,Max) :   none
+    559          //
+    560          // RETURN VALUE :   none
+    561          //
+    562          // DESIGN INFORMATION : prsFS_ASA-264, prsFS_ASA-384, prsFS_ASA-385
+    563          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    564          void LAPAlaSendDoorState(void)
+   \                     LAPAlaSendDoorState:
+    565          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    566          #ifdef X90_PROJECT
+    567              LAPAlaSendDoorState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaSendDoorState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaSendDoorState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    568          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    569          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    570          static MEM_TYPE void LAPAlaSendDoorState_Static(void)
+   \                     LAPAlaSendDoorState_Static:
+    571          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    572          #endif
+    573          
+    574              U8 u8DoorStatusL;
+    575          
+    576              if ( mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0001   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0004   31B73C         BF        [HL].3, ??LAPAlaAfterResetFinished_28
+    577              {
+    578                  // Set previous Door Status and previous Ign State
+    579                  u8DoorStatusL = (U8)(ReadDoorsInput() | ((mDATRead(U1Bit, PWR_IGN, Defaut)) << cIgnStateIsOn));
+   \   0007   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0009   5D01           AND       A,#1
+   \   000B   A040           MOV       X,#64
+   \   000D   3188           MULU      X
+   \   000F   60             MOV       A,X
+   \   0010   72             MOV       C,A
+   \   0011   9A....         CALL      ReadDoorsInput
+   \   0014   616A           OR        A,C
+   \   0016   70             MOV       X,A
+    580                  // Forbid the sleep until the end of the emission
+    581                  bSleepingAuthorisation = cFalse;
+   \   0017   A100           MOV       A,#0
+   \   0019   9E....         MOV       bSleepingAuthorisation,A
+    582                  // Set the data to send to the alarm
+    583                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte0OfFrame, cDoorStatusCommand, Default);
+   \   001C   A1DC           MOV       A,#220
+   \   001E   9E....         MOV       AlaCmdFrame,A
+    584                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte1OfFrame, u8DoorStatusL, Default);
+   \   0021   60             MOV       A,X
+   \   0022   9E....         MOV       AlaCmdFrame+1,A
+    585                  mDATWriteTable(U8Bit, AlaCmdFrame, cByte2OfFrame, (U8)0x00, Default);
+   \   0025   A100           MOV       A,#0
+   \   0027   9E....         MOV       AlaCmdFrame+2,A
+    586                  ChecksumCalculation(); // This function calculate the checksum 
+   \   002A   9A....         CALL      ChecksumCalculation
+    587                  // AND set the byte 3 of the buffer AlaCmdFrame
+    588                  // Send the message to the alarm
+    589                  mDATControl(DATAla, SendCommand);
+   \   002D   9A....         CALL      DATAlaSendCommand
+    590          
+    591          
+    592                  // Clear Falling edge flag and authorize sleep state; LastCommandSent is DoorStatus
+    593                  if (bFallingEdgeForDS == cTrue)
+   \   0030   8E....         MOV       A,bFallingEdgeForDS
+   \   0033   51             DEC       A
+   \   0034   BD05           BNZ       ??LAPAlaAfterResetFinished_29
+    594                  {
+    595                      bFallingEdgeForDS = cFalse;
+   \   0036   A100           MOV       A,#0
+   \   0038   9E....         MOV       bFallingEdgeForDS,A
+    596                  }
+    597          
+    598          
+    599                  PauseBetweenTwoMessagesValue =  cPauseBetweenArmADisarmCommandAndDoorStateCommand;
+   \                     ??LAPAlaAfterResetFinished_29:
+   \   003B   100000         MOVW      AX,#0
+   \   003E   03....         MOVW      PauseBetweenTwoMessagesValue,AX
+   \   0041   FA05           BR        ??LAPAlaAfterResetFinished_30
+    600              }
+    601              else
+    602              {
+    603                  bSleepingAuthorisation = cTrue;
+   \                     ??LAPAlaAfterResetFinished_28:
+   \   0043   A101           MOV       A,#1
+   \   0045   9E....         MOV       bSleepingAuthorisation,A
+    604              }
+    605              
+    606          }
+   \                     ??LAPAlaAfterResetFinished_30:
+   \   0048   B2             POP       BC
+   \   0049   AF             RET       
+   \   004A                  REQUIRE ?CL78K_V4_6_L00
+    607          //==============================================================================
+    608          // DESCRIPTION : Alarm command sending is finished
+    609          //
+    610          // PARAMETERS (Type,Name,Min,Max) :   none
+    611          //
+    612          // RETURN VALUE :   BOOL
+    613          //
+    614          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    615          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    616          BOOL LAPAlaSendingIsFinished(void)
+   \                     LAPAlaSendingIsFinished:
+    617          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    618              return (BOOL)(mDATRead(U1Bit, AlaCommunicationIsRunning, Default) == 0);
+   \   0000   8E....         MOV       A,bDATAlaCommunicationIsRunning
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??LAPAlaAfterResetFinished_5
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPAlaAfterResetFinished_5:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    619          }
+    620          //==============================================================================
+    621          // DESCRIPTION : Checks that car is secured
+    622          //
+    623          // PARAMETERS (Type,Name,Min,Max) :   none
+    624          //
+    625          // RETURN VALUE :   BOOL
+    626          //
+    627          // DESIGN INFORMATION : prsFS_ASA-240, prsFS_ASA-254
+    628          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    629          BOOL LAPAlaIsCarSecure(void)
+   \                     LAPAlaIsCarSecure:
+    630          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    631          
+    632              return (bSetAlarmIsRequested && (bArmFollowedByDisarm == cFalse));
+   \   0000   8E....         MOV       A,bSetAlarmIsRequested
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD0A           BZ        ??LAPAlaAfterResetFinished_6
+   \   0007   8E....         MOV       A,bArmFollowedByDisarm
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD03           BNZ       ??LAPAlaAfterResetFinished_6
+   \   000E   A101           MOV       A,#1
+   \   0010   AF             RET       
+   \                     ??LAPAlaAfterResetFinished_6:
+   \   0011   A100           MOV       A,#0
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    633          }
+    634          //==============================================================================
+    635          // DESCRIPTION : Checks that car is  not secured
+    636          //
+    637          // PARAMETERS (Type,Name,Min,Max) :   none
+    638          //
+    639          // RETURN VALUE :   BOOL 
+    640          //
+    641          // DESIGN INFORMATION : prsFS_ASA-255, prsFS_ASA-256
+    642          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    643          BOOL LAPAlaIsNotSecure(void)
+   \                     LAPAlaIsNotSecure:
+    644          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    645          
+    646              return (bUnsetAlarmIsRequested && (bArmFollowedByDisarm == cFalse));
+   \   0000   8E....         MOV       A,bUnsetAlarmIsRequested
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD0A           BZ        ??LAPAlaAfterResetFinished_7
+   \   0007   8E....         MOV       A,bArmFollowedByDisarm
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD03           BNZ       ??LAPAlaAfterResetFinished_7
+   \   000E   A101           MOV       A,#1
+   \   0010   AF             RET       
+   \                     ??LAPAlaAfterResetFinished_7:
+   \   0011   A100           MOV       A,#0
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    647          }
+    648          
+    649          //==============================================================================
+    650          // DESCRIPTION : Component initialization
+    651          //
+    652          // PARAMETERS (Type,Name,Min,Max) :   none
+    653          //
+    654          // RETURN VALUE :   none
+    655          //
+    656          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    657          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    658          void LAPAlaInitialize(void)
+   \                     LAPAlaInitialize:
+    659          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    660              bStateAfterReset = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bStateAfterReset,A
+    661              TOSStopTimer(&PauseBetweenTwoMessagesTimer);
+   \   0005   10....         MOVW      AX,#PauseBetweenTwoMessagesTimer
+   \   0008   ..             CALLT     [__T_TOSStopTimer]
+    662          }
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    663          //==============================================================================
+    664          // DESCRIPTION : Checks is anybody maintain active state
+    665          //
+    666          // PARAMETERS (Type,Name,Min,Max) :   none
+    667          //
+    668          // RETURN VALUE :   none
+    669          //
+    670          // DESIGN INFORMATION : prsFS_ASA-259
+    671          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    672          void LAPAlaIsAnybodyMaintainActiveState(void)
+   \                     LAPAlaIsAnybodyMaintainActiveState:
+    673          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    674              if (bSleepingAuthorisation == cFalse)
+   \   0000   8E....         MOV       A,bSleepingAuthorisation
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD04           BNZ       ??LAPAlaAfterResetFinished_8
+    675              {
+    676                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   0007   102900         MOVW      AX,#41
+   \   000A   ..             CALLT     [__T_TOSWriteSignal]
+    677              }
+    678          	
+    679          }
+   \                     ??LAPAlaAfterResetFinished_8:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    680          
+    681          //==============================================================================
+    682          // DESCRIPTION : Checks is anybody maintain active sleep state
+    683          //
+    684          // PARAMETERS (Type,Name,Min,Max) :   none
+    685          //
+    686          // RETURN VALUE :   none
+    687          //
+    688          // DESIGN INFORMATION : prsFS_ASA-259
+    689          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    690          void LAPAlaIsAnybodyMaintainActiveSleepState(void)
+   \                     LAPAlaIsAnybodyMaintainActiveSleepState:
+    691          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    692              if (bSleepingAuthorisation == cFalse)
+   \   0000   8E....         MOV       A,bSleepingAuthorisation
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD04           BNZ       ??LAPAlaAfterResetFinished_9
+    693              {
+    694                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveSleepState);
+   \   0007   102800         MOVW      AX,#40
+   \   000A   ..             CALLT     [__T_TOSWriteSignal]
+    695              }
+    696          	
+    697          }
+   \                     ??LAPAlaAfterResetFinished_9:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    698          
+    699          //==============================================================================
+    700          // DESCRIPTION : Enter active state
+    701          //
+    702          // PARAMETERS (Type,Name,Min,Max) :   none
+    703          //
+    704          // RETURN VALUE :   none
+    705          //
+    706          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    707          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    708          void LAPAlaEnterActiveState(void)
+   \                     LAPAlaEnterActiveState:
+    709          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    710              mDATWrite(U1Bit, IsAlaDiagEnabled, 0,Defaut);
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bIsAlaDiagEnabled,A
+    711              
+    712              if (bStateAfterReset != cFalse)
+   \   0005   8E....         MOV       A,bStateAfterReset
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD0A           BNZ       ??LAPAlaAfterResetFinished_10
+    713              {
+    714                  // do not start main graph
+    715                  // graph will be started by reset graph
+    716              }
+    717              else
+    718              {
+    719                  //QACJ 3204: akodzhh: keep for readability 
+    720                  //QACJ 3220: akodzhh: keep for clarity
+    721                  tTOSSeqGraphStateType GraphStateL = TOSSeqGraphState(cTOSSeqGraphIdLAPAlarms);
+    722                  if (GraphStateL == cTOSSeqInactiveGraph)
+   \   000C   A112           MOV       A,#18
+   \   000E   ..             CALLT     [__T_TOSSeqGraphState]
+   \   000F   4D00           CMP       A,#0
+   \   0011   BD03           BNZ       ??LAPAlaAfterResetFinished_10
+    723                  {
+    724                      TOSSeqActivateGraph(cTOSSeqGraphIdLAPAlarms);
+   \   0013   A112           MOV       A,#18
+   \   0015   ..             CALLT     [__T_TOSSeqActivateGraph]
+    725                  }
+    726              }
+    727          }
+   \                     ??LAPAlaAfterResetFinished_10:
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    728          //==============================================================================
+    729          // DESCRIPTION : Leave active state
+    730          //
+    731          // PARAMETERS (Type,Name,Min,Max) :   none
+    732          //
+    733          // RETURN VALUE :   none
+    734          //
+    735          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    736          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    737          void LAPAlaLeaveActiveState(void)
+   \                     LAPAlaLeaveActiveState:
+    738          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    739              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPAlarms);
+   \   0000   A112           MOV       A,#18
+   \   0002   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    740              mDATWrite(U1Bit, IsAlaDiagEnabled, 0,Defaut);
+   \   0003   A100           MOV       A,#0
+   \   0005   9E....         MOV       bIsAlaDiagEnabled,A
+    741          }
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    742          //==============================================================================
+    743          // DESCRIPTION : Leave active state
+    744          //
+    745          // PARAMETERS (Type,Name,Min,Max) :   none
+    746          //
+    747          // RETURN VALUE :   none
+    748          //
+    749          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    750          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    751          void LAPAlaLeaveStartingStepState(void)
+   \                     LAPAlaLeaveStartingStepState:
+    752          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    753              mDATWrite(U1Bit, IsAlaDiagEnabled, 0,Defaut);
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bIsAlaDiagEnabled,A
+    754              if (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0005   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0008   31B711         BF        [HL].3, ??LAPAlaAfterResetFinished_11
+    755              {
+    756                  if( mDATRead(U1Bit, EEP_CAR_SECURE, Default) == cFalse)
+   \   000B   A101           MOV       A,#1
+   \   000D   31F605         BT        [HL].7, ??LAPAlaAfterResetFinished_12
+    757                  {
+    758                      bUnsetAlarmIsRequested = cTrue;
+   \   0010   9E....         MOV       bUnsetAlarmIsRequested,A
+   \   0013   FA03           BR        ??LAPAlaAfterResetFinished_13
+    759                  }
+    760                  else
+    761                  {
+    762                      bSetAlarmIsRequested = cTrue;
+   \                     ??LAPAlaAfterResetFinished_12:
+   \   0015   9E....         MOV       bSetAlarmIsRequested,A
+    763                  }
+    764          
+    765                  TOSSeqActivateGraph(cTOSSeqGraphIdAlarmAfterReset);
+   \                     ??LAPAlaAfterResetFinished_13:
+   \   0018   A113           MOV       A,#19
+   \   001A   ..             CALLT     [__T_TOSSeqActivateGraph]
+   \   001B   AF             RET       
+    766              }
+    767              else
+    768              {
+    769                  bStateAfterReset = cFalse;
+   \                     ??LAPAlaAfterResetFinished_11:
+   \   001C   9E....         MOV       bStateAfterReset,A
+    770              }
+    771              
+    772          }
+   \   001F   AF             RET       
+   \   0020                  REQUIRE ?CL78K_V4_6_L00
+    773          //==============================================================================
+    774          // DESCRIPTION : Car unlock
+    775          //
+    776          // PARAMETERS (Type,Name,Min,Max) :   none
+    777          //
+    778          // RETURN VALUE :   none
+    779          //
+    780          // DESIGN INFORMATION : prsFS_ASA-255, prsFS_ASA-256
+    781          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    782          void LAPAlaUnlockFromTheOutside(void)
+   \                     LAPAlaUnlockFromTheOutside:
+    783          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    784              if (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B711         BF        [HL].3, ??LAPAlaAfterResetFinished_14
+    785              {
+    786                  bUnsetAlarmIsRequested = cTrue;
+   \   0006   A101           MOV       A,#1
+   \   0008   9E....         MOV       bUnsetAlarmIsRequested,A
+    787                  if(u8LastCommandSent == cArmCommand) 
+   \   000B   8E....         MOV       A,u8LastCommandSent
+   \   000E   4DC9           CMP       A,#201
+   \   0010   BD05           BNZ       ??LAPAlaAfterResetFinished_14
+    788                  {
+    789                      bArmFollowedByDisarm = cTrue;
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       bArmFollowedByDisarm,A
+    790                  }
+    791              }
+    792          }
+   \                     ??LAPAlaAfterResetFinished_14:
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+    793          //==============================================================================
+    794          // DESCRIPTION : Key authentication
+    795          //
+    796          // PARAMETERS (Type,Name,Min,Max) :   none
+    797          //
+    798          // RETURN VALUE :   none
+    799          //
+    800          // DESIGN INFORMATION : prsFS_ASA-265
+    801          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    802          void LAPAlaKeyIsAuthenticated(void)
+   \                     LAPAlaKeyIsAuthenticated:
+    803          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    804              if (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B711         BF        [HL].3, ??LAPAlaAfterResetFinished_15
+    805              {
+    806                  bUnsetAlarmIsRequested = cTrue;
+   \   0006   A101           MOV       A,#1
+   \   0008   9E....         MOV       bUnsetAlarmIsRequested,A
+    807           
+    808                  if(u8LastCommandSent == cArmCommand) 
+   \   000B   8E....         MOV       A,u8LastCommandSent
+   \   000E   4DC9           CMP       A,#201
+   \   0010   BD05           BNZ       ??LAPAlaAfterResetFinished_15
+    809                  {
+    810                      bArmFollowedByDisarm = cTrue;
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       bArmFollowedByDisarm,A
+    811                  }
+    812              }
+    813           
+    814          }
+   \                     ??LAPAlaAfterResetFinished_15:
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+    815          
+    816          //==============================================================================
+    817          // DESCRIPTION : Falling edge of door ot ignition
+    818          //
+    819          // PARAMETERS (Type,Name,Min,Max) :   none
+    820          //
+    821          // RETURN VALUE :   none
+    822          //
+    823          // DESIGN INFORMATION : prsFS_ASA-262
+    824          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    825          void LAPAlaFallingEdgeForDS(void)
+   \                     LAPAlaFallingEdgeForDS:
+    826          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    827              if ((mDATRead(U1Bit, EEP_CAR_SECURE, Default) == cTrue)
+    828                  && (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize))
+   \   0000   8E....         MOV       A,DATDbkMirrors+27
+   \   0003   5D88           AND       A,#136
+   \   0005   4D88           CMP       A,#136
+   \   0007   BD0A           BNZ       ??LAPAlaAfterResetFinished_16
+    829              {
+    830                  bFallingEdgeForDS = cTrue;
+   \   0009   A101           MOV       A,#1
+   \   000B   9E....         MOV       bFallingEdgeForDS,A
+    831                  bSleepingAuthorisation = cFalse;
+   \   000E   A100           MOV       A,#0
+   \   0010   9E....         MOV       bSleepingAuthorisation,A
+    832              }
+    833          }
+   \                     ??LAPAlaAfterResetFinished_16:
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    834          //==============================================================================
+    835          // DESCRIPTION : Falling edge of door ot ignition
+    836          //
+    837          // PARAMETERS (Type,Name,Min,Max) :   none
+    838          //
+    839          // RETURN VALUE :   none
+    840          //
+    841          // DESIGN INFORMATION : prsFS_ASA-262
+    842          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    843          void LAPAlaFallingEdgeForPWR_IGN(void)
+   \                     LAPAlaFallingEdgeForPWR_IGN:
+    844          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    845              if (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B70A         BF        [HL].3, ??LAPAlaAfterResetFinished_17
+    846              {
+    847                  bFallingEdgeForDS = cTrue;
+   \   0006   A101           MOV       A,#1
+   \   0008   9E....         MOV       bFallingEdgeForDS,A
+    848                  bSleepingAuthorisation = cFalse;
+   \   000B   A100           MOV       A,#0
+   \   000D   9E....         MOV       bSleepingAuthorisation,A
+    849              }
+    850          }
+   \                     ??LAPAlaAfterResetFinished_17:
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    851          //==============================================================================
+    852          // DESCRIPTION : Car locked
+    853          //
+    854          // PARAMETERS (Type,Name,Min,Max) :   none
+    855          //
+    856          // RETURN VALUE :   none
+    857          //
+    858          // DESIGN INFORMATION : prsFS_ASA-240, prsFS_ASA-2
+    859          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    860          void LAPAlaLockFromTheOutside(void)
+   \                     LAPAlaLockFromTheOutside:
+    861          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    862              if (mDATRead(U1Bit, EEP_CALALARM, Default) == cAuthorize)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0003   31B711         BF        [HL].3, ??LAPAlaAfterResetFinished_18
+    863              {
+    864                  bSetAlarmIsRequested = cTrue;
+   \   0006   A101           MOV       A,#1
+   \   0008   9E....         MOV       bSetAlarmIsRequested,A
+    865          
+    866                  if (u8LastCommandSent == cDisarmCommand) 
+   \   000B   8E....         MOV       A,u8LastCommandSent
+   \   000E   4DC6           CMP       A,#198
+   \   0010   BD05           BNZ       ??LAPAlaAfterResetFinished_18
+    867                  {
+    868                      bArmFollowedByDisarm = cTrue;
+   \   0012   A101           MOV       A,#1
+   \   0014   9E....         MOV       bArmFollowedByDisarm,A
+    869                  }
+    870              }
+    871          }
+   \                     ??LAPAlaAfterResetFinished_18:
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+    872          //==============================================================================
+    873          // DESCRIPTION :  Diagnostic is enabled
+    874          //
+    875          // PARAMETERS (Type,Name,Min,Max) :   none
+    876          //
+    877          // RETURN VALUE :   none
+    878          //
+    879          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    880          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    881          void LAPAlaDiagEnable(void)
+   \                     LAPAlaDiagEnable:
+    882          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    883          #ifdef X90_PROJECT
+    884              LAPAlaDiagEnable_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaDiagEnable_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaDiagEnable_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    885          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    886          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    887          static MEM_TYPE void LAPAlaDiagEnable_Static(void)
+   \                     LAPAlaDiagEnable_Static:
+    888          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    889          #endif
+    890          
+    891              U8 u8GraphStateL; 
+    892              u8GraphStateL = (U8) TOSSeqGraphState(cTOSSeqGraphIdLAPAlarms);
+   \   0000   A112           MOV       A,#18
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   70             MOV       X,A
+    893          
+    894              mDATWrite(U1Bit, IsAlaDiagEnabled, 1,Defaut);
+   \   0004   A101           MOV       A,#1
+   \   0006   9E....         MOV       bIsAlaDiagEnabled,A
+    895              if(u8GraphStateL == cTOSSeqActiveGraph)
+   \   0009   60             MOV       A,X
+   \   000A   51             DEC       A
+   \   000B   BD05           BNZ       ??LAPAlaAfterResetFinished_31
+    896              {
+    897                  TOSSeqFreezeGraph(cTOSSeqGraphIdLAPAlarms);
+   \   000D   A112           MOV       A,#18
+   \   000F   9A....         CALL      TOSSeqFreezeGraph
+    898              }
+    899              
+    900          }
+   \                     ??LAPAlaAfterResetFinished_31:
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    901          //==============================================================================
+    902          // DESCRIPTION : Diagnostic is disabled
+    903          //
+    904          // PARAMETERS (Type,Name,Min,Max) :   none
+    905          //
+    906          // RETURN VALUE :   none
+    907          //
+    908          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    909          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    910          void LAPAlaDiagDisable(void)
+   \                     LAPAlaDiagDisable:
+    911          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    912          #ifdef X90_PROJECT
+    913              LAPAlaDiagDisable_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPAlaDiagDisable_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPAlaDiagDisable_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    914          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    915          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    916          static MEM_TYPE void LAPAlaDiagDisable_Static(void)
+   \                     LAPAlaDiagDisable_Static:
+    917          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    918          #endif
+    919          
+    920              U8 u8GraphStateL; 
+    921              u8GraphStateL = (U8) TOSSeqGraphState(cTOSSeqGraphIdLAPAlarms);
+   \   0000   A112           MOV       A,#18
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   70             MOV       X,A
+    922          
+    923              mDATWrite(U1Bit, IsAlaDiagEnabled, 0,Defaut);
+   \   0004   A100           MOV       A,#0
+   \   0006   9E....         MOV       bIsAlaDiagEnabled,A
+    924              if(u8GraphStateL == cTOSSeqFrozenGraph)
+   \   0009   60             MOV       A,X
+   \   000A   4D02           CMP       A,#2
+   \   000C   BD05           BNZ       ??LAPAlaAfterResetFinished_32
+    925              {
+    926                  TOSSeqUnfreezeGraph(cTOSSeqGraphIdLAPAlarms);    
+   \   000E   A112           MOV       A,#18
+   \   0010   9A....         CALL      TOSSeqUnfreezeGraph
+    927              }
+    928              
+    929          
+    930          }
+   \                     ??LAPAlaAfterResetFinished_32:
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    931          //==============================================================================
+    932          // DESCRIPTION : Sets sleeping authorization
+    933          //
+    934          // PARAMETERS (Type,Name,Min,Max) :   none
+    935          //
+    936          // RETURN VALUE :   none
+    937          //
+    938          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    939          //==============================================================================
+    940          void LAPAlaSetSleepingAuthorisation(void)
+   \                     LAPAlaSetSleepingAuthorisation:
+    941          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    942              bSleepingAuthorisation = cTrue;
+   \   0000                  REQUIRE ?CL78K_V4_6_L00
+   \   0000                  REQUIRE ?Subroutine0
+   \   0000                  ; // Fall through to label ?Subroutine0
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bSleepingAuthorisation,A
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    943          }
+    944          //==============================================================================
+    945          // DESCRIPTION : No door or ignition falling edges
+    946          //
+    947          // PARAMETERS (Type,Name,Min,Max) :   none
+    948          //
+    949          // RETURN VALUE :   none
+    950          //
+    951          // DESIGN INFORMATION : prsFS_ASA-262
+    952          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    953          BOOL LAPAlaNoFallingEdges(void)
+   \                     LAPAlaNoFallingEdges:
+    954          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    955              BOOL bReturnValueL = cFalse;
+   \   0000   A000           MOV       X,#0
+    956          
+    957              // if no falling edges presented, authorize sleep mode of BCM
+    958              if (bFallingEdgeForDS == cFalse)
+   \   0002   8E....         MOV       A,bFallingEdgeForDS
+   \   0005   4D00           CMP       A,#0
+   \   0007   BD02           BNZ       ??LAPAlaAfterResetFinished_19
+    959              {
+    960                  bReturnValueL = cTrue;
+   \   0009   A001           MOV       X,#1
+    961              }
+    962          
+    963              return bReturnValueL;
+   \                     ??LAPAlaAfterResetFinished_19:
+   \   000B   60             MOV       A,X
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    964              
+    965          }
+    966          //==============================================================================
+    967          // DESCRIPTION : door or ignition falling edges
+    968          //
+    969          // PARAMETERS (Type,Name,Min,Max) :   none
+    970          //
+    971          // RETURN VALUE :   none
+    972          //
+    973          // DESIGN INFORMATION : prsFS_ASA-262
+    974          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    975          BOOL LAPAlaFallingEdges(void)
+   \                     LAPAlaFallingEdges:
+    976          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    977              return bFallingEdgeForDS;
+   \   0000   8E....         MOV       A,bFallingEdgeForDS
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    978          }
+    979          
+    980          //==============================================================================
+    981          // DESCRIPTION : 
+    982          //
+    983          // PARAMETERS (Type,Name,Min,Max) :   none
+    984          //
+    985          // RETURN VALUE :   none
+    986          //
+    987          // DESIGN INFORMATION : Refer to DCD
+    988          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    989          void LAPAlaAfterResetFinished(void)
+   \                     LAPAlaAfterResetFinished:
+    990          {    
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    991              TOSSeqActivateGraph(cTOSSeqGraphIdLAPAlarms);
+   \   0000   A112           MOV       A,#18
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    992              bStateAfterReset = cFalse;
+   \   0003   A100           MOV       A,#0
+   \   0005   9E....         MOV       bStateAfterReset,A
+    993              bMemoIgnState = mDATRead(U1Bit,PWR_IGN,Default);
+   \   0008   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   000A   5D01           AND       A,#1
+   \   000C   9E....         MOV       bMemoIgnState,A
+    994          
+    995              bSleepingAuthorisation = cTrue;
+   \   000F   9B....         BR        N:?Subroutine0
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    996          }
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bSleepingAuthorisation>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_LSH_L02:
+   \   0000   ....           DW       ?I_LSH_L02
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqGraphState:
+   \   0000   ....           DW       TOSSeqGraphState
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+    997          
+    998          // [EXPORTED_FUNCTIONS_END] 
+    999           
+
+   Segment part sizes:
+
+     Function/Label                            Bytes
+     --------------                            -----
+     LAPAlarms                                  108
+     AlarmAfterReset                             60
+     PauseBetweenTwoMessagesTimer                 2
+     PauseBetweenTwoMessagesValue                 2
+     u8PreviousDoorState                          1
+     bSleepingAuthorisation                       1
+     bSetAlarmIsRequested                         1
+     bUnsetAlarmIsRequested                       1
+     bArmFollowedByDisarm                         1
+     bMemoIgnState                                1
+     u8LastCommandSent                            1
+     bFallingEdgeForDS                            1
+     bStateAfterReset                             1
+     ReadDoorsInput                              18
+     DoorStateHasChanged                         28
+     ChecksumCalculation                         36
+     LAPAlaStartPauseBetweenMessage               5
+     LAPAlaDoorStateCommandIsRequested
+                                                  9
+     LAPAlaDoorStateCommandIsRequested_Static
+                                                 65
+     LAPAlaArmFollowedByDisarm                    9
+     LAPAlaArmFollowedByDisarm_Static
+                                                 40
+     LAPAlaPauseIsFinished                        9
+     LAPAlaPauseIsFinished_Static                11
+     LAPAlaSendArmCommand                         9
+     LAPAlaSendArmCommand_Static                 42
+     ?Subroutine2                                 6
+     ?Subroutine1                                10
+     LAPAlaSendDisarmCommand                      9
+     LAPAlaSendDisarmCommand_Static              45
+     LAPAlaSendDoorState                          9
+     LAPAlaSendDoorState_Static                  74
+     LAPAlaSendingIsFinished                     13
+     LAPAlaIsCarSecure                           20
+     LAPAlaIsNotSecure                           20
+     LAPAlaInitialize                            10
+     LAPAlaIsAnybodyMaintainActiveState
+                                                 12
+     LAPAlaIsAnybodyMaintainActiveSleepState
+                                                 12
+     LAPAlaEnterActiveState                      23
+     LAPAlaLeaveActiveState                       9
+     LAPAlaLeaveStartingStepState                32
+     LAPAlaUnlockFromTheOutside                  24
+     LAPAlaKeyIsAuthenticated                    24
+     LAPAlaFallingEdgeForDS                      20
+     LAPAlaFallingEdgeForPWR_IGN                 17
+     LAPAlaLockFromTheOutside                    24
+     LAPAlaDiagEnable                             9
+     LAPAlaDiagEnable_Static                     19
+     LAPAlaDiagDisable                            9
+     LAPAlaDiagDisable_Static                    20
+     LAPAlaSetSleepingAuthorisation               0
+     ?Subroutine0                                 6
+     LAPAlaNoFallingEdges                        13
+     LAPAlaFallingEdges                           4
+     LAPAlaAfterResetFinished                    18
+     ?<Initializer for bSleepingAuthorisation>    1
+     __T_?I_LSH_L02                               2
+     __T_TOSStartTimer                            2
+     __T_?FAR_CALL_L07                            2
+     __T_TOSIsTimerElapsed                        2
+     __T_TOSStopTimer                             2
+     __T_TOSWriteSignal                           2
+     __T_TOSSeqGraphState                         2
+     __T_TOSSeqActivateGraph                      2
+     __T_TOSSeqDeactivateGraph                    2
+
+ 
+ 332 bytes in segment BCODE
+  18 bytes in segment CLTVEC
+ 460 bytes in segment CODE
+ 168 bytes in segment CONST
+   1 byte  in segment NEAR_I
+   1 byte  in segment NEAR_ID
+  12 bytes in segment NEAR_Z
+ 
+ 792 bytes of CODE  memory (+ 18 bytes shared)
+ 169 bytes of CONST memory
+  13 bytes of DATA  memory
+
+Errors: none
+Warnings: none

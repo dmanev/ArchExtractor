@@ -1,0 +1,5 @@
+class StkS32
+!!!174575.python!!!	__init__(inout self : )
+        self.Name = 'S32'
+        self.lowerLimit = -2147483646
+        self.upperLimit = 2147483647

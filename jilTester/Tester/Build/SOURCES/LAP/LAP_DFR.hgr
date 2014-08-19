@@ -1,0 +1,75 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef LAP_DFR
+   extern const tTOSSeqGraphType RDFRearDefoggerManagement;
+   extern const tTOSSeqGraphType RDFProtectionManagement; 
+#endif
+
+#ifdef LAP_DFR
+   extern BOOL LAPDfrCommandOff(void);
+   extern BOOL LAPDfrCommandOn(void);
+   extern void     LAPDfrOff(void);
+   extern void     LAPDfrOn(void);
+   extern void     LAPDfrProtectionTask(void);
+   extern BOOL TOSSeqEvalVrai(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef LAP_DFR
+  const tTOSSeqGraphType RDFRearDefoggerManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "RDFRearDefoggerManagement",
+    {
+#endif
+  /*   0*/  {LAPDfrCommandOn,LAPDfrOn,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPDfrCommandOff,LAPDfrOff,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef LAP_DFR
+  const tTOSSeqGraphType RDFProtectionManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "RDFProtectionManagement",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,LAPDfrProtectionTask,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

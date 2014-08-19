@@ -1,0 +1,369 @@
+format 74
+"ModelConverter" // EA_Model::System::Base::ModelConverter
+  revision 13
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Base/ModelConverter/"
+  python_package "ModelConverter"
+  classview 194159 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 282223 "XMIConverter class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    sequencediagram 282351 "XMIConverter running diagram"
+      show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+      overlapping_bars size A3
+    end
+
+    class 278511 "XMIConverter"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 300527 // <dependency>
+	relation 300015 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 300527 // <dependency>
+	  b parent class_ref 278639 // xmi.core
+      end
+
+      classrelation 300783 // <dependency>
+	relation 300271 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 300783 // <dependency>
+	  b parent class_ref 128239 // BaseComponent
+      end
+
+      classrelation 300911 // <dependency>
+	relation 300399 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 300911 // <dependency>
+	  b parent class_ref 164207 // Operation
+      end
+
+      classrelation 301039 // <dependency>
+	relation 300527 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301039 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 301167 // <dependency>
+	relation 300655 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301167 // <dependency>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      classrelation 301295 // <dependency>
+	relation 300783 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301295 // <dependency>
+	  b parent class_ref 163567 // RequiredPort
+      end
+
+      classrelation 301423 // <dependency>
+	relation 300911 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301423 // <dependency>
+	  b parent class_ref 163695 // ProvidedPort
+      end
+
+      classrelation 301551 // <dependency>
+	relation 301039 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301551 // <dependency>
+	  b parent class_ref 171119 // ParamData
+      end
+
+      classrelation 301679 // <dependency>
+	relation 301167 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301679 // <dependency>
+	  b parent class_ref 258671 // AEPackage
+      end
+
+      classrelation 301807 // <dependency>
+	relation 301295 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 301807 // <dependency>
+	  b parent class_ref 258927 // AEModel
+      end
+
+      attribute 181231 "interfaceCreateMap"
+	private explicit_type ""
+	stereotype "map"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+      end
+
+      attribute 174703 "xmiTypesMap"
+	private explicit_type ""
+	multiplicity "*"
+	stereotype "map"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+      end
+
+      attribute 168175 "xmiFactory"
+	private explicit_type ""
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+      end
+
+      operation 275823 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 327535 "getXMIBaseDataType"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 334063 "getXMIBaseArrayDataType"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 283887 "importBaseComponent"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpBaseComponent" type class_ref 128239 // BaseComponent
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 284143 "importSenderReceiverInterface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpSRIf" type class_ref 164079 // SenderReceiverInterface
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 284271 "importClientServerInterface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpCSIf" type class_ref 163951 // ClientServerInterface
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 277231 "importAEPackage"
+	preserve_cpp_body_indent private explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpAEPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 300271 "importTypes"
+	preserve_cpp_body_indent private explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpAEModel" type class_ref 258927 // AEModel
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 300527 "importInterfaces"
+	preserve_cpp_body_indent private explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpAEModel" type class_ref 258927 // AEModel
+	  param inout name "inoutXmiPackage" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 275695 "convert"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpAEModel" type class_ref 258927 // AEModel
+	  param out name "outXMIMdlRepo" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 324079 // <dependency>
+	relation 323567 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 324079 // <dependency>
+	  b parent class_ref 170991 // DataType
+      end
+
+      classrelation 324207 // <dependency>
+	relation 323695 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 324207 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+    end
+  end
+
+  deploymentview 168303 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 271087 "XMIConverter"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 278511 // XMIConverter
+      end
+    end
+  end
+end

@@ -1,0 +1,8 @@
+class BaseComponent
+!!!164975.python!!!	__init__(inout self : , in inpName : string)
+        self.Name = inpName
+!!!204143.python!!!	addPort(in self : , in inpIPort : )
+        if inpIPort.getName() not in self.itsIPortMap.keys():
+            self.itsIPortMap[inpIPort.getName()] = inpIPort
+!!!260719.python!!!	addFileList(in self : , in inpFileList : )
+        self.fileList.extend(inpFileList)

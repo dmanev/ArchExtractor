@@ -1,0 +1,12 @@
+format 74
+
+artifactcanvas 128111 artifact_ref 135407 // IComponent
+  xyz 28 71.5 2000
+end
+artifactcanvas 128239 artifact_ref 134767 // BaseComponent
+  xyz 237 72.5 2000
+end
+simplerelationcanvas 128367 simplerelation_ref 134895
+  from ref 128239 z 2001 to ref 128111
+end
+end

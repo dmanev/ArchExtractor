@@ -1,0 +1,512 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:49 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SPI.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_SPI.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_SPI.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SPI.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_SPI.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_SPI.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SPI.C
+      1          /*============================================================================
+      2            Project ......................... STANDARD
+      3            Component ....................... ldb_spi.c
+      4            File revision.................... 
+      5            Last modification date .......... 
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20            
+     21            -------------------------------------------------------------------------
+     22            ldb_spi.c file review : 
+     23          
+     24              See PVCS revision
+     25          
+     26            ==========================================================================*/
+     27          
+     28          /*--------------------------------------------------------------------------
+     29            Body Identification
+     30            --------------------------------------------------------------------------*/
+     31          #define ldb_spi   "ldb_spi"
+     32          
+     33          /*-------------------------------------------------------------------------
+     34            Included files
+     35          
+     36            #include <system_file_name.h>
+     37            #include "project_file_name.h"
+     38            --------------------------------------------------------------------------*/
+     39          #include "ldb.h"
+     40          #include "ldb_har.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   0000                  DS 1
+     41          #include "ldb_spi.h"
+     42          
+     43          /*--------------------------------------------------------------------------
+     44            Local constants
+     45          
+     46            #define cConstantName   ((tType) ConstantValue)
+     47            --------------------------------------------------------------------------*/
+     48          
+     49          /*--------------------------------------------------------------------------
+     50            Local macros
+     51          
+     52            #define mMacroName   (MacroDefinition)
+     53            --------------------------------------------------------------------------*/
+     54          #define mSetSckHigh()       mLDBHarWrite(cLDBHarSpiSCK,1)
+     55          #define mSetSckLow()        mLDBHarWrite(cLDBHarSpiSCK,0)
+     56          
+     57          #define mReadDin()          mLDBHarRead(cLDBHarSpiSI)
+     58          #define mSetDoutHigh()      mLDBHarWrite(cLDBHarSpiSO,1)
+     59          #define mSetDoutLow()       mLDBHarWrite(cLDBHarSpiSO,0)
+     60          
+     61          /*--------------------------------------------------------------------------
+     62            Local types
+     63          
+     64            struct  sStructureName { ... };
+     65            union   uUnionName { ... };
+     66            enum    eEnumerationName { ... };
+     67            typedef Expression tTypeName;
+     68            --------------------------------------------------------------------------*/
+     69          
+     70          /*--------------------------------------------------------------------------
+     71            Local data
+     72          
+     73            static  tType   VariableName;
+     74            static  tType*  pVariableName; 
+     75            --------------------------------------------------------------------------*/
+     76          
+     77          /*--------------------------------------------------------------------------
+     78            Constant local data
+     79          
+     80            static const tType  VariableName;
+     81            --------------------------------------------------------------------------*/
+     82          
+     83          /*--------------------------------------------------------------------------
+     84            Exported data
+     85          
+     86            tType   CNLVariableName;      (CNL: 3 characters to identify this component)
+     87            tType*  pCNLVariableName;     (CNL: 3 characters to identify this component)
+     88            --------------------------------------------------------------------------*/
+     89          
+     90          /*--------------------------------------------------------------------------
+     91            Constant exported data
+     92           
+     93            const tType   CNLVariableName;(CNL: 3 characters to identify this component)
+     94            --------------------------------------------------------------------------*/
+     95          
+     96          /*--------------------------------------------------------------------------
+     97            Local function prototypes
+     98            
+     99            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    100            --------------------------------------------------------------------------*/
+    101          
+    102          /*============================================================================
+    103            =========================== LOCAL FUNCTIONS ================================
+    104            ==========================================================================*/
+    105          
+    106          /*============================================================================
+    107            DESCRIPTION :
+    108            
+    109            PARAMETERS (Type,Name,Min,Max) :   none
+    110          
+    111            RETURN VALUE :   none
+    112           
+    113            DESIGN INFORMATION :   refer to Detailed Design Document
+    114            ==========================================================================*/
+    115          //static type FunctionName(...)
+    116          
+    117          /*============================================================================
+    118            =========================== EXPORTED FUNCTIONS =============================
+    119            ==========================================================================*/
+    120          /*============================================================================
+    121            DESCRIPTION :void LDBSpiInit(void)
+    122                          Init of the LDB layer
+    123            
+    124            PARAMETERS (Type,Name,Min,Max) :  none
+    125          
+    126            RETURN VALUE :  none
+    127           
+    128            DESIGN INFORMATION :  refer to Detailed Design Document
+    129          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    130          void LDBSpiInit(void)
+   \                     LDBSpiInit:
+    131          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    132          #ifndef cLIBStkCpu_NecV850FxDxSx3
+    133              mLDBHarConfig(cLDBHarSpiSO,cLDBHarOutput);
+   \   0000   712B20         CLR1      0xFF20.2
+    134              mLDBHarConfig(cLDBHarSpiSCK,cLDBHarOutput);
+   \   0003   714B20         CLR1      0xFF20.4
+    135          
+    136              mLDBHarWrite(cLDBHarSpiSCK,cLDBSpiSckLevelInIdleMode);
+   \   0006   4B00           CLR1      S:0xFF00.4
+    137              mLDBHarWrite(cLDBHarSpiSO,cLDBSpiSckLevelInIdleMode);
+   \   0008   2B00           CLR1      S:0xFF00.2
+    138          #else
+    139              mLDBHarWrite(cLDBHarSpiSO,cLDBSpiSckLevelInIdleMode);
+    140              mLDBHarConfig(cLDBHarSpiSO,cLDBHarOutput);
+    141          
+    142              mLDBHarWrite(cLDBHarSpiSCK,cLDBSpiSckLevelInIdleMode);
+    143              mLDBHarConfig(cLDBHarSpiSCK,cLDBHarOutput);
+    144          #endif
+    145          }
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+   \   000B                  REQUIRE _A_P0
+   \   000B                  REQUIRE _A_PM0
+    146          
+    147          #ifdef LDBSPI_FORMAT_LR_USED
+    148          /*============================================================================
+    149            DESCRIPTION :void LDBSpiLRSendBits(U8 DataByte )
+    150                          Write a bit on the SPI bus
+    151          
+    152            PARAMETERS (Type,Name,Min,Max) :  
+    153                - Data: Byte to write on SPI bus
+    154          
+    155            RETURN VALUE : none
+    156          
+    157            DESIGN INFORMATION :  refer to Detailed Design Document
+    158          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    159          void LDBSpiLRSendBits(U8 DataByte,U8 NbBits)
+   \                     LDBSpiLRSendBits:
+    160          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   74             MOV       E,A
+    161              U8 BitIndex;
+    162              U8 Data;
+    163              U8 DataMask;
+    164          
+    165              Data = DataByte;
+    166              DataMask = (((U8)1)<<(NbBits-1));
+   \   0003   63             MOV       A,B
+   \   0004   51             DEC       A
+   \   0005   72             MOV       C,A
+   \   0006   100100         MOVW      AX,#1
+   \   0009   ..             CALLT     [__T_?I_LSH_L02]
+    167              for(BitIndex = 0; BitIndex < NbBits; BitIndex++)
+   \   000A   63             MOV       A,B
+   \   000B   4D00           CMP       A,#0
+   \   000D   AD18           BZ        ??LDBSpiLRReceiveBits_0
+    168              {
+    169                  //  Clock edge signal for set data
+    170                  mSetSckLow();
+   \                     ??LDBSpiLRSendBits_0:
+   \   000F   64             MOV       A,E
+   \   0010   4B00           CLR1      S:0xFF00.4
+    171          
+    172                  // Write data
+    173                  if ( (Data & DataMask) == DataMask)
+   \   0012   6158           AND       A,X
+   \   0014   6148           CMP       A,X
+   \   0016   BD04           BNZ       ??LDBSpiLRReceiveBits_1
+    174                  {
+    175                      mSetDoutHigh();
+   \   0018   2A00           SET1      S:0xFF00.2
+   \   001A   FA02           BR        ??LDBSpiLRReceiveBits_2
+    176                  }
+    177                  else
+    178                  {
+    179                      mSetDoutLow();
+   \                     ??LDBSpiLRReceiveBits_1:
+   \   001C   2B00           CLR1      S:0xFF00.2
+    180                  }
+    181                  Data = Data<<1;
+   \                     ??LDBSpiLRReceiveBits_2:
+   \   001E   64             MOV       A,E
+   \   001F   21             CLR1      CY
+   \   0020   27             ROLC      A,0x1
+   \   0021   74             MOV       E,A
+    182          
+    183                  //Temporization to ensure tDVCH and tCL
+    184              #ifdef cLDBHarMicro78K0_F0536
+    185                 // No need of temporization: computations take time > 1 us
+    186              #else
+    187                  mLDBHarActiveWaitUs(1);
+    188              #endif
+    189          
+    190                  //  Clock edge signal for sampling
+    191                  mSetSckHigh();
+   \   0022   4A00           SET1      S:0xFF00.4
+    192                  //Temporization to ensure tCHDX and tCH
+    193              #ifdef cLDBHarMicro78K0_F0536
+    194                  // No need of temporization: computations take time > 1 us
+    195              #else
+    196                  mLDBHarActiveWaitUs(1);
+    197              #endif
+    198              }
+   \   0024   53             DEC       B
+   \   0025   BDE8           BNZ       ??LDBSpiLRSendBits_0
+    199          
+    200              // Make sure to leave the SPI bus with the output pin in low state
+    201              mSetDoutLow();
+   \                     ??LDBSpiLRReceiveBits_0:
+   \   0027   2B00           CLR1      S:0xFF00.2
+    202          }
+   \   0029   B4             POP       DE
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+   \   002C                  REQUIRE _A_P0
+    203          
+    204          /*============================================================================
+    205            DESCRIPTION :void LDBSpiLRReceiveBits(void )
+    206                          Read a bit on the SPI bus
+    207          
+    208            PARAMETERS (Type,Name,Min,Max) :  none
+    209          
+    210            RETURN VALUE : byte read on the bus
+    211          
+    212            DESIGN INFORMATION :  refer to Detailed Design Document
+    213          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    214          U8 LDBSpiLRReceiveBits(U8 NbBits)
+   \                     LDBSpiLRReceiveBits:
+    215          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    216              U8 ByteValue = 0;
+   \   0002   A300           MOV       B,#0
+    217              U8 BitIndex;
+    218          
+    219          	// Fix the SPI bus output into the low state
+    220              mSetDoutLow();
+   \   0004   2B00           CLR1      S:0xFF00.2
+    221          
+    222          #ifndef cLIBStkEepType_STM93Cx6
+    223              for(BitIndex = 0; BitIndex < NbBits; BitIndex++)
+    224              {
+    225                  //  Clock edge signal for set data
+    226                  mSetSckLow();
+    227                  //Temporization to ensure tCLQV and tCL
+    228                  mLDBHarActiveWaitUs(1);
+    229                  //  Clock edge signal for sampling
+    230                  mSetSckHigh();
+    231                  //  Read bit
+    232                  ByteValue <<= 1;
+    233                  ByteValue |= mReadDin();
+    234                  //Temporization to ensure tCH
+    235                  mLDBHarActiveWaitUs(1);
+    236              }
+    237          #else
+    238              for(BitIndex = 0; BitIndex < NbBits; BitIndex++)
+   \   0006   4D00           CMP       A,#0
+   \   0008   AD18           BZ        ??LDBSpiLRReceiveBits_3
+    239              {
+    240                  //  Clock to low
+    241                  mSetSckLow();
+   \                     ??LDBSpiLRReceiveBits_4:
+   \   000A   A100           MOV       A,#0
+   \   000C   4B00           CLR1      S:0xFF00.4
+    242                  //Temporization to ensure tCL
+    243              #ifdef cLDBHarMicro78K0_F0536
+    244                  mLDBRegNop();
+   \   000E   00             NOP       
+    245                  mLDBRegNop();
+   \   000F   00             NOP       
+    246                  mLDBRegNop(); // 5 NOPs produce a duration of 1 us for low clock pulse 
+   \   0010   00             NOP       
+    247                  mLDBRegNop(); // measured on target
+   \   0011   00             NOP       
+    248                  mLDBRegNop();
+   \   0012   00             NOP       
+    249              #else
+    250                  mLDBHarActiveWaitUs(1);
+    251              #endif
+    252                  //  Clock to low
+    253                  mSetSckHigh();
+   \   0013   4A00           SET1      S:0xFF00.4
+    254                  //Temporization to ensure tCH and tCHQV
+    255              #ifdef cLDBHarMicro78K0_F0536
+    256                  // No need of temporization: computations take time > 1 us
+    257              #else
+    258                  mLDBHarActiveWaitUs(1);
+    259              #endif
+    260                  //  Read bit
+    261                  ByteValue <<= 1;
+    262                  ByteValue |= mReadDin();
+   \   0015   713400         MOV1      CY,S:0xFF00.3
+   \   0018   27             ROLC      A,0x1
+   \   0019   70             MOV       X,A
+   \   001A   63             MOV       A,B
+   \   001B   27             ROLC      A,0x1
+   \   001C   6168           OR        A,X
+   \   001E   73             MOV       B,A
+    263              }
+   \   001F   52             DEC       C
+   \   0020   BDE8           BNZ       ??LDBSpiLRReceiveBits_4
+    264          #endif
+    265              return(ByteValue);
+   \                     ??LDBSpiLRReceiveBits_3:
+   \   0022   63             MOV       A,B
+   \   0023   B2             POP       BC
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+   \   0025                  REQUIRE _A_P0
+    266          }
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_LSH_L02:
+   \   0000   ....           DW       ?I_LSH_L02
+    267          #endif  /*LDBSPI_FORMAT_LR_USED*/
+    268          
+    269          #ifdef LDBSPI_FORMAT_LF_USED
+    270          /*============================================================================
+    271            DESCRIPTION :void LDBSpiLFSendBits(U8 DataByte )
+    272                          Write a bit on the SPI bus
+    273          
+    274            PARAMETERS (Type,Name,Min,Max) :  
+    275                - Data: Byte to write on SPI bus
+    276          
+    277            RETURN VALUE : none
+    278          
+    279            DESIGN INFORMATION :  refer to Detailed Design Document
+    280          ============================================================================*/
+    281          void LDBSpiLFSendBits(U8 DataByte,U8 NbBits)
+    282          {
+    283              U8 BitIndex;
+    284              U8 Data;
+    285              U8 DataMask;
+    286          
+    287              Data = DataByte;
+    288              DataMask = (1<<(NbBits-1));
+    289              for(BitIndex = 0; BitIndex < NbBits; BitIndex++)
+    290              {
+    291                  //  Clock edge signal for set data
+    292                  mSetSckHigh();
+    293                  
+    294                  // Write data
+    295                  if ( (Data & DataMask) == DataMask)
+    296                  {
+    297                      mSetDoutHigh();
+    298                  }
+    299                  else
+    300                  {
+    301                      mSetDoutLow();
+    302                  }
+    303                  Data = Data<<1;
+    304          
+    305                  //Temporization to ensure tDVCL and tCH
+    306                  mLDBHarActiveWaitUs(1);
+    307          
+    308                  //  Clock edge signal for sampling
+    309                  mSetSckLow();
+    310                  //Temporization to ensure tCLDX and tCL
+    311                  mLDBHarActiveWaitUs(1);
+    312              }
+    313          
+    314          	// Make sure to leave the SPI bus with the output pin in low state
+    315              mSetDoutLow();
+    316          }
+    317          
+    318          /*============================================================================
+    319            DESCRIPTION :void LDBSpiLFReceiveBits(void )
+    320                          Read a bit on the SPI bus
+    321          
+    322            PARAMETERS (Type,Name,Min,Max) :  none
+    323          
+    324            RETURN VALUE : byte read on the bus
+    325          
+    326            DESIGN INFORMATION :  refer to Detailed Design Document
+    327          ============================================================================*/
+    328          U8 LDBSpiLFReceiveBits(U8 NbBits)
+    329          {
+    330              U8 ByteValue = 0;
+    331              U8 BitIndex;
+    332          
+    333          	// Fix the SPI bus output into the low state
+    334              mSetDoutLow();
+    335          
+    336              for(BitIndex = 0; BitIndex < NbBits; BitIndex++)
+    337              {
+    338                  //  Clock edge signal for set data
+    339                  mSetSckHigh();
+    340                  //Temporization to ensure tCHQV and tCH
+    341                  mLDBHarActiveWaitUs(1);
+    342                  //  Clock edge signal for sampling
+    343                  mSetSckLow();
+    344                  //  Read bit
+    345                  ByteValue <<= 1;
+    346                  ByteValue |= mReadDin();
+    347                  //Temporization to ensure tCL
+    348                  mLDBHarActiveWaitUs(1);
+    349              }
+    350              return(ByteValue);
+    351          }
+    352          #endif
+
+   Segment part sizes:
+
+     Function/Label      Bytes
+     --------------      -----
+     _A_P0                  1
+     _A_PM0                 1
+     LDBSpiInit            11
+     LDBSpiLRSendBits      44
+     LDBSpiLRReceiveBits   37
+     __T_?I_LSH_L02         2
+
+ 
+  2 bytes in segment CLTVEC
+ 92 bytes in segment CODE
+  1 byte  in segment NEAR_A
+  1 byte  in segment SADDR_A
+ 
+ 92 bytes of CODE memory (+ 2 bytes shared)
+  0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

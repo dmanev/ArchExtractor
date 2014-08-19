@@ -1,0 +1,30 @@
+################################################################################
+#                                                                              #
+#      IAR Universal Linker V4.61C/386                                         #
+#                                                                              #
+#           Link time     =  01/Feb/2011  14:52:10                             #
+#           Target CPU    =  78000                                             #
+#           List file     =  ..\..\..\Build\EXE\TARGET_R\_in_flash.map         #
+#           Output file 1 =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TA #
+#                            RGET_R\_in_flash.int                              #
+#                            Format: intel-extended                            #
+#           Command line  =  ..\..\..\Build\EXE\TARGET_R\_in_flash.r26 -f      #
+#                            ..\..\..\Build\EXE\TARGET_R\_in_flash.xcl (-o     #
+#                            ..\..\..\Build\EXE\TARGET_R\_in_flash.int         #
+#                            -Fintel-extended -glog_zone -gappli_state         #
+#                            -gchecksum -Z(CONST)LOG_ZONE=17EB0-17FFF          #
+#                            -Z(CONST)APPLI_STATE=67F8                         #
+#                            -Z(CONST)CHECKSUM=67F4 -l                         #
+#                            ..\..\..\Build\EXE\TARGET_R\_in_flash.map)        #
+#                                                                              #
+#                        Copyright 1987-2008 IAR Systems. All rights reserved. #
+################################################################################
+
+
+
+
+ 52 bytes of CONST memory
+
+Errors: none
+Warnings: none
+

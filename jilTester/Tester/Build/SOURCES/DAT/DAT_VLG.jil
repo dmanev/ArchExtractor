@@ -1,0 +1,231 @@
+//*****************************************************************************
+// Company:      Johnson Controls Inc.
+// ----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// ----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// ----------------------------------------------------------------------------
+// Component:    DAT_VLG
+// ----------------------------------------------------------------------------
+// $Date:   Dec 21 2009 13:45:18  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_VLG/DAT_VLG.jil-arc  $
+// $Revision:   1.8  $
+// ----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_VLG/DAT_VLG.jil-arc  $
+// 
+//    Rev 1.8   Dec 21 2009 13:45:18   amanevd
+// Cm005797: On input change LIBVlg2ProcessData() is called
+// 
+//    Rev 1.7   Nov 04 2009 17:50:26   amanevd
+// Cm005566: Simplified Protection
+// 
+//    Rev 1.6   Sep 21 2009 12:01:56   amanevd
+// Cm005044: Now Verlog frame is sent while in Permanent Authentication
+// 
+//    Rev 1.5   Aug 28 2009 10:14:50   amanevd
+// Cm004914: Code review corrections
+// 
+//    Rev 1.4   Jul 16 2009 13:56:14   amanevd
+// Cm005277: NRZ encoding applied
+// 
+//    Rev 1.3   Apr 29 2009 13:12:30   amanevd
+// Cm003272 - Intermediate part 3 
+// - PRS compliance
+// 
+//    Rev 1.2   Apr 24 2009 17:17:14   amanevd
+// Cm003272 - Finishing part 2 - pre-integration
+// 
+//    Rev 1.1   Mar 23 2009 18:16:54   amanevd
+// Cm003272 - Correction after DCD_LIB_VLG2 Review
+// 
+//    Rev 1.0   Mar 17 2009 15:53:50   amanevd
+// Initial revision.
+//
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+//    Includes non re entry
+//-----------------------------------------------------------------------------
+#ifndef I_DAT_VLG_JIL
+#define I_DAT_VLG_JIL (1)
+
+//-----------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//-----------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component DAT_VLG
+{
+
+    //-----------------------------------------------------------------------------
+    //    Task TaskName                           // Declaration of Task
+    //    {
+    //        Id            = "IdName";             --> this field is optional
+    //        Fct           = "FonctionName";       --> this field is optional
+    //        GraphGroup    = GraphGroupReference;  --> this field is optional
+    //        Resource      = ResourceReference;    --> this field is optional
+    //        Npg           = NpgReference;         --> this field is optional
+    //        Priority      = Priority;             --> this field is optional
+    //
+    //    };
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    Graph GraphName                         // Declaration of Graph
+    //    {
+    //        Id            = "IdName";             --> this field is optional
+    //        GraphGroup    = GraphGroupReference;  --> this field is optional
+    //        NbInstances   = NbInstances;          --> this field is optional
+    //    };
+    //-----------------------------------------------------------------------------
+
+    Graph DATVlgInput
+    {
+        GraphGroup = GraphGroup80Ms;
+    };
+
+    Graph DATVlgOutputProtection
+    {
+        GraphGroup = Default;
+    };
+
+    //-----------------------------------------------------------------------------
+    //    GraphGroup GraphGroupName                // Declaration of GraphGroup
+    //    {
+    //        Macro         = "MacroName";          --> this field is optional
+    //        Default       = TRUE;                 --> this field is optional
+    //        Graph         = Graph1;               --> this field is optional
+    //        Graph         = Graph2;               --> this field is optional
+    //        Graph         = ...;                  --> this field is optional
+    //    };
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    Resource ResourceName                   // Declaration of Resource
+    //                                            // (for Pre-emptive TOS only)
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+    //                                           // group (for Pre-emptive TOS only)
+    //-----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
+    //    TaskPriority TaskName
+    //    {
+    //        Priority = Priority;                  --> this field is optional
+    //
+    //        Npg = NonPreemptiveGroupReference;    --> this field is optional
+    //                                                  (for Pre-emptive TOS only)
+    //    };
+    //
+    //    !!this table should be used into LAP_SUP.jil only, it permit to set all
+    //    task priority and non pre-emptive group in one unique file, "TaskName" 
+    //    must be the task name declared for the "Task" table
+    //
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    Signal SignalName;                      // Declaration of Signal
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    //    OnControl = CallBack                    // Declaration of Control consumed 
+    //    {
+    //         Ctrl = "ControlName";
+    //         Fct = "FonctionName";
+    //    }; 
+    //    
+    //    OnControl = CallBackActivateTask
+    //    {
+    //         Ctrl = "ControlName";
+    //         Task = TaskReference;
+    //    };
+    //
+    //    OnControl = CallBackSetSignal
+    //    {
+    //        Ctrl = "ControlName";
+    //        Signal = SignalReference;
+    //    }; 
+    //-----------------------------------------------------------------------------
+
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct  = "DATVlgInit";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "KeyIsAuthenticated";
+        Fct  = "DATVlgKeyIsAuthenticated";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "KeyIsNotAuthenticated";
+        Fct  = "DATVlgKeyIsNotAuthenticated";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl="StartPermanentAuthentication";
+        Fct="DATVlgStartAuthentPermKey";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl="StopPermanentAuthentication";
+        Fct="DATVlgExitFromAuthentPermKey";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl="Falling_PWR_IGN";
+        Fct="DATVlgFalling_PWR_IGN";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainActiveState";
+        Fct  = "DATVlgIsAnybodyMaintainActiveState";
+    };
+		
+    //-----------------------------------------------------------------------------
+    //    In                                      // Declaration of Data flow
+    //    {
+    //        Data = "DataName";
+    //        Type = U1 or U8, U16, U32, S8, S16, S32;
+    //        or
+    //        Type = U1Array or U8Array, ..., S32Array
+    //        {
+    //                Size = ItemNumber;
+    //        };
+    //    };
+    //
+    //    Out
+    //    {
+    //        ...(see In)
+    //    };
+    //-----------------------------------------------------------------------------
+};
+
+//-----------------------------------------------------------------------------
+//  End of component declaration
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+//  End of includes non re entry
+//-----------------------------------------------------------------------------
+#endif // I_DAT_VLG_JIL

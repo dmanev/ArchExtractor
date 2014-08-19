@@ -1,0 +1,87 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date:   27 Oct 2008 09:22:26  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+
+   Rev 1.0   27 Oct 2008 09:22:26   avidoly
+Initial revision.
+
+   Rev 1.2   10 Mar 2005 16:30:22   abarbae
+PON URD42 DEV 2514 / PON URD42 BODY_SW 851 : Update component template for compatibility with VSS 
+*/
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef LAP_PAL
+   extern const tTOSSeqGraphType PerimeterAlarmManagement; 
+#endif
+
+#ifdef LAP_PAL
+   extern BOOL LAPPAlHornPauseElapsed(void);
+   extern BOOL LAPPalActivate(void);
+   extern BOOL LAPPalAlarmInhibited(void);
+   extern void     LAPPalEndOfAlarmCycle(void);
+   extern BOOL LAPPalHornActivationContinues(void);
+   extern BOOL LAPPalHornActivationFinished(void);
+   extern void     LAPPalInitializeDisableMode(void);
+   extern void     LAPPalInitializeStandbyMode(void);
+   extern BOOL LAPPalNewAlarmCycle(void);
+   extern BOOL LAPPalNextAlarmCycle(void);
+   extern BOOL LAPPalRfLock(void);
+   extern BOOL LAPPalRfUnlockOrKeyIsRecognised(void);
+   extern void     LAPPalStartHorn(void);
+   extern void     LAPPalStartHornPause(void);
+   extern BOOL TOSSeqEvalVrai(void);
+   extern void     TOSSeqNop(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef LAP_PAL
+  const tTOSSeqGraphType PerimeterAlarmManagement =
+  {
+#ifdef COMPILATION_NATIVE
+    "PerimeterAlarmManagement",
+    {
+#endif
+  /*   0*/  {LAPPalAlarmInhibited,LAPPalInitializeDisableMode,mTOSSeqRuleNumber(1),mTOSSeqRuleNumber(0)},
+  /*   1*/  {LAPPalRfLock,LAPPalInitializeStandbyMode,mTOSSeqRuleNumber(2),mTOSSeqRuleNumber(0)},
+  /*   2*/  {LAPPalRfUnlockOrKeyIsRecognised,LAPPalInitializeDisableMode,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(0)},
+  /*   3*/  {LAPPalActivate,LAPPalStartHorn,mTOSSeqRuleNumber(11),mTOSSeqRuleNumber(4)},
+  /*   4*/  {LAPPalRfUnlockOrKeyIsRecognised,LAPPalInitializeDisableMode,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(0)},
+  /*   5*/  {LAPPalHornActivationContinues,LAPPalStartHorn,mTOSSeqRuleNumber(6),mTOSSeqRuleNumber(4)},
+  /*   6*/  {LAPPalHornActivationFinished,LAPPalStartHornPause,mTOSSeqRuleNumber(9),mTOSSeqRuleNumber(7)},
+  /*   7*/  {LAPPalRfUnlockOrKeyIsRecognised,LAPPalInitializeDisableMode,mTOSSeqRuleNumber(8),mTOSSeqRuleNumber(0)},
+  /*   8*/  {LAPPAlHornPauseElapsed,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*   9*/  {LAPPalNextAlarmCycle,LAPPalEndOfAlarmCycle,cTOSSeqInvalidRule,mTOSSeqRuleNumber(10)},
+  /*  10*/  {TOSSeqEvalVrai,LAPPalInitializeStandbyMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*  11*/  {LAPPalNewAlarmCycle,LAPPalStartHornPause,cTOSSeqInvalidRule,mTOSSeqRuleNumber(7)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

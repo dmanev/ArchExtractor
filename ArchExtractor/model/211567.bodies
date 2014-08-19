@@ -1,0 +1,10 @@
+class StkJilTOSSignalCriteria
+!!!211439.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+        for tosSignal in re.findall(r'Signal\s*(\w+)\s*;', inpTextContent, re.I):
+            pif = self.getPortInterfaceFactory()
+            dtf = self.getDataTypeFactory()
+            tosCtrlIf = pif.getStkTOSSignalIf(tosSignal, dtf)                  
+            provPort = PortInterface.ProvidedPort.ProvidedPort(tosCtrlIf)
+            provPort.setName(tosSignal)
+            provPort.setInterface(tosCtrlIf)
+            inoutIComponent.addPort(provPort)

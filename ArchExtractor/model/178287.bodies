@@ -1,0 +1,5 @@
+class StkS16
+!!!174319.python!!!	__init__(inout self : )
+        self.Name = 'S16'
+        self.lowerLimit = -32766
+        self.upperLimit = 32767

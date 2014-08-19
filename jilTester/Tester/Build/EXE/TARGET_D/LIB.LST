@@ -1,0 +1,186 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:42 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\L #
+#                    IB.C                                                     #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LIB.LST -o ..\EXE\TARGET_D\LIB.R26    #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\L #
+#                    IB.C                                                     #
+#    List file    =  ..\EXE\TARGET_D\LIB.LST                                  #
+#    Object file  =  ..\EXE\TARGET_D\LIB.R26                                  #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\LIB.C
+      1          /*============================================================================
+      2            Project ......................... COMMON
+      3            Component ....................... LIB
+      4            File revision.................... 
+      5            Last modification date .......... 
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20            
+     21            -------------------------------------------------------------------------
+     22            LIB.c file review : 
+     23          
+     24          
+     25            ==========================================================================*/
+     26          
+     27          /*--------------------------------------------------------------------------
+     28            Body Identification
+     29            --------------------------------------------------------------------------*/
+     30          
+     31          #define LIB   "LIB"
+     32          
+     33          /*-------------------------------------------------------------------------
+     34            Included files
+     35          
+     36            #include <system_file_name.h>
+     37            #include "project_file_name.h"
+     38            --------------------------------------------------------------------------*/
+     39          #include "lib.h"
+     40          
+     41          /*--------------------------------------------------------------------------
+     42            Local constants
+     43          
+     44            #define cConstantName   ((tType) ConstantValue)
+     45            --------------------------------------------------------------------------*/
+     46          
+     47          
+     48          /*--------------------------------------------------------------------------
+     49            Local macross
+     50          
+     51            #define mMacroName   (MacroDefinition)
+     52            --------------------------------------------------------------------------*/
+     53          
+     54          
+     55          /*--------------------------------------------------------------------------
+     56            Local types
+     57          
+     58            struct  sStructureName { ... };
+     59            union   uUnionName { ... };
+     60            enum    eEnumerationName { ... };
+     61            typedef Expression tTypeName;
+     62            --------------------------------------------------------------------------*/
+     63          
+     64          
+     65          /*--------------------------------------------------------------------------
+     66            Local data
+     67          
+     68            static  tType   VariableName;
+     69            static  tType*  pVariableName; 
+     70            --------------------------------------------------------------------------*/
+     71          
+     72          /*--------------------------------------------------------------------------
+     73            Constant local data
+     74          
+     75            static const tType  VariableName;
+     76            --------------------------------------------------------------------------*/
+     77          
+     78          /*--------------------------------------------------------------------------
+     79            Exported data
+     80          
+     81            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     82            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     83            --------------------------------------------------------------------------*/
+     84          
+     85          /*--------------------------------------------------------------------------
+     86            Constant exported data
+     87           
+     88            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+     89            --------------------------------------------------------------------------*/
+     90          
+     91          
+     92          /*--------------------------------------------------------------------------
+     93            Local function prototypes
+     94            
+     95            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+     96            --------------------------------------------------------------------------*/
+     97          
+     98          /*============================================================================
+     99            =========================== LOCAL FUNCTIONS ================================
+    100            ==========================================================================*/
+    101          
+    102          /*============================================================================
+    103            DESCRIPTION :
+    104            
+    105            PARAMETERS (Type,Name,Min,Max) :   none
+    106          
+    107            RETURN VALUE :   none
+    108           
+    109            DESIGN INFORMATION :   refer to Detailed Design Document
+    110            ==========================================================================*/
+    111          //static type FunctionName(...)
+    112          
+    113          /*============================================================================
+    114            =========================== EXPORTED FUNCTIONS =============================
+    115            ==========================================================================*/
+    116          
+    117          /*============================================================================
+    118            DESCRIPTION :
+    119            
+    120            PARAMETERS (Type,Name,Min,Max) :  none
+    121          
+    122            RETURN VALUE :  none
+    123           
+    124            DESIGN INFORMATION :  refer to Detailed Design Document
+    125          ============================================================================*/
+    126          #ifdef DEBUG
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    127          void LIBAssertionFailed(void)
+   \                     LIBAssertionFailed:
+    128          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    129              // This function allows to detect assertion failure.
+    130              // You can set a BreakPoint here.
+    131              while( 1 == 1 );
+   \                     ??LIBAssertionFailed_0:
+   \   0000   FAFE           BR        ??LIBAssertionFailed_0
+   \   0002                  REQUIRE ?CL78K_V4_6_L00
+    132          }
+    133          #endif
+
+   Segment part sizes:
+
+     Function/Label     Bytes
+     --------------     -----
+     LIBAssertionFailed    2
+
+ 
+ 2 bytes in segment CODE
+ 
+ 2 bytes of CODE memory
+
+Errors: none
+Warnings: none

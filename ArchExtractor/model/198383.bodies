@@ -1,0 +1,16 @@
+class StkJilOnControlCriteria
+!!!202863.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+        for seq in re.findall(r'OnControl\s*=\s*(\w+)\s*\{([\w\s=\";]*)\};', inpTextContent, re.I):
+                dataName, dataProps = seq
+                if dataName == 'CallBack' or dataName == 'SetSignal':
+                    control = re.findall(r'\s*Ctrl\s*=\s*\"(\w+)\"', dataProps, re.I)[0]
+
+                    if control not in inoutIComponent.getItsIPortMap():
+                        pif = self.getPortInterfaceFactory()
+                        clSrvIntIf = pif.getStkControlIf(control)                                            
+                        reqPort = PortInterface.RequiredPort.RequiredPort(clSrvIntIf)
+                        reqPort.setName(control)
+                        reqPort.setInterface(clSrvIntIf)
+                        inoutIComponent.addPort(reqPort)
+
+        return inoutIComponent

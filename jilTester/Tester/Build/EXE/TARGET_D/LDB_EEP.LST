@@ -1,0 +1,978 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:48 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_EEP.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_EEP.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_EEP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_EEP.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_EEP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_EEP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_EEP.C
+      1          /*============================================================================
+      2            Project ......................... STANDARD
+      3            Component ....................... LDB_EEP
+      4            File revision....................
+      5            Last modification date ..........
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20          
+     21                  M93C76 EEP Driver
+     22            
+     23            -------------------------------------------------------------------------
+     24            ldb_eep.c file review : 
+     25          
+     26              See PVCS revision
+     27          
+     28            ==========================================================================*/
+     29          
+     30          /*--------------------------------------------------------------------------
+     31            Body Identification
+     32            --------------------------------------------------------------------------*/
+     33          #define LDB_EEP   "LDB_EEP"
+     34          
+     35          /*-------------------------------------------------------------------------
+     36            Included files
+     37          
+     38            #include <system_file_name.h>
+     39            #include "project_file_name.h"
+     40            --------------------------------------------------------------------------*/
+     41          #include "ldb.h"
+     42          #include "ldb_har.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0d
+   \   union <unnamed> volatile __saddr _A_P13
+   \                     _A_P13:
+   \   0000                  DS 1
+     43          #include "ldb_spi.h"
+     44          #include "ldb_tim.h"
+     45          #include "ldb_eep.h"
+     46          
+     47          /*--------------------------------------------------------------------------
+     48            Local constants
+     49          
+     50            #define cConstantName   ((tType) ConstantValue)
+     51            --------------------------------------------------------------------------*/
+     52          
+     53          #define cEEPROMPageSize     ((U16)32)
+     54          
+     55          // Instructions                                              // Example for the M93C76
+     56          #define cInstructionREAD    ((U8)0x06)    // OpCode = 0000 0110 Address
+     57          #define cInstructionWRITE   ((U8)0x05)    // OpCode = 0000 0101 Address
+     58          #define cInstructionEWEN    ((U8)0x04)    // OpCode = 0000 0100 11xx xxxx
+     59          #define cInstructionEWDS    ((U8)0x04)    // OpCode = 0000 0100 00xx xxxx
+     60          #define cInstructionERASE   ((U8)0x07)    // OpCode = 0000 0111 Address
+     61          #define cInstructionERAL    ((U8)0x04)    // OpCode = 0000 0100 10xx xxxx
+     62          #define cInstructionWRAL    ((U8)0x04)    // OpCode = 0000 0100 01xx xxxx
+     63          
+     64          #define cInstructionEWENCompletion11BitsHigh  ((U8)0x07)
+     65          #define cInstructionEWENCompletion11BitsLow   ((U8)0xFF)
+     66          #define cInstructionEWENCompletion10BitsHigh  ((U8)0x03)
+     67          #define cInstructionEWENCompletion10BitsLow   ((U8)0xFF)
+     68          #define cInstructionEWENCompletion9BitsHigh   ((U8)0x01)
+     69          #define cInstructionEWENCompletion9BitsLow    ((U8)0xFF)
+     70          #define cInstructionEWENCompletion8Bits       ((U8)0xFF)
+     71          #define cInstructionEWENCompletion7Bits       ((U8)0x7F)
+     72          #define cInstructionEWENCompletion6Bits       ((U8)0x3F)
+     73          
+     74          #define cInstructionEWDSCompletion11BitsHigh  ((U8)0x01)
+     75          #define cInstructionEWDSCompletion11BitsLow   ((U8)0xFF)
+     76          #define cInstructionEWDSCompletion10BitsHigh  ((U8)0x00)
+     77          #define cInstructionEWDSCompletion10BitsLow   ((U8)0xFF)
+     78          #define cInstructionEWDSCompletion9BitsHigh   ((U8)0x00)
+     79          #define cInstructionEWDSCompletion9BitsLow    ((U8)0x7F)
+     80          #define cInstructionEWDSCompletion8Bits       ((U8)0x3F)
+     81          #define cInstructionEWDSCompletion7Bits       ((U8)0x1F)
+     82          #define cInstructionEWDSCompletion6Bits       ((U8)0x0F)
+     83          
+     84          //EEPROM size
+     85          
+     86          #ifdef cLDBHarEep93Type_M93C06
+     87            #define cNbByte 32
+     88            #error "This eeprom type has never been tested"
+     89          #elif defined(cLDBHarEep93Type_M93C46)
+     90            #define cNbByte 128
+     91            #error "This eeprom type has never been tested"
+     92          #elif defined(cLDBHarEep93Type_M93C56)
+     93            #define cNbByte 256
+     94          #elif defined(cLDBHarEep93Type_M93C66)
+     95            #define cNbByte 512
+     96          #elif defined(cLDBHarEep93Type_M93C76)
+     97            #define cNbByte 1024
+     98          #elif defined(cLDBHarEep93Type_M93C86)
+     99            #define cNbByte 2048
+    100          #else
+    101            #error "This eeprom type is not managed by this component"
+    102          #endif
+    103          
+    104          #if (defined(cLDBHarEep93Org_8Bits))
+    105          #elif (defined(cLDBHarEep93Org_16Bits))
+    106          #else
+    107            #error "The acces type is not defined (in LDB_HAR)"
+    108          #endif
+    109          
+    110          
+    111          /*--------------------------------------------------------------------------
+    112            Local macros
+    113          
+    114            #define mMacroName   (MacroDefinition)
+    115            --------------------------------------------------------------------------*/
+    116          
+    117          //first temporization to ensure tCLSH
+    118          //second temporization to ensure tSHCH
+    119          #define mSelectEEPChip()    mLDBEepPutSPIInIdleMode();\
+    120                                      mLDBHarActiveWaitUs(1);\
+    121                                      mLDBHarWrite(cLDBHarEepCS,1);\
+    122                                      mLDBHarActiveWaitUs(1)
+    123          
+    124          //temporization to ensure the CS = 0 validity (Tslsh and Tslch value)
+    125          //no need to wait tCLSL because its value is 0
+    126          #define mUnselectEEPChip()  mLDBHarWrite(cLDBHarEepCS,0);\
+    127                                      mLDBHarActiveWaitUs(1)
+    128          
+    129          #define mReadEEPBusyState() mLDBHarRead(cLDBHarSpiSI)
+    130            
+    131          /*--------------------------------------------------------------------------
+    132            Local types
+    133          
+    134            struct  sStructureName { ... };
+    135            union   uUnionName { ... };
+    136            enum    eEnumerationName { ... };
+    137            typedef Expression tTypeName;
+    138            --------------------------------------------------------------------------*/
+    139          
+    140          /*--------------------------------------------------------------------------
+    141            Local data
+    142          
+    143            static  tType   VariableName;
+    144            static  tType*  pVariableName; 
+    145            --------------------------------------------------------------------------*/
+    146          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    147          static  tAddress  WriteAddress;
+   \                     WriteAddress:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    148          static  BOOL  IsWriteProcessing;
+   \                     IsWriteProcessing:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    149          
+    150          /*--------------------------------------------------------------------------
+    151            Constant local data
+    152          
+    153            static const tType  VariableName;
+    154            --------------------------------------------------------------------------*/
+    155          
+    156          /*--------------------------------------------------------------------------
+    157            Exported data
+    158          
+    159            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    160            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    161            --------------------------------------------------------------------------*/
+    162          
+    163          /*--------------------------------------------------------------------------
+    164            Constant exported data
+    165           
+    166            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    167            --------------------------------------------------------------------------*/
+    168          
+    169          /*--------------------------------------------------------------------------
+    170            Local function prototypes
+    171            
+    172            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    173            --------------------------------------------------------------------------*/
+    174          
+    175          static BOOL IsWriteFinished (void);
+    176          
+    177          /*============================================================================
+    178            =========================== LOCAL FUNCTIONS ================================
+    179            ==========================================================================*/
+    180          
+    181          /*============================================================================
+    182            DESCRIPTION : static BOOL IsWriteFinished(void)
+    183                      Check if write operation is finished
+    184            
+    185            PARAMETERS (Type,Name,Min,Max) :  none
+    186          
+    187            RETURN VALUE :  none
+    188           
+    189            DESIGN INFORMATION :  refer to Detailed Design Document
+    190          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    191          static BOOL IsWriteFinished(void)
+   \                     IsWriteFinished:
+    192          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100000         MOVW      AX,#0
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    193            U8 StatusRegister;
+    194          
+    195            //  Select
+    196            mSelectEEPChip();
+   \   0004   4B00           CLR1      S:0xFF00.4
+   \   0006   2B00           CLR1      S:0xFF00.2
+   \   0008   9A....         CALL      LDBHarActiveWaitUs
+   \   000B   100000         MOVW      AX,#0
+   \   000E   0A0D           SET1      S:0xFF0D.0
+   \   0010   9A....         CALL      LDBHarActiveWaitUs
+    197          
+    198            //Temporization to ensure the status validity (tSHQV value)
+    199            mLDBHarActiveWaitUs(1);
+   \   0013   100000         MOVW      AX,#0
+   \   0016   9A....         CALL      LDBHarActiveWaitUs
+    200          
+    201            StatusRegister = mReadEEPBusyState();
+   \   0019   A100           MOV       A,#0
+   \   001B   713400         MOV1      CY,S:0xFF00.3
+   \   001E   27             ROLC      A,0x1
+   \   001F   72             MOV       C,A
+    202          
+    203            //  UnSelect
+    204            mUnselectEEPChip();
+   \   0020   100000         MOVW      AX,#0
+   \   0023   0B0D           CLR1      S:0xFF0D.0
+   \   0025   9A....         CALL      LDBHarActiveWaitUs
+    205          
+    206            return( (StatusRegister == 1) );
+   \   0028   62             MOV       A,C
+   \   0029   51             DEC       A
+   \   002A   BD04           BNZ       ??LDBEepControl_0
+   \   002C   A101           MOV       A,#1
+   \   002E   FA02           BR        ??LDBEepControl_1
+   \                     ??LDBEepControl_0:
+   \   0030   A100           MOV       A,#0
+   \                     ??LDBEepControl_1:
+   \   0032   B2             POP       BC
+   \   0033   AF             RET       
+   \   0034                  REQUIRE ?CL78K_V4_6_L00
+   \   0034                  REQUIRE _A_P0
+   \   0034                  REQUIRE _A_P13
+    207          }
+    208          
+    209          /*============================================================================
+    210            =========================== EXPORTED FUNCTIONS =============================
+    211            ==========================================================================*/
+    212          
+    213          /*============================================================================
+    214            DESCRIPTION : void LDBEepInit(void)
+    215                        Initialize LDB Eep
+    216            
+    217            PARAMETERS (Type,Name,Min,Max) :  none
+    218          
+    219            RETURN VALUE :  none
+    220           
+    221            DESIGN INFORMATION :  refer to Detailed Design Document
+    222          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    223          MEM_TYPE void LDBEepInit(void)
+   \                     LDBEepInit:
+    224          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    225            IsWriteProcessing = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       IsWriteProcessing,A
+    226            mLDBEepSelectMemoryOrganization();
+    227            mUnselectEEPChip();
+   \   0005   70             MOV       X,A
+   \   0006   0B0D           CLR1      S:0xFF0D.0
+   \   0008   9B....         BR        N:LDBHarActiveWaitUs
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+   \   000B                  REQUIRE _A_P13
+    228          }
+    229          
+    230          /*============================================================================
+    231            DESCRIPTION : LDBEepSendWithAddr
+    232                  Write pMsg->Lng bytes in eeprom
+    233            
+    234            PARAMETERS (Type,Name,Min,Max) :  none
+    235          
+    236            RETURN VALUE :  none
+    237           
+    238            DESIGN INFORMATION :  refer to Detailed Design Document
+    239          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    240          MEM_TYPE void  LDBEepSendWithAddr(tAddress Address,tMsg* pMsg)
+   \                     LDBEepSendWithAddr:
+    241          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   D4             MOVW      DE,AX
+    242            U8 u8Index;
+    243          
+    244            // check if the data size goes beyond the current EEPROM page
+    245            mLIBassert( ((Address + pMsg->Lng) <= cNbByte) && 
+    246                (((Address % cEEPROMPageSize) + pMsg->Lng) <= cEEPROMPageSize) );
+   \   0002   891C           MOVW      AX,SP
+   \   0004   D6             MOVW      HL,AX
+   \   0005   87             MOV       A,[HL]
+   \   0006   70             MOV       X,A
+   \   0007   AE01           MOV       A,[HL+0x01]
+   \   0009   D6             MOVW      HL,AX
+   \   000A   AE02           MOV       A,[HL+0x02]
+   \   000C   70             MOV       X,A
+   \   000D   AE03           MOV       A,[HL+0x03]
+   \   000F   30             XCH       A,X
+   \   0010   610C           ADD       A,E
+   \   0012   30             XCH       A,X
+   \   0013   612D           ADDC      A,D
+   \   0015   EA0102         CMPW      AX,#513
+   \   0018   9D1E           BNC       ??LDBEepControl_2
+   \   001A   891C           MOVW      AX,SP
+   \   001C   D6             MOVW      HL,AX
+   \   001D   87             MOV       A,[HL]
+   \   001E   70             MOV       X,A
+   \   001F   AE01           MOV       A,[HL+0x01]
+   \   0021   D6             MOVW      HL,AX
+   \   0022   AE02           MOV       A,[HL+0x02]
+   \   0024   70             MOV       X,A
+   \   0025   AE03           MOV       A,[HL+0x03]
+   \   0027   D6             MOVW      HL,AX
+   \   0028   C4             MOVW      AX,DE
+   \   0029   60             MOV       A,X
+   \   002A   5D1F           AND       A,#31
+   \   002C   A000           MOV       X,#0
+   \   002E   610E           ADD       A,L
+   \   0030   30             XCH       A,X
+   \   0031   612F           ADDC      A,H
+   \   0033   EA2100         CMPW      AX,#33
+   \   0036   8D03           BC        ??LDBEepControl_3
+   \                     ??LDBEepControl_2:
+   \   0038   9A....         CALL      LIBAssertionFailed
+    247          
+    248            WriteAddress = Address;
+   \                     ??LDBEepControl_3:
+   \   003B   C4             MOVW      AX,DE
+   \   003C   03....         MOVW      WriteAddress,AX
+    249          
+    250            //  Select eep
+    251            mSelectEEPChip();
+   \   003F   100000         MOVW      AX,#0
+   \   0042   4B00           CLR1      S:0xFF00.4
+   \   0044   2B00           CLR1      S:0xFF00.2
+   \   0046   9A....         CALL      LDBHarActiveWaitUs
+   \   0049   100000         MOVW      AX,#0
+   \   004C   0A0D           SET1      S:0xFF0D.0
+   \   004E   9A....         CALL      LDBHarActiveWaitUs
+    252          
+    253            // send WRITE instruction
+    254            mLDBEepSendBitsToSPI(cInstructionWRITE, 3);
+   \   0051   A105           MOV       A,#5
+   \   0053   A303           MOV       B,#3
+   \   0055   9A....         CALL      LDBSpiLRSendBits
+    255          
+    256            // send address
+    257            #if (defined(cLDBHarEep93Type_M93C06) || defined(cLDBHarEep93Type_M93C46))
+    258              {
+    259                #if (defined(cLDBHarEep93Org_8Bits))
+    260                {
+    261                  mLDBEepSendBitsToSPI((U8)WriteAddress,7);
+    262                }
+    263                #elif (defined(cLDBHarEep93Org_16Bits))
+    264                {
+    265                  mLDBEepSendBitsToSPI((U8)(WriteAddress>>1),6);
+    266                }
+    267                #endif
+    268              }
+    269            #elif (defined(cLDBHarEep93Type_M93C56) || defined(cLDBHarEep93Type_M93C66))
+    270              {
+    271                #if (defined(cLDBHarEep93Org_8Bits))
+    272                {
+    273                  mLDBEepSendBitsToSPI((U8)(WriteAddress >> 8),1);
+    274                  mLDBEepSendByteToSPI((U8)WriteAddress);
+    275                }
+    276                #elif (defined(cLDBHarEep93Org_16Bits))
+    277                {
+    278                  mLDBEepSendByteToSPI((U8)(WriteAddress>>1));
+   \   0058   A308           MOV       B,#8
+   \   005A   02....         MOVW      AX,WriteAddress
+   \   005D   21             CLR1      CY
+   \   005E   25             RORC      A,0x1
+   \   005F   60             MOV       A,X
+   \   0060   25             RORC      A,0x1
+   \   0061   9A....         CALL      LDBSpiLRSendBits
+    279                }
+    280                #endif
+    281              }
+    282            #elif (defined(cLDBHarEep93Type_M93C76) || defined(cLDBHarEep93Type_M93C86))
+    283              {
+    284                #if (defined(cLDBHarEep93Org_8Bits))
+    285                {
+    286                  mLDBEepSendBitsToSPI((U8)(WriteAddress >> 8),3);
+    287                  mLDBEepSendByteToSPI((U8)WriteAddress);
+    288                }
+    289                #elif (defined(cLDBHarEep93Org_16Bits))
+    290                {
+    291                  mLDBEepSendBitsToSPI((U8)((WriteAddress>>1) >> 8),2);
+    292                  mLDBEepSendByteToSPI((U8)(WriteAddress>>1));
+    293                }
+    294                #endif
+    295              }
+    296            #endif
+    297          
+    298            // send datas
+    299            #if (defined(cLDBHarEep93Org_8Bits))
+    300              {
+    301                mLDBEepSendByteToSPI(pMsg->pBuffer[0]);
+    302              }
+    303            #elif (defined(cLDBHarEep93Org_16Bits))
+    304              {
+    305                for (u8Index = 0; u8Index < pMsg->Lng; u8Index++)
+   \   0064   A200           MOV       C,#0
+   \   0066   891C           MOVW      AX,SP
+   \   0068   D6             MOVW      HL,AX
+   \   0069   87             MOV       A,[HL]
+   \   006A   70             MOV       X,A
+   \   006B   AE01           MOV       A,[HL+0x01]
+   \   006D   D6             MOVW      HL,AX
+   \   006E   AE02           MOV       A,[HL+0x02]
+   \   0070   70             MOV       X,A
+   \   0071   AE03           MOV       A,[HL+0x03]
+   \   0073   6168           OR        A,X
+   \   0075   AD2C           BZ        ??LDBEepControl_4
+    306                {
+    307                    mLDBEepSendByteToSPI(pMsg->pBuffer[u8Index]);
+   \                     ??LDBEepSendWithAddr_0:
+   \   0077   A308           MOV       B,#8
+   \   0079   891C           MOVW      AX,SP
+   \   007B   D6             MOVW      HL,AX
+   \   007C   87             MOV       A,[HL]
+   \   007D   70             MOV       X,A
+   \   007E   AE01           MOV       A,[HL+0x01]
+   \   0080   D6             MOVW      HL,AX
+   \   0081   87             MOV       A,[HL]
+   \   0082   70             MOV       X,A
+   \   0083   AE01           MOV       A,[HL+0x01]
+   \   0085   D6             MOVW      HL,AX
+   \   0086   AA             MOV       A,[HL+C]
+   \   0087   9A....         CALL      LDBSpiLRSendBits
+    308                }
+   \   008A   42             INC       C
+   \   008B   891C           MOVW      AX,SP
+   \   008D   D6             MOVW      HL,AX
+   \   008E   87             MOV       A,[HL]
+   \   008F   70             MOV       X,A
+   \   0090   AE01           MOV       A,[HL+0x01]
+   \   0092   D6             MOVW      HL,AX
+   \   0093   AE02           MOV       A,[HL+0x02]
+   \   0095   70             MOV       X,A
+   \   0096   AE03           MOV       A,[HL+0x03]
+   \   0098   D6             MOVW      HL,AX
+   \   0099   62             MOV       A,C
+   \   009A   A000           MOV       X,#0
+   \   009C   611E           SUB       A,L
+   \   009E   60             MOV       A,X
+   \   009F   613F           SUBC      A,H
+   \   00A1   8DD4           BC        ??LDBEepSendWithAddr_0
+    309              }
+    310            #endif
+    311          
+    312            //  Unselect eep
+    313            mLDBEepPutSPIInIdleMode();
+   \                     ??LDBEepControl_4:
+   \   00A3   100000         MOVW      AX,#0
+   \   00A6   4B00           CLR1      S:0xFF00.4
+   \   00A8   2B00           CLR1      S:0xFF00.2
+    314            mUnselectEEPChip();
+   \   00AA   0B0D           CLR1      S:0xFF0D.0
+   \   00AC   9A....         CALL      LDBHarActiveWaitUs
+    315          
+    316            IsWriteProcessing = cTrue;
+   \   00AF   A101           MOV       A,#1
+   \   00B1   9E....         MOV       IsWriteProcessing,A
+    317          }
+   \   00B4   B0             POP       AX
+   \   00B5   AF             RET       
+   \   00B6                  REQUIRE ?CL78K_V4_6_L00
+   \   00B6                  REQUIRE _A_P0
+   \   00B6                  REQUIRE _A_P13
+    318          
+    319          /*============================================================================
+    320            DESCRIPTION : LDBEepReceiveWithAddr
+    321                    Read pMsg->Lng bytes from eeprom
+    322            
+    323            PARAMETERS (Type,Name,Min,Max) :  none
+    324          
+    325            RETURN VALUE :  none
+    326           
+    327            DESIGN INFORMATION :  refer to Detailed Design Document
+    328          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    329          MEM_TYPE void  LDBEepReceiveWithAddr(tAddress Address,tMsg* pMsg)
+   \                     LDBEepReceiveWithAddr:
+    330          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001                  ; Total Auto size: 2
+   \   0001   B3             PUSH      BC
+   \   0002   B4             POP       DE
+    331            U8 u8Index;
+    332          
+    333            // check if the data size goes beyond the current EEPROM page
+    334            mLIBassert( ((Address + pMsg->Lng) <= cNbByte) && 
+    335                (((Address % cEEPROMPageSize) + pMsg->Lng) <= cEEPROMPageSize) );
+   \   0003   C4             MOVW      AX,DE
+   \   0004   D6             MOVW      HL,AX
+   \   0005   AE02           MOV       A,[HL+0x02]
+   \   0007   70             MOV       X,A
+   \   0008   AE03           MOV       A,[HL+0x03]
+   \   000A   D2             MOVW      BC,AX
+   \   000B   891C           MOVW      AX,SP
+   \   000D   D6             MOVW      HL,AX
+   \   000E   87             MOV       A,[HL]
+   \   000F   70             MOV       X,A
+   \   0010   AE01           MOV       A,[HL+0x01]
+   \   0012   30             XCH       A,X
+   \   0013   610A           ADD       A,C
+   \   0015   30             XCH       A,X
+   \   0016   612B           ADDC      A,B
+   \   0018   EA0102         CMPW      AX,#513
+   \   001B   9D0F           BNC       ??LDBEepControl_5
+   \   001D   87             MOV       A,[HL]
+   \   001E   5D1F           AND       A,#31
+   \   0020   A000           MOV       X,#0
+   \   0022   610A           ADD       A,C
+   \   0024   30             XCH       A,X
+   \   0025   612B           ADDC      A,B
+   \   0027   EA2100         CMPW      AX,#33
+   \   002A   8D03           BC        ??LDBEepControl_6
+   \                     ??LDBEepControl_5:
+   \   002C   9A....         CALL      LIBAssertionFailed
+    336          
+    337            IsWriteProcessing = cFalse;
+   \                     ??LDBEepControl_6:
+   \   002F   A100           MOV       A,#0
+   \   0031   9E....         MOV       IsWriteProcessing,A
+    338          
+    339            //select eep
+    340            mSelectEEPChip();
+   \   0034   70             MOV       X,A
+   \   0035   4B00           CLR1      S:0xFF00.4
+   \   0037   2B00           CLR1      S:0xFF00.2
+   \   0039   9A....         CALL      LDBHarActiveWaitUs
+   \   003C   100000         MOVW      AX,#0
+   \   003F   0A0D           SET1      S:0xFF0D.0
+   \   0041   9A....         CALL      LDBHarActiveWaitUs
+    341          
+    342            // send READ instruction
+    343            mLDBEepSendBitsToSPI(cInstructionREAD, 3);
+   \   0044   A106           MOV       A,#6
+   \   0046   A303           MOV       B,#3
+   \   0048   9A....         CALL      LDBSpiLRSendBits
+    344          
+    345            //send address
+    346            #if (defined(cLDBHarEep93Type_M93C06) || defined(cLDBHarEep93Type_M93C46))
+    347              {
+    348                #if (defined(cLDBHarEep93Org_8Bits))
+    349                {
+    350                  mLDBEepSendBitsToSPI((U8)Address,7);
+    351                }
+    352                #elif (defined(cLDBHarEep93Org_16Bits))
+    353                {
+    354                  mLDBEepSendBitsToSPI((U8)(Address>>1),6);
+    355                }
+    356                #endif
+    357              }
+    358            #elif (defined(cLDBHarEep93Type_M93C56) || defined(cLDBHarEep93Type_M93C66))
+    359              {
+    360                #if (defined(cLDBHarEep93Org_8Bits))
+    361                {
+    362                  mLDBEepSendBitsToSPI((U8)(Address >> 8),1);
+    363                  mLDBEepSendByteToSPI((U8)Address);
+    364                }
+    365                #elif (defined(cLDBHarEep93Org_16Bits))
+    366                {
+    367                  mLDBEepSendByteToSPI((U8)(Address>>1));
+   \   004B   A308           MOV       B,#8
+   \   004D   891C           MOVW      AX,SP
+   \   004F   D6             MOVW      HL,AX
+   \   0050   87             MOV       A,[HL]
+   \   0051   70             MOV       X,A
+   \   0052   AE01           MOV       A,[HL+0x01]
+   \   0054   21             CLR1      CY
+   \   0055   25             RORC      A,0x1
+   \   0056   60             MOV       A,X
+   \   0057   25             RORC      A,0x1
+   \   0058   9A....         CALL      LDBSpiLRSendBits
+    368                }
+    369                #endif
+    370              }
+    371            #elif (defined(cLDBHarEep93Type_M93C76) || defined(cLDBHarEep93Type_M93C86))
+    372              {
+    373                #if (defined(cLDBHarEep93Org_8Bits))
+    374                {
+    375                  mLDBEepSendBitsToSPI((U8)(Address >> 8),3);
+    376                  mLDBEepSendByteToSPI((U8)Address);
+    377                }
+    378                #elif (defined(cLDBHarEep93Org_16Bits))
+    379                {
+    380                  mLDBEepSendBitsToSPI((U8)((Address>>1) >> 8),2);
+    381                  mLDBEepSendByteToSPI((U8)(Address>>1));
+    382                }
+    383                #endif
+    384              }
+    385            #endif
+    386          
+    387            //Received data
+    388            for (u8Index = 0; u8Index < pMsg->Lng; u8Index++)
+   \   005B   C4             MOVW      AX,DE
+   \   005C   A200           MOV       C,#0
+   \   005E   D6             MOVW      HL,AX
+   \   005F   AE02           MOV       A,[HL+0x02]
+   \   0061   70             MOV       X,A
+   \   0062   AE03           MOV       A,[HL+0x03]
+   \   0064   6168           OR        A,X
+   \   0066   AD28           BZ        ??LDBEepControl_7
+    389            {
+    390                pMsg->pBuffer[u8Index] = mLDBEepReadByteFromSPI();
+   \                     ??LDBEepReceiveWithAddr_0:
+   \   0068   A108           MOV       A,#8
+   \   006A   9A....         CALL      LDBSpiLRReceiveBits
+   \   006D   73             MOV       B,A
+   \   006E   C4             MOVW      AX,DE
+   \   006F   D6             MOVW      HL,AX
+   \   0070   87             MOV       A,[HL]
+   \   0071   70             MOV       X,A
+   \   0072   AE01           MOV       A,[HL+0x01]
+   \   0074   30             XCH       A,X
+   \   0075   610A           ADD       A,C
+   \   0077   30             XCH       A,X
+   \   0078   2D00           ADDC      A,#0
+   \   007A   D6             MOVW      HL,AX
+   \   007B   63             MOV       A,B
+   \   007C   97             MOV       [HL],A
+    391            }
+   \   007D   C4             MOVW      AX,DE
+   \   007E   42             INC       C
+   \   007F   D6             MOVW      HL,AX
+   \   0080   AE02           MOV       A,[HL+0x02]
+   \   0082   70             MOV       X,A
+   \   0083   AE03           MOV       A,[HL+0x03]
+   \   0085   D6             MOVW      HL,AX
+   \   0086   62             MOV       A,C
+   \   0087   A000           MOV       X,#0
+   \   0089   611E           SUB       A,L
+   \   008B   60             MOV       A,X
+   \   008C   613F           SUBC      A,H
+   \   008E   8DD8           BC        ??LDBEepReceiveWithAddr_0
+    392          
+    393            //unselect eep
+    394            mLDBEepPutSPIInIdleMode();
+   \                     ??LDBEepControl_7:
+   \   0090   100000         MOVW      AX,#0
+   \   0093   4B00           CLR1      S:0xFF00.4
+   \   0095   2B00           CLR1      S:0xFF00.2
+    395            mUnselectEEPChip();
+   \   0097   0B0D           CLR1      S:0xFF0D.0
+   \   0099   9A....         CALL      LDBHarActiveWaitUs
+    396          
+    397            DATEepCallBackRxWithAddr(Address, cLDBCorrect);
+   \   009C   A300           MOV       B,#0
+   \   009E   891C           MOVW      AX,SP
+   \   00A0   D6             MOVW      HL,AX
+   \   00A1   87             MOV       A,[HL]
+   \   00A2   70             MOV       X,A
+   \   00A3   AE01           MOV       A,[HL+0x01]
+   \   00A5   9A....         CALL      DATEepCallBackRxWithAddr
+    398          }
+   \   00A8   B0             POP       AX
+   \   00A9   AF             RET       
+   \   00AA                  REQUIRE ?CL78K_V4_6_L00
+   \   00AA                  REQUIRE _A_P0
+   \   00AA                  REQUIRE _A_P13
+    399          
+    400          /*============================================================================
+    401            DESCRIPTION :void LDBEepControl(tCtrl Ctrl)
+    402                      Lock and unlock eeprom
+    403            
+    404            PARAMETERS (Type,Name,Min,Max) :  none
+    405          
+    406            RETURN VALUE :  none
+    407           
+    408            DESIGN INFORMATION :  refer to Detailed Design Document
+    409          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    410          MEM_TYPE void LDBEepControl(tCtrl Ctrl)
+   \                     LDBEepControl:
+    411          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    412          
+    413            //  Command evaluation
+    414            switch(Ctrl)
+   \   0002   4D00           CMP       A,#0
+   \   0004   AD38           BZ        ??LDBEepControl_8
+   \   0006   4D01           CMP       A,#1
+   \   0008   AD06           BZ        ??LDBEepControl_9
+   \   000A   4D02           CMP       A,#2
+   \   000C   AD5E           BZ        ??LDBEepControl_10
+   \   000E   FA78           BR        ??LDBEepControl_11
+    415            {
+    416              case cLDBEepUnLock:
+    417                //  Select eep
+    418                mSelectEEPChip();
+   \                     ??LDBEepControl_9:
+   \   0010   100000         MOVW      AX,#0
+   \   0013   4B00           CLR1      S:0xFF00.4
+   \   0015   2B00           CLR1      S:0xFF00.2
+   \   0017   9A....         CALL      LDBHarActiveWaitUs
+   \   001A   100000         MOVW      AX,#0
+   \   001D   0A0D           SET1      S:0xFF0D.0
+   \   001F   9A....         CALL      LDBHarActiveWaitUs
+    419                // send EWEN instruction
+    420                mLDBEepSendBitsToSPI(cInstructionEWEN, 3);
+   \   0022   A104           MOV       A,#4
+   \   0024   A303           MOV       B,#3
+   \   0026   9A....         CALL      LDBSpiLRSendBits
+    421          
+    422                #if (defined(cLDBHarEep93Type_M93C06) || defined(cLDBHarEep93Type_M93C46))
+    423                  {
+    424                    #if (defined(cLDBHarEep93Org_8Bits))
+    425                    {
+    426                      mLDBEepSendBitsToSPI(cInstructionEWENCompletion7Bits, 7);
+    427                    }
+    428                    #elif (defined(cLDBHarEep93Org_16Bits))
+    429                    {
+    430                      mLDBEepSendBitsToSPI(cInstructionEWENCompletion6Bits, 6);
+    431                    }
+    432                    #endif
+    433                  }
+    434                #elif (defined(cLDBHarEep93Type_M93C56) || defined(cLDBHarEep93Type_M93C66))
+    435                  {
+    436                    #if (defined(cLDBHarEep93Org_8Bits))
+    437                    {
+    438                      mLDBEepSendBitsToSPI(cInstructionEWENCompletion9BitsHigh, 1);
+    439                      mLDBEepSendByteToSPI(cInstructionEWENCompletion9BitsLow);
+    440                    }
+    441                    #elif (defined(cLDBHarEep93Org_16Bits))
+    442                    {
+    443                      mLDBEepSendByteToSPI(cInstructionEWENCompletion8Bits);
+   \   0029   A1FF           MOV       A,#255
+   \   002B   A308           MOV       B,#8
+   \   002D   9A....         CALL      LDBSpiLRSendBits
+    444                    }
+    445                    #endif
+    446                  }
+    447                #elif (defined(cLDBHarEep93Type_M93C76) || defined(cLDBHarEep93Type_M93C86))
+    448                  {
+    449                    #if (defined(cLDBHarEep93Org_8Bits))
+    450                    {
+    451                      mLDBEepSendBitsToSPI(cInstructionEWENCompletion11BitsHigh, 3);
+    452                      mLDBEepSendByteToSPI(cInstructionEWENCompletion11BitsLow);
+    453                    }
+    454                    #elif (defined(cLDBHarEep93Org_16Bits))
+    455                    {
+    456                      mLDBEepSendBitsToSPI(cInstructionEWENCompletion10BitsHigh, 2);
+    457                      mLDBEepSendByteToSPI(cInstructionEWENCompletion10BitsLow);
+    458                    }
+    459                    #endif
+    460                  }
+    461                #endif
+    462          
+    463                //  Unselect eep
+    464                mLDBEepPutSPIInIdleMode();
+   \   0030   100000         MOVW      AX,#0
+   \   0033   4B00           CLR1      S:0xFF00.4
+   \   0035   2B00           CLR1      S:0xFF00.2
+    465                mUnselectEEPChip();
+   \   0037   0B0D           CLR1      S:0xFF0D.0
+   \   0039   9A....         CALL      LDBHarActiveWaitUs
+   \   003C   FA4D           BR        ??LDBEepControl_12
+    466                break;
+    467              case cLDBEepLock:
+    468                //  Select eep
+    469                mSelectEEPChip();
+   \                     ??LDBEepControl_8:
+   \   003E   100000         MOVW      AX,#0
+   \   0041   4B00           CLR1      S:0xFF00.4
+   \   0043   2B00           CLR1      S:0xFF00.2
+   \   0045   9A....         CALL      LDBHarActiveWaitUs
+   \   0048   100000         MOVW      AX,#0
+   \   004B   0A0D           SET1      S:0xFF0D.0
+   \   004D   9A....         CALL      LDBHarActiveWaitUs
+    470                // send EWDS instruction
+    471                mLDBEepSendBitsToSPI(cInstructionEWDS, 3);
+   \   0050   A104           MOV       A,#4
+   \   0052   A303           MOV       B,#3
+   \   0054   9A....         CALL      LDBSpiLRSendBits
+    472          
+    473                #if (defined(cLDBHarEep93Type_M93C06) || defined(cLDBHarEep93Type_M93C46))
+    474                  {
+    475                    #if (defined(cLDBHarEep93Org_8Bits))
+    476                    {
+    477                      mLDBEepSendBitsToSPI(cInstructionEWDSCompletion7Bits, 7);
+    478                    }
+    479                    #elif (defined(cLDBHarEep93Org_16Bits))
+    480                    {
+    481                      mLDBEepSendBitsToSPI(cInstructionEWDSCompletion6Bits, 6);
+    482                    }
+    483                    #endif
+    484                  }
+    485                #elif (defined(cLDBHarEep93Type_M93C56) || defined(cLDBHarEep93Type_M93C66))
+    486                  {
+    487                    #if (defined(cLDBHarEep93Org_8Bits))
+    488                    {
+    489                      mLDBEepSendBitsToSPI(cInstructionEWDSCompletion9BitsHigh, 1);
+    490                      mLDBEepSendByteToSPI(cInstructionEWDSCompletion9BitsLow);
+    491                    }
+    492                    #elif (defined(cLDBHarEep93Org_16Bits))
+    493                    {
+    494                      mLDBEepSendByteToSPI(cInstructionEWDSCompletion8Bits);
+   \   0057   A13F           MOV       A,#63
+   \   0059   A308           MOV       B,#8
+   \   005B   9A....         CALL      LDBSpiLRSendBits
+    495                    }
+    496                    #endif
+    497                  }
+    498                #elif (defined(cLDBHarEep93Type_M93C76) || defined(cLDBHarEep93Type_M93C86))
+    499                  {
+    500                    #if (defined(cLDBHarEep93Org_8Bits))
+    501                    {
+    502                      mLDBEepSendBitsToSPI(cInstructionEWDSCompletion11BitsHigh, 3);
+    503                      mLDBEepSendByteToSPI(cInstructionEWDSCompletion11BitsLow);
+    504                    }
+    505                    #elif (defined(cLDBHarEep93Org_16Bits))
+    506                    {
+    507                      mLDBEepSendBitsToSPI(cInstructionEWDSCompletion10BitsHigh, 2);
+    508                      mLDBEepSendByteToSPI(cInstructionEWDSCompletion10BitsLow);
+    509                    }
+    510                    #endif
+    511                  }
+    512                #endif
+    513          
+    514                //  Unselect eep
+    515                mLDBEepPutSPIInIdleMode();
+   \   005E   100000         MOVW      AX,#0
+   \   0061   4B00           CLR1      S:0xFF00.4
+   \   0063   2B00           CLR1      S:0xFF00.2
+    516                mUnselectEEPChip();
+   \   0065   0B0D           CLR1      S:0xFF0D.0
+   \   0067   9A....         CALL      LDBHarActiveWaitUs
+   \   006A   FA1F           BR        ??LDBEepControl_12
+    517                break;
+    518              case cLDBEepCheckWriteCompletion:
+    519                if( IsWriteProcessing != cFalse )
+   \                     ??LDBEepControl_10:
+   \   006C   8E....         MOV       A,IsWriteProcessing
+   \   006F   4D00           CMP       A,#0
+   \   0071   AD18           BZ        ??LDBEepControl_12
+    520                {
+    521                  // There is no timeout in the LDB.
+    522                  // The timeout is managed by the DAT Layer
+    523                  if ( IsWriteFinished() == cTrue )
+   \   0073   9A....         CALL      IsWriteFinished
+   \   0076   51             DEC       A
+   \   0077   BD12           BNZ       ??LDBEepControl_12
+    524                  {
+    525                    // If the write operation is finished
+    526                    DATEepCallBackTxWithAddr(WriteAddress, cLDBCorrect);
+   \   0079   A300           MOV       B,#0
+   \   007B   02....         MOVW      AX,WriteAddress
+   \   007E   9A....         CALL      DATEepCallBackTxWithAddr
+    527                    IsWriteProcessing = cFalse;
+   \   0081   A100           MOV       A,#0
+   \   0083   9E....         MOV       IsWriteProcessing,A
+   \   0086   FA03           BR        ??LDBEepControl_12
+    528                  }
+    529                }
+    530                break;
+    531              default :
+    532                mLIBassert(cFalse);
+   \                     ??LDBEepControl_11:
+   \   0088   9A....         CALL      LIBAssertionFailed
+    533                break;
+    534          
+    535            }
+    536            DATEepCallBackEndCtrl(Ctrl,cLDBCorrect);
+   \                     ??LDBEepControl_12:
+   \   008B   62             MOV       A,C
+   \   008C   A300           MOV       B,#0
+   \   008E   9A....         CALL      DATEepCallBackEndCtrl
+    537          
+    538          }
+   \   0091   B2             POP       BC
+   \   0092   AF             RET       
+   \   0093                  REQUIRE ?CL78K_V4_6_L00
+   \   0093                  REQUIRE _A_P0
+   \   0093                  REQUIRE _A_P13
+
+   Segment part sizes:
+
+     Function/Label        Bytes
+     --------------        -----
+     _A_P0                    1
+     _A_P13                   1
+     WriteAddress             2
+     IsWriteProcessing        1
+     IsWriteFinished         52
+     LDBEepInit              11
+     LDBEepSendWithAddr     182
+     LDBEepReceiveWithAddr  170
+     LDBEepControl          147
+
+ 
+ 510 bytes in segment BCODE
+  52 bytes in segment CODE
+   3 bytes in segment NEAR_Z
+   2 bytes in segment SADDR_A
+ 
+ 562 bytes of CODE memory
+   3 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none

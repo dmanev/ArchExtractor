@@ -1,0 +1,379 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:33 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_ALA.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_ALA.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_ALA.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_ALA.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_ALA.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_ALA.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_ALA.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      RSA_X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    DAT_ALA
+     13          // -----------------------------------------------------------------------------
+     14          // $Date    :   Apr 25 2009 08:20:17  $
+     15          // $Archive :   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_ALA/DAT_ALA.c-arc  $
+     16          // $Revision:   1.7  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log     :   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_ALA/DAT_ALA.c-arc  $
+     19          // 
+     20          //    Rev 1.6   Apr 25 2009 08:20:17   aangovt
+     21          // Cm003271: Functions moved to banked memory area 
+     22          // 
+     23          //    Rev 1.5   Apr 13 2009 17:46:53   aangovt
+     24          // Cm003271 - Ararm Status for Diag is added  
+     25          // 
+     26          //    Rev 1.4   Apr 08 2009 11:44:02   aangovt
+     27          // Cm003271 Name of LDBDou contols is chanhed 
+     28          // 
+     29          //    Rev 1.3   Feb 23 2009 09:33:20   aangovt
+     30          // Cm003271  Implementation of the Alarm functionality 
+     31          // 
+     32          //    Rev 1.2   Feb 12 2009 17:26:51   aangovt
+     33          // Cm003271  Implementation of the Alarm functionality  
+     34          // 
+     35          //    Rev 1.1   Feb 10 2009 17:00:47   aangovt
+     36          // Cm003271  Implementation of the Alarm functionality 
+     37          // 
+     38          //    Rev 1.0   Feb 10 2009 13:24:09   aangovt
+     39          // Initial revision. 
+     40          //******************************************************************************
+     41          #endif
+     42          //------------------------------------------------------------------------------
+     43          // Body Identification
+     44          //------------------------------------------------------------------------------
+     45          #define DAT_ALA  "DAT_ALA"
+     46          
+     47          //------------------------------------------------------------------------------
+     48          // Included files to resolve specific definitions in this file
+     49          //
+     50          // #include <system_file_name.h>
+     51          // #include "project_file_name.h"
+     52          //------------------------------------------------------------------------------
+     53          #include "deftypes.h"
+     54          #include "lib.h"
+     55          #include "ldb.h"
+     56          #include "tos.h"
+     57          #include "dat.h"
+     58          #include "DAT_ALA.h"
+     59          
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Local constants
+     63          //
+     64          // #define cConstantName   ((tType) ConstantValue)
+     65          //------------------------------------------------------------------------------
+     66          
+     67          
+     68          //------------------------------------------------------------------------------
+     69          // Local macros
+     70          //
+     71          // #define mMacroName   (MacroDefinition)
+     72          //------------------------------------------------------------------------------
+     73          
+     74          //------------------------------------------------------------------------------
+     75          // Local types
+     76          //
+     77          // typedef Expression    tTypeName;
+     78          //------------------------------------------------------------------------------
+     79          
+     80          //------------------------------------------------------------------------------
+     81          // Data prefix
+     82          //
+     83          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+     84          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+     85          //
+     86          // -----------------------------------------------------------------------------
+     87          // Local data
+     88          //
+     89          // static  tType   u8VariableName;  
+     90          // static  tType*  pu8VariableName; 
+     91          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     92          static tMsg DATAlaMsg;
+   \                     DATAlaMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+     93          //------------------------------------------------------------------------------
+     94          // Constant local data
+     95          //
+     96          // static const tType  VariableName;
+     97          //------------------------------------------------------------------------------
+     98          
+     99          //------------------------------------------------------------------------------
+    100          // Exported data
+    101          //
+    102          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    103          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    104          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    105          U8     AlaCmdFrame[cDATALADataLenght];
+   \                     AlaCmdFrame:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    106          BOOL  bDATAlaCommunicationIsRunning;
+   \                     bDATAlaCommunicationIsRunning:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    107          BOOL    bIsAlaDiagEnabled;
+   \                     bIsAlaDiagEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    108          //------------------------------------------------------------------------------
+    109          // Constant exported data
+    110          //
+    111          //             (LAY: 3 characters to identify the layer)
+    112          //             (Cmp: 3 characters to identify this component)
+    113          // 
+    114          // const tType   LAYCmpVariableName;
+    115          //------------------------------------------------------------------------------
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Local function prototypes
+    119          // 
+    120          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    121          //------------------------------------------------------------------------------
+    122          
+    123          #ifdef X90_PROJECT
+    124          static MEM_TYPE void DATAlaCallBackTxWithoutAddr_Static(tStatus Status);
+    125          static MEM_TYPE void DATAlaSendCommand_Static(void);
+    126          #endif
+    127          
+    128          //==============================================================================
+    129          //=========================== LOCAL FUNCTIONS ==================================
+    130          //==============================================================================
+    131          
+    132          // [LOCAL_FUNCTIONS_END] 
+    133          
+    134          
+    135          //==============================================================================
+    136          //=========================== EXPORTED FUNCTIONS ===============================
+    137          //==============================================================================
+    138          
+    139          //==============================================================================
+    140          // DESCRIPTION : Initialization of DAT_ALA
+    141          //
+    142          // PARAMETERS (Type,Name,Min,Max) :   none
+    143          //
+    144          // RETURN VALUE :   none
+    145          //
+    146          // DESIGN INFORMATION : refer to Detailed Design Document
+    147          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    148          void DATAlaInit(void)
+   \                     DATAlaInit:
+    149          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    150              bDATAlaCommunicationIsRunning = cFalse;
+   \   0004   9E....         MOV       bDATAlaCommunicationIsRunning,A
+    151              bIsAlaDiagEnabled = cFalse;
+   \   0007   9E....         MOV       bIsAlaDiagEnabled,A
+    152              mLIBmemset(AlaCmdFrame,0x00,cDATALADataLenght);
+   \   000A   10....         MOVW      AX,#AlaCmdFrame
+   \   000D   140400         MOVW      DE,#4
+   \   0010   120000         MOVW      BC,#0
+   \   0013   9A....         CALL      memset
+    153          }
+   \   0016   B4             POP       DE
+   \   0017   B2             POP       BC
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    154          
+    155          //==============================================================================
+    156          // DESCRIPTION : Callback from LDB_ALA - end of alarm frame transmission
+    157          //
+    158          // PARAMETERS (Type,Name,Min,Max) :   tStatus Status
+    159          //
+    160          // RETURN VALUE :   none
+    161          //
+    162          // DESIGN INFORMATION : refer to Detailed Design Document
+    163          //==============================================================================
+    164          //QACJ 3206: aangovt: tStatus Status is standard  parameter  for DAT callback
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    165          void DATAlaCallBackTxWithoutAddr(tStatus Status)
+   \                     DATAlaCallBackTxWithoutAddr:
+    166          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    167          #ifdef X90_PROJECT
+    168              DATAlaCallBackTxWithoutAddr_Static(Status);
+   \   0001   16....         MOVW      HL,#LWRD(DATAlaCallBackTxWithoutAddr_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATAlaCallBackTxWithoutAddr_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    169          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    170          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    171          static MEM_TYPE void DATAlaCallBackTxWithoutAddr_Static(tStatus Status)
+   \                     DATAlaCallBackTxWithoutAddr_Static:
+    172          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    173          #endif
+    174              
+    175              mLIBassert(Status == cLDBCorrect);
+    176          
+    177              
+    178              // The channel dou takes the control of OPEN_DOOR_LED output
+    179              LDBControl(cLDBChannelDou,cLDBDouEnableOPEN_DOOR_LED);
+   \   0000   A107           MOV       A,#7
+   \   0002   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   0005   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0007   ..             CALLT     [__T_?FAR_CALL_L07]
+    180          
+    181              // End of the alarm communication
+    182              bDATAlaCommunicationIsRunning = cFalse;
+   \   0008   A100           MOV       A,#0
+   \   000A   9E....         MOV       bDATAlaCommunicationIsRunning,A
+    183              DATDouRefreshOutputTask(); 
+   \   000D   9B....         BR        N:DATDouRefreshOutputTask
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+    184          }
+    185          
+    186          //==============================================================================
+    187          // DESCRIPTION : Starts alarm frame transmission with LDBSendWithoutAddr
+    188          //
+    189          // PARAMETERS (Type,Name,Min,Max) :   none
+    190          //
+    191          // RETURN VALUE :   none
+    192          //
+    193          // DESIGN INFORMATION : refer to Detailed Design Document
+    194          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    195          void DATAlaSendCommand(void)
+   \                     DATAlaSendCommand:
+    196          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    197          #ifdef X90_PROJECT
+    198              DATAlaSendCommand_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATAlaSendCommand_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATAlaSendCommand_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    199          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    200          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    201          static MEM_TYPE void DATAlaSendCommand_Static(void)
+   \                     DATAlaSendCommand_Static:
+    202          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    203          #endif
+    204          
+    205              // Start the alarm sending
+    206              bDATAlaCommunicationIsRunning = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bDATAlaCommunicationIsRunning,A
+    207          
+    208              // The alarm takes the control of OPEN_DOOR_LED output
+    209              LDBControl(cLDBChannelDou,cLDBDouDisableOPEN_DOOR_LED);
+   \   0005   A108           MOV       A,#8
+   \   0007   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   000A   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   000C   ..             CALLT     [__T_?FAR_CALL_L07]
+    210          
+    211              DATAlaMsg.Lng     = cDATALADataLenght;
+   \   000D   100400         MOVW      AX,#4
+   \   0010   03....         MOVW      DATAlaMsg+2,AX
+    212              DATAlaMsg.pBuffer = AlaCmdFrame; 
+   \   0013   10....         MOVW      AX,#AlaCmdFrame
+   \   0016   03....         MOVW      DATAlaMsg,AX
+    213              LDBSendWithoutAddr(cLDBChannelAla, &DATAlaMsg);
+   \   0019   10....         MOVW      AX,#DATAlaMsg
+   \   001C   16....         MOVW      HL,#LWRD(LDBAlaSendWithoutAddr)
+   \   001F   A4..           MOV       E,#BYTE3(LDBAlaSendWithoutAddr)
+   \   0021   ..             CALLT     [__T_?FAR_CALL_L07]
+    214          }
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+    215          // [EXPORTED_FUNCTIONS_END] 
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     DATAlaMsg                         4
+     AlaCmdFrame                       4
+     bDATAlaCommunicationIsRunning     1
+     bIsAlaDiagEnabled                 1
+     DATAlaInit                       25
+     DATAlaCallBackTxWithoutAddr       9
+     DATAlaCallBackTxWithoutAddr_Static
+                                      16
+     DATAlaSendCommand                 9
+     DATAlaSendCommand_Static         35
+     __T_?FAR_CALL_L07                 2
+
+ 
+ 51 bytes in segment BCODE
+  2 bytes in segment CLTVEC
+ 43 bytes in segment CODE
+ 10 bytes in segment NEAR_Z
+ 
+ 94 bytes of CODE memory (+ 2 bytes shared)
+ 10 bytes of DATA memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,2671 @@
+Layer: DAT
+	Class: dat	Requires methods from the following classes:
+	Provides the following methods:
+
+	Class: dat_ala	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setAlaCmdFrame(in Index: U8Bit, in Value: U8Bit )
+			setDATControlDATAla(in Value: U8Bit )
+			setIsAlaDiagEnabled(in Value: U1Bit )
+			getAlaCmdFrame(in Index: U8Bit): U8Bit
+			getAlaCommunicationIsRunning(): U1Bit
+			getIsAlaDiagEnabled(): U1Bit
+
+	Class: dat_ana	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATEnterActiveState()
+			OnControlDATLeaveActiveState()
+	Provides the following methods:
+			setAI_DOOR_UNLOCK_SW(in Value: U16Bit )
+			setAI_FR_WIPER_INT_SW(in Value: U16Bit )
+			setAI_RR_DOORS_SW(in Value: U16Bit )
+			setDIAG_BAT(in Value: U16Bit )
+			setDIAG_DRIVER_HIGH_SIDE(in Value: U16Bit )
+			setDIAG_DRIVER_KLAXON(in Value: U16Bit )
+			setDIAG_DRIVER_ULQ(in Value: U16Bit )
+			setDIAG_FLASHER(in Value: U16Bit )
+			getAI_DOOR_UNLOCK_SW(): U16Bit
+			getAI_FR_WIPER_INT_SW(): U16Bit
+			getAI_RR_DOORS_SW(): U16Bit
+			getDIAG_BAT(): U16Bit
+			getDIAG_DRIVER_HIGH_SIDE(): U16Bit
+			getDIAG_DRIVER_KLAXON(): U16Bit
+			getDIAG_DRIVER_ULQ(): U16Bit
+			getDIAG_FLASHER(): U16Bit
+
+	Class: dat_apr	Requires methods from the following classes:
+		Class: dat_pee
+			getEEP_AfterSalesCode(in Index: U8Bit): U8Bit
+			getEEP_ImmoSecretKey(in Index: U8Bit): U8Bit
+			setEEP_AfterSalesCode(in Index: U8Bit, in Value: U8Bit )
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setDATAprAfterSaleCode(in Index: U8Bit, in Value: U8Bit )
+			setDATAprDiagAfterSaleCode(in Index: U8Bit, in Value: U8Bit )
+			setDATAprIdentifier(in Value: U32Bit )
+			setDATAprImmobilizerSecretKey(in Index: U8Bit, in Value: U8Bit )
+			setDATAprPasswordTag(in Value: U32Bit )
+			setDATControlApr(in Value: U8Bit )
+			getDATAprAfterSaleCode(in Index: U8Bit): U8Bit
+			getDATAprAfterSaleCodeRecognized(): U1Bit
+			getDATAprImmobilizerSecretKey(in Index: U8Bit): U8Bit
+			getDATAprRemoteSecretKey(in Index: U8Bit): U8Bit
+			getDATAprSKey(): U16Bit
+
+	Class: dat_buz	Requires methods from the following classes:
+		Class: dat_peep
+			getNEEP_SBR_TIMEOUT_TM_TP(): U8Bit
+			getNEEP_TPS_BUZ_CLI(): U8Bit
+			getNEEP_TPS_CLI(): U8Bit
+		Class: lap_sup
+			OnControlDATEnterActiveState()
+			OnControlDATInitialize()
+			OnControlDATLeaveActiveState()
+	Provides the following methods:
+			setBUZZER(in Index: U8Bit, in Value: U1Bit )
+			setDATBuzDiagBuzz(in Value: U16Bit )
+			setDATControlDATBuzDiagBuzz(in Value: U8Bit )
+			getIsBuzzerSoundPlaying(): U1Bit
+
+	Class: dat_cmn	Requires methods from the following classes:
+		Class: dat_pee
+			getEEP_ResetCount(): U8Bit
+			setEEP_ResetCount(in Value: U8Bit )
+		Class: dat_pin
+			getBcmSleepMode(): U1Bit
+			OnControlChanging_FR_DOORS_SW()
+			OnControlChanging_RR_DOORS_SW()
+			OnControlFalling_FR_DOORS_SW()
+			OnControlFalling_HAZARD_SW()
+			OnControlFalling_PWR_IGN()
+			OnControlFalling_RR_DOORS_SW()
+			OnControlFrontStopPositionDetected()
+			OnControlRearStopPositionDetected()
+			OnControlRising_DOOR_LOCK_SW()
+			OnControlRising_DOOR_UNLOCK_SW()
+			OnControlRising_FR_DOORS_SW()
+			OnControlRising_PWR_IGN()
+			OnControlRising_RR_DOORS_SW()
+		Class: dat_rf
+			setDATControlRf(in Value: U8Bit )
+		Class: lap_car
+			OnControlGetCarTrpResource()
+			OnControlReleaseCarTrpResource()
+		Class: lap_lrn
+			OnControlGetAprTrpResource()
+			OnControlReleaseAprTrpResource()
+		Class: lap_sup
+			OnControlDATInitialize()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setAFSCodeIsOk(in Value: U1Bit )
+			setAfterSaleModeAuthorized(in Value: U1Bit )
+			setAfterSaleModeValidationAuthorized(in Value: U1Bit )
+			setAuthentLocalFailureCounter(in Value: U8Bit )
+			setAuthentPermanentFailCounter(in Value: U8Bit )
+			setAuthentPermanentResynchroFailCounter(in Value: U8Bit )
+			setAuthentPermanentTotalCounter(in Value: U16Bit )
+			setBcmSleepRequested(in Value: U1Bit )
+			setCOD_ERR_APP(in Value: U8Bit )
+			setDATControlEepromReprogramming(in Value: U8Bit )
+			setDATKeyIsAlreadyLearnt(in Value: U1Bit )
+			setDefAFAR(in Value: U1Bit )
+			setDefAFAV(in Value: U1Bit )
+			setDefAirbag(in Value: U1Bit )
+			setDefBtonCpeFer(in Value: U1Bit )
+			setDefBtonCpeOuv(in Value: U1Bit )
+			setDefClignL(in Value: U1Bit )
+			setDefClignR(in Value: U1Bit )
+			setDefDfrToBat(in Value: U1Bit )
+			setDefDfrToGnd(in Value: U1Bit )
+			setDefDoorlockLedCC(in Value: U1Bit )
+			setDefEEPROM(in Value: U1Bit )
+			setDefHornCCBat(in Value: U1Bit )
+			setDefHornCCGnd(in Value: U1Bit )
+			setDefKLineCC(in Value: U1Bit )
+			setDefRrwCC(in Value: U1Bit )
+			setDefTrpShortCircuitToBat(in Value: U1Bit )
+			setDefTrpShortCircuitToGnd(in Value: U1Bit )
+			setDefVerlogLedCC(in Value: U1Bit )
+			setDefVerlogToBat(in Value: U1Bit )
+			setDefVerlogToGnd(in Value: U1Bit )
+			setFactoryModeAuthorized(in Value: U1Bit )
+			setFlasherLampsTestResult(in Value: U8Bit )
+			setFlashingFrequency(in Value: U8Bit )
+			setFrontWasherButtonBlocked(in Value: U1Bit )
+			setHazardAlarmRequested(in Value: U1Bit )
+			setISKSuccessfullyWritten(in Value: U1Bit )
+			setLastCommandOrigin(in Value: U1Bit )
+			setLastOpeningPanelControl(in Value: U1Bit )
+			setLearningModeInProgress(in Value: U8Bit )
+			setLedVerlogPattern(in Value: U8Bit )
+			setNumberOfKeys315MHzLearnt(in Value: U8Bit )
+			setNumberOfKeys315MHzSmallLearnt(in Value: U8Bit )
+			setNumberOfKeys433MHzLearnt(in Value: U8Bit )
+			setNumberOfKeysLearnt(in Value: U8Bit )
+			setPcfRefreshAllowed(in Value: U1Bit )
+			setRSKSuccessfullyWritten(in Value: U1Bit )
+			setRearWasherButtonBlocked(in Value: U1Bit )
+			setSynchroSuccessfullyWritten(in Value: U1Bit )
+			setTOSSignalChanging_FR_DOORS_SW_LAP_DLK()
+			setTOSSignalChanging_FR_DOORS_SW_LAP_ILL()
+			setTOSSignalChanging_RR_DOORS_SW_LAP_DLK()
+			setTOSSignalChanging_RR_DOORS_SW_LAP_ILL()
+			setTOSSignalFalling_FR_DOORS_SW_LAP_DLK()
+			setTOSSignalFalling_FR_DOORS_SW_LAP_ILL()
+			setTOSSignalFalling_HAZARD_SW_LAP_FLI()
+			setTOSSignalFalling_PWR_IGN_LAP_BUZ()
+			setTOSSignalFalling_PWR_IGN_LAP_DLK()
+			setTOSSignalFalling_PWR_IGN_LAP_ILL()
+			setTOSSignalFalling_RR_DOORS_SW_LAP_DLK()
+			setTOSSignalFalling_RR_DOORS_SW_LAP_ILL()
+			setTOSSignalFrontStopPositionDetected_LAP_FRW1()
+			setTOSSignalFrontStopPositionDetected_LAP_FRW2()
+			setTOSSignalRearStopPositionDetected_LAP_RRW1()
+			setTOSSignalRearStopPositionDetected_LAP_RRW2()
+			setTOSSignalRising_DOOR_LOCK_SW_LAP_DLK()
+			setTOSSignalRising_DOOR_UNLOCK_LOCK_SW_LAP_DLK()
+			setTOSSignalRising_FR_DOORS_SW_LAP_DLK()
+			setTOSSignalRising_FR_DOORS_SW_LAP_ILL()
+			setTOSSignalRising_PWR_IGN_LAP_DLK()
+			setTOSSignalRising_PWR_IGN_LAP_FLI()
+			setTOSSignalRising_PWR_IGN_LAP_ILL()
+			setTOSSignalRising_RF_UNLOCK_DRIVER_DOOR_LAP_DLK()
+			setTOSSignalRising_RR_DOORS_SW_LAP_DLK()
+			setTOSSignalRising_RR_DOORS_SW_LAP_ILL()
+			setVERLOGON(in Value: U1Bit )
+			setVehicleIsAutoRelocked(in Value: U1Bit )
+			setVehicleIsLockedWithSpeed(in Value: U1Bit )
+			setVehiculeHasBeenMoving(in Value: U1Bit )
+			setWritingErrorInEepForKey1InFactoryMode(in Value: U1Bit )
+			setWritingErrorInEepForKey2InFactoryMode(in Value: U1Bit )
+			setWritingErrorInEepInBcmReplacement(in Value: U1Bit )
+			setWritingErrorInEepInReassignment(in Value: U1Bit )
+			getAFSCodeIsOk(): U1Bit
+			getAfterSaleModeAuthorized(): U1Bit
+			getAfterSaleModeValidationAuthorized(): U1Bit
+			getAuthentLocalFailureCounter(): U8Bit
+			getAuthentPermanentFailCounter(): U8Bit
+			getAuthentPermanentResynchroFailCounter(): U8Bit
+			getAuthentPermanentTotalCounter(): U16Bit
+			getBcmSleepRequested(): U1Bit
+			getCOD_ERR_APP(): U8Bit
+			getDATKeyIsAlreadyLearnt(): U1Bit
+			getDefAFAR(): U1Bit
+			getDefAFAV(): U1Bit
+			getDefAirbag(): U1Bit
+			getDefBtonCpeFer(): U1Bit
+			getDefBtonCpeOuv(): U1Bit
+			getDefClignL(): U1Bit
+			getDefClignR(): U1Bit
+			getDefDfrToBat(): U1Bit
+			getDefDfrToGnd(): U1Bit
+			getDefDoorlockLedCC(): U1Bit
+			getDefEEPROM(): U1Bit
+			getDefHornCCBat(): U1Bit
+			getDefHornCCGnd(): U1Bit
+			getDefKLineCC(): U1Bit
+			getDefRrwCC(): U1Bit
+			getDefTrpShortCircuitToBat(): U1Bit
+			getDefTrpShortCircuitToGnd(): U1Bit
+			getDefVerlogLedCC(): U1Bit
+			getDefVerlogToBat(): U1Bit
+			getDefVerlogToGnd(): U1Bit
+			getFactoryModeAuthorized(): U1Bit
+			getFlasherLampsTestResult(): U8Bit
+			getFlashingFrequency(): U8Bit
+			getFrontWasherButtonBlocked(): U1Bit
+			getHazardAlarmRequested(): U1Bit
+			getISKSuccessfullyWritten(): U1Bit
+			getLastCommandOrigin(): U1Bit
+			getLastOpeningPanelControl(): U1Bit
+			getLearningModeInProgress(): U8Bit
+			getLedVerlogPattern(): U8Bit
+			getNumberOfKeys315MHzLearnt(): U8Bit
+			getNumberOfKeys315MHzSmallLearnt(): U8Bit
+			getNumberOfKeys433MHzLearnt(): U8Bit
+			getNumberOfKeysLearnt(): U8Bit
+			getRSKSuccessfullyWritten(): U1Bit
+			getRearWasherButtonBlocked(): U1Bit
+			getSynchroSuccessfullyWritten(): U1Bit
+			getTOSSignalChanging_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalChanging_FR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalChanging_RR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalChanging_RR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalFalling_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalFalling_FR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalFalling_HAZARD_SW_LAP_FLI(): U1Bit
+			getTOSSignalFalling_PWR_IGN_LAP_BUZ(): U1Bit
+			getTOSSignalFalling_PWR_IGN_LAP_DLK(): U1Bit
+			getTOSSignalFalling_PWR_IGN_LAP_ILL(): U1Bit
+			getTOSSignalFalling_RR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalFalling_RR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalFrontStopPositionDetected_LAP_FRW1(): U1Bit
+			getTOSSignalFrontStopPositionDetected_LAP_FRW2(): U1Bit
+			getTOSSignalRearStopPositionDetected_LAP_RRW1(): U1Bit
+			getTOSSignalRearStopPositionDetected_LAP_RRW2(): U1Bit
+			getTOSSignalRising_DOOR_LOCK_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_DOOR_UNLOCK_LOCK_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_FR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_DLK(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_FLI(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_ILL(): U1Bit
+			getTOSSignalRising_RF_UNLOCK_DRIVER_DOOR_LAP_DLK(): U1Bit
+			getTOSSignalRising_RR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_RR_DOORS_SW_LAP_ILL(): U1Bit
+			getTfcRevisionNum(): U8Bit
+			getTfcVersionNum(): U8Bit
+			getVERLOGON(): U1Bit
+			getVehicleIsAutoRelocked(): U1Bit
+			getVehicleIsLockedWithSpeed(): U1Bit
+			getVehiculeHasBeenMoving(): U1Bit
+			getVerRevisionNum(in Index: U8Bit): U8Bit
+			getVerVersionNum(in Index: U8Bit): U8Bit
+			getWritingErrorInEepForKey1InFactoryMode(): U1Bit
+			getWritingErrorInEepForKey2InFactoryMode(): U1Bit
+			getWritingErrorInEepInBcmReplacement(): U1Bit
+			getWritingErrorInEepInReassignment(): U1Bit
+
+	Class: dat_cpu	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setDATControlCpu(in Value: U8Bit )
+			setDATControlGraphEngine(in Value: U8Bit )
+			getUnUsedStackSize(): U32Bit
+
+	Class: dat_dbk	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+
+	Class: dat_dea	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setDATControlDATDea(in Value: U8Bit )
+			setDATDeaAddressInByte(in Value: U16Bit )
+			setDATDeaSizeBufferInByte(in Value: U8Bit )
+			getDATDeaActionIsFinished(): U8Bit
+			getDATDeaWriteIsOk(): U8Bit
+
+	Class: dat_din	Requires methods from the following classes:
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			OnControlDATEnterActiveState()
+			OnControlDATLeaveActiveState()
+			OnControlIsAnybodyMaintainActiveSleepState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setAIRBAG_CRASH(in Value: U1Bit )
+			setDEFROSTER_SW(in Value: U1Bit )
+			setDI_DATA_IMMOBILIZER(in Value: U1Bit )
+			setDI_ENGINE_RPM(in Value: U1Bit )
+			setDI_VEHICLE_SPEED(in Value: U1Bit )
+			setDI_VERLOG(in Value: U1Bit )
+			setDOOR_LOCK_SW(in Value: U1Bit )
+			setDOOR_UNLOCK_SW(in Value: U1Bit )
+			setFR_AUTOSTOP_SW(in Value: U1Bit )
+			setFR_DOORS_SW(in Value: U1Bit )
+			setFR_WASHER_SW(in Value: U1Bit )
+			setFR_WIPER_INT_SW(in Value: U1Bit )
+			setHAZARD_SW(in Value: U1Bit )
+			setHIGH_LOW_BEAM(in Value: U1Bit )
+			setL_FLASHER_SW(in Value: U1Bit )
+			setPOSITION_LIGHTS(in Value: U1Bit )
+			setPWR_IGN(in Value: U1Bit )
+			setRR_AUTOSTOP_SW(in Value: U1Bit )
+			setRR_DOORS_SW(in Value: U1Bit )
+			setRR_FOG_SW(in Value: U1Bit )
+			setRR_WASHER_SW(in Value: U1Bit )
+			setRR_WIPER_INT_SW(in Value: U1Bit )
+			setR_FLASHER_SW(in Value: U1Bit )
+			setSEATBELT_REMINDER_SW(in Value: U1Bit )
+			getAIRBAG_CRASH(): U1Bit
+			getDEFROSTER_SW(): U1Bit
+			getDI_DATA_IMMOBILIZER(): U1Bit
+			getDI_ENGINE_RPM(): U1Bit
+			getDI_VEHICLE_SPEED(): U1Bit
+			getDI_VERLOG(): U1Bit
+			getDOOR_LOCK_SW(): U1Bit
+			getDOOR_UNLOCK_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getFR_DOORS_SW(): U1Bit
+			getFR_WASHER_SW(): U1Bit
+			getFR_WIPER_INT_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getHIGH_LOW_BEAM(): U1Bit
+			getL_FLASHER_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+			getRR_FOG_SW(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+			getRR_WIPER_INT_SW(): U1Bit
+			getR_FLASHER_SW(): U1Bit
+			getSEATBELT_REMINDER_SW(): U1Bit
+			ProdControlActiveSleepRequest()
+
+	Class: dat_dou	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATEnterActiveState()
+			OnControlDATLeaveActiveState()
+	Provides the following methods:
+			setBAT_LIGHT_TEMPO(in Value: U1Bit )
+			setDEFROSTER(in Value: U1Bit )
+			setDI_LEFT(in Value: U1Bit )
+			setDI_RIGHT(in Value: U1Bit )
+			setFRONT_WIPER(in Value: U1Bit )
+			setHORN_RL(in Value: U1Bit )
+			setLOCK_DOORS(in Value: U1Bit )
+			setOPEN_DOOR_LED(in Value: U1Bit )
+			setRR_WIPER_RR_FOG_LAMP(in Value: U1Bit )
+			setUNLOCK_DOORS(in Value: U1Bit )
+			setUNLOCK_DRIVER_DOOR(in Value: U1Bit )
+			setVERLOG_LED(in Value: U1Bit )
+			getBAT_LIGHT_TEMPO(): U1Bit
+			getDEFROSTER(): U1Bit
+			getDI_LEFT(): U1Bit
+			getDI_RIGHT(): U1Bit
+			getFRONT_WIPER(): U1Bit
+			getHORN_RL(): U1Bit
+			getLOCK_DOORS(): U1Bit
+			getOPEN_DOOR_LED(): U1Bit
+			getRR_WIPER_RR_FOG_LAMP(): U1Bit
+			getUNLOCK_DOORS(): U1Bit
+			getUNLOCK_DRIVER_DOOR(): U1Bit
+			getVERLOG_LED(): U1Bit
+
+	Class: dat_eep	Requires methods from the following classes:
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			OnControlDATInitialize()
+			OnControlIsAnybodyMaintainActiveSleepState()
+	Provides the following methods:
+			ProdControlActiveSleepRequest()
+
+	Class: dat_kwp	Requires methods from the following classes:
+		Class: dat_cmn
+			setDefKLineCC(in Value: U1Bit )
+		Class: dat_pee
+			setEEP_DefKLineCC(in Value: U1Bit )
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlDATInitialize()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setDATControlKwp(in Value: U8Bit )
+			setDATKwpTxBuffer(in Index: U8Bit, in Value: U8Bit )
+			setDATKwpTxFrameLgth(in Value: U8Bit )
+			setTOSSignalDiagnosticMessageIsReceived()
+			setTOSSignalEventIntKwpWakeUp()
+			getDATKwpRxBuffer(in Index: U8Bit): U8Bit
+			getDATKwpRxFrameLgth(): U8Bit
+			getTOSSignalDiagnosticMessageIsReceived(): U1Bit
+			getTOSSignalEventIntKwpWakeUp(): U1Bit
+			getTargetID(): U8Bit
+
+	Class: dat_pan	Requires methods from the following classes:
+		Class: dat_ana
+			getDIAG_BAT(): U16Bit
+			getDIAG_FLASHER(): U16Bit
+		Class: dat_dou
+			getDI_LEFT(): U1Bit
+		Class: dat_pee
+			getEEP_FlaCoeffLNormal(): U8Bit
+			getEEP_FlaCoeffRNormal(): U8Bit
+		Class: dat_pin
+			getBcmSleepMode(): U1Bit
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setDATControlAna(in Value: U8Bit )
+			setDATControlDATPan(in Value: U8Bit )
+			getBATTERY_VOLTAGE(): U16Bit
+			getDIAG_DRIVER_HIGH_SIDE_SCGnd(): U1Bit
+			getDIAG_DRIVER_KLAXON_DualSCBat(): U1Bit
+			getDIAG_DRIVER_KLAXON_KLineCommandSCBat(): U1Bit
+			getDIAG_DRIVER_KLAXON_KLineTestSCBat(): U1Bit
+			getDIAG_DRIVER_KLAXON_SCGnd(): U1Bit
+			getDIAG_DRIVER_KLAXON_SingleSCBat(): U1Bit
+			getDIAG_DRIVER_ULQ_SCBat(): U1Bit
+			getDIAG_FLASHER_SCGnd(): U1Bit
+			getFlasherBulbFailure(): U1Bit
+			getFlasherSCBatOrOpenLoad(): U1Bit
+			getFlashersCurrentInMilliAmpers(): U16Bit
+			getKlaxonCurrentInMilliAmpers(): U16Bit
+			getOverVoltageIsDetected(): U1Bit
+			getPDOInMilliVolt(): U16Bit
+			getSTATUS_CLIGN(): U8Bit
+			getTENSION_BATTERIE(): U8Bit
+			getULQCurrentInMilliAmpers(): U16Bit
+			getUnderVoltageIsDetected(): U1Bit
+
+	Class: dat_pee	Requires methods from the following classes:
+		Class: dat_cmn
+			getDefEEPROM(): U1Bit
+			setDefEEPROM(in Value: U1Bit )
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainStartingStepState()
+			OnControlDATInitialize()
+			OnControlDATLeaveActiveState()
+			OnControlEnterStartingStepState()
+			OnControlIsAnybodyMaintainStartingStepState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setDATControlEep(in Value: U8Bit )
+			setEEPErrorTable(in Index: U8Bit, in Value: U8Bit )
+			setEEPSparedArea(in Value: U16Bit )
+			setEEP_ALIM_PLAF(in Value: U1Bit )
+			setEEP_AUTCRASH(in Value: U1Bit )
+			setEEP_AUTDEGIVRAGE(in Value: U1Bit )
+			setEEP_AUTPLAF(in Value: U1Bit )
+			setEEP_AUTRECRF(in Value: U1Bit )
+			setEEP_AUTVERLOG(in Value: U1Bit )
+			setEEP_AfsEraseIgnitionCnt(in Value: U8Bit )
+			setEEP_AfterSalesCode(in Index: U8Bit, in Value: U8Bit )
+			setEEP_AppCleNonEffect(in Value: U1Bit )
+			setEEP_AuthentDelayedCounter(in Value: U8Bit )
+			setEEP_AuthentFailureCounter(in Value: U8Bit )
+			setEEP_BCMBlank(in Value: U1Bit )
+			setEEP_CAD_BAGUE_AV(in Value: U1Bit )
+			setEEP_CALALARM(in Value: U1Bit )
+			setEEP_CALALPRI(in Value: U1Bit )
+			setEEP_CALULKTR(in Value: U1Bit )
+			setEEP_CARCLIENT(in Value: U1Bit )
+			setEEP_CAR_SECURE(in Value: U1Bit )
+			setEEP_CDDoorLockLed(in Value: U8Bit )
+			setEEP_CDImmo(in Value: U8Bit )
+			setEEP_CDLeftInd(in Value: U16Bit )
+			setEEP_CDRearWiper(in Value: U16Bit )
+			setEEP_CDRightInd(in Value: U16Bit )
+			setEEP_CDVerlog(in Value: U8Bit )
+			setEEP_CDVerlogLed(in Value: U8Bit )
+			setEEP_CLI_REM(in Value: U1Bit )
+			setEEP_CONDAROU(in Value: U1Bit )
+			setEEP_CONDATMPO(in Value: U1Bit )
+			setEEP_CPE_IMPULS(in Value: U1Bit )
+			setEEP_CodeAFSAvailable(in Value: U1Bit )
+			setEEP_CrashCount(in Value: U8Bit )
+			setEEP_CrashHazardIsRequested(in Value: U1Bit )
+			setEEP_DEM_SURVIT(in Value: U1Bit )
+			setEEP_DETCHOC(in Value: U1Bit )
+			setEEP_DateCode(in Index: U8Bit, in Value: U8Bit )
+			setEEP_DefAfar(in Value: U1Bit )
+			setEEP_DefAfav(in Value: U1Bit )
+			setEEP_DefAirbag(in Value: U1Bit )
+			setEEP_DefClignL(in Value: U1Bit )
+			setEEP_DefClignR(in Value: U1Bit )
+			setEEP_DefDfrToBat(in Value: U1Bit )
+			setEEP_DefDfrToGnd(in Value: U1Bit )
+			setEEP_DefDoorlockLedCC(in Value: U1Bit )
+			setEEP_DefEeprom(in Value: U1Bit )
+			setEEP_DefHornCCBat(in Value: U1Bit )
+			setEEP_DefHornCCGnd(in Value: U1Bit )
+			setEEP_DefKLineCC(in Value: U1Bit )
+			setEEP_DefResynchroValueRead(in Index: U8Bit, in Value: U32Bit )
+			setEEP_DefResynchroValueWrite(in Index: U8Bit, in Value: U32Bit )
+			setEEP_DefRrwCC(in Value: U1Bit )
+			setEEP_DefTrpToBat(in Value: U1Bit )
+			setEEP_DefTrpToGnd(in Value: U1Bit )
+			setEEP_DefVerlogLedCC(in Value: U1Bit )
+			setEEP_DefVerlogToBat(in Value: U1Bit )
+			setEEP_DefVerlogToGnd(in Value: U1Bit )
+			setEEP_DefrosterActivationState(in Value: U1Bit )
+			setEEP_DoorlockLedActivation(in Value: U1Bit )
+			setEEP_ECMLearningModeFinished(in Value: U1Bit )
+			setEEP_ECUReference(in Index: U8Bit, in Value: U8Bit )
+			setEEP_ECUType(in Value: U8Bit )
+			setEEP_EV_ARR(in Value: U1Bit )
+			setEEP_EraseAFSCodeRequest(in Value: U1Bit )
+			setEEP_FEU_BROUILLARD(in Value: U1Bit )
+			setEEP_FinalTestCounter(in Value: U8Bit )
+			setEEP_FlaCoeffLNormal(in Value: U8Bit )
+			setEEP_FlaCoeffRNormal(in Value: U8Bit )
+			setEEP_INFO_REGIME(in Value: U1Bit )
+			setEEP_ImmoSecretKey(in Index: U8Bit, in Value: U8Bit )
+			setEEP_InSituTestCounter(in Value: U8Bit )
+			setEEP_InitialResynchroValue(in Index: U8Bit, in Value: U32Bit )
+			setEEP_KEY_BUTTON(in Value: U1Bit )
+			setEEP_KeyIdentifier(in Index: U8Bit, in Value: U32Bit )
+			setEEP_MAX_NB_ALERT_SEQUENCES_TP(in Value: U8Bit )
+			setEEP_NBCOM_MAX(in Value: U8Bit )
+			setEEP_N_MISE_APC(in Value: U8Bit )
+			setEEP_NbKeysLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd315MhzLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd315MhzLowPowerLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd433MhzLearnt(in Value: U8Bit )
+			setEEP_OUBLICEINTURE(in Value: U1Bit )
+			setEEP_PIL_PLAF(in Value: U1Bit )
+			setEEP_PROLONG_APPUI_ARR(in Value: U8Bit )
+			setEEP_PROLONG_APPUI_COURT(in Value: U8Bit )
+			setEEP_PROLONG_APPUI_LONG(in Value: U8Bit )
+			setEEP_PassingTestCounter(in Value: U8Bit )
+			setEEP_PerimeterAlarmState(in Value: U8Bit )
+			setEEP_PieIndex(in Index: U8Bit, in Value: U8Bit )
+			setEEP_PieNumber(in Index: U8Bit, in Value: U8Bit )
+			setEEP_PwdTag(in Index: U8Bit, in Value: U32Bit )
+			setEEP_RELAIS_DEM(in Value: U1Bit )
+			setEEP_RESERVED1(in Value: U1Bit )
+			setEEP_RESERVED2(in Value: U1Bit )
+			setEEP_RESERVED3(in Value: U1Bit )
+			setEEP_RESERVED4(in Value: U1Bit )
+			setEEP_RESERVED5(in Value: U1Bit )
+			setEEP_RESERVED6(in Value: U1Bit )
+			setEEP_ReliabilityTestCounter(in Value: U8Bit )
+			setEEP_RemoteSecretKey1(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey2(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey3(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey4(in Index: U8Bit, in Value: U8Bit )
+			setEEP_ResetCount(in Value: U8Bit )
+			setEEP_ResynchroFailureCounter(in Value: U8Bit )
+			setEEP_ResynchroRequest(in Value: U8Bit )
+			setEEP_ResynchroSuccessfulCounter(in Value: U8Bit )
+			setEEP_RevisionEEPROM(in Value: U8Bit )
+			setEEP_RfTestCounter(in Value: U8Bit )
+			setEEP_SBR_ACTIVE_SPEED_THRESH_TP(in Value: U8Bit )
+			setEEP_SBR_TIMEOUT_TM_TP(in Value: U8Bit )
+			setEEP_SCLimit(in Value: U16Bit )
+			setEEP_SDO(in Value: U1Bit )
+			setEEP_SEUIL_VIT_CONDAROU(in Value: U8Bit )
+			setEEP_SI28Bits(in Index: U8Bit, in Value: U32Bit )
+			setEEP_SerialNumber(in Index: U8Bit, in Value: U8Bit )
+			setEEP_TIMER_DETRESSE(in Value: U8Bit )
+			setEEP_TIMER_RECONDA_AUTO(in Value: U8Bit )
+			setEEP_TPS_APC(in Value: U8Bit )
+			setEEP_TPS_APPUILAV(in Value: U8Bit )
+			setEEP_TPS_ARRET(in Value: U8Bit )
+			setEEP_TPS_BUZ_CLI(in Value: U8Bit )
+			setEEP_TPS_CAD_FIXE(in Value: U8Bit )
+			setEEP_TPS_CLI(in Value: U8Bit )
+			setEEP_TPS_CLIDEGRAD(in Value: U8Bit )
+			setEEP_TPS_COM_MOTEUR(in Value: U8Bit )
+			setEEP_TPS_ESSUIE_MINI(in Value: U8Bit )
+			setEEP_TPS_FILT_AF(in Value: U8Bit )
+			setEEP_TPS_IMPUL_MINI(in Value: U8Bit )
+			setEEP_TPS_MAX_COUPLBLOC(in Value: U8Bit )
+			setEEP_TPS_OUVPORTE(in Value: U8Bit )
+			setEEP_TPS_PLAF(in Value: U8Bit )
+			setEEP_TPS_POSIT_BALAIS(in Value: U8Bit )
+			setEEP_TPS_POSIT_BALAIS_AR(in Value: U8Bit )
+			setEEP_TPS_REF(in Value: U8Bit )
+			setEEP_TPS_REPRISE(in Value: U8Bit )
+			setEEP_TPS_RETARD_DETRESSE(in Value: U8Bit )
+			setEEP_TPS_TEMPO_DEG(in Value: U8Bit )
+			setEEP_TimeOutMERA(in Value: U8Bit )
+			setEEP_TimeOutTW2(in Value: U16Bit )
+			setEEP_VDiag(in Value: U8Bit )
+			setEEP_VehicleIdentifierNumber(in Index: U8Bit, in Value: U8Bit )
+			setEEP_VerlogSKey(in Value: U16Bit )
+			setEEP_VersionEEPROM(in Value: U8Bit )
+			setEEP_timeout_app_cle(in Value: U8Bit )
+			setEEP_tmp_app_cle(in Value: U8Bit )
+			setSpare_DiagBank(in Value: U16Bit )
+			setSpare_FactoryConfigBank(in Value: U8Bit )
+			setSpare_GeneralParameterBank(in Value: U8Bit )
+			setSpare_SupplierBank(in Value: U8Bit )
+			getEEPErrorTable(in Index: U8Bit): U8Bit
+			getEEPErrorTableDefaultValue(in Index: U8Bit): U1Bit
+			getEEPRenaultNissan(): U1Bit
+			getEEPSparedArea(): U16Bit
+			getEEPSparedAreaDefaultValue(): U16Bit
+			getEEP_ALIM_PLAF(): U1Bit
+			getEEP_ALIM_PLAFDefaultValue(): U1Bit
+			getEEP_AUTCRASH(): U1Bit
+			getEEP_AUTCRASHDefaultValue(): U1Bit
+			getEEP_AUTDEGIVRAGE(): U1Bit
+			getEEP_AUTDEGIVRAGEDefaultValue(): U1Bit
+			getEEP_AUTPLAF(): U1Bit
+			getEEP_AUTPLAFDefaultValue(): U1Bit
+			getEEP_AUTRECRF(): U1Bit
+			getEEP_AUTRECRFDefaultValue(): U1Bit
+			getEEP_AUTVERLOG(): U1Bit
+			getEEP_AUTVERLOGDefaultValue(): U1Bit
+			getEEP_AfsEraseIgnitionCnt(): U8Bit
+			getEEP_AfsEraseIgnitionCntDefaultValue(): U8Bit
+			getEEP_AfterSalesCode(in Index: U8Bit): U8Bit
+			getEEP_AfterSalesCodeDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_AppCleNonEffect(): U1Bit
+			getEEP_AppCleNonEffectDefaultValue(): U1Bit
+			getEEP_AuthentDelayedCounter(): U8Bit
+			getEEP_AuthentDelayedCounterDefaultValue(): U8Bit
+			getEEP_AuthentFailureCounter(): U8Bit
+			getEEP_AuthentFailureCounterDefaultValue(): U8Bit
+			getEEP_BCMBlank(): U1Bit
+			getEEP_BCMBlankDefaultValue(): U1Bit
+			getEEP_CAD_BAGUE_AV(): U1Bit
+			getEEP_CAD_BAGUE_AVDefaultValue(): U1Bit
+			getEEP_CALALARM(): U1Bit
+			getEEP_CALALARMDefaultValue(): U1Bit
+			getEEP_CALALPRI(): U1Bit
+			getEEP_CALALPRIDefaultValue(): U1Bit
+			getEEP_CALULKTR(): U1Bit
+			getEEP_CALULKTRDefaultValue(): U1Bit
+			getEEP_CARCLIENT(): U1Bit
+			getEEP_CARCLIENTDefaultValue(): U1Bit
+			getEEP_CAR_SECURE(): U1Bit
+			getEEP_CAR_SECUREDefaultValue(): U1Bit
+			getEEP_CDDoorLockLed(): U8Bit
+			getEEP_CDDoorLockLedDefaultValue(): U8Bit
+			getEEP_CDImmo(): U8Bit
+			getEEP_CDImmoDefaultValue(): U8Bit
+			getEEP_CDLeftInd(): U16Bit
+			getEEP_CDLeftIndDefaultValue(): U16Bit
+			getEEP_CDRearWiper(): U16Bit
+			getEEP_CDRearWiperDefaultValue(): U16Bit
+			getEEP_CDRightInd(): U16Bit
+			getEEP_CDRightIndDefaultValue(): U16Bit
+			getEEP_CDVerlog(): U8Bit
+			getEEP_CDVerlogDefaultValue(): U8Bit
+			getEEP_CDVerlogLed(): U8Bit
+			getEEP_CDVerlogLedDefaultValue(): U8Bit
+			getEEP_CLI_REM(): U1Bit
+			getEEP_CLI_REMDefaultValue(): U1Bit
+			getEEP_CONDAROU(): U1Bit
+			getEEP_CONDAROUDefaultValue(): U1Bit
+			getEEP_CONDATMPO(): U1Bit
+			getEEP_CONDATMPODefaultValue(): U1Bit
+			getEEP_CPE_IMPULS(): U1Bit
+			getEEP_CPE_IMPULSDefaultValue(): U1Bit
+			getEEP_CodeAFSAvailable(): U1Bit
+			getEEP_CodeAFSAvailableDefaultValue(): U1Bit
+			getEEP_CrashCount(): U8Bit
+			getEEP_CrashCountDefaultValue(): U8Bit
+			getEEP_CrashHazardIsRequested(): U1Bit
+			getEEP_CrashHazardIsRequestedDefaultValue(): U1Bit
+			getEEP_DEM_SURVIT(): U1Bit
+			getEEP_DEM_SURVITDefaultValue(): U1Bit
+			getEEP_DETCHOC(): U1Bit
+			getEEP_DETCHOCDefaultValue(): U1Bit
+			getEEP_DateCode(in Index: U8Bit): U8Bit
+			getEEP_DateCodeDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_DefAfar(): U1Bit
+			getEEP_DefAfarDefaultValue(): U1Bit
+			getEEP_DefAfav(): U1Bit
+			getEEP_DefAfavDefaultValue(): U1Bit
+			getEEP_DefAirbag(): U1Bit
+			getEEP_DefAirbagDefaultValue(): U1Bit
+			getEEP_DefClignL(): U1Bit
+			getEEP_DefClignLDefaultValue(): U1Bit
+			getEEP_DefClignR(): U1Bit
+			getEEP_DefClignRDefaultValue(): U1Bit
+			getEEP_DefDfrToBat(): U1Bit
+			getEEP_DefDfrToBatDefaultValue(): U1Bit
+			getEEP_DefDfrToGnd(): U1Bit
+			getEEP_DefDfrToGndDefaultValue(): U1Bit
+			getEEP_DefDoorlockLedCC(): U1Bit
+			getEEP_DefDoorlockLedCCDefaultValue(): U1Bit
+			getEEP_DefEeprom(): U1Bit
+			getEEP_DefEepromDefaultValue(): U1Bit
+			getEEP_DefHornCCBat(): U1Bit
+			getEEP_DefHornCCBatDefaultValue(): U1Bit
+			getEEP_DefHornCCGnd(): U1Bit
+			getEEP_DefHornCCGndDefaultValue(): U1Bit
+			getEEP_DefKLineCC(): U1Bit
+			getEEP_DefKLineCCDefaultValue(): U1Bit
+			getEEP_DefResynchroValueRead(in Index: U8Bit): U32Bit
+			getEEP_DefResynchroValueReadDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_DefResynchroValueWrite(in Index: U8Bit): U32Bit
+			getEEP_DefResynchroValueWriteDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_DefRrwCC(): U1Bit
+			getEEP_DefRrwCCDefaultValue(): U1Bit
+			getEEP_DefTrpToBat(): U1Bit
+			getEEP_DefTrpToBatDefaultValue(): U1Bit
+			getEEP_DefTrpToGnd(): U1Bit
+			getEEP_DefTrpToGndDefaultValue(): U1Bit
+			getEEP_DefVerlogLedCC(): U1Bit
+			getEEP_DefVerlogLedCCDefaultValue(): U1Bit
+			getEEP_DefVerlogToBat(): U1Bit
+			getEEP_DefVerlogToBatDefaultValue(): U1Bit
+			getEEP_DefVerlogToGnd(): U1Bit
+			getEEP_DefVerlogToGndDefaultValue(): U1Bit
+			getEEP_DefrosterActivationState(): U1Bit
+			getEEP_DefrosterActivationStateDefaultValue(): U1Bit
+			getEEP_DoorlockLedActivation(): U1Bit
+			getEEP_DoorlockLedActivationDefaultValue(): U1Bit
+			getEEP_ECMLearningModeFinished(): U1Bit
+			getEEP_ECMLearningModeFinishedDefaultValue(): U1Bit
+			getEEP_ECUReference(in Index: U8Bit): U8Bit
+			getEEP_ECUReferenceDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_ECUType(): U8Bit
+			getEEP_ECUTypeDefaultValue(): U8Bit
+			getEEP_EV_ARR(): U1Bit
+			getEEP_EV_ARRDefaultValue(): U1Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_EraseAFSCodeRequestDefaultValue(): U1Bit
+			getEEP_FEU_BROUILLARD(): U1Bit
+			getEEP_FEU_BROUILLARDDefaultValue(): U1Bit
+			getEEP_FinalTestCounter(): U8Bit
+			getEEP_FinalTestCounterDefaultValue(): U8Bit
+			getEEP_FlaCoeffLNormal(): U8Bit
+			getEEP_FlaCoeffLNormalDefaultValue(): U8Bit
+			getEEP_FlaCoeffRNormal(): U8Bit
+			getEEP_FlaCoeffRNormalDefaultValue(): U8Bit
+			getEEP_INFO_REGIME(): U1Bit
+			getEEP_INFO_REGIMEDefaultValue(): U1Bit
+			getEEP_ImmoSecretKey(in Index: U8Bit): U8Bit
+			getEEP_ImmoSecretKeyDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_InSituTestCounter(): U8Bit
+			getEEP_InSituTestCounterDefaultValue(): U8Bit
+			getEEP_InitialResynchroValue(in Index: U8Bit): U32Bit
+			getEEP_InitialResynchroValueDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_KEY_BUTTON(): U1Bit
+			getEEP_KEY_BUTTONDefaultValue(): U1Bit
+			getEEP_KeyIdentifier(in Index: U8Bit): U32Bit
+			getEEP_KeyIdentifierDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_MAX_NB_ALERT_SEQUENCES_TP(): U8Bit
+			getEEP_MAX_NB_ALERT_SEQUENCES_TPDefaultValue(): U8Bit
+			getEEP_NBCOM_MAX(): U8Bit
+			getEEP_NBCOM_MAXDefaultValue(): U8Bit
+			getEEP_N_MISE_APC(): U8Bit
+			getEEP_N_MISE_APCDefaultValue(): U8Bit
+			getEEP_NbKeysLearnt(): U8Bit
+			getEEP_NbKeysLearntDefaultValue(): U8Bit
+			getEEP_NbKeysStd315MhzLearnt(): U8Bit
+			getEEP_NbKeysStd315MhzLearntDefaultValue(): U8Bit
+			getEEP_NbKeysStd315MhzLowPowerLearnt(): U8Bit
+			getEEP_NbKeysStd315MhzLowPowerLearntDefaultValue(): U8Bit
+			getEEP_NbKeysStd433MhzLearnt(): U8Bit
+			getEEP_NbKeysStd433MhzLearntDefaultValue(): U8Bit
+			getEEP_OUBLICEINTURE(): U1Bit
+			getEEP_OUBLICEINTUREDefaultValue(): U1Bit
+			getEEP_PIL_PLAF(): U1Bit
+			getEEP_PIL_PLAFDefaultValue(): U1Bit
+			getEEP_PROLONG_APPUI_ARR(): U8Bit
+			getEEP_PROLONG_APPUI_ARRDefaultValue(): U8Bit
+			getEEP_PROLONG_APPUI_COURT(): U8Bit
+			getEEP_PROLONG_APPUI_COURTDefaultValue(): U8Bit
+			getEEP_PROLONG_APPUI_LONG(): U8Bit
+			getEEP_PROLONG_APPUI_LONGDefaultValue(): U8Bit
+			getEEP_PassingTestCounter(): U8Bit
+			getEEP_PassingTestCounterDefaultValue(): U8Bit
+			getEEP_PerimeterAlarmState(): U8Bit
+			getEEP_PerimeterAlarmStateDefaultValue(): U8Bit
+			getEEP_PieIndex(in Index: U8Bit): U8Bit
+			getEEP_PieIndexDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_PieNumber(in Index: U8Bit): U8Bit
+			getEEP_PieNumberDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_PwdTag(in Index: U8Bit): U32Bit
+			getEEP_PwdTagDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_RELAIS_DEM(): U1Bit
+			getEEP_RELAIS_DEMDefaultValue(): U1Bit
+			getEEP_RESERVED1(): U1Bit
+			getEEP_RESERVED1DefaultValue(): U1Bit
+			getEEP_RESERVED2(): U1Bit
+			getEEP_RESERVED2DefaultValue(): U1Bit
+			getEEP_RESERVED3(): U1Bit
+			getEEP_RESERVED3DefaultValue(): U1Bit
+			getEEP_RESERVED4(): U1Bit
+			getEEP_RESERVED4DefaultValue(): U1Bit
+			getEEP_RESERVED5(): U1Bit
+			getEEP_RESERVED5DefaultValue(): U1Bit
+			getEEP_RESERVED6(): U1Bit
+			getEEP_RESERVED6DefaultValue(): U1Bit
+			getEEP_ReliabilityTestCounter(): U8Bit
+			getEEP_ReliabilityTestCounterDefaultValue(): U8Bit
+			getEEP_RemoteSecretKey1(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey1DefaultValue(in Index: U8Bit): U1Bit
+			getEEP_RemoteSecretKey2(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey2DefaultValue(in Index: U8Bit): U1Bit
+			getEEP_RemoteSecretKey3(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey3DefaultValue(in Index: U8Bit): U1Bit
+			getEEP_RemoteSecretKey4(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey4DefaultValue(in Index: U8Bit): U1Bit
+			getEEP_ResetCount(): U8Bit
+			getEEP_ResetCountDefaultValue(): U8Bit
+			getEEP_ResynchroFailureCounter(): U8Bit
+			getEEP_ResynchroFailureCounterDefaultValue(): U8Bit
+			getEEP_ResynchroRequest(): U8Bit
+			getEEP_ResynchroRequestDefaultValue(): U8Bit
+			getEEP_ResynchroSuccessfulCounter(): U8Bit
+			getEEP_ResynchroSuccessfulCounterDefaultValue(): U8Bit
+			getEEP_RevisionEEPROM(): U8Bit
+			getEEP_RevisionEEPROMDefaultValue(): U8Bit
+			getEEP_RfTestCounter(): U8Bit
+			getEEP_RfTestCounterDefaultValue(): U8Bit
+			getEEP_SBR_ACTIVE_SPEED_THRESH_TP(): U8Bit
+			getEEP_SBR_ACTIVE_SPEED_THRESH_TPDefaultValue(): U8Bit
+			getEEP_SBR_TIMEOUT_TM_TP(): U8Bit
+			getEEP_SBR_TIMEOUT_TM_TPDefaultValue(): U8Bit
+			getEEP_SCLimit(): U16Bit
+			getEEP_SCLimitDefaultValue(): U16Bit
+			getEEP_SDO(): U1Bit
+			getEEP_SDODefaultValue(): U1Bit
+			getEEP_SEUIL_VIT_CONDAROU(): U8Bit
+			getEEP_SEUIL_VIT_CONDAROUDefaultValue(): U8Bit
+			getEEP_SI28Bits(in Index: U8Bit): U32Bit
+			getEEP_SI28BitsDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_SerialNumber(in Index: U8Bit): U8Bit
+			getEEP_SerialNumberDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_TIMER_DETRESSE(): U8Bit
+			getEEP_TIMER_DETRESSEDefaultValue(): U8Bit
+			getEEP_TIMER_RECONDA_AUTO(): U8Bit
+			getEEP_TIMER_RECONDA_AUTODefaultValue(): U8Bit
+			getEEP_TPS_APC(): U8Bit
+			getEEP_TPS_APCDefaultValue(): U8Bit
+			getEEP_TPS_APPUILAV(): U8Bit
+			getEEP_TPS_APPUILAVDefaultValue(): U8Bit
+			getEEP_TPS_ARRET(): U8Bit
+			getEEP_TPS_ARRETDefaultValue(): U8Bit
+			getEEP_TPS_BUZ_CLI(): U8Bit
+			getEEP_TPS_BUZ_CLIDefaultValue(): U8Bit
+			getEEP_TPS_CAD_FIXE(): U8Bit
+			getEEP_TPS_CAD_FIXEDefaultValue(): U8Bit
+			getEEP_TPS_CLI(): U8Bit
+			getEEP_TPS_CLIDEGRAD(): U8Bit
+			getEEP_TPS_CLIDEGRADDefaultValue(): U8Bit
+			getEEP_TPS_CLIDefaultValue(): U8Bit
+			getEEP_TPS_COM_MOTEUR(): U8Bit
+			getEEP_TPS_COM_MOTEURDefaultValue(): U8Bit
+			getEEP_TPS_ESSUIE_MINI(): U8Bit
+			getEEP_TPS_ESSUIE_MINIDefaultValue(): U8Bit
+			getEEP_TPS_FILT_AF(): U8Bit
+			getEEP_TPS_FILT_AFDefaultValue(): U8Bit
+			getEEP_TPS_IMPUL_MINI(): U8Bit
+			getEEP_TPS_IMPUL_MINIDefaultValue(): U8Bit
+			getEEP_TPS_MAX_COUPLBLOC(): U8Bit
+			getEEP_TPS_MAX_COUPLBLOCDefaultValue(): U8Bit
+			getEEP_TPS_OUVPORTE(): U8Bit
+			getEEP_TPS_OUVPORTEDefaultValue(): U8Bit
+			getEEP_TPS_PLAF(): U8Bit
+			getEEP_TPS_PLAFDefaultValue(): U8Bit
+			getEEP_TPS_POSIT_BALAIS(): U8Bit
+			getEEP_TPS_POSIT_BALAISDefaultValue(): U8Bit
+			getEEP_TPS_POSIT_BALAIS_AR(): U8Bit
+			getEEP_TPS_POSIT_BALAIS_ARDefaultValue(): U8Bit
+			getEEP_TPS_REF(): U8Bit
+			getEEP_TPS_REFDefaultValue(): U8Bit
+			getEEP_TPS_REPRISE(): U8Bit
+			getEEP_TPS_REPRISEDefaultValue(): U8Bit
+			getEEP_TPS_RETARD_DETRESSE(): U8Bit
+			getEEP_TPS_RETARD_DETRESSEDefaultValue(): U8Bit
+			getEEP_TPS_TEMPO_DEG(): U8Bit
+			getEEP_TPS_TEMPO_DEGDefaultValue(): U8Bit
+			getEEP_TimeOutMERA(): U8Bit
+			getEEP_TimeOutMERADefaultValue(): U8Bit
+			getEEP_TimeOutTW2(): U16Bit
+			getEEP_TimeOutTW2DefaultValue(): U16Bit
+			getEEP_VDiag(): U8Bit
+			getEEP_VDiagDefaultValue(): U8Bit
+			getEEP_VehicleIdentifierNumber(in Index: U8Bit): U8Bit
+			getEEP_VehicleIdentifierNumberDefaultValue(in Index: U8Bit): U1Bit
+			getEEP_VerlogSKey(): U16Bit
+			getEEP_VerlogSKeyDefaultValue(): U16Bit
+			getEEP_VersionEEPROM(): U8Bit
+			getEEP_VersionEEPROMDefaultValue(): U8Bit
+			getEEP_timeout_app_cle(): U8Bit
+			getEEP_timeout_app_cleDefaultValue(): U8Bit
+			getEEP_tmp_app_cle(): U8Bit
+			getEEP_tmp_app_cleDefaultValue(): U8Bit
+			getIsEepGroupDiagBankProcessing(): U1Bit
+			getIsEepGroupDiagBankWriteOk(): U1Bit
+			getIsEepGroupDynamicImmoDataBankProcessing(): U1Bit
+			getIsEepGroupDynamicImmoDataBankWriteOk(): U1Bit
+			getIsEepGroupErrorGroupProcessing(): U1Bit
+			getIsEepGroupErrorGroupWriteOk(): U1Bit
+			getIsEepGroupFactoryConfigBankProcessing(): U1Bit
+			getIsEepGroupFactoryConfigBankWriteOk(): U1Bit
+			getIsEepGroupGeneralParameterBankProcessing(): U1Bit
+			getIsEepGroupGeneralParameterBankWriteOk(): U1Bit
+			getIsEepGroupSpareBankProcessing(): U1Bit
+			getIsEepGroupSpareBankWriteOk(): U1Bit
+			getIsEepGroupStaticImmoBankProcessing(): U1Bit
+			getIsEepGroupStaticImmoBankWriteOk(): U1Bit
+			getIsEepGroupSupplierBankProcessing(): U1Bit
+			getIsEepGroupSupplierBankWriteOk(): U1Bit
+			getIsEepGroupVINBankProcessing(): U1Bit
+			getIsEepGroupVINBankWriteOk(): U1Bit
+			getIsEepGroupVersionBankProcessing(): U1Bit
+			getIsEepGroupVersionBankWriteOk(): U1Bit
+			getIsEepProcessing(): U1Bit
+			getSpare_DiagBank(): U16Bit
+			getSpare_DiagBankDefaultValue(): U16Bit
+			getSpare_FactoryConfigBank(): U8Bit
+			getSpare_FactoryConfigBankDefaultValue(): U8Bit
+			getSpare_GeneralParameterBank(): U8Bit
+			getSpare_GeneralParameterBankDefaultValue(): U8Bit
+			getSpare_SupplierBank(): U8Bit
+			getSpare_SupplierBankDefaultValue(): U8Bit
+
+	Class: dat_peep	Requires methods from the following classes:
+	Provides the following methods:
+			setEEPGeneralParameterBank(in Index: U8Bit, in Value: U8Bit )
+			getEEPGeneralParameterBank(in Index: U8Bit): U8Bit
+			getNEEP_MAX_NB_ALERT_SEQUENCES_TP(): U8Bit
+			getNEEP_NBCOM_MAX(): U8Bit
+			getNEEP_N_MISE_APC(): U8Bit
+			getNEEP_PROLONG_APPUI_ARR(): U8Bit
+			getNEEP_PROLONG_APPUI_COURT(): U8Bit
+			getNEEP_PROLONG_APPUI_LONG(): U8Bit
+			getNEEP_SBR_ACTIVE_SPEED_THRESH_TP(): U8Bit
+			getNEEP_SBR_TIMEOUT_TM_TP(): U8Bit
+			getNEEP_SEUIL_VIT_CONDAROU(): U8Bit
+			getNEEP_TIMER_DETRESSE(): U8Bit
+			getNEEP_TIMER_RECONDA_AUTO(): U8Bit
+			getNEEP_TPS_APC(): U8Bit
+			getNEEP_TPS_APPUILAV(): U8Bit
+			getNEEP_TPS_ARRET(): U8Bit
+			getNEEP_TPS_BUZ_CLI(): U8Bit
+			getNEEP_TPS_CLI(): U8Bit
+			getNEEP_TPS_CLIDEGRAD(): U8Bit
+			getNEEP_TPS_COM_MOTEUR(): U8Bit
+			getNEEP_TPS_ESSUIE_MINI(): U8Bit
+			getNEEP_TPS_MAX_COUPLBLOC(): U8Bit
+			getNEEP_TPS_OUVPORTE(): U8Bit
+			getNEEP_TPS_PLAF(): U8Bit
+			getNEEP_TPS_REF(): U8Bit
+			getNEEP_TPS_REPRISE(): U8Bit
+			getNEEP_TPS_RETARD_DETRESSE(): U8Bit
+			getNEEP_TPS_TEMPO_DEG(): U8Bit
+
+	Class: dat_pin	Requires methods from the following classes:
+		Class: dat_ana
+			getAI_DOOR_UNLOCK_SW(): U16Bit
+			getAI_FR_WIPER_INT_SW(): U16Bit
+			getAI_RR_DOORS_SW(): U16Bit
+		Class: dat_din
+			getDEFROSTER_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			setDOOR_UNLOCK_SW(in Value: U1Bit )
+			setFR_WIPER_INT_SW(in Value: U1Bit )
+			setRR_DOORS_SW(in Value: U1Bit )
+		Class: dat_pan
+			getUnderVoltageIsDetected(): U1Bit
+		Class: dat_pee
+			getEEP_AUTDEGIVRAGE(): U1Bit
+			getEEP_EV_ARR(): U1Bit
+			getEEP_TPS_FILT_AF(): U8Bit
+			getEEP_TPS_IMPUL_MINI(): U8Bit
+			getEEP_TPS_POSIT_BALAIS(): U8Bit
+			getEEP_TPS_POSIT_BALAIS_AR(): U8Bit
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlDATEnterActiveState()
+			OnControlDATInitialize()
+			OnControlDATLeaveActiveState()
+			OnControlIsAnybodyMaintainActiveSleepState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setDATControlDin(in Value: U8Bit )
+			setTOSSignalFR_AUTOSTOP_SWFalling_LAP_FRW()
+			setTOSSignalFrontWiperStopIsAllowed_LAP_FRW()
+			setTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW()
+			setTOSSignalRearWiperStopIsAllowed_LAP_RRW()
+			getBcmSleepMode(): U1Bit
+			getDEFROSTER_SW_FILTERED(): U1Bit
+			getTOSSignalFR_AUTOSTOP_SWFalling_LAP_FRW(): U1Bit
+			getTOSSignalFrontWiperStopIsAllowed_LAP_FRW(): U1Bit
+			getTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW(): U1Bit
+			getTOSSignalRearWiperStopIsAllowed_LAP_RRW(): U1Bit
+			ProdControlChanging_FR_DOORS_SW()
+			ProdControlChanging_RR_DOORS_SW()
+			ProdControlFalling_FR_DOORS_SW()
+			ProdControlFalling_HAZARD_SW()
+			ProdControlFalling_PWR_IGN()
+			ProdControlFalling_RR_DOORS_SW()
+			ProdControlFrontStopPositionDetected()
+			ProdControlInputsReadAfterStartingStepState()
+			ProdControlProtectionLedVerlogSleepMode()
+			ProdControlRearStopPositionDetected()
+			ProdControlRising_DOOR_LOCK_SW()
+			ProdControlRising_DOOR_UNLOCK_SW()
+			ProdControlRising_FR_DOORS_SW()
+			ProdControlRising_PWR_IGN()
+			ProdControlRising_RR_DOORS_SW()
+			ProdControlWakeUpRequest()
+
+	Class: dat_pin_	Requires methods from the following classes:
+		Class: dat_ana
+			getAI_DOOR_UNLOCK_SW(): U16Bit
+			getAI_FR_WIPER_INT_SW(): U16Bit
+			getAI_RR_DOORS_SW(): U16Bit
+		Class: dat_din
+			getDEFROSTER_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			setDOOR_UNLOCK_SW(in Value: U1Bit )
+			setFR_WIPER_INT_SW(in Value: U1Bit )
+			setRR_DOORS_SW(in Value: U1Bit )
+		Class: dat_pan
+			getUnderVoltageIsDetected(): U1Bit
+		Class: dat_pee
+			getEEP_AUTDEGIVRAGE(): U1Bit
+			getEEP_EV_ARR(): U1Bit
+			getEEP_TPS_FILT_AF(): U8Bit
+			getEEP_TPS_IMPUL_MINI(): U8Bit
+			getEEP_TPS_POSIT_BALAIS(): U8Bit
+			getEEP_TPS_POSIT_BALAIS_AR(): U8Bit
+		Class: dat_pin
+			setTOSSignalFR_AUTOSTOP_SWFalling_LAP_FRW()
+			setTOSSignalFrontWiperStopIsAllowed_LAP_FRW()
+			setTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW()
+			setTOSSignalRearWiperStopIsAllowed_LAP_RRW()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			setTOSSignalSomebodyMaintainActiveState()
+	Provides the following methods:
+
+	Class: dat_pou	Requires methods from the following classes:
+		Class: dat_pan
+			getOverVoltageIsDetected(): U1Bit
+		Class: dat_pee
+			getEEP_CrashHazardIsRequested(): U1Bit
+			getEEP_ECUType(): U8Bit
+		Class: dat_rbg
+			OnControlAirbagUnlock()
+		Class: dat_trp
+			setDATControlTrp(in Value: U8Bit )
+		Class: lap_dlk
+			OnControlCrashUnlockFinished()
+		Class: lap_sup
+			OnControlDATInitialize()
+			OnControlDATLeaveActiveState()
+			OnControlLeaveStartingStepState()
+		Class: lap_tfc
+			OnControlActivateFinalTest()
+	Provides the following methods:
+			setBAT_LIGHT_TEMPOProtection(in Value: U1Bit )
+			setDATControlPou(in Value: U8Bit )
+			setDATPouDiagBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDATPouDiagMaskBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDEFROSTERProtection(in Value: U1Bit )
+			setDI_LEFTProtection(in Value: U1Bit )
+			setDI_RIGHTProtection(in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiag(in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiagEnabled(in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERProtection(in Value: U1Bit )
+			setDO_VERLOG(in Value: U1Bit )
+			setDO_VERLOGDiag(in Value: U1Bit )
+			setDO_VERLOGDiagEnabled(in Value: U1Bit )
+			setDO_VERLOGProtection(in Value: U1Bit )
+			setFRONT_WIPERProtection(in Value: U1Bit )
+			setHORN_RLProtection(in Value: U1Bit )
+			setLOCK_DOORSProtection(in Value: U1Bit )
+			setOPEN_DOOR_LEDProtection(in Value: U1Bit )
+			setOutputProtection(in Value: U1Bit )
+			setRR_WIPER_RR_FOG_LAMPProtection(in Value: U1Bit )
+			setUNLOCK_DOORSProtection(in Value: U1Bit )
+			setUNLOCK_DRIVER_DOORProtection(in Value: U1Bit )
+			setVERLOG_LEDDirect(in Value: U1Bit )
+			setVERLOG_LEDProtection(in Value: U1Bit )
+			getBAT_LIGHT_TEMPOProtection(): U1Bit
+			getDATPouDiagBuffer(in Index: U8Bit): U1Bit
+			getDATPouDiagMaskBuffer(in Index: U8Bit): U1Bit
+			getDATPouHardMaskBuffer(in Index: U8Bit): U1Bit
+			getDEFROSTERProtection(): U1Bit
+			getDI_LEFTProtection(): U1Bit
+			getDI_RIGHTProtection(): U1Bit
+			getDO_DATA_IMMOBILIZERDiagEnabled(): U1Bit
+			getDO_DATA_IMMOBILIZERProtection(): U1Bit
+			getDO_VERLOG(): U1Bit
+			getDO_VERLOGDiagEnabled(): U1Bit
+			getDO_VERLOGProtection(): U1Bit
+			getFRONT_WIPERProtection(): U1Bit
+			getHORN_RLProtection(): U1Bit
+			getLOCK_DOORSProtection(): U1Bit
+			getOPEN_DOOR_LEDProtection(): U1Bit
+			getOutputProtection(): U1Bit
+			getRR_WIPER_RR_FOG_LAMPProtection(): U1Bit
+			getUNLOCK_DOORSProtection(): U1Bit
+			getUNLOCK_DRIVER_DOORProtection(): U1Bit
+			getVERLOG_LEDProtection(): U1Bit
+
+	Class: dat_pwm	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			setPWM_ROOMLAMP(in Value: U8Bit )
+			setPWM_ROOMLAMPDiagFreq(in Value: U16Bit )
+			setPWM_ROOMLAMPDiagMask(in Value: U1Bit )
+			setPWM_ROOMLAMPDiagRatio(in Value: U8Bit )
+			setPWM_ROOMLAMPFreq(in Value: U16Bit )
+			setPWM_ROOMLAMPHardMask(in Value: U1Bit )
+			getPWM_ROOMLAMP(): U8Bit
+			getPWM_ROOMLAMPDiagFreq(): U16Bit
+			getPWM_ROOMLAMPDiagMask(): U1Bit
+			getPWM_ROOMLAMPDiagRatio(): U8Bit
+			getPWM_ROOMLAMPFreq(): U16Bit
+
+	Class: dat_rbg	Requires methods from the following classes:
+		Class: dat_cmn
+			setDefAirbag(in Value: U1Bit )
+		Class: dat_din
+			getAIRBAG_CRASH(): U1Bit
+		Class: dat_pee
+			setEEP_DefAirbag(in Value: U1Bit )
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+			setDATControlRbag(in Value: U8Bit )
+			ProdControlAirbagUnlock()
+
+	Class: dat_rf	Requires methods from the following classes:
+		Class: dat_cmn
+			setPcfRefreshAllowed(in Value: U1Bit )
+		Class: dat_pee
+			getEEP_AUTRECRF(): U1Bit
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlDATInitialize()
+			OnControlIsAnybodyMaintainActiveSleepState()
+			OnControlIsAnybodyMaintainActiveState()
+	Provides the following methods:
+			setDATControlRf(in Value: U8Bit )
+			getDATRfButton1IsLongPressed(): U1Bit
+			getDATRfButton1IsShortPressed(): U1Bit
+			getDATRfButton2IsLongPressed(): U1Bit
+			getDATRfButton2IsShortPressed(): U1Bit
+			getDATRfButton3IsLongPressed(): U1Bit
+			getDATRfButton3IsShortPressed(): U1Bit
+			getDATRfButton4IsLongPressed(): U1Bit
+			getDATRfButton4IsShortPressed(): U1Bit
+			getDATRfLockPush(): U1Bit
+			getDATRfNbRCBlocksReceived(): U8Bit
+			getDATRfNbRCBlocksReceivedAndOK(): U8Bit
+			getDATRfNbRCBlocksReceivedCrcOK(): U8Bit
+			getDATRfNbSIBlocksReceived(): U8Bit
+			getDATRfNbSIBlocksReceivedAndOK(): U8Bit
+			getDATRfNbWakeUpBlocksReceived(): U8Bit
+			getDATRfUnlockPush(): U1Bit
+			getRfPushMemorized(): U8Bit
+			getRfRCFrameIDReceived(): U32Bit
+			getRollingCode(): U32Bit
+
+	Class: dat_sbk	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATInitialize()
+	Provides the following methods:
+
+	Class: dat_spd	Requires methods from the following classes:
+		Class: lap_sup
+			OnControlDATEnterActiveState()
+			OnControlDATInitialize()
+			OnControlDATLeaveActiveState()
+	Provides the following methods:
+			getENGINE_RPM(): U1Bit
+			getENGINE_RPMAvailable(): U1Bit
+			getENGINE_RUNNING(): U1Bit
+			getVEHICLE_SPEED(): U8Bit
+			getVEHICLE_SPEEDAvailable(): U1Bit
+			getVEH_SPEED(): U8Bit
+
+	Class: dat_trp	Requires methods from the following classes:
+		Class: dat_cmn
+			getLearningModeInProgress(): U8Bit
+			getNumberOfKeysLearnt(): U8Bit
+			setDefTrpShortCircuitToBat(in Value: U1Bit )
+			setDefTrpShortCircuitToGnd(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_pee
+			getEEP_AuthentDelayedCounter(): U8Bit
+			getEEP_AuthentFailureCounter(): U8Bit
+			getEEP_CDImmo(): U8Bit
+			getEEP_KeyIdentifier(in Index: U8Bit): U32Bit
+			getEEP_PwdTag(in Index: U8Bit): U32Bit
+			getEEP_ResynchroFailureCounter(): U8Bit
+			getEEP_ResynchroRequest(): U8Bit
+			getEEP_ResynchroSuccessfulCounter(): U8Bit
+			getEEP_TimeOutTW2(): U16Bit
+			setEEP_AuthentDelayedCounter(in Value: U8Bit )
+			setEEP_AuthentFailureCounter(in Value: U8Bit )
+			setEEP_CDImmo(in Value: U8Bit )
+			setEEP_DefResynchroValueRead(in Index: U8Bit, in Value: U32Bit )
+			setEEP_DefResynchroValueWrite(in Index: U8Bit, in Value: U32Bit )
+			setEEP_DefTrpToBat(in Value: U1Bit )
+			setEEP_DefTrpToGnd(in Value: U1Bit )
+			setEEP_InitialResynchroValue(in Index: U8Bit, in Value: U32Bit )
+			setEEP_ResynchroFailureCounter(in Value: U8Bit )
+			setEEP_ResynchroRequest(in Value: U8Bit )
+			setEEP_ResynchroSuccessfulCounter(in Value: U8Bit )
+			setEEP_SI28Bits(in Index: U8Bit, in Value: U32Bit )
+		Class: dat_pou
+			getDO_DATA_IMMOBILIZERProtection(): U1Bit
+			setDO_DATA_IMMOBILIZERProtection(in Value: U1Bit )
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlDATInitialize()
+			OnControlIsAnybodyMaintainActiveState()
+	Provides the following methods:
+			setDATControlTrp(in Value: U8Bit )
+			setDATTrpActiveTestMode(in Value: U1Bit )
+			setDATTrpAuthentInLearningMode(in Value: U1Bit )
+			setDATTrpAuthentTryCounter(in Value: U8Bit )
+			setDATTrpDataToWrite(in Value: U32Bit )
+			setDATTrpISKForAuthent(in Index: U8Bit, in Value: U8Bit )
+			setDATTrpIdentifierOfPresentKeyIsReceived(in Value: U1Bit )
+			setDATTrpIdentifierOfPresentKeyIsValid(in Value: U1Bit )
+			setDATTrpIndexOfKeyRecognized(in Value: U8Bit )
+			setDATTrpKeyLearningElapsed(in Value: U1Bit )
+			setDATTrpKeyWithRF(in Value: U1Bit )
+			setDATTrpPageNumber(in Value: U8Bit )
+			setDATTrpPresentKeyLocked(in Value: U1Bit )
+			setDATTrpResponseToChallengeIsPresent(in Value: U1Bit )
+			setDATTrpResponseToChallengeIsValid(in Value: U1Bit )
+			setDATTrpWriteSecretKeyHigh(in Value: U1Bit )
+			setVirginKeyAuthentOk(in Value: U1Bit )
+			getDATTrpActiveTestMode(): U1Bit
+			getDATTrpAuthentTryCounter(): U8Bit
+			getDATTrpAuthenticationState(): U8Bit
+			getDATTrpDataRead(): U32Bit
+			getDATTrpDiagKeyFrequency(): U8Bit
+			getDATTrpFrequencyOfPresentKey(): U8Bit
+			getDATTrpIdentifierOfPresentKey(): U32Bit
+			getDATTrpIdentifierOfPresentKeyIsReceived(): U1Bit
+			getDATTrpIdentifierOfPresentKeyIsValid(): U1Bit
+			getDATTrpIndexOfKeyRecognized(): U8Bit
+			getDATTrpKeyWithRF(): U1Bit
+			getDATTrpOutputActive(): U1Bit
+			getDATTrpPresentKeyLocked(): U1Bit
+			getDATTrpResponseToChallengeIsPresent(): U1Bit
+			getDATTrpResponseToChallengeIsValid(): U1Bit
+			getDATTrpResynchronizationState(): U8Bit
+			getDATTrpResynchronizationValue(): U32Bit
+			getDATTrpSleepControlState(): U8Bit
+			getDATTrpTransportISK(in Index: U8Bit): U8Bit
+			getDATTrpWriteAccessReadingError(): U1Bit
+			getDATTrpWriteAccessState(): U8Bit
+			getDATTrpWriteAccessWritingError(): U1Bit
+			getRepToChallenge(): U32Bit
+			getVirginKeyAuthentOk(): U1Bit
+
+	Class: dat_vlg	Requires methods from the following classes:
+		Class: dat_cmn
+			setDefVerlogToBat(in Value: U1Bit )
+			setDefVerlogToGnd(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_pee
+			getEEP_AUTVERLOG(): U1Bit
+			getEEP_CDVerlog(): U8Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_VerlogSKey(): U16Bit
+			setEEP_CDVerlog(in Value: U8Bit )
+			setEEP_DefVerlogToBat(in Value: U1Bit )
+			setEEP_DefVerlogToGnd(in Value: U1Bit )
+		Class: dat_pin
+			OnControlFalling_PWR_IGN()
+		Class: dat_pou
+			getDO_VERLOGProtection(): U1Bit
+			getDO_VERLOG(): U1Bit
+			setDO_VERLOGProtection(in Value: U1Bit )
+			setDO_VERLOG(in Value: U1Bit )
+		Class: lap_afs
+			OnControlStartPermanentAuthentication()
+			OnControlStopPermanentAuthentication()
+		Class: lap_car
+			OnControlKeyIsAuthenticated()
+			OnControlKeyIsNotAuthenticated()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlDATInitialize()
+			OnControlIsAnybodyMaintainActiveState()
+	Provides the following methods:
+			setDATControlVlg(in Value: U8Bit )
+			getDATVlgSerialTestInProgress(): U1Bit
+
+	Class: dat_vlg__	Requires methods from the following classes:
+		Class: dat_cmn
+			setDefVerlogToBat(in Value: U1Bit )
+			setDefVerlogToGnd(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_pee
+			getEEP_AUTVERLOG(): U1Bit
+			getEEP_CDVerlog(): U8Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_VerlogSKey(): U16Bit
+			setEEP_CDVerlog(in Value: U8Bit )
+			setEEP_DefVerlogToBat(in Value: U1Bit )
+			setEEP_DefVerlogToGnd(in Value: U1Bit )
+		Class: dat_pou
+			getDO_VERLOGProtection(): U1Bit
+			getDO_VERLOG(): U1Bit
+			setDO_VERLOGProtection(in Value: U1Bit )
+			setDO_VERLOG(in Value: U1Bit )
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+	Provides the following methods:
+
+Layer: EXE
+Layer: GEN
+	Class: dat_panx	Requires methods from the following classes:
+	Provides the following methods:
+			setAI_DOOR_UNLOCK_SW(in Value: U16Bit )
+			setAI_FR_WIPER_INT_SW(in Value: U16Bit )
+			setAI_RR_DOORS_SW(in Value: U16Bit )
+			setDIAG_BAT(in Value: U16Bit )
+			setDIAG_DRIVER_HIGH_SIDE(in Value: U16Bit )
+			setDIAG_DRIVER_KLAXON(in Value: U16Bit )
+			setDIAG_DRIVER_ULQ(in Value: U16Bit )
+			setDIAG_FLASHER(in Value: U16Bit )
+			getAI_DOOR_UNLOCK_SW(): U16Bit
+			getAI_FR_WIPER_INT_SW(): U16Bit
+			getAI_RR_DOORS_SW(): U16Bit
+			getDIAG_BAT(): U16Bit
+			getDIAG_DRIVER_HIGH_SIDE(): U16Bit
+			getDIAG_DRIVER_KLAXON(): U16Bit
+			getDIAG_DRIVER_ULQ(): U16Bit
+			getDIAG_FLASHER(): U16Bit
+
+	Class: dat_pinx	Requires methods from the following classes:
+	Provides the following methods:
+			setAIRBAG_CRASH(in Value: U1Bit )
+			setDEFROSTER_SW(in Value: U1Bit )
+			setDI_DATA_IMMOBILIZER(in Value: U1Bit )
+			setDI_ENGINE_RPM(in Value: U1Bit )
+			setDI_VEHICLE_SPEED(in Value: U1Bit )
+			setDI_VERLOG(in Value: U1Bit )
+			setDOOR_LOCK_SW(in Value: U1Bit )
+			setDOOR_UNLOCK_SW(in Value: U1Bit )
+			setFR_AUTOSTOP_SW(in Value: U1Bit )
+			setFR_DOORS_SW(in Value: U1Bit )
+			setFR_WASHER_SW(in Value: U1Bit )
+			setFR_WIPER_INT_SW(in Value: U1Bit )
+			setHAZARD_SW(in Value: U1Bit )
+			setHIGH_LOW_BEAM(in Value: U1Bit )
+			setL_FLASHER_SW(in Value: U1Bit )
+			setPOSITION_LIGHTS(in Value: U1Bit )
+			setPWR_IGN(in Value: U1Bit )
+			setRR_AUTOSTOP_SW(in Value: U1Bit )
+			setRR_DOORS_SW(in Value: U1Bit )
+			setRR_FOG_SW(in Value: U1Bit )
+			setRR_WASHER_SW(in Value: U1Bit )
+			setRR_WIPER_INT_SW(in Value: U1Bit )
+			setR_FLASHER_SW(in Value: U1Bit )
+			setSEATBELT_REMINDER_SW(in Value: U1Bit )
+			getAIRBAG_CRASH(): U1Bit
+			getDEFROSTER_SW(): U1Bit
+			getDI_DATA_IMMOBILIZER(): U1Bit
+			getDI_ENGINE_RPM(): U1Bit
+			getDI_VEHICLE_SPEED(): U1Bit
+			getDI_VERLOG(): U1Bit
+			getDOOR_LOCK_SW(): U1Bit
+			getDOOR_UNLOCK_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getFR_DOORS_SW(): U1Bit
+			getFR_WASHER_SW(): U1Bit
+			getFR_WIPER_INT_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getHIGH_LOW_BEAM(): U1Bit
+			getL_FLASHER_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+			getRR_FOG_SW(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+			getRR_WIPER_INT_SW(): U1Bit
+			getR_FLASHER_SW(): U1Bit
+			getSEATBELT_REMINDER_SW(): U1Bit
+
+	Class: dat_poux	Requires methods from the following classes:
+	Provides the following methods:
+			setBAT_LIGHT_TEMPO(in Value: U1Bit )
+			setDEFROSTER(in Value: U1Bit )
+			setDI_LEFT(in Value: U1Bit )
+			setDI_RIGHT(in Value: U1Bit )
+			setFRONT_WIPER(in Value: U1Bit )
+			setHORN_RL(in Value: U1Bit )
+			setLOCK_DOORS(in Value: U1Bit )
+			setOPEN_DOOR_LED(in Value: U1Bit )
+			setRR_WIPER_RR_FOG_LAMP(in Value: U1Bit )
+			setUNLOCK_DOORS(in Value: U1Bit )
+			setUNLOCK_DRIVER_DOOR(in Value: U1Bit )
+			setVERLOG_LED(in Value: U1Bit )
+			getBAT_LIGHT_TEMPO(): U1Bit
+			getDEFROSTER(): U1Bit
+			getDI_LEFT(): U1Bit
+			getDI_RIGHT(): U1Bit
+			getFRONT_WIPER(): U1Bit
+			getHORN_RL(): U1Bit
+			getLOCK_DOORS(): U1Bit
+			getOPEN_DOOR_LED(): U1Bit
+			getRR_WIPER_RR_FOG_LAMP(): U1Bit
+			getUNLOCK_DOORS(): U1Bit
+			getUNLOCK_DRIVER_DOOR(): U1Bit
+			getVERLOG_LED(): U1Bit
+
+Layer: Kernel
+Layer: LAP
+	Class: lap_afs	Requires methods from the following classes:
+		Class: dat_ala
+			getIsAlaDiagEnabled(): U1Bit
+		Class: dat_apr
+			getDATAprAfterSaleCodeRecognized(): U1Bit
+			getDATAprAfterSaleCode(in Index: U8Bit): U8Bit
+			setDATAprDiagAfterSaleCode(in Index: U8Bit, in Value: U8Bit )
+			setDATControlApr(in Value: U8Bit )
+		Class: dat_buz
+			getIsBuzzerSoundPlaying(): U1Bit
+			setDATBuzDiagBuzz(in Value: U16Bit )
+			setDATControlDATBuzDiagBuzz(in Value: U8Bit )
+		Class: dat_cmn
+			getAFSCodeIsOk(): U1Bit
+			getAfterSaleModeAuthorized(): U1Bit
+			getAfterSaleModeValidationAuthorized(): U1Bit
+			getAuthentPermanentFailCounter(): U8Bit
+			getAuthentPermanentResynchroFailCounter(): U8Bit
+			getAuthentPermanentTotalCounter(): U16Bit
+			getCOD_ERR_APP(): U8Bit
+			getDefAFAR(): U1Bit
+			getDefAFAV(): U1Bit
+			getDefAirbag(): U1Bit
+			getDefBtonCpeFer(): U1Bit
+			getDefBtonCpeOuv(): U1Bit
+			getDefClignL(): U1Bit
+			getDefClignR(): U1Bit
+			getDefDfrToBat(): U1Bit
+			getDefDfrToGnd(): U1Bit
+			getDefDoorlockLedCC(): U1Bit
+			getDefEEPROM(): U1Bit
+			getDefHornCCBat(): U1Bit
+			getDefHornCCGnd(): U1Bit
+			getDefTrpShortCircuitToBat(): U1Bit
+			getDefTrpShortCircuitToGnd(): U1Bit
+			getDefVerlogToBat(): U1Bit
+			getDefVerlogToGnd(): U1Bit
+			getFactoryModeAuthorized(): U1Bit
+			getFlashingFrequency(): U8Bit
+			getLastCommandOrigin(): U1Bit
+			getLastOpeningPanelControl(): U1Bit
+			getLearningModeInProgress(): U8Bit
+			getNumberOfKeys315MHzLearnt(): U8Bit
+			getNumberOfKeys433MHzLearnt(): U8Bit
+			getNumberOfKeysLearnt(): U8Bit
+			getVERLOGON(): U1Bit
+			getVehicleIsAutoRelocked(): U1Bit
+			getVehicleIsLockedWithSpeed(): U1Bit
+			getVehiculeHasBeenMoving(): U1Bit
+			getVerRevisionNum(in Index: U8Bit): U8Bit
+			getVerVersionNum(in Index: U8Bit): U8Bit
+			setAFSCodeIsOk(in Value: U1Bit )
+			setCOD_ERR_APP(in Value: U8Bit )
+			setDefAFAR(in Value: U1Bit )
+			setDefAFAV(in Value: U1Bit )
+			setDefAirbag(in Value: U1Bit )
+			setDefBtonCpeFer(in Value: U1Bit )
+			setDefBtonCpeOuv(in Value: U1Bit )
+			setDefClignL(in Value: U1Bit )
+			setDefClignR(in Value: U1Bit )
+			setDefDfrToBat(in Value: U1Bit )
+			setDefDfrToGnd(in Value: U1Bit )
+			setDefDoorlockLedCC(in Value: U1Bit )
+			setDefEEPROM(in Value: U1Bit )
+			setDefHornCCBat(in Value: U1Bit )
+			setDefHornCCGnd(in Value: U1Bit )
+			setDefKLineCC(in Value: U1Bit )
+			setDefRrwCC(in Value: U1Bit )
+			setDefTrpShortCircuitToBat(in Value: U1Bit )
+			setDefTrpShortCircuitToGnd(in Value: U1Bit )
+			setDefVerlogLedCC(in Value: U1Bit )
+			setDefVerlogToBat(in Value: U1Bit )
+			setDefVerlogToGnd(in Value: U1Bit )
+		Class: dat_din
+			getAIRBAG_CRASH(): U1Bit
+			getDEFROSTER_SW(): U1Bit
+			getDI_DATA_IMMOBILIZER(): U1Bit
+			getDI_VERLOG(): U1Bit
+			getDOOR_LOCK_SW(): U1Bit
+			getDOOR_UNLOCK_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getFR_DOORS_SW(): U1Bit
+			getFR_WASHER_SW(): U1Bit
+			getFR_WIPER_INT_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getHIGH_LOW_BEAM(): U1Bit
+			getL_FLASHER_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+			getRR_FOG_SW(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+			getRR_WIPER_INT_SW(): U1Bit
+			getR_FLASHER_SW(): U1Bit
+			getSEATBELT_REMINDER_SW(): U1Bit
+		Class: dat_dou
+			getBAT_LIGHT_TEMPO(): U1Bit
+			getDEFROSTER(): U1Bit
+			getDI_LEFT(): U1Bit
+			getDI_RIGHT(): U1Bit
+			getFRONT_WIPER(): U1Bit
+			getHORN_RL(): U1Bit
+			getLOCK_DOORS(): U1Bit
+			getOPEN_DOOR_LED(): U1Bit
+			getRR_WIPER_RR_FOG_LAMP(): U1Bit
+			getUNLOCK_DRIVER_DOOR(): U1Bit
+			getVERLOG_LED(): U1Bit
+		Class: dat_kwp
+			getDATKwpRxFrameLgth(): U8Bit
+		Class: dat_pan
+			getSTATUS_CLIGN(): U8Bit
+			getTENSION_BATTERIE(): U8Bit
+		Class: dat_pee
+			getEEP_ALIM_PLAF(): U1Bit
+			getEEP_AUTCRASH(): U1Bit
+			getEEP_AUTDEGIVRAGE(): U1Bit
+			getEEP_AUTPLAF(): U1Bit
+			getEEP_AUTRECRF(): U1Bit
+			getEEP_AUTVERLOG(): U1Bit
+			getEEP_AppCleNonEffect(): U1Bit
+			getEEP_AuthentDelayedCounter(): U8Bit
+			getEEP_AuthentFailureCounter(): U8Bit
+			getEEP_BCMBlank(): U1Bit
+			getEEP_CAD_BAGUE_AV(): U1Bit
+			getEEP_CALALARM(): U1Bit
+			getEEP_CALALPRI(): U1Bit
+			getEEP_CALULKTR(): U1Bit
+			getEEP_CARCLIENT(): U1Bit
+			getEEP_CAR_SECURE(): U1Bit
+			getEEP_CLI_REM(): U1Bit
+			getEEP_CONDAROU(): U1Bit
+			getEEP_CONDATMPO(): U1Bit
+			getEEP_CPE_IMPULS(): U1Bit
+			getEEP_CodeAFSAvailable(): U1Bit
+			getEEP_CrashCount(): U8Bit
+			getEEP_DEM_SURVIT(): U1Bit
+			getEEP_DETCHOC(): U1Bit
+			getEEP_DefAfar(): U1Bit
+			getEEP_DefAfav(): U1Bit
+			getEEP_DefAirbag(): U1Bit
+			getEEP_DefClignL(): U1Bit
+			getEEP_DefClignR(): U1Bit
+			getEEP_DefDfrToBat(): U1Bit
+			getEEP_DefDfrToGnd(): U1Bit
+			getEEP_DefDoorlockLedCC(): U1Bit
+			getEEP_DefEeprom(): U1Bit
+			getEEP_DefHornCCBat(): U1Bit
+			getEEP_DefHornCCGnd(): U1Bit
+			getEEP_DefTrpToBat(): U1Bit
+			getEEP_DefTrpToGnd(): U1Bit
+			getEEP_DefVerlogToBat(): U1Bit
+			getEEP_DefVerlogToGnd(): U1Bit
+			getEEP_ECUReference(in Index: U8Bit): U8Bit
+			getEEP_ECUType(): U8Bit
+			getEEP_EV_ARR(): U1Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_FEU_BROUILLARD(): U1Bit
+			getEEP_INFO_REGIME(): U1Bit
+			getEEP_KEY_BUTTON(): U1Bit
+			getEEP_MAX_NB_ALERT_SEQUENCES_TP(): U8Bit
+			getEEP_NBCOM_MAX(): U8Bit
+			getEEP_N_MISE_APC(): U8Bit
+			getEEP_NbKeysLearnt(): U8Bit
+			getEEP_NbKeysStd315MhzLearnt(): U8Bit
+			getEEP_NbKeysStd433MhzLearnt(): U8Bit
+			getEEP_OUBLICEINTURE(): U1Bit
+			getEEP_PIL_PLAF(): U1Bit
+			getEEP_PROLONG_APPUI_ARR(): U8Bit
+			getEEP_PROLONG_APPUI_COURT(): U8Bit
+			getEEP_PROLONG_APPUI_LONG(): U8Bit
+			getEEP_PerimeterAlarmState(): U8Bit
+			getEEP_PieIndex(in Index: U8Bit): U8Bit
+			getEEP_PieNumber(in Index: U8Bit): U8Bit
+			getEEP_RELAIS_DEM(): U1Bit
+			getEEP_ResetCount(): U8Bit
+			getEEP_ResynchroFailureCounter(): U8Bit
+			getEEP_ResynchroSuccessfulCounter(): U8Bit
+			getEEP_SBR_ACTIVE_SPEED_THRESH_TP(): U8Bit
+			getEEP_SBR_TIMEOUT_TM_TP(): U8Bit
+			getEEP_SDO(): U1Bit
+			getEEP_SEUIL_VIT_CONDAROU(): U8Bit
+			getEEP_SerialNumber(in Index: U8Bit): U8Bit
+			getEEP_TIMER_DETRESSE(): U8Bit
+			getEEP_TIMER_RECONDA_AUTO(): U8Bit
+			getEEP_TPS_APC(): U8Bit
+			getEEP_TPS_APPUILAV(): U8Bit
+			getEEP_TPS_ARRET(): U8Bit
+			getEEP_TPS_BUZ_CLI(): U8Bit
+			getEEP_TPS_CLIDEGRAD(): U8Bit
+			getEEP_TPS_CLI(): U8Bit
+			getEEP_TPS_COM_MOTEUR(): U8Bit
+			getEEP_TPS_ESSUIE_MINI(): U8Bit
+			getEEP_TPS_FILT_AF(): U8Bit
+			getEEP_TPS_IMPUL_MINI(): U8Bit
+			getEEP_TPS_MAX_COUPLBLOC(): U8Bit
+			getEEP_TPS_OUVPORTE(): U8Bit
+			getEEP_TPS_PLAF(): U8Bit
+			getEEP_TPS_POSIT_BALAIS(): U8Bit
+			getEEP_TPS_POSIT_BALAIS_AR(): U8Bit
+			getEEP_TPS_REF(): U8Bit
+			getEEP_TPS_REPRISE(): U8Bit
+			getEEP_TPS_RETARD_DETRESSE(): U8Bit
+			getEEP_TPS_TEMPO_DEG(): U8Bit
+			getEEP_TimeOutMERA(): U8Bit
+			getEEP_VDiag(): U8Bit
+			getEEP_VehicleIdentifierNumber(in Index: U8Bit): U8Bit
+			getIsEepGroupFactoryConfigBankProcessing(): U1Bit
+			getIsEepGroupFactoryConfigBankWriteOk(): U1Bit
+			getIsEepGroupGeneralParameterBankProcessing(): U1Bit
+			getIsEepGroupGeneralParameterBankWriteOk(): U1Bit
+			getIsEepGroupVINBankProcessing(): U1Bit
+			getIsEepGroupVINBankWriteOk(): U1Bit
+			setDATControlEep(in Value: U8Bit )
+			setEEP_ALIM_PLAF(in Value: U1Bit )
+			setEEP_AUTCRASH(in Value: U1Bit )
+			setEEP_AUTDEGIVRAGE(in Value: U1Bit )
+			setEEP_AUTPLAF(in Value: U1Bit )
+			setEEP_AUTRECRF(in Value: U1Bit )
+			setEEP_AUTVERLOG(in Value: U1Bit )
+			setEEP_AuthentDelayedCounter(in Value: U8Bit )
+			setEEP_AuthentFailureCounter(in Value: U8Bit )
+			setEEP_CAD_BAGUE_AV(in Value: U1Bit )
+			setEEP_CALALARM(in Value: U1Bit )
+			setEEP_CALALPRI(in Value: U1Bit )
+			setEEP_CALULKTR(in Value: U1Bit )
+			setEEP_CARCLIENT(in Value: U1Bit )
+			setEEP_CLI_REM(in Value: U1Bit )
+			setEEP_CONDAROU(in Value: U1Bit )
+			setEEP_CONDATMPO(in Value: U1Bit )
+			setEEP_CPE_IMPULS(in Value: U1Bit )
+			setEEP_CrashCount(in Value: U8Bit )
+			setEEP_DEM_SURVIT(in Value: U1Bit )
+			setEEP_DETCHOC(in Value: U1Bit )
+			setEEP_DefAfar(in Value: U1Bit )
+			setEEP_DefAfav(in Value: U1Bit )
+			setEEP_DefAirbag(in Value: U1Bit )
+			setEEP_DefClignL(in Value: U1Bit )
+			setEEP_DefClignR(in Value: U1Bit )
+			setEEP_DefDfrToBat(in Value: U1Bit )
+			setEEP_DefDfrToGnd(in Value: U1Bit )
+			setEEP_DefDoorlockLedCC(in Value: U1Bit )
+			setEEP_DefEeprom(in Value: U1Bit )
+			setEEP_DefHornCCBat(in Value: U1Bit )
+			setEEP_DefHornCCGnd(in Value: U1Bit )
+			setEEP_DefKLineCC(in Value: U1Bit )
+			setEEP_DefRrwCC(in Value: U1Bit )
+			setEEP_DefTrpToBat(in Value: U1Bit )
+			setEEP_DefTrpToGnd(in Value: U1Bit )
+			setEEP_DefVerlogLedCC(in Value: U1Bit )
+			setEEP_DefVerlogToBat(in Value: U1Bit )
+			setEEP_DefVerlogToGnd(in Value: U1Bit )
+			setEEP_EV_ARR(in Value: U1Bit )
+			setEEP_EraseAFSCodeRequest(in Value: U1Bit )
+			setEEP_FEU_BROUILLARD(in Value: U1Bit )
+			setEEP_INFO_REGIME(in Value: U1Bit )
+			setEEP_KEY_BUTTON(in Value: U1Bit )
+			setEEP_MAX_NB_ALERT_SEQUENCES_TP(in Value: U8Bit )
+			setEEP_NBCOM_MAX(in Value: U8Bit )
+			setEEP_N_MISE_APC(in Value: U8Bit )
+			setEEP_OUBLICEINTURE(in Value: U1Bit )
+			setEEP_PIL_PLAF(in Value: U1Bit )
+			setEEP_PROLONG_APPUI_ARR(in Value: U8Bit )
+			setEEP_PROLONG_APPUI_COURT(in Value: U8Bit )
+			setEEP_PROLONG_APPUI_LONG(in Value: U8Bit )
+			setEEP_RELAIS_DEM(in Value: U1Bit )
+			setEEP_ResetCount(in Value: U8Bit )
+			setEEP_ResynchroFailureCounter(in Value: U8Bit )
+			setEEP_ResynchroSuccessfulCounter(in Value: U8Bit )
+			setEEP_SBR_ACTIVE_SPEED_THRESH_TP(in Value: U8Bit )
+			setEEP_SBR_TIMEOUT_TM_TP(in Value: U8Bit )
+			setEEP_SDO(in Value: U1Bit )
+			setEEP_SEUIL_VIT_CONDAROU(in Value: U8Bit )
+			setEEP_TIMER_DETRESSE(in Value: U8Bit )
+			setEEP_TIMER_RECONDA_AUTO(in Value: U8Bit )
+			setEEP_TPS_APC(in Value: U8Bit )
+			setEEP_TPS_APPUILAV(in Value: U8Bit )
+			setEEP_TPS_ARRET(in Value: U8Bit )
+			setEEP_TPS_BUZ_CLI(in Value: U8Bit )
+			setEEP_TPS_CLIDEGRAD(in Value: U8Bit )
+			setEEP_TPS_CLI(in Value: U8Bit )
+			setEEP_TPS_COM_MOTEUR(in Value: U8Bit )
+			setEEP_TPS_ESSUIE_MINI(in Value: U8Bit )
+			setEEP_TPS_FILT_AF(in Value: U8Bit )
+			setEEP_TPS_IMPUL_MINI(in Value: U8Bit )
+			setEEP_TPS_MAX_COUPLBLOC(in Value: U8Bit )
+			setEEP_TPS_OUVPORTE(in Value: U8Bit )
+			setEEP_TPS_PLAF(in Value: U8Bit )
+			setEEP_TPS_POSIT_BALAIS(in Value: U8Bit )
+			setEEP_TPS_POSIT_BALAIS_AR(in Value: U8Bit )
+			setEEP_TPS_REF(in Value: U8Bit )
+			setEEP_TPS_REPRISE(in Value: U8Bit )
+			setEEP_TPS_RETARD_DETRESSE(in Value: U8Bit )
+			setEEP_TPS_TEMPO_DEG(in Value: U8Bit )
+			setEEP_TimeOutMERA(in Value: U8Bit )
+			setEEP_VehicleIdentifierNumber(in Index: U8Bit, in Value: U8Bit )
+		Class: dat_pou
+			getDATPouDiagBuffer(in Index: U8Bit): U1Bit
+			getDATPouDiagMaskBuffer(in Index: U8Bit): U1Bit
+			getDO_DATA_IMMOBILIZERDiagEnabled(): U1Bit
+			getDO_VERLOGDiagEnabled(): U1Bit
+			setDATPouDiagBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDATPouDiagMaskBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiagEnabled(in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiag(in Value: U1Bit )
+			setDO_VERLOGDiagEnabled(in Value: U1Bit )
+			setDO_VERLOGDiag(in Value: U1Bit )
+		Class: dat_pwm
+			getPWM_ROOMLAMPDiagMask(): U1Bit
+			getPWM_ROOMLAMPDiagRatio(): U8Bit
+			setPWM_ROOMLAMPDiagMask(in Value: U1Bit )
+			setPWM_ROOMLAMPDiagRatio(in Value: U8Bit )
+		Class: dat_rf
+			getRfPushMemorized(): U8Bit
+			getRfRCFrameIDReceived(): U32Bit
+		Class: dat_spd
+			getENGINE_RPM(): U1Bit
+			getVEHICLE_SPEED(): U8Bit
+		Class: dat_trp
+			getDATTrpAuthentTryCounter(): U8Bit
+			getDATTrpAuthenticationState(): U8Bit
+			getDATTrpDiagKeyFrequency(): U8Bit
+			getDATTrpIdentifierOfPresentKeyIsReceived(): U1Bit
+			getDATTrpIdentifierOfPresentKeyIsValid(): U1Bit
+			getDATTrpIdentifierOfPresentKey(): U32Bit
+			getDATTrpIndexOfKeyRecognized(): U8Bit
+			getDATTrpPresentKeyLocked(): U1Bit
+			getDATTrpResponseToChallengeIsPresent(): U1Bit
+			getDATTrpResponseToChallengeIsValid(): U1Bit
+			getVirginKeyAuthentOk(): U1Bit
+			setDATTrpAuthentTryCounter(in Value: U8Bit )
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+		Class: lap_tfc
+			OnControlClearFaultFlagsAndCounters()
+	Provides the following methods:
+			ProdControlAlaDiagDisable()
+			ProdControlAlaDiagEnable()
+			ProdControlExitFromLearningInFactoryMode()
+			ProdControlGiveUpLearningInAfterSaleMode()
+			ProdControlStartLearningInAfterSaleMode()
+			ProdControlStartLearningInFactoryMode()
+			ProdControlStartPermanentAuthentication()
+			ProdControlStartTestVirginKey()
+			ProdControlStopPermanentAuthentication()
+			ProdControlValidateLearningInAfterSaleMode()
+
+	Class: lap_afsp	Requires methods from the following classes:
+		Class: dat_peep
+			getNEEP_TPS_COM_MOTEUR(): U8Bit
+	Provides the following methods:
+
+	Class: lap_ala	Requires methods from the following classes:
+		Class: dat_ala
+			getAlaCmdFrame(in Index: U8Bit): U8Bit
+			getAlaCommunicationIsRunning(): U1Bit
+			setAlaCmdFrame(in Index: U8Bit, in Value: U8Bit )
+			setDATControlDATAla(in Value: U8Bit )
+			setIsAlaDiagEnabled(in Value: U1Bit )
+		Class: dat_din
+			getFR_DOORS_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+		Class: dat_pee
+			getEEP_CALALARM(): U1Bit
+			getEEP_CAR_SECURE(): U1Bit
+			getEEP_VehicleIdentifierNumber(in Index: U8Bit): U8Bit
+		Class: dat_pin
+			OnControlFalling_FR_DOORS_SW()
+			OnControlFalling_PWR_IGN()
+			OnControlFalling_RR_DOORS_SW()
+		Class: lap_afs
+			OnControlAlaDiagDisable()
+			OnControlAlaDiagEnable()
+		Class: lap_car
+			OnControlKeyIsAuthenticated()
+		Class: lap_dlk
+			OnControlRfLockAllForAlarm()
+			OnControlRfUnlockAllForAlarm()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveSleepState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+
+	Class: lap_buz	Requires methods from the following classes:
+		Class: dat_buz
+			setBUZZER(in Index: U8Bit, in Value: U1Bit )
+		Class: dat_cmn
+			getTOSSignalFalling_PWR_IGN_LAP_BUZ(): U1Bit
+		Class: dat_din
+			getFR_DOORS_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_FOG_SW(): U1Bit
+			getSEATBELT_REMINDER_SW(): U1Bit
+		Class: dat_pee
+			getEEP_DEM_SURVIT(): U1Bit
+			getEEP_FEU_BROUILLARD(): U1Bit
+			getEEP_OUBLICEINTURE(): U1Bit
+		Class: dat_peep
+			getNEEP_MAX_NB_ALERT_SEQUENCES_TP(): U8Bit
+			getNEEP_SBR_ACTIVE_SPEED_THRESH_TP(): U8Bit
+		Class: dat_spd
+			getVEH_SPEED(): U8Bit
+		Class: lap_sup
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+
+	Class: lap_car	Requires methods from the following classes:
+		Class: dat_cmn
+			getAuthentPermanentFailCounter(): U8Bit
+			getAuthentPermanentResynchroFailCounter(): U8Bit
+			getAuthentPermanentTotalCounter(): U16Bit
+			getLearningModeInProgress(): U8Bit
+			getVERLOGON(): U1Bit
+			setAuthentPermanentFailCounter(in Value: U8Bit )
+			setAuthentPermanentResynchroFailCounter(in Value: U8Bit )
+			setAuthentPermanentTotalCounter(in Value: U16Bit )
+			setDefTrpShortCircuitToBat(in Value: U1Bit )
+			setDefTrpShortCircuitToGnd(in Value: U1Bit )
+			setLedVerlogPattern(in Value: U8Bit )
+			setVERLOGON(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_pee
+			getEEP_BCMBlank(): U1Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_ImmoSecretKey(in Index: U8Bit): U8Bit
+			getEEP_ResynchroRequest(): U8Bit
+			getEEP_TimeOutMERA(): U8Bit
+		Class: dat_pou
+			setDO_DATA_IMMOBILIZERProtection(in Value: U1Bit )
+		Class: dat_trp
+			getDATTrpAuthenticationState(): U8Bit
+			getDATTrpIndexOfKeyRecognized(): U8Bit
+			getDATTrpKeyWithRF(): U1Bit
+			getDATTrpResynchronizationState(): U8Bit
+			getDATTrpSleepControlState(): U8Bit
+			getDATTrpTransportISK(in Index: U8Bit): U8Bit
+			setDATControlTrp(in Value: U8Bit )
+			setDATTrpActiveTestMode(in Value: U1Bit )
+			setDATTrpAuthentInLearningMode(in Value: U1Bit )
+			setDATTrpISKForAuthent(in Index: U8Bit, in Value: U8Bit )
+			setDATTrpWriteSecretKeyHigh(in Value: U1Bit )
+		Class: dat_vlg
+			setDATControlVlg(in Value: U8Bit )
+		Class: lap_afs
+			OnControlStartPermanentAuthentication()
+			OnControlStartTestVirginKey()
+			OnControlStopPermanentAuthentication()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			ProdControlGetCarTrpResource()
+			ProdControlKeyIsAuthenticated()
+			ProdControlKeyIsNotAuthenticated()
+			ProdControlReleaseCarTrpResource()
+
+	Class: lap_dfr	Requires methods from the following classes:
+		Class: dat_cmn
+			setDefDfrToBat(in Value: U1Bit )
+			setDefDfrToGnd(in Value: U1Bit )
+			setDefHornCCBat(in Value: U1Bit )
+			setDefHornCCGnd(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_dou
+			getDEFROSTER(): U1Bit
+			getHORN_RL(): U1Bit
+			setDEFROSTER(in Value: U1Bit )
+		Class: dat_pan
+			getDIAG_DRIVER_KLAXON_DualSCBat(): U1Bit
+			getDIAG_DRIVER_KLAXON_SCGnd(): U1Bit
+			getDIAG_DRIVER_KLAXON_SingleSCBat(): U1Bit
+		Class: dat_pee
+			getEEP_AUTDEGIVRAGE(): U1Bit
+			getEEP_DefrosterActivationState(): U1Bit
+			getEEP_INFO_REGIME(): U1Bit
+			setEEP_DefDfrToBat(in Value: U1Bit )
+			setEEP_DefDfrToGnd(in Value: U1Bit )
+			setEEP_DefHornCCBat(in Value: U1Bit )
+			setEEP_DefHornCCGnd(in Value: U1Bit )
+			setEEP_DefrosterActivationState(in Value: U1Bit )
+		Class: dat_peep
+			getNEEP_TPS_TEMPO_DEG(): U8Bit
+		Class: dat_pin
+			getDEFROSTER_SW_FILTERED(): U1Bit
+		Class: dat_pou
+			getDEFROSTERProtection(): U1Bit
+			getHORN_RLProtection(): U1Bit
+			setDEFROSTERProtection(in Value: U1Bit )
+			setHORN_RLProtection(in Value: U1Bit )
+		Class: dat_spd
+			getENGINE_RPMAvailable(): U1Bit
+			getENGINE_RPM(): U1Bit
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+
+	Class: lap_dlk	Requires methods from the following classes:
+		Class: dat_ala
+			getAlaCommunicationIsRunning(): U1Bit
+		Class: dat_buz
+			setBUZZER(in Index: U8Bit, in Value: U1Bit )
+		Class: dat_cmn
+			getDefAirbag(): U1Bit
+			getDefBtonCpeFer(): U1Bit
+			getDefBtonCpeOuv(): U1Bit
+			getTOSSignalChanging_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalChanging_RR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalFalling_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalFalling_PWR_IGN_LAP_DLK(): U1Bit
+			getTOSSignalFalling_RR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_DOOR_LOCK_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_DOOR_UNLOCK_LOCK_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_FR_DOORS_SW_LAP_DLK(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_DLK(): U1Bit
+			getTOSSignalRising_RR_DOORS_SW_LAP_DLK(): U1Bit
+			setDefAirbag(in Value: U1Bit )
+			setDefBtonCpeFer(in Value: U1Bit )
+			setDefBtonCpeOuv(in Value: U1Bit )
+			setDefDoorlockLedCC(in Value: U1Bit )
+			setDefVerlogLedCC(in Value: U1Bit )
+			setLastCommandOrigin(in Value: U1Bit )
+			setLastOpeningPanelControl(in Value: U1Bit )
+			setVehicleIsAutoRelocked(in Value: U1Bit )
+			setVehicleIsLockedWithSpeed(in Value: U1Bit )
+			setVehiculeHasBeenMoving(in Value: U1Bit )
+		Class: dat_din
+			getDI_VERLOG(): U1Bit
+			getDOOR_LOCK_SW(): U1Bit
+			getDOOR_UNLOCK_SW(): U1Bit
+			getFR_DOORS_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+		Class: dat_dou
+			getOPEN_DOOR_LED(): U1Bit
+			getVERLOG_LED(): U1Bit
+			setLOCK_DOORS(in Value: U1Bit )
+			setOPEN_DOOR_LED(in Value: U1Bit )
+			setUNLOCK_DOORS(in Value: U1Bit )
+			setUNLOCK_DRIVER_DOOR(in Value: U1Bit )
+			setVERLOG_LED(in Value: U1Bit )
+		Class: dat_pan
+			getDIAG_DRIVER_ULQ_SCBat(): U1Bit
+		Class: dat_pee
+			getEEP_AUTCRASH(): U1Bit
+			getEEP_AUTRECRF(): U1Bit
+			getEEP_CARCLIENT(): U1Bit
+			getEEP_CAR_SECURE(): U1Bit
+			getEEP_CDDoorLockLed(): U8Bit
+			getEEP_CDVerlogLed(): U8Bit
+			getEEP_CONDAROU(): U1Bit
+			getEEP_CONDATMPO(): U1Bit
+			getEEP_CPE_IMPULS(): U1Bit
+			getEEP_CrashCount(): U8Bit
+			getEEP_CrashHazardIsRequested(): U1Bit
+			getEEP_DoorlockLedActivation(): U1Bit
+			getEEP_KEY_BUTTON(): U1Bit
+			getEEP_SDO(): U1Bit
+			setEEP_CARCLIENT(in Value: U1Bit )
+			setEEP_CAR_SECURE(in Value: U1Bit )
+			setEEP_CDDoorLockLed(in Value: U8Bit )
+			setEEP_CDVerlogLed(in Value: U8Bit )
+			setEEP_CrashCount(in Value: U8Bit )
+			setEEP_CrashHazardIsRequested(in Value: U1Bit )
+			setEEP_DefDoorlockLedCC(in Value: U1Bit )
+			setEEP_DefVerlogLedCC(in Value: U1Bit )
+			setEEP_DoorlockLedActivation(in Value: U1Bit )
+		Class: dat_peep
+			getNEEP_NBCOM_MAX(): U8Bit
+			getNEEP_SEUIL_VIT_CONDAROU(): U8Bit
+			getNEEP_TIMER_RECONDA_AUTO(): U8Bit
+			getNEEP_TPS_COM_MOTEUR(): U8Bit
+			getNEEP_TPS_OUVPORTE(): U8Bit
+			getNEEP_TPS_REF(): U8Bit
+		Class: dat_pin
+			OnControlInputsReadAfterStartingStepState()
+			OnControlProtectionLedVerlogSleepMode()
+		Class: dat_pou
+			getVERLOG_LEDProtection(): U1Bit
+			setOPEN_DOOR_LEDProtection(in Value: U1Bit )
+			setVERLOG_LEDDirect(in Value: U1Bit )
+			setVERLOG_LEDProtection(in Value: U1Bit )
+		Class: dat_rbg
+			setDATControlRbag(in Value: U8Bit )
+			OnControlAirbagUnlock()
+		Class: dat_rf
+			getDATRfLockPush(): U1Bit
+			getDATRfUnlockPush(): U1Bit
+		Class: dat_spd
+			getENGINE_RUNNING(): U1Bit
+			getVEHICLE_SPEED(): U8Bit
+		Class: dat_trp
+			getDATTrpOutputActive(): U1Bit
+		Class: lap_car
+			OnControlKeyIsAuthenticated()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+			setTOSSignalCrashIsDetectedByAirbag()
+			setTOSSignalCrashUnlockStarted()
+			getTOSSignalCrashIsDetectedByAirbag(): U1Bit
+			getTOSSignalCrashUnlockStarted(): U1Bit
+			ProdControlAutoRelock()
+			ProdControlCrashUnlockFinished()
+			ProdControlRKE_LOCK_REQUEST()
+			ProdControlRKE_UNLOCK_REQUEST()
+			ProdControlRfLockAllForAlarm()
+			ProdControlRfUnlockAllForAlarm()
+
+	Class: lap_dvp	Requires methods from the following classes:
+		Class: dat_cpu
+			setDATControlCpu(in Value: U8Bit )
+		Class: dat_dea
+			getDATDeaActionIsFinished(): U8Bit
+			getDATDeaWriteIsOk(): U8Bit
+			setDATControlDATDea(in Value: U8Bit )
+			setDATDeaAddressInByte(in Value: U16Bit )
+			setDATDeaSizeBufferInByte(in Value: U8Bit )
+		Class: dat_kwp
+			getDATKwpRxFrameLgth(): U8Bit
+		Class: dat_pan
+			getPDOInMilliVolt(): U16Bit
+		Class: dat_pee
+			getEEPErrorTable(in Index: U8Bit): U8Bit
+			setEEPErrorTable(in Index: U8Bit, in Value: U8Bit )
+		Class: dat_rf
+			getDATRfNbRCBlocksReceivedAndOK(): U8Bit
+			getDATRfNbRCBlocksReceived(): U8Bit
+			getDATRfNbWakeUpBlocksReceived(): U8Bit
+			setDATControlRf(in Value: U8Bit )
+	Provides the following methods:
+
+	Class: lap_exl	Requires methods from the following classes:
+		Class: dat_din
+			getHIGH_LOW_BEAM(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_FOG_SW(): U1Bit
+		Class: dat_dou
+			getRR_WIPER_RR_FOG_LAMP(): U1Bit
+			setRR_WIPER_RR_FOG_LAMP(in Value: U1Bit )
+		Class: dat_pee
+			getEEP_EV_ARR(): U1Bit
+			getEEP_FEU_BROUILLARD(): U1Bit
+		Class: lap_sup
+			OnControlLAPEnterActiveState()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+
+	Class: lap_fli	Requires methods from the following classes:
+		Class: dat_buz
+			setBUZZER(in Index: U8Bit, in Value: U1Bit )
+		Class: dat_cmn
+			getHazardAlarmRequested(): U1Bit
+			getTOSSignalFalling_HAZARD_SW_LAP_FLI(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_FLI(): U1Bit
+			setDefClignL(in Value: U1Bit )
+			setDefClignR(in Value: U1Bit )
+			setFlasherLampsTestResult(in Value: U8Bit )
+			setFlashingFrequency(in Value: U8Bit )
+		Class: dat_din
+			getFR_DOORS_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getL_FLASHER_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+			getR_FLASHER_SW(): U1Bit
+		Class: dat_dou
+			getDI_LEFT(): U1Bit
+			getDI_RIGHT(): U1Bit
+			setDI_LEFT(in Value: U1Bit )
+			setDI_RIGHT(in Value: U1Bit )
+		Class: dat_pan
+			getDIAG_FLASHER_SCGnd(): U1Bit
+			getFlasherBulbFailure(): U1Bit
+			setDATControlDATPan(in Value: U8Bit )
+		Class: dat_pee
+			getEEP_CDLeftInd(): U16Bit
+			getEEP_CDRightInd(): U16Bit
+			getEEP_CrashHazardIsRequested(): U1Bit
+			getEEP_DETCHOC(): U1Bit
+			getEEP_SCLimit(): U16Bit
+			setEEP_CDLeftInd(in Value: U16Bit )
+			setEEP_CDRightInd(in Value: U16Bit )
+			setEEP_CrashHazardIsRequested(in Value: U1Bit )
+			setEEP_DefClignL(in Value: U1Bit )
+			setEEP_DefClignR(in Value: U1Bit )
+		Class: dat_peep
+			getNEEP_TIMER_DETRESSE(): U8Bit
+			getNEEP_TPS_CLIDEGRAD(): U8Bit
+			getNEEP_TPS_CLI(): U8Bit
+			getNEEP_TPS_RETARD_DETRESSE(): U8Bit
+		Class: dat_pou
+			getDI_LEFTProtection(): U1Bit
+			getDI_RIGHTProtection(): U1Bit
+			setDI_LEFTProtection(in Value: U1Bit )
+			setDI_RIGHTProtection(in Value: U1Bit )
+		Class: lap_dlk
+			OnControlCrashUnlockFinished()
+			OnControlRKE_LOCK_REQUEST()
+			OnControlRKE_UNLOCK_REQUEST()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+		Class: lap_tfc
+			OnControlLeftFlashingForTFC()
+			OnControlRightFlashingForTFC()
+	Provides the following methods:
+			setTOSSignalLAPFliCrashUnlockFinished()
+			setTOSSignalLAPFliEventRfLockAll()
+			setTOSSignalLAPFliEventRfUnlockAll()
+			getTOSSignalLAPFliCrashUnlockFinished(): U1Bit
+			getTOSSignalLAPFliEventRfLockAll(): U1Bit
+			getTOSSignalLAPFliEventRfUnlockAll(): U1Bit
+
+	Class: lap_frw	Requires methods from the following classes:
+		Class: dat_cmn
+			getFrontWasherButtonBlocked(): U1Bit
+			getRearWasherButtonBlocked(): U1Bit
+			getTOSSignalFrontStopPositionDetected_LAP_FRW1(): U1Bit
+			getTOSSignalFrontStopPositionDetected_LAP_FRW2(): U1Bit
+			setDefAFAV(in Value: U1Bit )
+			setFrontWasherButtonBlocked(in Value: U1Bit )
+		Class: dat_din
+			getFR_AUTOSTOP_SW(): U1Bit
+			getFR_WASHER_SW(): U1Bit
+			getFR_WIPER_INT_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+		Class: dat_dou
+			getFRONT_WIPER(): U1Bit
+			setFRONT_WIPER(in Value: U1Bit )
+		Class: dat_pee
+			getEEP_TPS_CAD_FIXE(): U8Bit
+			setEEP_DefAfav(in Value: U1Bit )
+		Class: dat_peep
+			getNEEP_PROLONG_APPUI_COURT(): U8Bit
+			getNEEP_PROLONG_APPUI_LONG(): U8Bit
+			getNEEP_TPS_APPUILAV(): U8Bit
+			getNEEP_TPS_ARRET(): U8Bit
+			getNEEP_TPS_ESSUIE_MINI(): U8Bit
+			getNEEP_TPS_MAX_COUPLBLOC(): U8Bit
+		Class: dat_pin
+			getTOSSignalFR_AUTOSTOP_SWFalling_LAP_FRW(): U1Bit
+			getTOSSignalFrontWiperStopIsAllowed_LAP_FRW(): U1Bit
+		Class: lap_sup
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+
+	Class: lap_ill	Requires methods from the following classes:
+		Class: dat_cmn
+			getBcmSleepRequested(): U1Bit
+			getTOSSignalChanging_FR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalChanging_RR_DOORS_SW_LAP_ILL(): U1Bit
+			getTOSSignalFalling_PWR_IGN_LAP_ILL(): U1Bit
+			getTOSSignalRising_PWR_IGN_LAP_ILL(): U1Bit
+			setBcmSleepRequested(in Value: U1Bit )
+		Class: dat_din
+			getFR_DOORS_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+		Class: dat_dou
+			getBAT_LIGHT_TEMPO(): U1Bit
+			setBAT_LIGHT_TEMPO(in Value: U1Bit )
+		Class: dat_pee
+			getEEP_ALIM_PLAF(): U1Bit
+			getEEP_AUTPLAF(): U1Bit
+			getEEP_PIL_PLAF(): U1Bit
+		Class: dat_peep
+			getNEEP_TPS_APC(): U8Bit
+			getNEEP_TPS_PLAF(): U8Bit
+		Class: dat_pwm
+			getPWM_ROOMLAMP(): U8Bit
+			setPWM_ROOMLAMP(in Value: U8Bit )
+		Class: lap_dlk
+			OnControlAutoRelock()
+			OnControlRKE_LOCK_REQUEST()
+			OnControlRKE_UNLOCK_REQUEST()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+			OnControlLeaveStartingStepState()
+	Provides the following methods:
+			ProdControlWakeUpRequest()
+
+	Class: lap_kwp	Requires methods from the following classes:
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_kwp
+			getDATKwpRxBuffer(in Index: U8Bit): U8Bit
+			getDATKwpRxFrameLgth(): U8Bit
+			getTOSSignalDiagnosticMessageIsReceived(): U1Bit
+			getTOSSignalEventIntKwpWakeUp(): U1Bit
+			getTargetID(): U8Bit
+			setDATControlKwp(in Value: U8Bit )
+			setDATKwpTxBuffer(in Index: U8Bit, in Value: U8Bit )
+			setDATKwpTxFrameLgth(in Value: U8Bit )
+		Class: dat_spd
+			getENGINE_RUNNING(): U1Bit
+			getVEHICLE_SPEED(): U8Bit
+		Class: lap_sup
+			OnControlLAPInitialize()
+	Provides the following methods:
+
+	Class: lap_lrn	Requires methods from the following classes:
+		Class: dat_apr
+			getDATAprAfterSaleCode(in Index: U8Bit): U8Bit
+			getDATAprImmobilizerSecretKey(in Index: U8Bit): U8Bit
+			getDATAprRemoteSecretKey(in Index: U8Bit): U8Bit
+			getDATAprSKey(): U16Bit
+			setDATAprAfterSaleCode(in Index: U8Bit, in Value: U8Bit )
+			setDATAprIdentifier(in Value: U32Bit )
+			setDATAprImmobilizerSecretKey(in Index: U8Bit, in Value: U8Bit )
+			setDATAprPasswordTag(in Value: U32Bit )
+			setDATControlApr(in Value: U8Bit )
+		Class: dat_cmn
+			getNumberOfKeys315MHzLearnt(): U8Bit
+			getNumberOfKeys315MHzSmallLearnt(): U8Bit
+			getNumberOfKeys433MHzLearnt(): U8Bit
+			getNumberOfKeysLearnt(): U8Bit
+			setAFSCodeIsOk(in Value: U1Bit )
+			setAfterSaleModeAuthorized(in Value: U1Bit )
+			setAfterSaleModeValidationAuthorized(in Value: U1Bit )
+			setCOD_ERR_APP(in Value: U8Bit )
+			setFactoryModeAuthorized(in Value: U1Bit )
+			setISKSuccessfullyWritten(in Value: U1Bit )
+			setLearningModeInProgress(in Value: U8Bit )
+			setLedVerlogPattern(in Value: U8Bit )
+			setNumberOfKeys315MHzLearnt(in Value: U8Bit )
+			setNumberOfKeys315MHzSmallLearnt(in Value: U8Bit )
+			setNumberOfKeys433MHzLearnt(in Value: U8Bit )
+			setNumberOfKeysLearnt(in Value: U8Bit )
+			setRSKSuccessfullyWritten(in Value: U1Bit )
+			setSynchroSuccessfullyWritten(in Value: U1Bit )
+			setWritingErrorInEepForKey1InFactoryMode(in Value: U1Bit )
+			setWritingErrorInEepForKey2InFactoryMode(in Value: U1Bit )
+			setWritingErrorInEepInBcmReplacement(in Value: U1Bit )
+			setWritingErrorInEepInReassignment(in Value: U1Bit )
+		Class: dat_din
+			getPWR_IGN(): U1Bit
+		Class: dat_pee
+			getEEP_AfsEraseIgnitionCnt(): U8Bit
+			getEEP_AppCleNonEffect(): U1Bit
+			getEEP_BCMBlank(): U1Bit
+			getEEP_CALULKTR(): U1Bit
+			getEEP_CodeAFSAvailable(): U1Bit
+			getEEP_EraseAFSCodeRequest(): U1Bit
+			getEEP_ImmoSecretKey(in Index: U8Bit): U8Bit
+			getEEP_KeyIdentifier(in Index: U8Bit): U32Bit
+			getEEP_NbKeysLearnt(): U8Bit
+			getEEP_NbKeysStd315MhzLearnt(): U8Bit
+			getEEP_NbKeysStd315MhzLowPowerLearnt(): U8Bit
+			getEEP_NbKeysStd433MhzLearnt(): U8Bit
+			getEEP_PwdTag(in Index: U8Bit): U32Bit
+			getEEP_RemoteSecretKey1(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey2(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey3(in Index: U8Bit): U8Bit
+			getEEP_RemoteSecretKey4(in Index: U8Bit): U8Bit
+			getEEP_timeout_app_cle(): U8Bit
+			getEEP_tmp_app_cle(): U8Bit
+			getIsEepGroupDynamicImmoDataBankProcessing(): U1Bit
+			getIsEepGroupDynamicImmoDataBankWriteOk(): U1Bit
+			getIsEepGroupStaticImmoBankProcessing(): U1Bit
+			getIsEepGroupStaticImmoBankWriteOk(): U1Bit
+			setEEP_AfsEraseIgnitionCnt(in Value: U8Bit )
+			setEEP_AfterSalesCode(in Index: U8Bit, in Value: U8Bit )
+			setEEP_AppCleNonEffect(in Value: U1Bit )
+			setEEP_BCMBlank(in Value: U1Bit )
+			setEEP_CodeAFSAvailable(in Value: U1Bit )
+			setEEP_EraseAFSCodeRequest(in Value: U1Bit )
+			setEEP_ImmoSecretKey(in Index: U8Bit, in Value: U8Bit )
+			setEEP_InitialResynchroValue(in Index: U8Bit, in Value: U32Bit )
+			setEEP_KeyIdentifier(in Index: U8Bit, in Value: U32Bit )
+			setEEP_NbKeysLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd315MhzLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd315MhzLowPowerLearnt(in Value: U8Bit )
+			setEEP_NbKeysStd433MhzLearnt(in Value: U8Bit )
+			setEEP_PwdTag(in Index: U8Bit, in Value: U32Bit )
+			setEEP_RemoteSecretKey1(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey2(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey3(in Index: U8Bit, in Value: U8Bit )
+			setEEP_RemoteSecretKey4(in Index: U8Bit, in Value: U8Bit )
+			setEEP_SI28Bits(in Index: U8Bit, in Value: U32Bit )
+			setEEP_VerlogSKey(in Value: U16Bit )
+		Class: dat_peep
+			getNEEP_N_MISE_APC(): U8Bit
+		Class: dat_trp
+			getDATTrpAuthenticationState(): U8Bit
+			getDATTrpDataRead(): U32Bit
+			getDATTrpFrequencyOfPresentKey(): U8Bit
+			getDATTrpIdentifierOfPresentKey(): U32Bit
+			getDATTrpIndexOfKeyRecognized(): U8Bit
+			getDATTrpKeyWithRF(): U1Bit
+			getDATTrpPresentKeyLocked(): U1Bit
+			getDATTrpResynchronizationState(): U8Bit
+			getDATTrpResynchronizationValue(): U32Bit
+			getDATTrpSleepControlState(): U8Bit
+			getDATTrpTransportISK(in Index: U8Bit): U8Bit
+			getDATTrpWriteAccessReadingError(): U1Bit
+			getDATTrpWriteAccessState(): U8Bit
+			getDATTrpWriteAccessWritingError(): U1Bit
+			setDATControlTrp(in Value: U8Bit )
+			setDATTrpAuthentInLearningMode(in Value: U1Bit )
+			setDATTrpDataToWrite(in Value: U32Bit )
+			setDATTrpISKForAuthent(in Index: U8Bit, in Value: U8Bit )
+			setDATTrpKeyLearningElapsed(in Value: U1Bit )
+			setDATTrpPageNumber(in Value: U8Bit )
+			setDATTrpPresentKeyLocked(in Value: U1Bit )
+			setDATTrpWriteSecretKeyHigh(in Value: U1Bit )
+		Class: lap_afs
+			OnControlExitFromLearningInFactoryMode()
+			OnControlGiveUpLearningInAfterSaleMode()
+			OnControlStartLearningInAfterSaleMode()
+			OnControlStartLearningInFactoryMode()
+			OnControlValidateLearningInAfterSaleMode()
+		Class: lap_sup
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+			ProdControlGetAprTrpResource()
+			ProdControlReleaseAprTrpResource()
+
+	Class: lap_pal	Requires methods from the following classes:
+		Class: dat_cmn
+			setHazardAlarmRequested(in Value: U1Bit )
+		Class: dat_din
+			getFR_DOORS_SW(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+		Class: dat_dou
+			setHORN_RL(in Value: U1Bit )
+		Class: dat_pee
+			getEEP_CALALPRI(): U1Bit
+			getEEP_PerimeterAlarmState(): U8Bit
+			setEEP_PerimeterAlarmState(in Value: U8Bit )
+		Class: dat_pin
+			OnControlInputsReadAfterStartingStepState()
+			OnControlRising_FR_DOORS_SW()
+			OnControlRising_RR_DOORS_SW()
+		Class: lap_car
+			OnControlKeyIsAuthenticated()
+		Class: lap_dlk
+			OnControlRfLockAllForAlarm()
+			OnControlRfUnlockAllForAlarm()
+		Class: lap_sup
+			setTOSSignalSomebodyMaintainActiveState()
+			OnControlIsAnybodyMaintainActiveState()
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+
+	Class: lap_rrw	Requires methods from the following classes:
+		Class: dat_cmn
+			getFrontWasherButtonBlocked(): U1Bit
+			getRearWasherButtonBlocked(): U1Bit
+			getTOSSignalRearStopPositionDetected_LAP_RRW1(): U1Bit
+			getTOSSignalRearStopPositionDetected_LAP_RRW2(): U1Bit
+			setDefAFAR(in Value: U1Bit )
+			setDefRrwCC(in Value: U1Bit )
+			setRearWasherButtonBlocked(in Value: U1Bit )
+		Class: dat_din
+			getFR_WASHER_SW(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+			getRR_WIPER_INT_SW(): U1Bit
+		Class: dat_dou
+			getRR_WIPER_RR_FOG_LAMP(): U1Bit
+			setRR_WIPER_RR_FOG_LAMP(in Value: U1Bit )
+		Class: dat_pan
+			getDIAG_DRIVER_HIGH_SIDE_SCGnd(): U1Bit
+		Class: dat_pee
+			getEEP_CDRearWiper(): U16Bit
+			getEEP_EV_ARR(): U1Bit
+			getEEP_SCLimit(): U16Bit
+			getEEP_TPS_CAD_FIXE(): U8Bit
+			setEEP_CDRearWiper(in Value: U16Bit )
+			setEEP_DefAfar(in Value: U1Bit )
+			setEEP_DefRrwCC(in Value: U1Bit )
+		Class: dat_peep
+			getNEEP_PROLONG_APPUI_ARR(): U8Bit
+			getNEEP_TPS_ARRET(): U8Bit
+			getNEEP_TPS_ESSUIE_MINI(): U8Bit
+			getNEEP_TPS_MAX_COUPLBLOC(): U8Bit
+			getNEEP_TPS_REPRISE(): U8Bit
+		Class: dat_pin
+			getTOSSignalRR_AUTOSTOP_SWFalling_LAP_RRW(): U1Bit
+			getTOSSignalRearWiperStopIsAllowed_LAP_RRW(): U1Bit
+		Class: dat_pou
+			setRR_WIPER_RR_FOG_LAMPProtection(in Value: U1Bit )
+		Class: lap_sup
+			OnControlLAPEnterActiveState()
+			OnControlLAPInitialize()
+			OnControlLAPLeaveActiveState()
+	Provides the following methods:
+
+	Class: lap_sup	Requires methods from the following classes:
+		Class: dat_cpu
+			setDATControlCpu(in Value: U8Bit )
+		Class: dat_din
+			OnControlActiveSleepRequest()
+		Class: dat_pin
+			OnControlWakeUpRequest()
+	Provides the following methods:
+			setTOSSignalActiveSleepRequested()
+			setTOSSignalSomebodyMaintainActiveSleepState()
+			setTOSSignalSomebodyMaintainActiveState()
+			setTOSSignalSomebodyMaintainStartingStepState()
+			setTOSSignalWakeUpRequested()
+			getTOSSignalActiveSleepRequested(): U1Bit
+			getTOSSignalSomebodyMaintainActiveSleepState(): U1Bit
+			getTOSSignalSomebodyMaintainActiveState(): U1Bit
+			getTOSSignalSomebodyMaintainStartingStepState(): U1Bit
+			getTOSSignalWakeUpRequested(): U1Bit
+			ProdControlDATEnterActiveState()
+			ProdControlDATInitialize()
+			ProdControlDATLeaveActiveState()
+			ProdControlEnterStartingStepState()
+			ProdControlIsAnybodyMaintainActiveSleepState()
+			ProdControlIsAnybodyMaintainActiveState()
+			ProdControlIsAnybodyMaintainStartingStepState()
+			ProdControlLAPEnterActiveState()
+			ProdControlLAPInitialize()
+			ProdControlLAPLeaveActiveState()
+			ProdControlLeaveStartingStepState()
+
+	Class: lap_tfc	Requires methods from the following classes:
+		Class: dat_ala
+			getIsAlaDiagEnabled(): U1Bit
+		Class: dat_buz
+			setDATBuzDiagBuzz(in Value: U16Bit )
+			setDATControlDATBuzDiagBuzz(in Value: U8Bit )
+		Class: dat_cmn
+			getFlasherLampsTestResult(): U8Bit
+			getTfcRevisionNum(): U8Bit
+			getTfcVersionNum(): U8Bit
+			setBcmSleepRequested(in Value: U1Bit )
+			setDATControlEepromReprogramming(in Value: U8Bit )
+		Class: dat_cpu
+			setDATControlCpu(in Value: U8Bit )
+		Class: dat_dea
+			getDATDeaActionIsFinished(): U8Bit
+			setDATControlDATDea(in Value: U8Bit )
+			setDATDeaAddressInByte(in Value: U16Bit )
+			setDATDeaSizeBufferInByte(in Value: U8Bit )
+		Class: dat_din
+			getAIRBAG_CRASH(): U1Bit
+			getDEFROSTER_SW(): U1Bit
+			getDI_DATA_IMMOBILIZER(): U1Bit
+			getDI_ENGINE_RPM(): U1Bit
+			getDI_VEHICLE_SPEED(): U1Bit
+			getDI_VERLOG(): U1Bit
+			getDOOR_LOCK_SW(): U1Bit
+			getDOOR_UNLOCK_SW(): U1Bit
+			getFR_AUTOSTOP_SW(): U1Bit
+			getFR_DOORS_SW(): U1Bit
+			getFR_WASHER_SW(): U1Bit
+			getFR_WIPER_INT_SW(): U1Bit
+			getHAZARD_SW(): U1Bit
+			getHIGH_LOW_BEAM(): U1Bit
+			getL_FLASHER_SW(): U1Bit
+			getPOSITION_LIGHTS(): U1Bit
+			getPWR_IGN(): U1Bit
+			getRR_AUTOSTOP_SW(): U1Bit
+			getRR_DOORS_SW(): U1Bit
+			getRR_FOG_SW(): U1Bit
+			getRR_WASHER_SW(): U1Bit
+			getRR_WIPER_INT_SW(): U1Bit
+			getR_FLASHER_SW(): U1Bit
+			getSEATBELT_REMINDER_SW(): U1Bit
+		Class: dat_kwp
+			getDATKwpRxFrameLgth(): U8Bit
+		Class: dat_pan
+			getBATTERY_VOLTAGE(): U16Bit
+			getFlashersCurrentInMilliAmpers(): U16Bit
+			getKlaxonCurrentInMilliAmpers(): U16Bit
+			getPDOInMilliVolt(): U16Bit
+			getULQCurrentInMilliAmpers(): U16Bit
+		Class: dat_pee
+			getEEP_DateCode(in Index: U8Bit): U8Bit
+			getEEP_ECUReference(in Index: U8Bit): U8Bit
+			getEEP_ECUType(): U8Bit
+			getEEP_FinalTestCounter(): U8Bit
+			getEEP_FlaCoeffLNormal(): U8Bit
+			getEEP_FlaCoeffRNormal(): U8Bit
+			getEEP_InSituTestCounter(): U8Bit
+			getEEP_PassingTestCounter(): U8Bit
+			getEEP_PieIndex(in Index: U8Bit): U8Bit
+			getEEP_PieNumber(in Index: U8Bit): U8Bit
+			getEEP_ReliabilityTestCounter(): U8Bit
+			getEEP_RevisionEEPROM(): U8Bit
+			getEEP_RfTestCounter(): U8Bit
+			getEEP_SerialNumber(in Index: U8Bit): U8Bit
+			getEEP_VersionEEPROM(): U8Bit
+			getIsEepGroupSupplierBankProcessing(): U1Bit
+			getIsEepGroupSupplierBankWriteOk(): U1Bit
+			setDATControlEep(in Value: U8Bit )
+			setEEP_CDDoorLockLed(in Value: U8Bit )
+			setEEP_CDImmo(in Value: U8Bit )
+			setEEP_CDLeftInd(in Value: U16Bit )
+			setEEP_CDRearWiper(in Value: U16Bit )
+			setEEP_CDRightInd(in Value: U16Bit )
+			setEEP_CDVerlogLed(in Value: U8Bit )
+			setEEP_CDVerlog(in Value: U8Bit )
+			setEEP_DateCode(in Index: U8Bit, in Value: U8Bit )
+			setEEP_ECUType(in Value: U8Bit )
+			setEEP_FinalTestCounter(in Value: U8Bit )
+			setEEP_FlaCoeffLNormal(in Value: U8Bit )
+			setEEP_FlaCoeffRNormal(in Value: U8Bit )
+			setEEP_InSituTestCounter(in Value: U8Bit )
+			setEEP_PassingTestCounter(in Value: U8Bit )
+			setEEP_PieIndex(in Index: U8Bit, in Value: U8Bit )
+			setEEP_PieNumber(in Index: U8Bit, in Value: U8Bit )
+			setEEP_ReliabilityTestCounter(in Value: U8Bit )
+			setEEP_RfTestCounter(in Value: U8Bit )
+			setEEP_SerialNumber(in Index: U8Bit, in Value: U8Bit )
+		Class: dat_pou
+			getDATPouHardMaskBuffer(in Index: U8Bit): U1Bit
+			getDO_DATA_IMMOBILIZERProtection(): U1Bit
+			getDO_VERLOGProtection(): U1Bit
+			setDATPouDiagBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDATPouDiagMaskBuffer(in Index: U8Bit, in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiagEnabled(in Value: U1Bit )
+			setDO_DATA_IMMOBILIZERDiag(in Value: U1Bit )
+			setDO_VERLOGDiagEnabled(in Value: U1Bit )
+			setDO_VERLOGDiag(in Value: U1Bit )
+		Class: dat_pwm
+			setPWM_ROOMLAMPDiagMask(in Value: U1Bit )
+			setPWM_ROOMLAMPDiagRatio(in Value: U8Bit )
+		Class: dat_rf
+			getDATRfNbRCBlocksReceivedCrcOK(): U8Bit
+			setDATControlRf(in Value: U8Bit )
+		Class: dat_spd
+			getENGINE_RPM(): U1Bit
+			getVEHICLE_SPEED(): U8Bit
+		Class: dat_trp
+			getDATTrpAuthenticationState(): U8Bit
+			setDATControlTrp(in Value: U8Bit )
+		Class: dat_vlg
+			getDATVlgSerialTestInProgress(): U1Bit
+			setDATControlVlg(in Value: U8Bit )
+	Provides the following methods:
+			ProdControlActivateFinalTest()
+			ProdControlClearFaultFlagsAndCounters()
+			ProdControlLeftFlashingForTFC()
+			ProdControlRightFlashingForTFC()
+
+	Class: lap_vld	Requires methods from the following classes:
+		Class: dat_cmn
+			getLedVerlogPattern(): U8Bit
+		Class: dat_dou
+			getVERLOG_LED(): U1Bit
+			setVERLOG_LED(in Value: U1Bit )
+		Class: dat_pou
+			setVERLOG_LEDDirect(in Value: U1Bit )
+			setVERLOG_LEDProtection(in Value: U1Bit )
+		Class: lap_sup
+			OnControlLAPInitialize()
+	Provides the following methods:
+
+Layer: LDB
+Layer: LDB_API
+Layer: LIB
+Layer: ParamDAT
+Layer: ParamLDB
+Layer: TARGET_R
+Layer: TOS
+	Class: tos	Requires methods from the following classes:
+	Provides the following methods:
+			ProdControlTOSInitialize()
+
+	Class: tos_ala	Requires methods from the following classes:
+		Class: tos
+			OnControlTOSInitialize()
+	Provides the following methods:
+
+	Class: tos_seq	Requires methods from the following classes:
+		Class: tos
+			OnControlTOSInitialize()
+	Provides the following methods:
+
+	Class: tos_sig	Requires methods from the following classes:
+		Class: tos
+			OnControlTOSInitialize()
+	Provides the following methods:
+
+	Class: tos_tpo	Requires methods from the following classes:
+		Class: tos
+			OnControlTOSInitialize()
+	Provides the following methods:
+

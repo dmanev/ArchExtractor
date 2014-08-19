@@ -1,0 +1,668 @@
+format 74
+"StkDataTypes" // EA_Model::System::Specific::STK::StkDataTypes
+  revision 7
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Specific/STK/StkDataTypes/"
+  python_package "StkDataTypes"
+  classview 167663 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 181231 "Class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 289135 "StkDataTypeFactory class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 177647 "StkVoid"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 173679 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      classrelation 182511 // <generalisation>
+	relation 182255 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 182511 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+    end
+
+    class 177775 "StkU1"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 182639 // <generalisation>
+	relation 182383 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 182639 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 173807 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 177903 "StkU8"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 182767 // <generalisation>
+	relation 182511 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 182767 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 173935 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 178031 "StkS8"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 182895 // <generalisation>
+	relation 182639 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 182895 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 174063 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 178159 "StkU16"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 183023 // <generalisation>
+	relation 182767 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 183023 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 174191 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 178287 "StkS16"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 183151 // <generalisation>
+	relation 182895 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 183151 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 174319 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 178415 "StkU32"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 183279 // <generalisation>
+	relation 183023 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 183279 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 174447 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 178543 "StkS32"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 183407 // <generalisation>
+	relation 183151 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 183407 // <generalisation>
+	  b parent class_ref 170991 // DataType
+      end
+
+      operation 174575 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 285551 "StkDataTypeFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 309231 // <generalisation>
+	relation 308719 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 309231 // <generalisation>
+	  b parent class_ref 285423 // DataTypeFactory
+      end
+
+      classrelation 309359 // <dependency>
+	relation 308847 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309359 // <dependency>
+	  b parent class_ref 177647 // StkVoid
+      end
+
+      classrelation 309487 // <dependency>
+	relation 308975 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309487 // <dependency>
+	  b parent class_ref 177775 // StkU1
+      end
+
+      classrelation 309615 // <dependency>
+	relation 309103 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309615 // <dependency>
+	  b parent class_ref 177903 // StkU8
+      end
+
+      classrelation 309743 // <dependency>
+	relation 309231 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309743 // <dependency>
+	  b parent class_ref 178031 // StkS8
+      end
+
+      classrelation 309871 // <dependency>
+	relation 309359 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309871 // <dependency>
+	  b parent class_ref 178159 // StkU16
+      end
+
+      classrelation 309999 // <dependency>
+	relation 309487 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 309999 // <dependency>
+	  b parent class_ref 178287 // StkS16
+      end
+
+      classrelation 310127 // <dependency>
+	relation 309615 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 310127 // <dependency>
+	  b parent class_ref 178415 // StkU32
+      end
+
+      classrelation 310255 // <dependency>
+	relation 309743 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 310255 // <dependency>
+	  b parent class_ref 178543 // StkS32
+      end
+
+      operation 287087 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 284911 "getStkVoid"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285039 "getStkU1"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285167 "getStkU8"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285295 "getStkS8"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285423 "getStkS16"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 286959 "getStkU16"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285551 "getStkU32"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 285679 "getStkS32"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+  end
+
+  deploymentview 141935 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 181359 "deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A4
+    end
+
+    artifact 169967 "StkVoid"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 177647 // StkVoid
+      end
+    end
+
+    artifact 170095 "StkU1"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 177775 // StkU1
+      end
+      simplerelation 168687
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170223 "StkU8"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 177903 // StkU8
+      end
+      simplerelation 168815
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170351 "StkS8"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 178031 // StkS8
+      end
+      simplerelation 168943
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170479 "StkU16"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 178159 // StkU16
+      end
+      simplerelation 169071
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170607 "StkS16"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 178287 // StkS16
+      end
+      simplerelation 169199
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170735 "StkU32"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 178415 // StkU32
+      end
+      simplerelation 169327
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 170863 "StkS32"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 178543 // StkS32
+      end
+      simplerelation 169455
+	-_->
+	  on artifact_ref 169711 // DataType
+      end
+    end
+
+    artifact 277871 "StkDataTypeFactory"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 285551 // StkDataTypeFactory
+      end
+    end
+  end
+end

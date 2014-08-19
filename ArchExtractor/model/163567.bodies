@@ -1,0 +1,7 @@
+class RequiredPort
+!!!166895.python!!!	__init__(inout self : , in inpIPortIf : IPortInterface)
+        self.itsIPortInterface = inpIPortIf 
+!!!203247.python!!!	getInterface(in self : ) : IPortInterface
+        return self.itsIPortInterface
+!!!203375.python!!!	setInterface(in self : , in inpIf : IPortInterface)
+        self.itsIPortInterface = inpIf

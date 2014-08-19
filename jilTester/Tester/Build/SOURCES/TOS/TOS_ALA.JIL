@@ -1,0 +1,39 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      STK
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    TOS_ALA
+//               JIL definitions
+// -----------------------------------------------------------------------------
+// $Date:   04 Feb 2009 17:03:06  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ALA.JIL-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ALA.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:03:06   adzhelp
+// Initial revision.
+*/
+//******************************************************************************
+#ifndef I_TOS_ALA_JIL
+#define I_TOS_ALA_JIL
+
+
+Component Tos_ala 
+{
+    
+    OnControl = CallBack
+    {
+         Ctrl = "TOSInitialize";
+         Fct = "TOSAlaInitialize";
+    };
+};
+
+
+#endif /* I_TOS_ALA_JIL */

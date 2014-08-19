@@ -1,0 +1,824 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:08 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_POU.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_POU.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_POU.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_POU.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_POU.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_POU.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_POU.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_POU
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Mar 19 2010 16:04:50  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_POU/DAT_POU.C-arc  $
+     15          // $Revision:   1.7  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_POU/DAT_POU.C-arc   $
+     18          // 
+     19          //    Rev 1.7   Mar 19 2010 16:04:50   adzhelp
+     20          // Cm006656: Code review corrections
+     21          // 
+     22          //    Rev 1.6   Dec 14 2009 11:42:28   adzhelp
+     23          // Cm005566: Implementation of full HW protection and overvoltage protection
+     24          // 
+     25          //    Rev 1.5   Nov 26 2009 14:16:48   adzhelp
+     26          // Cm005566: QAC and unit test updates
+     27          // 
+     28          //    Rev 1.4   Nov 20 2009 17:36:26   akodzhh
+     29          // Cm005566: Added read macros for HW protection, used in TFC diag.
+     30          // 
+     31          //    Rev 1.3   Nov 04 2009 16:23:02   adzhelp
+     32          // Cm005566: Implementation of HW Protection
+     33          // 
+     34          //    Rev 1.2   Oct 07 2009 09:07:08   adzhelp
+     35          // Cm005497: Configuration of LDB_DOU according to ECUType 
+     36          // 
+     37          //    Rev 1.1   Mar 20 2009 17:32:28   adzhelp
+     38          // Cm003619: Parameterization needed for diagnostics
+     39          // 
+     40          //    Rev 1.0   10 Nov 2008 10:26:18   ailievb
+     41          // Initial revision.
+     42          //******************************************************************************
+     43          
+     44          //------------------------------------------------------------------------------
+     45          // Body Identification
+     46          //------------------------------------------------------------------------------
+     47          #define dat_pst  "dat_pou"
+     48          
+     49          //------------------------------------------------------------------------------
+     50          // Included files to resolve specific definitions in this file
+     51          //------------------------------------------------------------------------------
+     52          #include "lib.h"
+     53          #include "tos.h"
+     54          #include "dat.h"
+     55          #include "dat_pou.h"
+     56          #include "dat_poux.h"
+     57          
+     58          //------------------------------------------------------------------------------
+     59          // Local constants
+     60          //------------------------------------------------------------------------------
+     61          
+     62          // This is an example:
+     63          // #define cConstantName    ((tType)ConstantValue)
+     64          
+     65          //------------------------------------------------------------------------------
+     66          // Local macros
+     67          //------------------------------------------------------------------------------
+     68          #define mSaveProtectionBuffer() \
+     69              mLIBmemcpy(HardMaskBufferCopy, DATPouHardMaskBuffer, cDATPouSizeDouGeneratorMessage)
+     70          #define mRestoreProtectionBuffer() \
+     71              mLIBmemcpy(DATPouHardMaskBuffer, HardMaskBufferCopy, cDATPouSizeDouGeneratorMessage)
+     72          #define mManageOutputProtection() \
+     73              ManageOutputProtection()
+     74          
+     75          //------------------------------------------------------------------------------
+     76          // Local types
+     77          //------------------------------------------------------------------------------
+     78          
+     79          // This is an example:
+     80          // typedef Expression   tTypeName;
+     81          
+     82          //------------------------------------------------------------------------------
+     83          // Local data
+     84          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     85          static U8 u8EcuType;
+   \                     u8EcuType:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     86          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     87          static BOOL bOverVoltageProtectionRunning;
+   \                     bOverVoltageProtectionRunning:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     88          static BOOL bAirbagUnlockActivated;
+   \                     bAirbagUnlockActivated:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     89          //QACJ 3207: adzhelp: Array is used by macro
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     90          static U8 HardMaskBufferCopy[cDATPouSizeDouGeneratorMessage];
+   \                     HardMaskBufferCopy:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+     91          
+     92          //------------------------------------------------------------------------------
+     93          // Constant local data
+     94          //------------------------------------------------------------------------------
+     95          
+     96          // This is an example:
+     97          // static const tType  cConstantName;
+     98          
+     99          //------------------------------------------------------------------------------
+    100          // Exported data
+    101          //------------------------------------------------------------------------------
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    102          MEM_FAST U8 DATPouSoftOutputBuffer[cDATPouSizeDouGeneratorMessage];
+   \                     DATPouSoftOutputBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    103          MEM_FAST U8 DATPouDiagMaskBuffer[cDATPouSizeDouGeneratorMessage];
+   \                     DATPouDiagMaskBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    104          MEM_FAST U8 DATPouDiagBuffer[cDATPouSizeDouGeneratorMessage];
+   \                     DATPouDiagBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    105          MEM_FAST U8 DATPouHardMaskBuffer[cDATPouSizeDouGeneratorMessage];
+   \                     DATPouHardMaskBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_SADDR_Z
+    106          
+    107          #ifndef _QAC_ // adzhelp: Following exported data is used by components 
+    108                        //          performing HW protection
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    109          BOOL bDO_DATA_IMMOBILIZERDiagEnabled;
+   \                     bDO_DATA_IMMOBILIZERDiagEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    110          BOOL bDO_VERLOGDiagEnabled;
+   \                     bDO_VERLOGDiagEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    111          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    112          BOOL bDO_VERLOG;
+   \                     bDO_VERLOG:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    113          BOOL bDO_VERLOGProtected;
+   \                     bDO_VERLOGProtected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    114          BOOL bVERLOG_LEDDirectProtected;
+   \                     bVERLOG_LEDDirectProtected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    115          BOOL bDO_DATA_IMMOBILIZERProtected;
+   \                     bDO_DATA_IMMOBILIZERProtected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    116          #endif
+    117          
+    118          //------------------------------------------------------------------------------
+    119          // Constant exported data
+    120          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 1
+    121          const U8 DATPouInitArray[cDATPouSizeDouGeneratorMessage] = cDATPouInitBufferDouGeneratorMessage;
+   \                     DATPouInitArray:
+   \   0000   00000000       DB 0, 0, 0, 0
+    122          
+    123          //------------------------------------------------------------------------------
+    124          // Local function prototypes
+    125          //------------------------------------------------------------------------------
+    126          static MEM_TYPE void ManageOutputProtection(void);
+    127          
+    128          //==============================================================================
+    129          //=========================== LOCAL FUNCTIONS ==================================
+    130          //==============================================================================
+    131          
+    132          //==============================================================================
+    133          // DESCRIPTION:         Manage Outputs Protection on overvoltage
+    134          //
+    135          // PARAMETERS:          None
+    136          //
+    137          // RETURN VALUE:        None
+    138          //
+    139          // DESIGN INFORMATION:  Refer to DCD
+    140          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    141          static MEM_TYPE void ManageOutputProtection(void)
+   \                     ManageOutputProtection:
+    142          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    143              mDATWrite(U1Bit, RR_WIPER_RR_FOG_LAMPProtection, cTrue, Delayed);
+    144              mDATWrite(U1Bit, FRONT_WIPERProtection, cTrue, Delayed);
+   \   0000   E8..30         OR        S:DATPouHardMaskBuffer+3,#48
+    145              mDATWrite(U1Bit, DEFROSTERProtection, cTrue, Delayed);
+   \   0003   1A..           SET1      S:DATPouHardMaskBuffer+1.1
+    146              mDATWrite(U1Bit, DI_LEFTProtection, cTrue, Delayed);
+    147              mDATWrite(U1Bit, DI_RIGHTProtection, cTrue, Delayed);
+   \   0005   E8..C0         OR        S:DATPouHardMaskBuffer+3,#192
+    148              
+    149              if (bAirbagUnlockActivated == cFalse)
+   \   0008   8E....         MOV       A,bAirbagUnlockActivated
+   \   000B   4D00           CMP       A,#0
+   \   000D   BD05           BNZ       ??DATPouAirbagUnlockFinished_0
+    150              {
+    151                  mDATWrite(U1Bit, LOCK_DOORSProtection, cTrue, Delayed);
+    152                  mDATWrite(U1Bit, UNLOCK_DOORSProtection, cTrue, Delayed);
+    153                  mDATWrite(U1Bit, UNLOCK_DRIVER_DOORProtection, cTrue, Delayed);
+   \   000F   E8..0B         OR        S:DATPouHardMaskBuffer+3,#11
+   \   0012   FA03           BR        ??DATPouAirbagUnlockFinished_1
+    154              }
+    155              else
+    156              {
+    157                  mDATWrite(U1Bit, LOCK_DOORSProtection, cFalse, Delayed);
+    158                  mDATWrite(U1Bit, UNLOCK_DOORSProtection, cFalse, Delayed);
+    159                  mDATWrite(U1Bit, UNLOCK_DRIVER_DOORProtection, cFalse, Delayed);
+   \                     ??DATPouAirbagUnlockFinished_0:
+   \   0014   D8..F4         AND       S:DATPouHardMaskBuffer+3,#244
+    160              }
+    161              
+    162              mDATWrite(U1Bit, HORN_RLProtection, cTrue, Delayed);
+   \                     ??DATPouAirbagUnlockFinished_1:
+   \   0017   2A..           SET1      S:DATPouHardMaskBuffer+2.2
+    163              mDATWrite(U1Bit, BAT_LIGHT_TEMPOProtection, cTrue, Delayed);
+   \   0019   2A..           SET1      S:DATPouHardMaskBuffer+3.2
+    164          }
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    165          
+    166          //==============================================================================
+    167          //=========================== EXPORTED FUNCTIONS ===============================
+    168          //==============================================================================
+    169          
+    170          //==============================================================================
+    171          // DESCRIPTION : Initialise DAT_POU and DAT_DOU component
+    172          //  
+    173          // PARAMETERS (Type,Name,Min,Max) :  none
+    174          //
+    175          // RETURN VALUE :  none
+    176          // 
+    177          // DESIGN INFORMATION :  refer to Detailed Design Document
+    178          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    179          void DATPouInit(void)
+   \                     DATPouInit:
+    180          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    181              bOverVoltageProtectionRunning = cFalse;
+   \   0004   9E....         MOV       bOverVoltageProtectionRunning,A
+    182              mLIBmemcpy(DATPouSoftOutputBuffer,DATPouInitArray,cDATPouSizeDouGeneratorMessage);
+   \   0007   14....         MOVW      DE,#DATPouInitArray
+   \   000A   16....         MOVW      HL,#S:DATPouSoftOutputBuffer
+   \   000D   A304           MOV       B,#4
+   \                     ??DATPouInit_0:
+   \   000F   85             MOV       A,[DE]
+   \   0010   97             MOV       [HL],A
+   \   0011   86             INCW      HL
+   \   0012   84             INCW      DE
+   \   0013   8BFA           DBNZ      B, ??DATPouInit_0
+    183              mLIBmemcpy(DATPouDiagBuffer,DATPouInitArray,cDATPouSizeDouGeneratorMessage);
+   \   0015   14....         MOVW      DE,#DATPouInitArray
+   \   0018   16....         MOVW      HL,#S:DATPouDiagBuffer
+   \   001B   A304           MOV       B,#4
+   \                     ??DATPouInit_1:
+   \   001D   85             MOV       A,[DE]
+   \   001E   97             MOV       [HL],A
+   \   001F   86             INCW      HL
+   \   0020   84             INCW      DE
+   \   0021   8BFA           DBNZ      B, ??DATPouInit_1
+    184              DATDouInit(DATPouInitArray);
+   \   0023   10....         MOVW      AX,#DATPouInitArray
+   \   0026   9A....         CALL      DATDouInit
+    185          }
+   \   0029   B4             POP       DE
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+    186          
+    187          //==============================================================================
+    188          // DESCRIPTION : Modifies the logical output buffer before writing
+    189          //  
+    190          // PARAMETERS (Type,Name,Min,Max) :  none
+    191          //
+    192          // RETURN VALUE :  none
+    193          // 
+    194          // DESIGN INFORMATION :  refer to Detailed Design Document
+    195          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    196          MEM_TYPE void DATPouPrepareRefresh(void)
+   \                     DATPouPrepareRefresh:
+    197          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 10
+   \   0001   ..             CALLT     [__T_?FUNC_ENTER_L06]
+   \   0002   0A00           DW        0xA
+    198              U8 i;
+    199          
+    200              // Check for change of ECU Type
+    201              if (u8EcuType != mDATRead(U8Bit, EEP_ECUType, Default))
+   \   0004   8E....         MOV       A,u8EcuType
+   \   0007   48....         CMP       A,DATSbkMirrors+32
+   \   000A   AD11           BZ        ??DATPouAirbagUnlockFinished_2
+    202              {
+    203                  // Switch pins configuration
+    204                  u8EcuType = mDATRead(U8Bit, EEP_ECUType, Default);
+   \   000C   8E....         MOV       A,DATSbkMirrors+32
+   \   000F   9E....         MOV       u8EcuType,A
+    205                  #if !defined(COMPILATION_NATIVE) || defined(UTEST)
+    206                  LDBControl(cLDBChannelDou, (tCtrl)(cLDBDouSetEcuType0 + u8EcuType));
+   \   0012   A110           MOV       A,#16
+   \   0014   08....         ADD       A,u8EcuType
+   \   0017   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   001A   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   001C   ..             CALLT     [__T_?FAR_CALL_L07]
+    207                  #endif
+    208              }
+    209          
+    210              // Overvoltage protection prsFS_HWP-982
+    211              if (mDATRead(U1Bit, OverVoltageIsDetected, Default) != cFalse)
+   \                     ??DATPouAirbagUnlockFinished_2:
+   \   001D   8E....         MOV       A,bDATPanOverVoltageIsDetected
+   \   0020   4D00           CMP       A,#0
+   \   0022   8E....         MOV       A,bOverVoltageProtectionRunning
+   \   0025   AD1F           BZ        ??DATPouAirbagUnlockFinished_3
+    212              {
+    213                  if (bOverVoltageProtectionRunning == cFalse)
+   \   0027   4D00           CMP       A,#0
+   \   0029   BD13           BNZ       ??DATPouAirbagUnlockFinished_4
+    214                  {
+    215                      bOverVoltageProtectionRunning = cTrue;
+   \   002B   A101           MOV       A,#1
+   \   002D   9E....         MOV       bOverVoltageProtectionRunning,A
+    216                      mSaveProtectionBuffer();
+   \   0030   14....         MOVW      DE,#S:DATPouHardMaskBuffer
+   \   0033   16....         MOVW      HL,#HardMaskBufferCopy
+   \   0036   A304           MOV       B,#4
+   \                     ??DATPouPrepareRefresh_0:
+   \   0038   85             MOV       A,[DE]
+   \   0039   97             MOV       [HL],A
+   \   003A   86             INCW      HL
+   \   003B   84             INCW      DE
+   \   003C   8BFA           DBNZ      B, ??DATPouPrepareRefresh_0
+    217                  }
+    218                  // all protected outputs except LED outputs and interface outputs
+    219                  mManageOutputProtection();
+   \                     ??DATPouAirbagUnlockFinished_4:
+   \   003E   16....         MOVW      HL,#LWRD(ManageOutputProtection)
+   \   0041   A4..           MOV       E,#BYTE3(ManageOutputProtection)
+   \   0043   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0044   FA17           BR        ??DATPouAirbagUnlockFinished_5
+    220                  // shall be called periodically in order to disable any re-activated outputs
+    221              }
+    222              else // normal voltage
+    223              {
+    224                  if (bOverVoltageProtectionRunning != cFalse)
+   \                     ??DATPouAirbagUnlockFinished_3:
+   \   0046   4D00           CMP       A,#0
+   \   0048   AD13           BZ        ??DATPouAirbagUnlockFinished_5
+    225                  {
+    226                      bOverVoltageProtectionRunning = cFalse;
+   \   004A   A100           MOV       A,#0
+   \   004C   9E....         MOV       bOverVoltageProtectionRunning,A
+    227                      mRestoreProtectionBuffer();
+   \   004F   14....         MOVW      DE,#HardMaskBufferCopy
+   \   0052   16....         MOVW      HL,#S:DATPouHardMaskBuffer
+   \   0055   A304           MOV       B,#4
+   \                     ??DATPouPrepareRefresh_1:
+   \   0057   85             MOV       A,[DE]
+   \   0058   97             MOV       [HL],A
+   \   0059   86             INCW      HL
+   \   005A   84             INCW      DE
+   \   005B   8BFA           DBNZ      B, ??DATPouPrepareRefresh_1
+    228                  }
+    229                  else
+    230                  {
+    231                      // overvoltage protection not running
+    232                  }
+    233              }
+    234          
+    235              // Prepare DOU buffer
+    236              for (i = 0; i < cDATPouSizeDouGeneratorMessage; i++)
+   \                     ??DATPouAirbagUnlockFinished_5:
+   \   005D   10....         MOVW      AX,#DATDouOutputBuffer
+   \   0060   D6             MOVW      HL,AX
+   \   0061   891C           MOVW      AX,SP
+   \   0063   E6             XCHW      AX,HL
+   \   0064   BE07           MOV       [HL+0x07],A
+   \   0066   60             MOV       A,X
+   \   0067   BE06           MOV       [HL+0x06],A
+   \   0069   10....         MOVW      AX,#S:DATPouHardMaskBuffer
+   \   006C   D6             MOVW      HL,AX
+   \   006D   891C           MOVW      AX,SP
+   \   006F   E6             XCHW      AX,HL
+   \   0070   BE05           MOV       [HL+0x05],A
+   \   0072   60             MOV       A,X
+   \   0073   BE04           MOV       [HL+0x04],A
+   \   0075   10....         MOVW      AX,#S:DATPouSoftOutputBuffer
+   \   0078   D6             MOVW      HL,AX
+   \   0079   891C           MOVW      AX,SP
+   \   007B   E6             XCHW      AX,HL
+   \   007C   BE03           MOV       [HL+0x03],A
+   \   007E   60             MOV       A,X
+   \   007F   BE02           MOV       [HL+0x02],A
+   \   0081   10....         MOVW      AX,#S:DATPouDiagBuffer
+   \   0084   14....         MOVW      DE,#S:DATPouDiagMaskBuffer
+   \   0087   B6             POP       HL
+   \   0088   B1             PUSH      AX
+   \   0089   891C           MOVW      AX,SP
+   \   008B   CA0800         ADDW      AX,#8
+   \   008E   D6             MOVW      HL,AX
+   \   008F   A104           MOV       A,#4
+   \   0091   97             MOV       [HL],A
+    237              { 
+    238                  // Disable all protected outputs;
+    239                  // Disable all masked outputs, write soft outputs, except diag masked bits
+    240                  DATDouOutputBuffer[i] = ( (U8)~DATPouHardMaskBuffer[i]) & //HW protection
+    241                       (
+    242                          (U8) ( (U8)(DATPouSoftOutputBuffer[i] & ((U8)~DATPouDiagMaskBuffer[i])) // Diag masking
+    243                                |(U8)(DATPouDiagBuffer[i] & DATPouDiagMaskBuffer[i]))
+    244                       );
+   \                     ??DATPouPrepareRefresh_2:
+   \   0092   891C           MOVW      AX,SP
+   \   0094   D6             MOVW      HL,AX
+   \   0095   AE06           MOV       A,[HL+0x06]
+   \   0097   70             MOV       X,A
+   \   0098   AE07           MOV       A,[HL+0x07]
+   \   009A   D6             MOVW      HL,AX
+   \   009B   B7             PUSH      HL
+   \   009C   85             MOV       A,[DE]
+   \   009D   72             MOV       C,A
+   \   009E   891C           MOVW      AX,SP
+   \   00A0   D6             MOVW      HL,AX
+   \   00A1   AE02           MOV       A,[HL+0x02]
+   \   00A3   70             MOV       X,A
+   \   00A4   AE03           MOV       A,[HL+0x03]
+   \   00A6   D6             MOVW      HL,AX
+   \   00A7   87             MOV       A,[HL]
+   \   00A8   615A           AND       A,C
+   \   00AA   73             MOV       B,A
+   \   00AB   85             MOV       A,[DE]
+   \   00AC   7DFF           XOR       A,#255
+   \   00AE   72             MOV       C,A
+   \   00AF   891C           MOVW      AX,SP
+   \   00B1   D6             MOVW      HL,AX
+   \   00B2   AE04           MOV       A,[HL+0x04]
+   \   00B4   70             MOV       X,A
+   \   00B5   AE05           MOV       A,[HL+0x05]
+   \   00B7   D6             MOVW      HL,AX
+   \   00B8   87             MOV       A,[HL]
+   \   00B9   615A           AND       A,C
+   \   00BB   616B           OR        A,B
+   \   00BD   72             MOV       C,A
+   \   00BE   891C           MOVW      AX,SP
+   \   00C0   D6             MOVW      HL,AX
+   \   00C1   AE06           MOV       A,[HL+0x06]
+   \   00C3   70             MOV       X,A
+   \   00C4   AE07           MOV       A,[HL+0x07]
+   \   00C6   D6             MOVW      HL,AX
+   \   00C7   87             MOV       A,[HL]
+   \   00C8   7DFF           XOR       A,#255
+   \   00CA   615A           AND       A,C
+   \   00CC   B6             POP       HL
+   \   00CD   97             MOV       [HL],A
+    245              }
+   \   00CE   891C           MOVW      AX,SP
+   \   00D0   D6             MOVW      HL,AX
+   \   00D1   87             MOV       A,[HL]
+   \   00D2   70             MOV       X,A
+   \   00D3   AE01           MOV       A,[HL+0x01]
+   \   00D5   80             INCW      AX
+   \   00D6   B6             POP       HL
+   \   00D7   B1             PUSH      AX
+   \   00D8   84             INCW      DE
+   \   00D9   891C           MOVW      AX,SP
+   \   00DB   D6             MOVW      HL,AX
+   \   00DC   AE02           MOV       A,[HL+0x02]
+   \   00DE   70             MOV       X,A
+   \   00DF   AE03           MOV       A,[HL+0x03]
+   \   00E1   80             INCW      AX
+   \   00E2   D6             MOVW      HL,AX
+   \   00E3   891C           MOVW      AX,SP
+   \   00E5   E6             XCHW      AX,HL
+   \   00E6   BE03           MOV       [HL+0x03],A
+   \   00E8   60             MOV       A,X
+   \   00E9   BE02           MOV       [HL+0x02],A
+   \   00EB   AE04           MOV       A,[HL+0x04]
+   \   00ED   70             MOV       X,A
+   \   00EE   AE05           MOV       A,[HL+0x05]
+   \   00F0   80             INCW      AX
+   \   00F1   D6             MOVW      HL,AX
+   \   00F2   891C           MOVW      AX,SP
+   \   00F4   E6             XCHW      AX,HL
+   \   00F5   BE05           MOV       [HL+0x05],A
+   \   00F7   60             MOV       A,X
+   \   00F8   BE04           MOV       [HL+0x04],A
+   \   00FA   AE06           MOV       A,[HL+0x06]
+   \   00FC   70             MOV       X,A
+   \   00FD   AE07           MOV       A,[HL+0x07]
+   \   00FF   D6             MOVW      HL,AX
+   \   0100   86             INCW      HL
+   \   0101   891C           MOVW      AX,SP
+   \   0103   E6             XCHW      AX,HL
+   \   0104   BE07           MOV       [HL+0x07],A
+   \   0106   60             MOV       A,X
+   \   0107   BE06           MOV       [HL+0x06],A
+   \   0109   AE08           MOV       A,[HL+0x08]
+   \   010B   51             DEC       A
+   \   010C   BE08           MOV       [HL+0x08],A
+   \   010E   BD82           BNZ       ??DATPouPrepareRefresh_2
+    246          }
+   \   0110   ..             CALLT     [__T_?FUNC_DEALL_L06]
+   \   0111   0A00           DW        0xA
+   \   0113   B2             POP       BC
+   \   0114   AF             RET       
+   \   0115                  REQUIRE ?CL78K_V4_6_L00
+    247          
+    248          //==============================================================================
+    249          // DESCRIPTION : Perform HW configuration depending on EEP_ECUType
+    250          //  
+    251          // PARAMETERS (Type,Name,Min,Max) :  none
+    252          //
+    253          // RETURN VALUE :  none
+    254          // 
+    255          // DESIGN INFORMATION :  refer to Detailed Design Document
+    256          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    257          void DATPouLeaveStartingStepState(void)
+   \                     DATPouLeaveStartingStepState:
+    258          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    259              u8EcuType = mDATRead(U8Bit, EEP_ECUType, Default);
+   \   0001   8E....         MOV       A,DATSbkMirrors+32
+   \   0004   9E....         MOV       u8EcuType,A
+    260          
+    261          #if !defined(COMPILATION_NATIVE) || defined(UTEST)
+    262              LDBControl(cLDBChannelDou, (tCtrl)(cLDBDouSetEcuType0 + u8EcuType));
+   \   0007   A110           MOV       A,#16
+   \   0009   08....         ADD       A,u8EcuType
+   \   000C   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   000F   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0011   ..             CALLT     [__T_?FAR_CALL_L07]
+    263          #endif
+    264              
+    265              bAirbagUnlockActivated = mDATRead(U1Bit, EEP_CrashHazardIsRequested, Default);
+   \   0012   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0015   31A704         BF        [HL].2, ??DATPouAirbagUnlockFinished_6
+   \   0018   A101           MOV       A,#1
+   \   001A   FA02           BR        ??DATPouAirbagUnlockFinished_7
+   \                     ??DATPouAirbagUnlockFinished_6:
+   \   001C   A100           MOV       A,#0
+   \                     ??DATPouAirbagUnlockFinished_7:
+   \   001E   9E....         MOV       bAirbagUnlockActivated,A
+    266          }
+   \   0021   B4             POP       DE
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+    267          
+    268          //==============================================================================
+    269          // DESCRIPTION : Leave active state
+    270          //  
+    271          // PARAMETERS (Type,Name,Min,Max) :  none
+    272          //
+    273          // RETURN VALUE :  none
+    274          // 
+    275          // DESIGN INFORMATION :  refer to Detailed Design Document
+    276          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    277          void DATPouLeaveActiveState(void)
+   \                     DATPouLeaveActiveState:
+    278          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    279              if (bOverVoltageProtectionRunning != cFalse)
+   \   0002   8E....         MOV       A,bOverVoltageProtectionRunning
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD13           BZ        ??DATPouAirbagUnlockFinished_8
+    280              {
+    281                  bOverVoltageProtectionRunning = cFalse;
+   \   0009   A100           MOV       A,#0
+   \   000B   9E....         MOV       bOverVoltageProtectionRunning,A
+    282                  mRestoreProtectionBuffer();
+   \   000E   14....         MOVW      DE,#HardMaskBufferCopy
+   \   0011   16....         MOVW      HL,#S:DATPouHardMaskBuffer
+   \   0014   A304           MOV       B,#4
+   \                     ??DATPouLeaveActiveState_0:
+   \   0016   85             MOV       A,[DE]
+   \   0017   97             MOV       [HL],A
+   \   0018   86             INCW      HL
+   \   0019   84             INCW      DE
+   \   001A   8BFA           DBNZ      B, ??DATPouLeaveActiveState_0
+    283              }
+    284          }
+   \                     ??DATPouAirbagUnlockFinished_8:
+   \   001C   B4             POP       DE
+   \   001D   B2             POP       BC
+   \   001E   AF             RET       
+   \   001F                  REQUIRE ?CL78K_V4_6_L00
+    285          
+    286          //==============================================================================
+    287          // DESCRIPTION : Modifies the logical output buffer before writing
+    288          //  
+    289          // PARAMETERS (Type,Name,Min,Max) :  none
+    290          //
+    291          // RETURN VALUE :  none
+    292          // 
+    293          // DESIGN INFORMATION :  refer to Detailed Design Document
+    294          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    295          void DATPouActivateFinalTest(void)
+   \                     DATPouActivateFinalTest:
+    296          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#S:DATPouDiagMaskBuffer
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    297              // Deactivate application output
+    298              mLIBmemset(DATPouDiagMaskBuffer, 0xFFU, cDATPouSizeDouGeneratorMessage);
+   \   0005   140400         MOVW      DE,#4
+   \   0008   12FF00         MOVW      BC,#255
+   \   000B   9A....         CALL      memset
+    299          }
+   \   000E   B4             POP       DE
+   \   000F   B2             POP       BC
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    300          
+    301          //==============================================================================
+    302          // DESCRIPTION : Sets a flag that allows overvoltage protection of lock/unlock
+    303          //               outputs
+    304          //  
+    305          // PARAMETERS (Type,Name,Min,Max) :  none
+    306          //
+    307          // RETURN VALUE :  none
+    308          // 
+    309          // DESIGN INFORMATION :  refer to Detailed Design Document
+    310          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    311          void DATPouAirbagUnlockStarted(void)
+   \                     DATPouAirbagUnlockStarted:
+    312          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    313              bAirbagUnlockActivated = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bAirbagUnlockActivated,A
+    314              mDATDouRefreshOutput();
+   \   0005   101000         MOVW      AX,#16
+   \   0008   9B....         BR        N:TOSActivateTask
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    315          }
+    316          
+    317          //==============================================================================
+    318          // DESCRIPTION : Resets a flag that allows overvoltage protection of lock/unlock
+    319          //               outputs
+    320          //  
+    321          // PARAMETERS (Type,Name,Min,Max) :  none
+    322          //
+    323          // RETURN VALUE :  none
+    324          // 
+    325          // DESIGN INFORMATION :  refer to Detailed Design Document
+    326          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    327          void DATPouAirbagUnlockFinished(void)
+   \                     DATPouAirbagUnlockFinished:
+    328          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    329              bAirbagUnlockActivated = cFalse;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       bAirbagUnlockActivated,A
+    330          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_ENTER_L06:
+   \   0000   ....           DW       ?FUNC_ENTER_L06
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_DEALL_L06:
+   \   0000   ....           DW       ?FUNC_DEALL_L06
+    331          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     u8EcuType                         1
+     bOverVoltageProtectionRunning     1
+     bAirbagUnlockActivated            1
+     HardMaskBufferCopy                4
+     DATPouSoftOutputBuffer            4
+     DATPouDiagMaskBuffer              4
+     DATPouDiagBuffer                  4
+     DATPouHardMaskBuffer              4
+     bDO_DATA_IMMOBILIZERDiagEnabled
+                                       1
+     bDO_VERLOGDiagEnabled             1
+     bDO_VERLOG                        1
+     bDO_VERLOGProtected               1
+     bVERLOG_LEDDirectProtected        1
+     bDO_DATA_IMMOBILIZERProtected     1
+     DATPouInitArray                   4
+     ManageOutputProtection           28
+     DATPouInit                       44
+     DATPouPrepareRefresh            277
+     DATPouLeaveStartingStepState     35
+     DATPouLeaveActiveState           31
+     DATPouActivateFinalTest          17
+     DATPouAirbagUnlockStarted        11
+     DATPouAirbagUnlockFinished        6
+     __T_?FAR_CALL_L07                 2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_?FUNC_ENTER_L06               2
+     __T_?FUNC_DEALL_L06               2
+
+ 
+ 305 bytes in segment BCODE
+   8 bytes in segment CLTVEC
+ 144 bytes in segment CODE
+   4 bytes in segment CONST
+  13 bytes in segment NEAR_Z
+  16 bytes in segment SADDR_Z
+ 
+ 449 bytes of CODE  memory (+ 8 bytes shared)
+   4 bytes of CONST memory
+  29 bytes of DATA  memory
+
+Errors: none
+Warnings: none

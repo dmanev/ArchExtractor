@@ -1,0 +1,29 @@
+-d "_QAC_="
+-d "X90_PROJECT="
+-d "MEM_TYPE="
+-d "MEM_FAST="
+-d "CALLT_TYPE="
+-ar-
+-bits-
+-u-
+-sl+
+-na 31
+-xn 31
+-xc-
+-ex ansipc
+-ex c++
+-sty exdented
+-tab 0
+-en ASC
+-maxerr 0
+-ppl+
+-ppf+
+-ppm-
+-co n
+-I ..\..\EXE\GEN
+-I ..\..\SOURCES\LIB
+-I ..\..\SOURCES\DAT
+-I ..\..\SOURCES\LDB_API
+-I ..\..\SOURCES\LAP
+-I ..\..\SOURCES\TOS
+-I ..\..\TARGET\LDB

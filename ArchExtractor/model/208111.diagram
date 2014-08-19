@@ -1,0 +1,12 @@
+format 74
+
+artifactcanvas 128111 artifact_ref 197231 // StkConrtolIf
+  xyz 106 243 2000
+end
+artifactcanvas 128239 artifact_ref 162799 // ClientServerInterface
+  xyz 104 107 2000
+end
+simplerelationcanvas 128367 simplerelation_ref 195823
+  from ref 128111 z 2001 to ref 128239
+end
+end

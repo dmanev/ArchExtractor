@@ -1,0 +1,3006 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:16 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TRP.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_TRP.LST -o                           #
+#                    ..\EXE\TARGET_R\LDB_TRP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TRP.C                                                  #
+#    List file    =  ..\EXE\TARGET_R\LDB_TRP.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LDB_TRP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_TRP.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_TRP
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Apr 09 2010 13:55:06  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_TRP/ldb_trp.c-arc  $
+     15          // $Revision:   1.18  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_TRP/ldb_trp.c-arc  $
+     18          // 
+     19          //    Rev 1.18   Apr 09 2010 13:55:06   amanevd
+     20          // Cm007827: Comment update - no change in binary code
+     21          // 
+     22          //    Rev 1.17   Mar 15 2010 11:05:46   amanevd
+     23          // Cm007827: cTRearmInit no used - removed
+     24          // 
+     25          //    Rev 1.16   Mar 15 2010 10:40:10   amanevd
+     26          // Cm007827: Now Immo is operable in 6-18V range
+     27          // 
+     28          //    Rev 1.15   Feb 24 2010 11:51:56   amanevd
+     29          // Cm007357: Applied switch to write mode on falling edge
+     30          // 
+     31          //    Rev 1.14   Feb 12 2010 10:19:48   amanevd
+     32          // Cm007357: QAC fix
+     33          // 
+     34          //    Rev 1.13   Feb 05 2010 16:53:06   amanevd
+     35          // Cm007357: Fix of communication with B99 and BNew antennas
+     36          // 
+     37          //    Rev 1.12   Jan 18 2010 09:16:26   amanevd
+     38          // Cm005797: Sleep pulse measurement corrected
+     39          // 
+     40          //    Rev 1.11   Oct 08 2009 18:03:18   amanevd
+     41          // Cm006468: Enabling and Disabling of cLDBHarInterruptTrpVerlogTimerIt removed
+     42          // 
+     43          //    Rev 1.10   Sep 24 2009 11:57:40   amanevd
+     44          // Cm006224: All 6 issues fixed
+     45          // 
+     46          //    Rev 1.9   Sep 08 2009 12:26:16   amanevd
+     47          // Cm006224: 3 of 6 issues fixed
+     48          // 
+     49          //    Rev 1.8   Sep 01 2009 15:26:42   amanevd
+     50          // Cm005466: second code review corrections SW2
+     51          // 
+     52          //    Rev 1.7   Aug 27 2009 18:12:32   amanevd
+     53          // Cm005466: QAC and code review fix
+     54          // 
+     55          //    Rev 1.6   Jul 24 2009 14:04:20   amanevd
+     56          // Cm005466: Change of the nominal BPLM timing
+     57          // 
+     58          //    Rev 1.5   Jul 16 2009 09:34:38   amanevd
+     59          // Cm005205: Update of the start/stop macros for Verlog timer
+     60          // 
+     61          //    Rev 1.4   Jul 09 2009 09:35:30   amanevd
+     62          // Cm005100: SAD requirement SAD.ROB.OUT.01.R01 related fix
+     63          // 
+     64          //    Rev 1.3   May 07 2009 10:52:44   amanevd
+     65          // Cm003272 - Finishing part 3 - pre-integration
+     66          // 
+     67          //    Rev 1.2   Apr 29 2009 13:14:22   amanevd
+     68          // Cm003272 - Intermediate part 3 
+     69          // - PRS compliance
+     70          // 
+     71          //    Rev 1.1   Apr 24 2009 17:17:16   amanevd
+     72          // Cm003272 - Finishing part 2 - pre-integration
+     73          // 
+     74          //    Rev 1.0   Apr 22 2009 19:28:50   amanevd
+     75          // Initial revision.
+     76          // 
+     77          //******************************************************************************
+     78          
+     79          //-----------------------------------------------------------------------------
+     80          //  Body Identification
+     81          //-----------------------------------------------------------------------------
+     82          #define ldb_trp   "ldb_trp"
+     83          
+     84          //-----------------------------------------------------------------------------
+     85          //  Included files
+     86          //
+     87          //  #include <system_file_name.h>
+     88          //  #include "project_file_name.h"
+     89          //-----------------------------------------------------------------------------
+     90          #include "lib.h"
+     91          #include "ldb.h"
+     92          #include "ldb_ioc.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff10
+   \   unsigned short const volatile __saddr __no_bit_access TM00
+   \                     TM00:
+   \   0000                  DS 2
+
+   \                                 In  segment SADDR_A, at 0xff12
+   \   unsigned short volatile __saddr __no_bit_access CR000
+   \                     CR000:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb0
+   \   unsigned short const volatile __sfr __no_bit_access TM01
+   \                     TM01:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffb2
+   \   unsigned short volatile __sfr __no_bit_access CR001
+   \                     CR001:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffb4
+   \   unsigned short volatile __sfr __no_bit_access CR011
+   \                     CR011:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffb6
+   \   union <unnamed> volatile __sfr _A_TMC01
+   \                     _A_TMC01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb7
+   \   union <unnamed> volatile __sfr _A_PRM01
+   \                     _A_PRM01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb8
+   \   union <unnamed> volatile __sfr _A_CRC01
+   \                     _A_CRC01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffb9
+   \   union <unnamed> volatile __sfr _A_TOC01
+   \                     _A_TOC01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffba
+   \   union <unnamed> volatile __sfr _A_TMC00
+   \                     _A_TMC00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffbb
+   \   union <unnamed> volatile __sfr _A_PRM00
+   \                     _A_PRM00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     93          #include "ldb_int.h"
+     94          #include "ldb_har.h"
+     95          #include "ldb_trp.h"
+     96          #include "ldb_trpp.h"
+     97          
+     98          //-----------------------------------------------------------------------------
+     99          //  Local constants
+    100          //
+    101          //  #define cConstantName   ((tType) ConstantValue)
+    102          //-----------------------------------------------------------------------------
+    103          
+    104          
+    105          //----------------------------------------------------------------------------
+    106          // Maximum size in byte of the buffer used to send and receive data
+    107          // to/from the transponder.
+    108          //----------------------------------------------------------------------------
+    109          #define cMaxShortCircuitToGnd           ((U8) 6U)
+    110          #define cMaxShortCircuitToBat           ((U8) 3U)
+    111          
+    112          #define cTransponderBufferSize          ((U8) 8U)
+    113          
+    114          #define cDataPageSizeInBit              ((U8) 32U)
+    115          
+    116          #define cMaskBitToSend                  ((U8) 0x80U)
+    117          
+    118          #define cMaskBit0                       ((U8) 0x01U)
+    119          
+    120          #define cNextByteMask                   ((U8) 7U)
+    121          
+    122          #define cMaxNbBitInByte                 ((U8) 8U)
+    123          
+    124          #define cShortCommandLenght             ((U16) 5U)
+    125          #define cLongCommandLenght              ((U16) 10U)
+    126          #define cPageLength                     ((U16) 32U)
+    127          #define cChallangeLenght                ((U16) 64U)
+    128          
+    129          #define cMaxRestart                     ((U8) 5U)
+    130          
+    131          #define cDivideBy8                      ((U8) 3U)
+    132          
+    133          #define cTBitMaxLength                  ((U16) 255U)
+    134          
+    135          #define cMaxVerlogCount                 ((U8) 24U)
+    136          
+    137          #define cReceiveBufferIndex             ((U32) 4U)
+    138          
+    139          #define cShiftBy2                       ((U16) 2U)
+    140          #define cShiftBy3                       ((U16) 3U)
+    141          #define cShiftBy6                       ((U16) 6U)
+    142          #define cShiftBy8                       ((U16) 8U)
+    143          
+    144          #define cShortCircuitThreshold          ((U8)0xFFU)
+    145          
+    146          #define cCommandSize                    ((U8) 2U)
+    147          
+    148          #define cCommandLastByteMask            ((U8) 0xC0U)
+    149          
+    150          //----------------------------------------------------------------------------
+    151          // Time out definitions
+    152          //----------------------------------------------------------------------------
+    153          #define cTResetTransponder            ((U16) mConvUsInTrpTick(10000U))
+    154          
+    155          #define cTInterCom                    ((U16) mConvUsInTrpTick(800U))
+    156          
+    157          #define cTInitPPGCorrection           ((U16) mConvTrpToPPGTick(mConvUsInTrpTick(18U)))
+    158          
+    159          #define cTReadingMode                 ((U16) mConvUsInTrpTick(1100U))  // Replaced by 5 points
+    160          #define cTEchReadingMode              ((U16) mConvUsInTrpTick((U16)200U - cLDBTrpItDelayBeforeSwitchInstr))
+    161          #define cMaxReadingCounter            ((U8)6)
+    162          
+    163          #define cTWritingPulseMode1           ((U16) mConvUsInTrpTick((U16)1056U - cLDBTrpItDelayBeforeSwitchInstr))
+    164          #define cTWritingPulseMode2           ((U16) mConvUsInTrpTick((U16)1030U - cLDBTrpItDelayBeforeSwitchInstr))
+    165          
+    166          #define cWritePulseWidth              ((U16)48U)
+    167          #define cStopPulseWidth               ((U16)288U)
+    168          
+    169          #define cTWritePulse                  ((U16) mConvTrpToPPGTick(mConvUsInTrpTick(cWritePulseWidth)))
+    170          #define cTBit0Pulse                   ((U16) mConvTrpToPPGTick(mConvUsInTrpTick((U16)152U - cLDBTrpItDelayBeforeSwitchInstr)))
+    171          #define cTBit1Pulse                   ((U16) mConvTrpToPPGTick(mConvUsInTrpTick((U16)227U - cLDBTrpItDelayBeforeSwitchInstr)))
+    172          #define cTStopPulse                   ((U16) mConvUsInTrpTick(cStopPulseWidth))
+    173          
+    174          #define cInitRearmTime                ((U16) mConvTrpToPPGTick(mConvUsInTrpTick(8UL)))
+    175          
+    176          #define cTBitMaxPulse                 ((U16) mConvUsInTrpTick(cTBitMaxLength))
+    177          
+    178          #define cTProg                        ((U16) mConvUsInTrpTick(12000UL))
+    179          
+    180          //#define cTEqualizer                   ((U16) mConvUsInTrpTick((U16)2396UL - cWritePulseWidth - cLDBTrpItDelayBeforeSwitchInstr))
+    181          #define cTEqualizer                   ((U16) mConvUsInTrpTick((U16)2446UL - cWritePulseWidth - cLDBTrpItDelayBeforeSwitchInstr))
+    182          
+    183          #define cTFirstWindowOpening          ((U16) mConvUsInTrpTick(cLDBTrpOneBitTimeMin))
+    184          #define cTWindowOpening               ((U16) mConvUsInTrpTick(cLDBTrpOneBitTimeMin - cLDBTrpItDelayMaxBeforeWindowOpening))
+    185          #define cTWindowClosing               ((U16) mConvUsInTrpTick(cLDBTrpTwoBitsTimeMax - cLDBTrpItDelayBeforeSwitchInstr))
+    186          
+    187          // 512us +/- 5%
+    188          #define cSleepAckPulseTimeMin         ((U16) mConvUsInTrpTick(484U))
+    189          #define cSleepAckPulseTimeMax         ((U16) mConvUsInTrpTick(580U))
+    190          
+    191          #define cTStartSleep                  ((U16) cTInterCom )
+    192          #define cTWaitBeforeSleepAck          ((U16) mConvUsInTrpTick(3500U))
+    193          #define cTWaitSleepAckTimeOut         ((U16) ((U16)2U * cSleepAckPulseTimeMax) - cTTestLigneStateTimeOut)
+    194          #define cTTestLigneStateTimeOut       ((U16) mConvUsInTrpTick(460U))
+    195          #define cTRestartBaseStationControl   ((U16) mConvUsInTrpTick(800U))
+    196          
+    197          #define cTWaitBeforeWakeUpRaisingEdge ((U16) cTInterCom )
+    198          #define cTWaitingWakeUp               ((U16) mConvUsInTrpTick(500U))
+    199          
+    200          
+    201          //-----------------------------------------------------------------------------
+    202          //  Local macros
+    203          //
+    204          //  #define mMacroName   (MacroDefinition)
+    205          //-----------------------------------------------------------------------------
+    206          #ifdef _QAC_
+    207              // Disabled  QAC warning QC0857: Number of macro definitions exceeds 1024 
+    208              // it is normal STK code exceeds 1024 macro definitions
+    209              #pragma PRQA_MESSAGES_OFF 0857
+    210          #endif
+    211          
+    212          
+    213          //----------------------------------------------------------------------------
+    214          // Convert time in micro second to a value in Trp tick
+    215          //----------------------------------------------------------------------------
+    216          #define mConvUsInTrpTick(Time) \
+    217              ((U32)((U32)(Time) * ((U32)1000UL)) / cLDBHarTickInNsTrpTimeOutTimer)
+    218          
+    219          #define mConvTrpToPPGTick(TrpTime)           ((U16)(TrpTime) >> 2)
+    220          
+    221          //----------------------------------------------------------------------------
+    222          // Test of the capture duration
+    223          //----------------------------------------------------------------------------
+    224          #define mValidOneBitTime(Range)                                                         \
+    225              (   ((U16)(Range) >= ((U16) mConvUsInTrpTick(cLDBTrpOneBitTimeMin)))                \
+    226               && ((U16)(Range) <= ((U16) mConvUsInTrpTick(cLDBTrpOneBitTimeMax)))                \
+    227              /*//QACJ 3435:amanevd: Macros is called with non arithmetic expression parameter*/  \
+    228              /*//QACJ 3456:amanevd: Macros is called with non arithmetic expression parameter*/  \
+    229              )
+    230          
+    231          #define mValidOneAndAHalfBitTime(Range) \
+    232              ((U16)(Range) <= ((U16) mConvUsInTrpTick(cLDBTrpOneAndAHalfBitTimeMax)))
+    233          
+    234          #define mValidTwoBitsTime(Range) \
+    235              ((U16)(Range) <= ((U16) mConvUsInTrpTick(cLDBTrpTwoBitsTimeMax)))
+    236          
+    237          #define mValidSleepAckPulseTime(Range)                                                      \
+    238              (   ((U16)(Range) > (U16)(  cSleepAckPulseTimeMin                                       \
+    239                                          -cTTestLigneStateTimeOut                                    \
+    240                                          -mConvUsInTrpTick(cLDBTrpItDelayMaxBeforeWindowOpening)))   \
+    241               && ((U16)(Range) < (U16)(  cSleepAckPulseTimeMax                                       \
+    242                                          -cTTestLigneStateTimeOut                                    \
+    243                                          -mConvUsInTrpTick(cLDBTrpItDelayMaxBeforeWindowOpening)))   \
+    244               /*//QACJ 3435:amanevd: Macros is called with non arithmetic expression parameter*/ \
+    245               /*//QACJ 3456:amanevd: Macros is called with non arithmetic expression parameter*/ \
+    246              )
+    247          
+    248          // Calculates the offset for pu8ReceptionBuffer
+    249          #define mReceptionOffset(NumberOfBytes)     (U32)(((U32)(NumberOfBytes)/(U32)8U)+(U32)1U)
+    250          
+    251          //----------------------------------------------------------------------------
+    252          // Control of the transponder line's state
+    253          //----------------------------------------------------------------------------
+    254          #define mWriteTranspondeurLine(State) mLDBHarWrite(cLDBHarTrpOut, (!(State)))
+    255          #define mReadTranspondeurLine()       ((U8)!(mLDBHarRead(cLDBHarTrpIn)))
+    256          
+    257          //----------------------------------------------------------------------------
+    258          // Output compare time manages :
+    259          //  - TInterCom's time out
+    260          //  - TReadingMode's time out
+    261          //  - BPLM data coding (data send to the transponder) 
+    262          //  - Time out on the equalizer pattern detection
+    263          //  - Windowing during Manchester data decoding
+    264          //----------------------------------------------------------------------------
+    265          #define mStartTimeOut(Time)                                                         \
+    266              mLDBIocStopTimer(cLDBHarTrpTimeOutTimer);                                       \
+    267              mLDBIocSelectClock(cLDBHarTrpTimeOutTimer, cLDBHarSelectClockTrpTimeOutTimer);  \
+    268              mLDBIocWriteTrigger(cLDBHarTrpTimeOutTrigger, ((U16)(Time) - (U16)1U));         \
+    269              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);                       \
+    270              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    271              mLDBIocStartTimer(cLDBHarTrpTimeOutTimer)
+    272          
+    273          #define mRearmTimeOut(Time)                                                         \
+    274              mLDBIocStopTimer(cLDBHarTrpTimeOutTimer);                                       \
+    275              mLDBIocWriteTrigger(cLDBHarTrpTimeOutTrigger, ((U16)(Time) - (U16)1U));         \
+    276              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);                       \
+    277              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    278              mLDBIocStartTimer(cLDBHarTrpTimeOutTimer)
+    279          
+    280          #define mStopTimeOut() \
+    281              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);                       \
+    282              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    283              mLDBIocStopTimer(cLDBHarTrpTimeOutTimer) 
+    284          
+    285          #define mReadTimeOutValue()   \
+    286              ((U16)mLDBIocReadCounter(cLDBHarTrpTimeOutTimer))
+    287          
+    288          #define mStartPPGOutput(TimeM, TimeN)                                               \
+    289              mLDBIocStopTimer(cLDBHarTrpTimePPGTimer);                                       \
+    290              mLDBIocSelectClock(cLDBHarTrpTimePPGTimer, cLDBHarSelectClockTrpPPGTimer);      \
+    291              mLDBIocSelectTimerMode(cLDBHarTrpTimePPGTimer, cLDBHarTrpPPGTimeCompareTimer);  \
+    292              mLDBIocWriteTrigger(cLDBHarTrpTimePPGTriggerM, ((U16)(TimeM) - (U16)1U));       \
+    293              mLDBIocWriteTrigger(cLDBHarTrpTimePPGTriggerN, ((U16)(TimeN) - (U16)1U));       \
+    294              mLDBIocOutputEnable(cLDBHarTrpTimePPGTimer);                                    \
+    295              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    296              mLDBIocStartTimer(cLDBHarTrpTimePPGTimer)
+    297          
+    298          
+    299          #define mStopPPGOutput()                                                            \
+    300              mLDBIocStopTimer(cLDBHarTrpTimePPGTimer);                                       \
+    301              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    302              mLDBIocOutputDisable(cLDBHarTrpTimePPGTimer)
+    303          
+    304          #define mRearmPPGOutput(TimeM, TimeN)                                               \
+    305              mLDBIocStopTimer(cLDBHarTrpTimePPGTimer);                                       \
+    306              mLDBIocWriteTrigger(cLDBHarTrpTimePPGTriggerM, ((U16)(TimeM) - (U16)1U));       \
+    307              mLDBIocWriteTrigger(cLDBHarTrpTimePPGTriggerN, ((U16)(TimeN) - (U16)1U));       \
+    308              mLDBIocOutputEnable(cLDBHarTrpTimePPGTimer);                                    \
+    309              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/   \
+    310              mLDBIocStartTimer(cLDBHarTrpTimePPGTimer)
+    311          
+    312          #define mReadPPGTimerValue()   \
+    313              ((U16)mLDBIocReadCounter(cLDBHarTrpTimePPGTimer))
+    314          
+    315          //----------------------------------------------------------------------------
+    316          // Main macro used to stop the input capture timer
+    317          //----------------------------------------------------------------------------
+    318          #define mStopTimeCaptureTimer() \
+    319              mLDBIocStopTimer(cLDBHarTrpTimeCaptureTimer)  
+    320          
+    321          //----------------------------------------------------------------------------
+    322          // Reading of the time capture value
+    323          //----------------------------------------------------------------------------
+    324          
+    325          // Caution !!! this has to be updated with
+    326          // correct value cLDBHarTickInNsTrpTimeCaptureTimer/cLDBHarTickInNsTrpTimeOutTimer
+    327          // currently cLDBHarTickInNsTrpTimeCaptureTimer/cLDBHarTickInNsTrpTimeOutTimer == 4
+    328          #define mReadTimeCaptureValue()   \
+    329              (U16)((U16)mLDBIocReadTrigger(cLDBHarTrpTimeCaptureTrigger) << (U16)2U)
+    330          
+    331          //----------------------------------------------------------------------------
+    332          // Manchester data acquisition management
+    333          //----------------------------------------------------------------------------
+    334          #define mStartAcquistion()                                                                              \
+    335              mLDBIocStopTimer(cLDBHarTrpTimeCaptureTimer);                                                       \
+    336              mLDBIocSelectClock(cLDBHarTrpTimeCaptureTimer, cLDBHarSelectClockTrpTimeCaptureTimer);              \
+    337              mLDBIocSelectTimerMode(cLDBHarTrpTimeCaptureTimer, cLDBHarFreeRunningModeTrpTimeCaptureTimer);      \
+    338              mLDBIocConfigureFreeRunningMode(cLDBHarTrpTimeCaptureTimer, cLDBHarConfigureTrpTimeCaptureTimer);   \
+    339              mLDBIocSetEdgeDetection(cLDBHarTrpTimeCaptureTimer, cLDBIocRisingEdge);                             \
+    340              u16TimeMeasuredOld = 0;                                                                              \
+    341              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/                       \
+    342              mLDBIocFreeRunningModeStartTimer(cLDBHarTrpTimeCaptureTimer)
+    343          
+    344          //----------------------------------------------------------------------------
+    345          // Edge detection management
+    346          //----------------------------------------------------------------------------
+    347          #define mStartEdgeDetection(Edge)                                                                       \
+    348              mLDBIocStopTimer(cLDBHarTrpTimeCaptureTimer);                                                       \
+    349              mLDBIocSelectClock(cLDBHarTrpTimeCaptureTimer, cLDBHarSelectClockTrpTimeCaptureTimer);              \
+    350              mLDBIocSelectTimerMode(cLDBHarTrpTimeCaptureTimer, cLDBHarFreeRunningModeTrpTimeCaptureTimer);      \
+    351              mLDBIocConfigureFreeRunningMode(cLDBHarTrpTimeCaptureTimer, cLDBHarConfigureTrpTimeCaptureTimer);   \
+    352              mLDBIocSetEdgeDetection(cLDBHarTrpTimeCaptureTimer, Edge);                                          \
+    353              u16TimeMeasuredOld = 0;                                                                              \
+    354              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/                       \
+    355              mLDBIocFreeRunningModeStartTimer(cLDBHarTrpTimeCaptureTimer)
+    356          
+    357          //----------------------------------------------------------------------------
+    358          // Sleep and Wake Up acknowledge timing capture
+    359          //----------------------------------------------------------------------------
+    360          #define mStartBaseStationAckCapture()                                                                   \
+    361              mLDBIocStopTimer(cLDBHarTrpTimeCaptureTimer);                                                       \
+    362              mLDBIocSelectClock(cLDBHarTrpTimeCaptureTimer, cLDBHarSelectClockTrpTimeCaptureTimer);              \
+    363              mLDBIocSelectTimerMode(cLDBHarTrpTimeCaptureTimer, cLDBHarFreeRunningModeTrpTimeCaptureTimer);      \
+    364              mLDBIocConfigureFreeRunningMode(cLDBHarTrpTimeCaptureTimer, cLDBHarConfigureTrpTimeCaptureTimer);   \
+    365              mLDBIocSetEdgeDetection(cLDBHarTrpTimeCaptureTimer, cLDBIocBothEdge);                               \
+    366              u16TimeMeasuredOld = 0;                                                                              \
+    367              /*//QACJ 3412:amanevd: Macros uses register definitions from io78f0536_64.h*/                       \
+    368              mLDBIocFreeRunningModeStartTimer(cLDBHarTrpTimeCaptureTimer)
+    369          
+    370          #define mStartVerlogTimer() (bLDBTrpIsVerlogTimerEnabled = cTrue)
+    371          
+    372          #define mStopVerlogTimer() (bLDBTrpIsVerlogTimerEnabled = cFalse)
+    373          
+    374          #ifdef _QAC_
+    375              // Enabled  QAC warning QC0857: Number of macro definitions exceeds 1024 
+    376              // it is normal STK code exceeds 1024 macro definitions
+    377              #pragma PRQA_MESSAGES_ON 0857
+    378          #endif
+    379          
+    380          
+    381          //-----------------------------------------------------------------------------
+    382          //  Local types
+    383          //
+    384          //  struct  sStructureName { ... };
+    385          //  union   uUnionName { ... };
+    386          //  enum    eEnumerationName { ... };
+    387          //  typedef Expression tTypeName;
+    388          //-----------------------------------------------------------------------------
+    389          
+    390          //----------------------------------------------------------------------------
+    391          // Decoding states
+    392          //----------------------------------------------------------------------------
+    393          typedef enum
+    394          {
+    395              cReadingModeChecking    ,
+    396              cOpenWindowData         ,
+    397              cDecoding               ,
+    398              cSleepAckDetection      ,
+    399              cStop                   ,
+    400              cTimeOutInterCom        ,
+    401              cEndWritePulse          ,
+    402              cEndStopPulse           ,
+    403              cTimeOutProg            ,
+    404              cTimeOutEqualizer       ,  
+    405              cStartSleep             ,
+    406              cStartSleepAckDetection ,
+    407              cGenerateRaisingEdge    ,
+    408              cWaitTransponderSleep   ,
+    409              cWaitingWakeUp
+    410          }tStateMachine;
+    411          
+    412          //-----------------------------------------------------------------------------
+    413          //  Local data
+    414          //
+    415          //  static  tType   VariableName;
+    416          //  static  tType*  pVariableName; 
+    417          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    418          static tStateMachine DecodingState;
+   \                     DecodingState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    419          
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    420          static MEM_FAST tMsg TransponderMessage;
+   \                     TransponderMessage:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    421          static MEM_FAST U8   TransponderBuffer[cTransponderBufferSize];
+   \                     TransponderBuffer:
+   \   0000                  DS 8
+   \   0008                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    422          static MEM_FAST U8 CurrentCommand[cCommandSize];
+   \                     CurrentCommand:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    423          static U8   u8ReceivedBits;
+   \                     u8ReceivedBits:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    424          static U8   u8ExpectedBitsNb;
+   \                     u8ExpectedBitsNb:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    425          static U8   u8RestartCounter;
+   \                     u8RestartCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    426          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    427          static BOOL bDataSynchronized;
+   \                     bDataSynchronized:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    428          static BOOL bTimeOutTProgRequested;
+   \                     bTimeOutTProgRequested:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    429          static BOOL bReceiveData;
+   \                     bReceiveData:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    430          static BOOL bDetectAckPulse;
+   \                     bDetectAckPulse:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    431          
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    432          static MEM_FAST U16  u16TimeMeasured;
+   \                     u16TimeMeasured:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    433          static MEM_FAST U16  u16TimeMeasuredOld;
+   \                     u16TimeMeasuredOld:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    434          static MEM_FAST U16  u16TimeDifference;
+   \                     u16TimeDifference:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    435          static MEM_FAST U16  u16TimeCapture;
+   \                     u16TimeCapture:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment SADDR_Z, align 2, align-sorted
+    436          static MEM_FAST U16  u16TimeRearm;
+   \                     u16TimeRearm:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    437          static U8*  pu8ReceptionBuffer;
+   \                     pu8ReceptionBuffer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    438          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    439          static U8 u8ShortCircuitToGnd;
+   \                     u8ShortCircuitToGnd:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    440          static U8 u8ShortCircuitToBat;
+   \                     u8ShortCircuitToBat:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    441          
+    442          //-----------------------------------------------------------------------------
+    443          //  Constant local data
+    444          //
+    445          //  static const tType  VariableName;
+    446          //-----------------------------------------------------------------------------
+    447          
+    448          
+    449          //-----------------------------------------------------------------------------
+    450          //  Exported data
+    451          //
+    452          //  tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    453          //  tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    454          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    455          BOOL bLDBTrpIsVerlogTimerEnabled;
+   \                     bLDBTrpIsVerlogTimerEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    456          
+    457          //-----------------------------------------------------------------------------
+    458          //  Constant exported data
+    459          //
+    460          //              (LAY: 3 characters to identify the layer)
+    461          //              (Cmp: 3 characters to identify this component)
+    462          // 
+    463          //  const tType   LAYCmpVariableName;
+    464          //-----------------------------------------------------------------------------
+    465          
+    466          
+    467          //-----------------------------------------------------------------------------
+    468          //  Local function prototypes
+    469          //  
+    470          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    471          //-----------------------------------------------------------------------------
+    472          static void StopCom(void);
+    473          static void StoreBit(const U8 u8Bit);
+    474          static void InitCom(void);
+    475          
+    476          //=============================================================================
+    477          //=========================== LOCAL FUNCTIONS =================================
+    478          //=============================================================================
+    479          
+    480          //=============================================================================
+    481          //  DESCRIPTION : Store a bit in the reception buffer.
+    482          //  
+    483          //  PARAMETERS (Type,Name,Min,Max) : U8 ucPageNumber : page number
+    484          //                                   tTrpCommand StandardCommand : base command
+    485          //
+    486          //  RETURN VALUE :  Computed command.
+    487          // 
+    488          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    489          //=============================================================================
+    490          static void StoreBit(const U8 u8Bit)
+    491          {
+    492              if (u8ReceivedBits == 0)
+    493              {
+    494                  //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+    495                  *pu8ReceptionBuffer = u8Bit & cMaskBit0;
+    496              }
+    497              else
+    498              {
+    499                  *pu8ReceptionBuffer <<= 1;
+    500                  *pu8ReceptionBuffer  += u8Bit & cMaskBit0;
+    501          
+    502                  if ((U8)(u8ReceivedBits & cNextByteMask) == cNextByteMask)
+    503                  {
+    504                      //QACJ 0489:amanevd: This is how it comes from STK
+    505                      pu8ReceptionBuffer--;
+    506                  }
+    507              }
+    508              u8ReceivedBits++;
+    509          }
+    510          //=============================================================================
+    511          //  DESCRIPTION : Initialize a communication
+    512          //  
+    513          //  PARAMETERS (Type,Name,Min,Max) :
+    514          //
+    515          //  RETURN VALUE :   none
+    516          // 
+    517          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    518          //=============================================================================
+    519          static void InitCom(void)
+    520          {
+    521          #ifdef X90_PROJECT
+    522              mLDBIntGetInterruptTM00TM01(cLDBIntTrpOwnerTM00TM01);
+    523          #endif
+    524          
+    525              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeOutIt);
+    526              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);
+    527              mLDBIntEnableIsr(cLDBHarInterruptTrpTimeOutIt);
+    528          
+    529              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+    530              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+    531          }
+    532          
+    533          //=============================================================================
+    534          //  DESCRIPTION : Stop a communication
+    535          //  
+    536          //  PARAMETERS (Type,Name,Min,Max) :   none
+    537          //
+    538          //  RETURN VALUE :   none
+    539          // 
+    540          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    541          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    542          static void StopCom(void)
+   \                     StopCom:
+    543          {    
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    544              mStopTimeOut();
+   \   0000   A104           MOV       A,#4
+   \   0002   716BE1         CLR1      0xFFE1.6
+   \   0005   712BBA         CLR1      0xFFBA.2
+   \   0008   713BBA         CLR1      0xFFBA.3
+    545              mStopTimeCaptureTimer();
+   \   000B   712BB6         CLR1      0xFFB6.2
+   \   000E   713BB6         CLR1      0xFFB6.3
+    546              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0011   713AE7         SET1      0xFFE7.3
+    547              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeOutIt);
+   \   0014   716AE5         SET1      0xFFE5.6
+    548              mLDBIntDisableIsr(cLDBHarInterruptTrpPPGIt);
+   \   0017   712AE7         SET1      0xFFE7.2
+    549              mWriteTranspondeurLine(1);
+   \   001A   6B00           CLR1      S:0xFF00.6
+    550              DecodingState = cStop;
+   \   001C   9E....         MOV       DecodingState,A
+    551          
+    552          #ifdef X90_PROJECT
+    553              mLDBIntReleaseInterruptTM00TM01(cLDBIntTrpOwnerTM00TM01);
+   \   001F   A100           MOV       A,#0
+   \   0021   9E....         MOV       LDBIntInterruptOwnerTM00TM01,A
+    554          #endif
+    555          }
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+   \   0025                  REQUIRE _A_P0
+   \   0025                  REQUIRE _A_TMC01
+   \   0025                  REQUIRE _A_TMC00
+   \   0025                  REQUIRE _A_IF0
+   \   0025                  REQUIRE _A_MK0
+   \   0025                  REQUIRE _A_MK1
+    556          
+    557          //=============================================================================
+    558          //============================ EXPORTED FUNCTIONS =============================
+    559          //=============================================================================
+    560          
+    561          //*****************************************************************************
+    562          //  DESCRIPTION : Interruption of the input capture timer
+    563          //  
+    564          //  PARAMETERS (Type,Name,Min,Max) :   none
+    565          //
+    566          //  RETURN VALUE :   none
+    567          // 
+    568          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    569          //*****************************************************************************
+    570          #ifndef X90_PROJECT
+    571          mLDBIntDeclareIsr(cLDBHarInterruptTrpTimeCaptureIt)
+    572          {
+    573              mLDBIntEnterIsr(cLDBHarInterruptTrpTimeCaptureIt);
+    574          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    575          void LDBTrpTimeCaptureIt(void)
+   \                     LDBTrpTimeCaptureIt:
+    576          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    577          #endif
+    578          
+    579              switch (DecodingState)
+   \   0002   8E....         MOV       A,DecodingState
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD0E           BZ        ??LDBTrpControl_0
+   \   0009   4D02           CMP       A,#2
+   \   000B   AD36           BZ        ??LDBTrpControl_1
+   \   000D   4D03           CMP       A,#3
+   \   000F   BD03           BNZ       $+5
+   \   0011   9B....         BR        N:??LDBTrpControl_2
+   \   0014   9B....         BR        N:??LDBTrpControl_3
+    580              {
+    581                  case cReadingModeChecking:
+    582          
+    583                  mWriteTranspondeurLine(0);
+   \                     ??LDBTrpControl_0:
+   \   0017   A106           MOV       A,#6
+   \   0019   6A00           SET1      S:0xFF00.6
+    584                  //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+    585                  mStartTimeOut(cTWritingPulseMode2);
+   \   001B   712BBA         CLR1      0xFFBA.2
+   \   001E   713BBA         CLR1      0xFFBA.3
+   \   0021   711BBB         CLR1      0xFFBB.1
+   \   0024   710ABB         SET1      0xFFBB.0
+   \   0027   EE120710       MOVW      S:0xFF12,#4103
+   \   002B   716BE1         CLR1      0xFFE1.6
+   \   002E   712ABA         SET1      0xFFBA.2
+   \   0031   713ABA         SET1      0xFFBA.3
+    586                  mStopTimeCaptureTimer();
+   \   0034   712BB6         CLR1      0xFFB6.2
+   \   0037   713BB6         CLR1      0xFFB6.3
+    587                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   003A   713AE7         SET1      0xFFE7.3
+    588                  DecodingState = cEndWritePulse;
+   \   003D   9E....         MOV       DecodingState,A
+   \   0040   9B....         BR        N:??LDBTrpControl_3
+    589                  break;
+    590          
+    591                  case cDecoding:
+    592          
+    593                  //Mesure du temps entre 2 fronts descendant
+    594                  //QACJ 0434:amanevd: 'CR011' is declared in io78f0536_64.h
+    595                  u16TimeMeasured = mReadTimeCaptureValue();
+   \                     ??LDBTrpControl_1:
+   \   0043   A9B4           MOVW      AX,0xFFB4
+   \   0045   21             CLR1      CY
+   \   0046   30             XCH       A,X
+   \   0047   27             ROLC      A,0x1
+   \   0048   30             XCH       A,X
+   \   0049   27             ROLC      A,0x1
+   \   004A   21             CLR1      CY
+   \   004B   30             XCH       A,X
+   \   004C   27             ROLC      A,0x1
+   \   004D   30             XCH       A,X
+   \   004E   27             ROLC      A,0x1
+   \   004F   99..           MOVW      S:u16TimeMeasured,AX
+    596          
+    597                  if (mValidOneBitTime(u16TimeMeasured - u16TimeMeasuredOld))       //T = 1Tbit
+   \   0051   30             XCH       A,X
+   \   0052   1E..           SUB       A,S:u16TimeMeasuredOld
+   \   0054   30             XCH       A,X
+   \   0055   3E..           SUBC      A,S:u16TimeMeasuredOld+1
+   \   0057   EA0003         CMPW      AX,#768
+   \   005A   8D46           BC        ??LDBTrpControl_4
+   \   005C   EA0105         CMPW      AX,#1281
+   \   005F   9D41           BNC       ??LDBTrpControl_4
+    598                  {
+    599                      if (bDataSynchronized == cFalse)          //Synchro bit "1"
+   \   0061   8E....         MOV       A,bDataSynchronized
+   \   0064   4D00           CMP       A,#0
+   \   0066   8E....         MOV       A,u8ReceivedBits
+   \   0069   BD27           BNZ       ??LDBTrpControl_5
+    600                      {
+    601                          StoreBit(1);
+   \   006B   4D00           CMP       A,#0
+   \   006D   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0070   D6             MOVW      HL,AX
+   \   0071   BD06           BNZ       ??LDBTrpControl_6
+   \                     ??LDBTrpTimeCaptureIt_0:
+   \   0073   A101           MOV       A,#1
+   \                     ??LDBTrpTimeCaptureIt_1:
+   \   0075   97             MOV       [HL],A
+   \   0076   9B....         BR        N:??LDBTrpControl_7
+   \                     ??LDBTrpControl_6:
+   \   0079   87             MOV       A,[HL]
+   \   007A   27             ROLC      A,0x1
+   \   007B   97             MOV       [HL],A
+   \   007C   02....         MOVW      AX,pu8ReceptionBuffer
+   \   007F   D6             MOVW      HL,AX
+   \   0080   87             MOV       A,[HL]
+   \   0081   41             INC       A
+   \                     ??LDBTrpTimeCaptureIt_2:
+   \   0082   97             MOV       [HL],A
+   \   0083   8E....         MOV       A,u8ReceivedBits
+   \   0086   5D07           AND       A,#7
+   \   0088   4D07           CMP       A,#7
+   \   008A   AD03           BZ        $+5
+   \   008C   9B....         BR        N:??LDBTrpControl_7
+   \   008F   9B....         BR        N:??LDBTrpControl_8
+    602                      }
+    603                      else                                      //Synchro bit "0"
+    604                      {
+    605                          StoreBit(0);
+   \                     ??LDBTrpControl_5:
+   \   0092   4D00           CMP       A,#0
+   \   0094   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0097   D6             MOVW      HL,AX
+   \   0098   BD04           BNZ       ??LDBTrpControl_9
+   \                     ??LDBTrpTimeCaptureIt_3:
+   \   009A   A100           MOV       A,#0
+   \   009C   FAD7           BR        ??LDBTrpTimeCaptureIt_1
+   \                     ??LDBTrpControl_9:
+   \   009E   87             MOV       A,[HL]
+   \   009F   27             ROLC      A,0x1
+   \   00A0   FAE0           BR        ??LDBTrpTimeCaptureIt_2
+    606                      }
+    607                  }
+    608                  else if (mValidOneAndAHalfBitTime(u16TimeMeasured - u16TimeMeasuredOld))    //T = 1.5Tbit
+   \                     ??LDBTrpControl_4:
+   \   00A2   EAD906         CMPW      AX,#1753
+   \   00A5   8D03           BC        $+5
+   \   00A7   9B....         BR        N:??LDBTrpControl_10
+    609                  {
+    610                      if (bDataSynchronized == cFalse)                      //Synchro bit "1"
+   \   00AA   8E....         MOV       A,bDataSynchronized
+   \   00AD   4D00           CMP       A,#0
+   \   00AF   8E....         MOV       A,u8ReceivedBits
+   \   00B2   BD55           BNZ       ??LDBTrpControl_11
+    611                      {
+    612                          StoreBit(0);
+   \   00B4   4D00           CMP       A,#0
+   \   00B6   02....         MOVW      AX,pu8ReceptionBuffer
+   \   00B9   D6             MOVW      HL,AX
+   \   00BA   BD05           BNZ       ??LDBTrpControl_12
+   \   00BC   A100           MOV       A,#0
+   \   00BE   97             MOV       [HL],A
+   \   00BF   FA13           BR        ??LDBTrpControl_13
+   \                     ??LDBTrpControl_12:
+   \   00C1   87             MOV       A,[HL]
+   \   00C2   27             ROLC      A,0x1
+   \   00C3   97             MOV       [HL],A
+   \   00C4   8E....         MOV       A,u8ReceivedBits
+   \   00C7   5D07           AND       A,#7
+   \   00C9   4D07           CMP       A,#7
+   \   00CB   BD07           BNZ       ??LDBTrpControl_13
+   \   00CD   02....         MOVW      AX,pu8ReceptionBuffer
+   \   00D0   90             DECW      AX
+   \   00D1   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_13:
+   \   00D4   8E....         MOV       A,u8ReceivedBits
+   \   00D7   41             INC       A
+   \   00D8   9E....         MOV       u8ReceivedBits,A
+    613          
+    614                          if (u8ReceivedBits < u8ExpectedBitsNb)              
+   \   00DB   48....         CMP       A,u8ExpectedBitsNb
+   \   00DE   8D03           BC        $+5
+   \   00E0   9B....         BR        N:??LDBTrpControl_14
+    615                          {
+    616                              bDataSynchronized = cTrue;
+   \   00E3   A101           MOV       A,#1
+   \                     ??LDBTrpTimeCaptureIt_4:
+   \   00E5   9E....         MOV       bDataSynchronized,A
+    617                          }
+    618                      }
+    619                      else                                                  //Synchro bit "0"
+    620                      {
+    621                          StoreBit(0);
+    622                          StoreBit(1);
+    623          
+    624                          if (u8ReceivedBits < u8ExpectedBitsNb)
+    625                          {
+    626                              bDataSynchronized = cFalse;
+    627                          }
+    628                      }
+    629                  }
+    630                  else if (mValidTwoBitsTime(u16TimeMeasured - u16TimeMeasuredOld))    //T = 2Tbit                                                    //T = 2Tbit
+    631                  {
+    632                      if (bDataSynchronized == cFalse)                      //Synchro bit "1"
+    633                      {
+    634                          StoreBit(0);
+    635                          StoreBit(1);
+    636                      }
+    637                      else                                                  //Synchro bit "0"
+    638                      {
+    639                          //DF : Cas ou l'on a un glitch dans la sequence 010
+    640                          StoreBit(1);
+    641                          StoreBit(0); 
+    642                          //StopCom();
+    643                          //DF : fin
+    644                      }      
+    645                  }
+    646                  else
+    647                  {
+    648                      //DF : Permet de faire apparaitre une erreur IDE
+    649                      DATTrpCallBackRxWithAddr(0, cLDBError);  
+    650                      //DF : fin
+    651                      //DF : Diag
+    652                      //Erreur decodage => Defaut Data
+    653                      //DATTrpCallBackCtrl(cLDBTrpDataError);
+    654                      StopCom();
+    655                      //DF : fin
+    656                  }
+    657          
+    658                  if (u8ReceivedBits >= u8ExpectedBitsNb)         //Tous les bits de la Data sont recus
+    659                  {
+    660                      StopCom();
+    661          
+    662                      if (bReceiveData != cFalse)
+    663                      {
+    664                          TransponderMessage.Lng     = u8ExpectedBitsNb;
+    665                          TransponderMessage.pBuffer = (U8*)(&TransponderBuffer[cReceiveBufferIndex]);
+    666          
+    667                          DATTrpCallBackTxWithAddr(cLDBTrpStartAuth, cLDBCorrect);
+    668                          DATTrpCallBackRxSpontWithoutAddr(cLDBCorrect, &TransponderMessage);
+    669                      }
+    670                      else
+    671                      {
+    672                          DATTrpCallBackRxWithAddr(0, cLDBCorrect);
+    673                      }
+    674                  }
+    675                  else                                        //Data incomplete
+    676                  {
+    677                      mRearmTimeOut(cTWindowOpening);         //220µs 
+   \                     ??LDBTrpTimeCaptureIt_5:
+   \   00E8   A101           MOV       A,#1
+   \   00EA   712BBA         CLR1      0xFFBA.2
+   \   00ED   713BBA         CLR1      0xFFBA.3
+   \   00F0   EE12AB02       MOVW      S:0xFF12,#683
+   \   00F4   716BE1         CLR1      0xFFE1.6
+   \   00F7   712ABA         SET1      0xFFBA.2
+   \   00FA   713ABA         SET1      0xFFBA.3
+    678                      mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   00FD   713AE7         SET1      0xFFE7.3
+    679                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0100   713BE3         CLR1      0xFFE3.3
+    680                      DecodingState = cOpenWindowData;
+   \   0103   9E....         MOV       DecodingState,A
+   \   0106   9B....         BR        N:??LDBTrpControl_15
+    681                  }
+   \                     ??LDBTrpControl_11:
+   \   0109   4D00           CMP       A,#0
+   \   010B   02....         MOVW      AX,pu8ReceptionBuffer
+   \   010E   D6             MOVW      HL,AX
+   \   010F   BD05           BNZ       ??LDBTrpControl_16
+   \   0111   A100           MOV       A,#0
+   \   0113   97             MOV       [HL],A
+   \   0114   FA13           BR        ??LDBTrpControl_17
+   \                     ??LDBTrpControl_16:
+   \   0116   87             MOV       A,[HL]
+   \   0117   27             ROLC      A,0x1
+   \   0118   97             MOV       [HL],A
+   \   0119   8E....         MOV       A,u8ReceivedBits
+   \   011C   5D07           AND       A,#7
+   \   011E   4D07           CMP       A,#7
+   \   0120   BD07           BNZ       ??LDBTrpControl_17
+   \   0122   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0125   90             DECW      AX
+   \   0126   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_17:
+   \   0129   8E....         MOV       A,u8ReceivedBits
+   \   012C   41             INC       A
+   \   012D   9E....         MOV       u8ReceivedBits,A
+   \   0130   4D00           CMP       A,#0
+   \   0132   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0135   D6             MOVW      HL,AX
+   \   0136   BD05           BNZ       ??LDBTrpControl_18
+   \   0138   A101           MOV       A,#1
+   \   013A   97             MOV       [HL],A
+   \   013B   FA1A           BR        ??LDBTrpControl_19
+   \                     ??LDBTrpControl_18:
+   \   013D   87             MOV       A,[HL]
+   \   013E   27             ROLC      A,0x1
+   \   013F   97             MOV       [HL],A
+   \   0140   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0143   D6             MOVW      HL,AX
+   \   0144   87             MOV       A,[HL]
+   \   0145   41             INC       A
+   \   0146   97             MOV       [HL],A
+   \   0147   8E....         MOV       A,u8ReceivedBits
+   \   014A   5D07           AND       A,#7
+   \   014C   4D07           CMP       A,#7
+   \   014E   BD07           BNZ       ??LDBTrpControl_19
+   \   0150   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0153   90             DECW      AX
+   \   0154   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_19:
+   \   0157   8E....         MOV       A,u8ReceivedBits
+   \   015A   41             INC       A
+   \   015B   9E....         MOV       u8ReceivedBits,A
+   \   015E   48....         CMP       A,u8ExpectedBitsNb
+   \   0161   8D03           BC        $+5
+   \   0163   9B....         BR        N:??LDBTrpControl_14
+   \   0166   A100           MOV       A,#0
+   \   0168   9B....         BR        N:??LDBTrpTimeCaptureIt_4
+   \                     ??LDBTrpControl_10:
+   \   016B   EA2109         CMPW      AX,#2337
+   \   016E   8D03           BC        $+5
+   \   0170   9B....         BR        N:??LDBTrpControl_20
+   \   0173   8E....         MOV       A,bDataSynchronized
+   \   0176   4D00           CMP       A,#0
+   \   0178   8E....         MOV       A,u8ReceivedBits
+   \   017B   BD35           BNZ       ??LDBTrpControl_21
+   \   017D   4D00           CMP       A,#0
+   \   017F   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0182   D6             MOVW      HL,AX
+   \   0183   BD05           BNZ       ??LDBTrpControl_22
+   \   0185   A100           MOV       A,#0
+   \   0187   97             MOV       [HL],A
+   \   0188   FA13           BR        ??LDBTrpControl_23
+   \                     ??LDBTrpControl_22:
+   \   018A   87             MOV       A,[HL]
+   \   018B   27             ROLC      A,0x1
+   \   018C   97             MOV       [HL],A
+   \   018D   8E....         MOV       A,u8ReceivedBits
+   \   0190   5D07           AND       A,#7
+   \   0192   4D07           CMP       A,#7
+   \   0194   BD07           BNZ       ??LDBTrpControl_23
+   \   0196   02....         MOVW      AX,pu8ReceptionBuffer
+   \   0199   90             DECW      AX
+   \   019A   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_23:
+   \   019D   8E....         MOV       A,u8ReceivedBits
+   \   01A0   41             INC       A
+   \   01A1   9E....         MOV       u8ReceivedBits,A
+   \   01A4   4D00           CMP       A,#0
+   \   01A6   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01A9   D6             MOVW      HL,AX
+   \   01AA   BD03           BNZ       $+5
+   \   01AC   9B....         BR        N:??LDBTrpTimeCaptureIt_0
+   \   01AF   9B....         BR        N:??LDBTrpControl_6
+   \                     ??LDBTrpControl_21:
+   \   01B2   4D00           CMP       A,#0
+   \   01B4   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01B7   D6             MOVW      HL,AX
+   \   01B8   BD05           BNZ       ??LDBTrpControl_24
+   \   01BA   A101           MOV       A,#1
+   \   01BC   97             MOV       [HL],A
+   \   01BD   FA1A           BR        ??LDBTrpControl_25
+   \                     ??LDBTrpControl_24:
+   \   01BF   87             MOV       A,[HL]
+   \   01C0   27             ROLC      A,0x1
+   \   01C1   97             MOV       [HL],A
+   \   01C2   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01C5   D6             MOVW      HL,AX
+   \   01C6   87             MOV       A,[HL]
+   \   01C7   41             INC       A
+   \   01C8   97             MOV       [HL],A
+   \   01C9   8E....         MOV       A,u8ReceivedBits
+   \   01CC   5D07           AND       A,#7
+   \   01CE   4D07           CMP       A,#7
+   \   01D0   BD07           BNZ       ??LDBTrpControl_25
+   \   01D2   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01D5   90             DECW      AX
+   \   01D6   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_25:
+   \   01D9   8E....         MOV       A,u8ReceivedBits
+   \   01DC   41             INC       A
+   \   01DD   9E....         MOV       u8ReceivedBits,A
+   \   01E0   4D00           CMP       A,#0
+   \   01E2   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01E5   D6             MOVW      HL,AX
+   \   01E6   BD03           BNZ       $+5
+   \   01E8   9B....         BR        N:??LDBTrpTimeCaptureIt_3
+   \   01EB   87             MOV       A,[HL]
+   \   01EC   27             ROLC      A,0x1
+   \   01ED   97             MOV       [HL],A
+   \   01EE   8E....         MOV       A,u8ReceivedBits
+   \   01F1   5D07           AND       A,#7
+   \   01F3   4D07           CMP       A,#7
+   \   01F5   BD07           BNZ       ??LDBTrpControl_7
+   \                     ??LDBTrpControl_8:
+   \   01F7   02....         MOVW      AX,pu8ReceptionBuffer
+   \   01FA   90             DECW      AX
+   \   01FB   03....         MOVW      pu8ReceptionBuffer,AX
+   \                     ??LDBTrpControl_7:
+   \   01FE   8E....         MOV       A,u8ReceivedBits
+   \   0201   41             INC       A
+   \   0202   9E....         MOV       u8ReceivedBits,A
+   \   0205   FA0E           BR        ??LDBTrpControl_14
+   \                     ??LDBTrpControl_20:
+   \   0207   100000         MOVW      AX,#0
+   \   020A   A301           MOV       B,#1
+   \   020C   16....         MOVW      HL,#LWRD(DATTrpCallBackRxWithAddr)
+   \   020F   A4..           MOV       E,#BYTE3(DATTrpCallBackRxWithAddr)
+   \   0211   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0212   9A....         CALL      StopCom
+   \                     ??LDBTrpControl_14:
+   \   0215   8E....         MOV       A,u8ReceivedBits
+   \   0218   48....         CMP       A,u8ExpectedBitsNb
+   \   021B   9D03           BNC       $+5
+   \   021D   9B....         BR        N:??LDBTrpTimeCaptureIt_5
+   \   0220   9A....         CALL      StopCom
+   \   0223   8E....         MOV       A,bReceiveData
+   \   0226   4D00           CMP       A,#0
+   \   0228   AD24           BZ        ??LDBTrpControl_26
+   \   022A   8E....         MOV       A,u8ExpectedBitsNb
+   \   022D   70             MOV       X,A
+   \   022E   A100           MOV       A,#0
+   \   0230   99..           MOVW      S:TransponderMessage+2,AX
+   \   0232   10....         MOVW      AX,#S:TransponderBuffer+4
+   \   0235   99..           MOVW      S:TransponderMessage,AX
+   \   0237   101800         MOVW      AX,#24
+   \   023A   73             MOV       B,A
+   \   023B   16....         MOVW      HL,#LWRD(DATTrpCallBackTxWithAddr)
+   \   023E   A4..           MOV       E,#BYTE3(DATTrpCallBackTxWithAddr)
+   \   0240   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0241   A100           MOV       A,#0
+   \   0243   12....         MOVW      BC,#S:TransponderMessage
+   \   0246   16....         MOVW      HL,#LWRD(DATTrpCallBackRxSpontWithoutAddr)
+   \   0249   A4..           MOV       E,#BYTE3(DATTrpCallBackRxSpontWithoutAddr)
+   \   024B   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   024C   FA0A           BR        ??LDBTrpControl_27
+   \                     ??LDBTrpControl_26:
+   \   024E   100000         MOVW      AX,#0
+   \   0251   73             MOV       B,A
+   \   0252   16....         MOVW      HL,#LWRD(DATTrpCallBackRxWithAddr)
+   \   0255   A4..           MOV       E,#BYTE3(DATTrpCallBackRxWithAddr)
+   \   0257   ..             CALLT     [__T_?FAR_CALL_L07]
+    682                  if(cStop != DecodingState)
+   \                     ??LDBTrpControl_27:
+   \   0258   8E....         MOV       A,DecodingState
+   \   025B   4D04           CMP       A,#4
+   \   025D   AD68           BZ        ??LDBTrpControl_3
+    683                  {
+    684                      u16TimeMeasuredOld = u16TimeMeasured; 
+   \                     ??LDBTrpControl_15:
+   \   025F   89..           MOVW      AX,S:u16TimeMeasured
+   \   0261   99..           MOVW      S:u16TimeMeasuredOld,AX
+   \   0263   FA62           BR        ??LDBTrpControl_3
+    685                  }
+    686                  break;
+    687          
+    688                  case cSleepAckDetection:
+    689          
+    690                  u16TimeMeasured = mReadTimeCaptureValue();   
+   \                     ??LDBTrpControl_2:
+   \   0265   A9B4           MOVW      AX,0xFFB4
+   \   0267   21             CLR1      CY
+   \   0268   30             XCH       A,X
+   \   0269   27             ROLC      A,0x1
+   \   026A   30             XCH       A,X
+   \   026B   27             ROLC      A,0x1
+   \   026C   21             CLR1      CY
+   \   026D   30             XCH       A,X
+   \   026E   27             ROLC      A,0x1
+   \   026F   30             XCH       A,X
+   \   0270   27             ROLC      A,0x1
+   \   0271   99..           MOVW      S:u16TimeMeasured,AX
+    691          
+    692                  if (mValidSleepAckPulseTime(u16TimeMeasured))
+   \   0273   EA0D00         CMPW      AX,#13
+   \   0276   8D24           BC        ??LDBTrpControl_28
+   \   0278   EA8C01         CMPW      AX,#396
+   \   027B   9D1F           BNC       ??LDBTrpControl_28
+    693                  {
+    694                      mStartTimeOut(cTResetTransponder);
+   \   027D   A10D           MOV       A,#13
+   \   027F   712BBA         CLR1      0xFFBA.2
+   \   0282   713BBA         CLR1      0xFFBA.3
+   \   0285   711BBB         CLR1      0xFFBB.1
+   \   0288   710ABB         SET1      0xFFBB.0
+   \   028B   EE123F9C       MOVW      S:0xFF12,#39999
+   \   028F   716BE1         CLR1      0xFFE1.6
+   \   0292   712ABA         SET1      0xFFBA.2
+   \   0295   713ABA         SET1      0xFFBA.3
+    695                      mWriteTranspondeurLine(1);
+   \   0298   6B00           CLR1      S:0xFF00.6
+    696                      DecodingState = cWaitTransponderSleep;
+   \   029A   FA22           BR        ??LDBTrpControl_29
+    697                  }
+    698                  else
+    699                  {
+    700                      mStartTimeOut(cTRestartBaseStationControl);
+   \                     ??LDBTrpControl_28:
+   \   029C   712BBA         CLR1      0xFFBA.2
+   \   029F   713BBA         CLR1      0xFFBA.3
+   \   02A2   711BBB         CLR1      0xFFBB.1
+   \   02A5   710ABB         SET1      0xFFBB.0
+   \   02A8   EE127F0C       MOVW      S:0xFF12,#3199
+   \   02AC   716BE1         CLR1      0xFFE1.6
+   \   02AF   712ABA         SET1      0xFFBA.2
+   \   02B2   713ABA         SET1      0xFFBA.3
+    701                      u8RestartCounter++;
+   \   02B5   8E....         MOV       A,u8RestartCounter
+   \   02B8   41             INC       A
+   \   02B9   9E....         MOV       u8RestartCounter,A
+    702                      DecodingState = cStartSleep;
+   \   02BC   A10A           MOV       A,#10
+   \                     ??LDBTrpControl_29:
+   \   02BE   9E....         MOV       DecodingState,A
+    703                  }
+    704                  mStopTimeCaptureTimer();
+   \   02C1   712BB6         CLR1      0xFFB6.2
+   \   02C4   713BB6         CLR1      0xFFB6.3
+    705                  break;
+    706          
+    707                  case cStop:
+    708          
+    709                  // Keep this state only for code optimization
+    710                  mLIBassert(cFalse);
+    711                  break;
+    712          
+    713                  default:
+    714                  mLIBassert(cFalse);
+    715                  break;
+    716              }
+    717          
+    718              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \                     ??LDBTrpControl_3:
+   \   02C7   713BE3         CLR1      0xFFE3.3
+    719          #ifndef X90_PROJECT
+    720              mLDBIntLeaveIsr(cLDBHarInterruptTrpTimeCaptureIt);
+    721          #endif
+    722          }
+   \   02CA   B4             POP       DE
+   \   02CB   B2             POP       BC
+   \   02CC   AF             RET       
+   \   02CD                  REQUIRE ?CL78K_V4_6_L00
+   \   02CD                  REQUIRE _A_P0
+   \   02CD                  REQUIRE CR011
+   \   02CD                  REQUIRE _A_TMC01
+   \   02CD                  REQUIRE _A_TMC00
+   \   02CD                  REQUIRE _A_PRM00
+   \   02CD                  REQUIRE _A_IF0
+   \   02CD                  REQUIRE _A_IF1
+   \   02CD                  REQUIRE _A_MK1
+   \   02CD                  REQUIRE CR000
+    723          
+    724          //*****************************************************************************
+    725          //  DESCRIPTION : Interruption of the output compare PPG output timer
+    726          //  
+    727          //  PARAMETERS (Type,Name,Min,Max) :   none
+    728          //
+    729          //  RETURN VALUE :   none
+    730          // 
+    731          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    732          //*****************************************************************************
+    733          
+    734          #ifndef X90_PROJECT
+    735          mLDBIntDeclareIsr(cLDBHarInterruptTrpPPGIt)
+    736          {
+    737              mLDBIntEnterIsr(cLDBHarInterruptTrpPPGIt);
+    738          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    739          void LDBTrpPPGIt(void)
+   \                     LDBTrpPPGIt:
+    740          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    741          #endif
+    742          
+    743              if(cEndWritePulse == DecodingState)
+   \   0001   8E....         MOV       A,DecodingState
+   \   0004   4D06           CMP       A,#6
+   \   0006   AD03           BZ        $+5
+   \   0008   9B....         BR        N:??LDBTrpControl_30
+    744              {
+    745                  TransponderMessage.Lng--;
+   \   000B   89..           MOVW      AX,S:TransponderMessage+2
+   \   000D   90             DECW      AX
+   \   000E   99..           MOVW      S:TransponderMessage+2,AX
+    746          
+    747                  if (TransponderMessage.Lng == 0)
+   \   0010   6168           OR        A,X
+   \   0012   BD26           BNZ       ??LDBTrpControl_31
+    748                  {
+    749                      mWriteTranspondeurLine(1);
+   \   0014   A107           MOV       A,#7
+   \   0016   6B00           CLR1      S:0xFF00.6
+    750          
+    751                      //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+    752                      mRearmTimeOut(cTStopPulse);
+   \   0018   712BBA         CLR1      0xFFBA.2
+   \   001B   713BBA         CLR1      0xFFBA.3
+   \   001E   EE127F04       MOVW      S:0xFF12,#1151
+   \   0022   716BE1         CLR1      0xFFE1.6
+   \   0025   712ABA         SET1      0xFFBA.2
+   \   0028   713ABA         SET1      0xFFBA.3
+    753                      mStopPPGOutput();
+   \   002B   712BB6         CLR1      0xFFB6.2
+   \   002E   713BB6         CLR1      0xFFB6.3
+   \   0031   13B900         MOV       0xFFB9,#0
+    754                      DecodingState = cEndStopPulse;          
+   \   0034   9E....         MOV       DecodingState,A
+   \   0037   9B....         BR        N:??LDBTrpControl_30
+    755                  }
+    756                  else
+    757                  {
+    758                      //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+    759                      *TransponderMessage.pBuffer <<= 1;
+   \                     ??LDBTrpControl_31:
+   \   003A   89..           MOVW      AX,S:TransponderMessage
+   \   003C   D6             MOVW      HL,AX
+   \   003D   87             MOV       A,[HL]
+   \   003E   21             CLR1      CY
+   \   003F   27             ROLC      A,0x1
+   \   0040   97             MOV       [HL],A
+    760          
+    761                      if ((U8)(TransponderMessage.Lng & cNextByteMask) == (U8)0)
+   \   0041   89..           MOVW      AX,S:TransponderMessage+2
+   \   0043   60             MOV       A,X
+   \   0044   5D07           AND       A,#7
+   \   0046   BD05           BNZ       ??LDBTrpControl_32
+    762                      {
+    763                          //QACJ 0489:amanevd: This is how it comes from STK
+    764                          TransponderMessage.pBuffer--;
+   \   0048   89..           MOVW      AX,S:TransponderMessage
+   \   004A   90             DECW      AX
+   \   004B   99..           MOVW      S:TransponderMessage,AX
+    765                      }
+    766          
+    767                      //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+    768                      if (((U8)(*TransponderMessage.pBuffer) & cMaskBitToSend) != 0)
+   \                     ??LDBTrpControl_32:
+   \   004D   89..           MOVW      AX,S:TransponderMessage
+   \   004F   D6             MOVW      HL,AX
+   \   0050   A9B0           MOVW      AX,0xFFB0
+   \   0052   99..           MOVW      S:u16TimeDifference,AX
+   \   0054   8910           MOVW      AX,S:0xFF10
+   \   0056   99..           MOVW      S:u16TimeCapture,AX
+   \   0058   31F71D         BF        [HL].7, ??LDBTrpControl_33
+    769                      {
+    770                          //QACJ 0434:amanevd: 'TM01' is declared in io78f0536_64.h
+    771                          u16TimeDifference = mReadPPGTimerValue();
+    772                          //QACJ 0434:amanevd: 'TM00' is declared in io78f0536_64.h
+    773                          u16TimeCapture = mReadTimeOutValue();
+    774          
+    775          //===================================================================================================
+    776          //
+    777          // TRP     PPG Interrupt n-1                                                          PPG Interrupt n
+    778          // Line    |                           Start of the new pattern                       |
+    779          //         V                           |                                              V
+    780          //    -----+                           |      +---------------------------------------+
+    781          //         |      Time of servicing    |      |                                       |
+    782          //         |      | Interrupt          |      |                                       |
+    783          //         |      V                    V      |                                       |
+    784          //         +----------------------------------+                                       +--------------
+    785          //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    786          //         ^      ^                    ^      ^                                       ^
+    787          // Desc-   |<--+->|<----------------+->|<-+-->|                                       |
+    788          // ription |   +                    +  |  ++(cTBit1Pulse-cTWritePulse                 |
+    789          //         |   +                    +  |     -u16TimeDifference-u16TimeRearm)         |
+    790          //         |   +                    +  |                                              |
+    791          //         |   +                    +  |<------------+------------------------------->|
+    792          //         |   +                    +                +                                |
+    793          //         |   +                    ++u16TimeRearm   ++(cTBit1Pulse-u16TimeDifference |
+    794          //         |   ++u16TimeDifference                     -u16TimeRearm)                 |
+    795          //         |                                                                          |
+    796          //         |<----------cTWritePulse---------->|                                       |
+    797          //         |<---------------------cTBit1Pulse---------------------------------------->|
+    798          //
+    799          //  1. u16TimeDifference    -   The time measured between 
+    800          //                              PPG interrupt and actual time of interrupt servicing
+    801          //  2. u16TimeRearm         -   The time for rearming the timer(from previous cycle)
+    802          //  3. cTWritePulse         -   WritePulse time constant
+    803          //  4. cTBit1Pulse          -   TBit1Pulse time constant
+    804          //
+    805          //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    806          //
+    807          //  mRearmPPGOutput(M, N) produces waveform with the following metrics:
+    808          //
+    809          //  +                                            +--------------+
+    810          //  |                                            |              |
+    811          //  |                                            |              |
+    812          //  |                                            |              |
+    813          //  +--------------------------------------------+              +--------------
+    814          //  ^                                            ^              ^  
+    815          //  |<-------------------N---------------------->|              |
+    816          //  |<-----------------------------M--------------------------->|    
+    817          //
+    818          //===================================================================================================
+    819          
+    820                          //QACJ 0434:amanevd: 'CR001' is declared in io78f0536_64.h
+    821                          //QACJ 0434:amanevd: 'CR011' is declared in io78f0536_64.h
+    822                          mRearmPPGOutput(cTBit1Pulse - u16TimeDifference - u16TimeRearm, 
+    823                              cTBit1Pulse - cTWritePulse - u16TimeDifference - u16TimeRearm);
+   \   005B   10DF00         MOVW      AX,#223
+   \   005E   712BB6         CLR1      0xFFB6.2
+   \   0061   713BB6         CLR1      0xFFB6.3
+   \   0064   30             XCH       A,X
+   \   0065   1E..           SUB       A,S:u16TimeDifference
+   \   0067   30             XCH       A,X
+   \   0068   3E..           SUBC      A,S:u16TimeDifference+1
+   \   006A   30             XCH       A,X
+   \   006B   1E..           SUB       A,S:u16TimeRearm
+   \   006D   30             XCH       A,X
+   \   006E   3E..           SUBC      A,S:u16TimeRearm+1
+   \   0070   90             DECW      AX
+   \   0071   B9B2           MOVW      0xFFB2,AX
+   \   0073   10AF00         MOVW      AX,#175
+   \   0076   FA1B           BR        ??LDBTrpControl_34
+    824                          u16TimeRearm = (U16)((U16)(mReadTimeOutValue() - u16TimeCapture) >> cShiftBy2);
+    825                          mLIBassert(cTBit1Pulse > (cTWritePulse + u16TimeDifference + u16TimeRearm));
+    826                      }
+    827                      else
+    828                      {
+    829                          //QACJ 0434:amanevd: 'TM01' is declared in io78f0536_64.h
+    830                          u16TimeDifference = mReadPPGTimerValue();
+    831                          //QACJ 0434:amanevd: 'TM00' is declared in io78f0536_64.h
+    832                          u16TimeCapture = mReadTimeOutValue();
+    833          
+    834          //===================================================================================================
+    835          //
+    836          // TRP     PPG Interrupt n-1                                                          PPG Interrupt n
+    837          // Line    |                           Start of the new pattern                       |
+    838          //         V                           |                                              V
+    839          //    -----+                           |      +---------------------------------------+
+    840          //         |      Time of servicing    |      |                                       |
+    841          //         |      | Interrupt          |      |                                       |
+    842          //         |      V                    V      |                                       |
+    843          //         +----------------------------------+                                       +--------------
+    844          //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    845          //         ^      ^                    ^      ^                                       ^
+    846          // Desc-   |<--+->|<----------------+->|<-+-->|                                       |
+    847          // ription |   +                    +  |  ++(cTBit0Pulse-cTWritePulse                 |
+    848          //         |   +                    +  |     -u16TimeDifference-u16TimeRearm)         |
+    849          //         |   +                    +  |                                              |
+    850          //         |   +                    +  |<------------+------------------------------->|
+    851          //         |   +                    +                +                                |
+    852          //         |   +                    ++u16TimeRearm   ++(cTBit0Pulse-u16TimeDifference |
+    853          //         |   ++u16TimeDifference                     -u16TimeRearm)                 |
+    854          //         |                                                                          |
+    855          //         |<----------cTWritePulse---------->|                                       |
+    856          //         |<---------------------cTBit0Pulse---------------------------------------->|
+    857          //
+    858          //  1. u16TimeDifference    -   The time measured between 
+    859          //                              PPG interrupt and actual time of interrupt servicing
+    860          //  2. u16TimeRearm         -   The time for rearming the timer(from previous cycle)
+    861          //  3. cTWritePulse         -   WritePulse time constant
+    862          //  4. cTBit0Pulse          -   TBit0Pulse time constant
+    863          //
+    864          //===================================================================================================
+    865          
+    866                          //QACJ 0434:amanevd: 'CR001' is declared in io78f0536_64.h
+    867                          //QACJ 0434:amanevd: 'CR011' is declared in io78f0536_64.h
+    868                          mRearmPPGOutput(cTBit0Pulse - u16TimeDifference - u16TimeRearm, 
+    869                              cTBit0Pulse - cTWritePulse - u16TimeDifference - u16TimeRearm);
+   \                     ??LDBTrpControl_33:
+   \   0078   109400         MOVW      AX,#148
+   \   007B   712BB6         CLR1      0xFFB6.2
+   \   007E   713BB6         CLR1      0xFFB6.3
+   \   0081   30             XCH       A,X
+   \   0082   1E..           SUB       A,S:u16TimeDifference
+   \   0084   30             XCH       A,X
+   \   0085   3E..           SUBC      A,S:u16TimeDifference+1
+   \   0087   30             XCH       A,X
+   \   0088   1E..           SUB       A,S:u16TimeRearm
+   \   008A   30             XCH       A,X
+   \   008B   3E..           SUBC      A,S:u16TimeRearm+1
+   \   008D   90             DECW      AX
+   \   008E   B9B2           MOVW      0xFFB2,AX
+   \   0090   106400         MOVW      AX,#100
+   \                     ??LDBTrpControl_34:
+   \   0093   30             XCH       A,X
+   \   0094   1E..           SUB       A,S:u16TimeDifference
+   \   0096   30             XCH       A,X
+   \   0097   3E..           SUBC      A,S:u16TimeDifference+1
+   \   0099   30             XCH       A,X
+   \   009A   1E..           SUB       A,S:u16TimeRearm
+   \   009C   30             XCH       A,X
+   \   009D   3E..           SUBC      A,S:u16TimeRearm+1
+   \   009F   90             DECW      AX
+   \   00A0   B9B4           MOVW      0xFFB4,AX
+   \   00A2   13B912         MOV       0xFFB9,#18
+   \   00A5   710AB9         SET1      0xFFB9.0
+   \   00A8   712AB6         SET1      0xFFB6.2
+   \   00AB   713AB6         SET1      0xFFB6.3
+    870                          u16TimeRearm = (U16)((U16)(mReadTimeOutValue()- u16TimeCapture) >> cShiftBy2);
+   \   00AE   8910           MOVW      AX,S:0xFF10
+   \   00B0   30             XCH       A,X
+   \   00B1   1E..           SUB       A,S:u16TimeCapture
+   \   00B3   30             XCH       A,X
+   \   00B4   3E..           SUBC      A,S:u16TimeCapture+1
+   \   00B6   21             CLR1      CY
+   \   00B7   25             RORC      A,0x1
+   \   00B8   30             XCH       A,X
+   \   00B9   25             RORC      A,0x1
+   \   00BA   30             XCH       A,X
+   \   00BB   21             CLR1      CY
+   \   00BC   25             RORC      A,0x1
+   \   00BD   30             XCH       A,X
+   \   00BE   25             RORC      A,0x1
+   \   00BF   30             XCH       A,X
+   \   00C0   99..           MOVW      S:u16TimeRearm,AX
+    871                          mLIBassert(cTBit0Pulse > (cTWritePulse + u16TimeDifference + u16TimeRearm));
+    872                      }
+    873                  }
+    874              }
+    875              else
+    876              {
+    877                  mLIBassert(cFalse);
+    878              }
+    879          
+    880              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpPPGIt);
+   \                     ??LDBTrpControl_30:
+   \   00C2   712BE3         CLR1      0xFFE3.2
+    881          #ifndef X90_PROJECT
+    882              mLDBIntLeaveIsr(cLDBHarInterruptTrpPPGIt);
+    883          #endif
+    884          }
+   \   00C5   B2             POP       BC
+   \   00C6   AF             RET       
+   \   00C7                  REQUIRE ?CL78K_V4_6_L00
+   \   00C7                  REQUIRE _A_P0
+   \   00C7                  REQUIRE TM01
+   \   00C7                  REQUIRE CR001
+   \   00C7                  REQUIRE CR011
+   \   00C7                  REQUIRE _A_TMC01
+   \   00C7                  REQUIRE _A_TOC01
+   \   00C7                  REQUIRE _A_TMC00
+   \   00C7                  REQUIRE _A_IF0
+   \   00C7                  REQUIRE _A_IF1
+   \   00C7                  REQUIRE TM00
+   \   00C7                  REQUIRE CR000
+    885          
+    886          //*****************************************************************************
+    887          //  DESCRIPTION : Interruption of the output compare timer
+    888          //  
+    889          //  PARAMETERS (Type,Name,Min,Max) :   none
+    890          //
+    891          //  RETURN VALUE :   none
+    892          // 
+    893          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    894          //*****************************************************************************
+    895          #ifndef X90_PROJECT
+    896          mLDBIntDeclareIsr(cLDBHarInterruptTrpTimeOutIt)
+    897          {
+    898              U16 u16Temp;
+    899              mLDBIntEnterIsr(cLDBHarInterruptTrpTimeOutIt);
+    900          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    901          void LDBTrpTimeOutIt(void)
+   \                     LDBTrpTimeOutIt:
+    902          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    903              U16 u16Temp;
+    904          #endif
+    905          
+    906              switch (DecodingState)
+   \   0002   8E....         MOV       A,DecodingState
+   \   0005   4D00           CMP       A,#0
+   \   0007   BD03           BNZ       $+5
+   \   0009   9B....         BR        N:??LDBTrpControl_35
+   \   000C   4D01           CMP       A,#1
+   \   000E   BD03           BNZ       $+5
+   \   0010   9B....         BR        N:??LDBTrpControl_36
+   \   0013   4D02           CMP       A,#2
+   \   0015   BD03           BNZ       $+5
+   \   0017   9B....         BR        N:??LDBTrpControl_37
+   \   001A   4D03           CMP       A,#3
+   \   001C   BD03           BNZ       $+5
+   \   001E   9B....         BR        N:??LDBTrpControl_38
+   \   0021   4D05           CMP       A,#5
+   \   0023   AD42           BZ        ??LDBTrpControl_39
+   \   0025   4D06           CMP       A,#6
+   \   0027   BD03           BNZ       $+5
+   \   0029   9B....         BR        N:??LDBTrpControl_40
+   \   002C   4D07           CMP       A,#7
+   \   002E   BD03           BNZ       $+5
+   \   0030   9B....         BR        N:??LDBTrpControl_41
+   \   0033   4D08           CMP       A,#8
+   \   0035   BD03           BNZ       $+5
+   \   0037   9B....         BR        N:??LDBTrpControl_42
+   \   003A   4D09           CMP       A,#9
+   \   003C   BD03           BNZ       $+5
+   \   003E   9B....         BR        N:??LDBTrpControl_43
+   \   0041   4D0A           CMP       A,#10
+   \   0043   BD03           BNZ       $+5
+   \   0045   9B....         BR        N:??LDBTrpControl_44
+   \   0048   4D0B           CMP       A,#11
+   \   004A   BD03           BNZ       $+5
+   \   004C   9B....         BR        N:??LDBTrpControl_45
+   \   004F   4D0C           CMP       A,#12
+   \   0051   BD03           BNZ       $+5
+   \   0053   9B....         BR        N:??LDBTrpControl_46
+   \   0056   4D0D           CMP       A,#13
+   \   0058   BD03           BNZ       $+5
+   \   005A   9B....         BR        N:??LDBTrpControl_47
+   \   005D   4D0E           CMP       A,#14
+   \   005F   BD03           BNZ       $+5
+   \   0061   9B....         BR        N:??LDBTrpControl_48
+   \   0064   9B....         BR        N:??LDBTrpControl_49
+    907              {
+    908                  case cTimeOutInterCom:
+    909          
+    910                  mStartEdgeDetection(cLDBIocRisingEdge);
+   \                     ??LDBTrpControl_39:
+   \   0067   A100           MOV       A,#0
+   \   0069   712BB6         CLR1      0xFFB6.2
+   \   006C   713BB6         CLR1      0xFFB6.3
+   \   006F   711BB7         CLR1      0xFFB7.1
+   \   0072   710AB7         SET1      0xFFB7.0
+   \   0075   710BB8         CLR1      0xFFB8.0
+   \   0078   711BB8         CLR1      0xFFB8.1
+   \   007B   712AB8         SET1      0xFFB8.2
+   \   007E   710BB9         CLR1      0xFFB9.0
+   \   0081   714AB7         SET1      0xFFB7.4
+   \   0084   715BB7         CLR1      0xFFB7.5
+   \   0087   EE..0000       MOVW      S:u16TimeMeasuredOld,#0
+   \   008B   712AB6         SET1      0xFFB6.2
+   \   008E   713BB6         CLR1      0xFFB6.3
+    911          
+    912                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0091   713AE7         SET1      0xFFE7.3
+    913                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0094   713BE3         CLR1      0xFFE3.3
+    914                  mLDBIntEnableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0097   713BE7         CLR1      0xFFE7.3
+    915          
+    916                  //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+    917                  mRearmTimeOut(cTEchReadingMode);
+   \   009A   712BBA         CLR1      0xFFBA.2
+   \   009D   713BBA         CLR1      0xFFBA.3
+   \   00A0   EE120F03       MOVW      S:0xFF12,#783
+   \   00A4   716BE1         CLR1      0xFFE1.6
+   \   00A7   712ABA         SET1      0xFFBA.2
+   \   00AA   713ABA         SET1      0xFFBA.3
+    918                  u8RestartCounter = 0;
+   \   00AD   9E....         MOV       u8RestartCounter,A
+    919          
+    920                  DecodingState = cReadingModeChecking;
+   \                     ??LDBTrpTimeOutIt_0:
+   \   00B0   9E....         MOV       DecodingState,A
+   \   00B3   9B....         BR        N:??LDBTrpControl_49
+    921                  break;
+    922          
+    923                  case cReadingModeChecking:
+    924          
+    925                  //QACJ 3346:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+    926                  if (mReadTranspondeurLine() != cFalse)
+   \                     ??LDBTrpControl_35:
+   \   00B6   DC0030         BT        S:0xFF00.5, ??LDBTrpControl_50
+    927                  {
+    928                      u8RestartCounter++;
+   \   00B9   8E....         MOV       A,u8RestartCounter
+   \   00BC   41             INC       A
+   \   00BD   9E....         MOV       u8RestartCounter,A
+    929                      if (u8RestartCounter > cMaxReadingCounter)   // Ensure reading mode
+   \   00C0   4D07           CMP       A,#7
+   \   00C2   9D03           BNC       $+5
+   \   00C4   9B....         BR        N:??LDBTrpControl_49
+    930                      {
+    931                          mWriteTranspondeurLine(0);
+   \   00C7   A106           MOV       A,#6
+   \   00C9   6A00           SET1      S:0xFF00.6
+    932          
+    933                          mStopTimeCaptureTimer();
+   \   00CB   712BB6         CLR1      0xFFB6.2
+   \   00CE   713BB6         CLR1      0xFFB6.3
+    934          
+    935                          mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   00D1   713AE7         SET1      0xFFE7.3
+    936          
+    937                          mRearmTimeOut(cTWritingPulseMode1);
+   \   00D4   712BBA         CLR1      0xFFBA.2
+   \   00D7   713BBA         CLR1      0xFFBA.3
+   \   00DA   EE126F10       MOVW      S:0xFF12,#4207
+   \                     ??LDBTrpTimeOutIt_1:
+   \   00DE   716BE1         CLR1      0xFFE1.6
+   \   00E1   712ABA         SET1      0xFFBA.2
+   \   00E4   713ABA         SET1      0xFFBA.3
+    938          
+    939                          DecodingState = cEndWritePulse;
+   \   00E7   FAC7           BR        ??LDBTrpTimeOutIt_0
+    940                      }
+    941                  }
+    942                  else
+    943                  //QACJ 3201:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+    944                  {
+    945                      u8RestartCounter = 0;
+   \                     ??LDBTrpControl_50:
+   \   00E9   A100           MOV       A,#0
+   \   00EB   9E....         MOV       u8RestartCounter,A
+   \   00EE   9B....         BR        N:??LDBTrpControl_49
+    946                  }
+    947                  break;
+    948          
+    949                  case cEndWritePulse:
+    950          
+    951                  if(    (cShortCommandLenght == TransponderMessage.Lng)
+    952                      || (cLongCommandLenght  == TransponderMessage.Lng)
+    953                      || (cPageLength         == TransponderMessage.Lng)
+    954                      || (cChallangeLenght    == TransponderMessage.Lng)
+    955                    )
+   \                     ??LDBTrpControl_40:
+   \   00F1   89..           MOVW      AX,S:TransponderMessage+2
+   \   00F3   EA0500         CMPW      AX,#5
+   \   00F6   AD0F           BZ        ??LDBTrpControl_51
+   \   00F8   EA0A00         CMPW      AX,#10
+   \   00FB   AD0A           BZ        ??LDBTrpControl_51
+   \   00FD   EA2000         CMPW      AX,#32
+   \   0100   AD05           BZ        ??LDBTrpControl_51
+   \   0102   EA4000         CMPW      AX,#64
+   \   0105   BD78           BNZ       ??LDBTrpControl_37
+    956                  {
+    957                      u16TimeDifference = 0;
+   \                     ??LDBTrpControl_51:
+   \   0107   EE..0000       MOVW      S:u16TimeDifference,#0
+    958          
+    959                      mLDBIntDisableIsr(cLDBHarInterruptTrpPPGIt);
+   \   010B   712AE7         SET1      0xFFE7.2
+    960                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpPPGIt);
+   \   010E   712BE3         CLR1      0xFFE3.2
+    961                      mLDBIntEnableIsr(cLDBHarInterruptTrpPPGIt);
+   \   0111   712BE7         CLR1      0xFFE7.2
+    962          
+    963                      mWriteTranspondeurLine(1);
+   \   0114   6B00           CLR1      S:0xFF00.6
+    964          
+    965                      u16Temp = (cTBitMaxPulse*TransponderMessage.Lng);
+   \   0116   12FC03         MOVW      BC,#1020
+   \   0119   89..           MOVW      AX,S:TransponderMessage+2
+   \   011B   ..             CALLT     [__T_?I_MUL_L02]
+    966                      mRearmTimeOut(u16Temp);
+   \   011C   712BBA         CLR1      0xFFBA.2
+   \   011F   713BBA         CLR1      0xFFBA.3
+   \   0122   90             DECW      AX
+   \   0123   9912           MOVW      S:0xFF12,AX
+   \   0125   716BE1         CLR1      0xFFE1.6
+   \   0128   712ABA         SET1      0xFFBA.2
+   \   012B   713ABA         SET1      0xFFBA.3
+    967          
+    968                      mLIBassert(NULL != TransponderMessage.pBuffer);
+    969          
+    970                      //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+    971                      if ((*TransponderMessage.pBuffer & cMaskBitToSend) != 0)
+   \   012E   89..           MOVW      AX,S:TransponderMessage
+   \   0130   D6             MOVW      HL,AX
+   \   0131   31F71C         BF        [HL].7, ??LDBTrpControl_52
+    972                      {
+    973                          //QACJ 0434:amanevd: 'CR001' is declared in io78f0536_64.h
+    974                          //QACJ 0434:amanevd: 'CR011' is declared in io78f0536_64.h
+    975                          mStartPPGOutput(cTBit1Pulse - cTInitPPGCorrection, 
+    976                              cTBit1Pulse - cTInitPPGCorrection - cTWritePulse);
+   \   0134   712BB6         CLR1      0xFFB6.2
+   \   0137   713BB6         CLR1      0xFFB6.3
+   \   013A   711BB7         CLR1      0xFFB7.1
+   \   013D   710AB7         SET1      0xFFB7.0
+   \   0140   710BB8         CLR1      0xFFB8.0
+   \   0143   712BB8         CLR1      0xFFB8.2
+   \   0146   FEB2CC00       MOVW      0xFFB2,#204
+   \   014A   FEB49C00       MOVW      0xFFB4,#156
+   \   014E   FA1A           BR        ??LDBTrpControl_53
+    977                          u16TimeRearm = cInitRearmTime;
+    978                      }
+    979                      else
+    980                      {
+    981                          //QACJ 0434:amanevd: 'CR001' is declared in io78f0536_64.h
+    982                          //QACJ 0434:amanevd: 'CR011' is declared in io78f0536_64.h
+    983                          mStartPPGOutput(cTBit0Pulse - cTInitPPGCorrection, 
+    984                              cTBit0Pulse - cTInitPPGCorrection - cTWritePulse);
+   \                     ??LDBTrpControl_52:
+   \   0150   712BB6         CLR1      0xFFB6.2
+   \   0153   713BB6         CLR1      0xFFB6.3
+   \   0156   711BB7         CLR1      0xFFB7.1
+   \   0159   710AB7         SET1      0xFFB7.0
+   \   015C   710BB8         CLR1      0xFFB8.0
+   \   015F   712BB8         CLR1      0xFFB8.2
+   \   0162   FEB28100       MOVW      0xFFB2,#129
+   \   0166   FEB45100       MOVW      0xFFB4,#81
+   \                     ??LDBTrpControl_53:
+   \   016A   A106           MOV       A,#6
+   \   016C   13B912         MOV       0xFFB9,#18
+   \   016F   710AB9         SET1      0xFFB9.0
+   \   0172   712AB6         SET1      0xFFB6.2
+   \   0175   713AB6         SET1      0xFFB6.3
+    985                          u16TimeRearm = cInitRearmTime;
+   \   0178   EE..0800       MOVW      S:u16TimeRearm,#8
+    986                      }
+    987          
+    988                      DecodingState = cEndWritePulse;
+   \   017C   9B....         BR        N:??LDBTrpTimeOutIt_0
+    989                  }
+    990                  else
+    991                  {
+    992                      StopCom();
+   \                     ??LDBTrpControl_37:
+   \   017F   9A....         CALL      StopCom
+    993                      DATTrpCallBackRxWithAddr(0, cLDBError);
+   \   0182   100000         MOVW      AX,#0
+   \   0185   A301           MOV       B,#1
+   \   0187   16....         MOVW      HL,#LWRD(DATTrpCallBackRxWithAddr)
+   \   018A   A4..           MOV       E,#BYTE3(DATTrpCallBackRxWithAddr)
+   \                     ??LDBTrpTimeOutIt_2:
+   \   018C   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   018D   9B....         BR        N:??LDBTrpControl_49
+    994                  }
+    995                  break;
+    996          
+    997                  case cEndStopPulse:
+    998          
+    999                  mLDBIntDisableIsr(cLDBHarInterruptTrpPPGIt);
+   \                     ??LDBTrpControl_41:
+   \   0190   712AE7         SET1      0xFFE7.2
+   1000          
+   1001                  if (bTimeOutTProgRequested != cFalse)
+   \   0193   8E....         MOV       A,bTimeOutTProgRequested
+   \   0196   4D00           CMP       A,#0
+   \   0198   AD0F           BZ        ??LDBTrpControl_54
+   1002                  {
+   1003                      mRearmTimeOut(cTProg);
+   \   019A   A108           MOV       A,#8
+   \   019C   712BBA         CLR1      0xFFBA.2
+   \   019F   713BBA         CLR1      0xFFBA.3
+   \   01A2   EE127FBB       MOVW      S:0xFF12,#47999
+   \   01A6   9B....         BR        N:??LDBTrpTimeOutIt_1
+   1004                      DecodingState = cTimeOutProg;
+   1005                  }
+   1006                  else
+   1007                  {
+   1008                      mRearmTimeOut(cTEqualizer);
+   \                     ??LDBTrpControl_54:
+   \   01A9   A109           MOV       A,#9
+   \   01AB   712BBA         CLR1      0xFFBA.2
+   \   01AE   713BBA         CLR1      0xFFBA.3
+   \   01B1   EE126725       MOVW      S:0xFF12,#9575
+   \   01B5   9B....         BR        N:??LDBTrpTimeOutIt_1
+   1009                      DecodingState = cTimeOutEqualizer;
+   1010                  }
+   1011                  break;
+   1012          
+   1013                  case cTimeOutProg:
+   1014          
+   1015                  StopCom();
+   \                     ??LDBTrpControl_42:
+   \   01B8   9A....         CALL      StopCom
+   1016                  DATTrpCallBackTxWithAddr(0, cLDBCorrect);
+   \   01BB   100000         MOVW      AX,#0
+   \   01BE   73             MOV       B,A
+   \   01BF   16....         MOVW      HL,#LWRD(DATTrpCallBackTxWithAddr)
+   \   01C2   A4..           MOV       E,#BYTE3(DATTrpCallBackTxWithAddr)
+   \   01C4   FAC6           BR        ??LDBTrpTimeOutIt_2
+   1017                  break;
+   1018          
+   1019                  case cTimeOutEqualizer:
+   1020          
+   1021                  mStartAcquistion();     //Initialisation Timer en mode capture, Detection sur front descendant, Commence à compter entre 2 front descendant
+   \                     ??LDBTrpControl_43:
+   \   01C6   A100           MOV       A,#0
+   \   01C8   712BB6         CLR1      0xFFB6.2
+   \   01CB   713BB6         CLR1      0xFFB6.3
+   \   01CE   711BB7         CLR1      0xFFB7.1
+   \   01D1   710AB7         SET1      0xFFB7.0
+   \   01D4   710BB8         CLR1      0xFFB8.0
+   \   01D7   711BB8         CLR1      0xFFB8.1
+   \   01DA   712AB8         SET1      0xFFB8.2
+   \   01DD   710BB9         CLR1      0xFFB9.0
+   \   01E0   714AB7         SET1      0xFFB7.4
+   \   01E3   715BB7         CLR1      0xFFB7.5
+   \   01E6   EE..0000       MOVW      S:u16TimeMeasuredOld,#0
+   \   01EA   712AB6         SET1      0xFFB6.2
+   \   01ED   713BB6         CLR1      0xFFB6.3
+   1022          
+   1023                  mRearmTimeOut(cTFirstWindowOpening);    //220µs fenetre de detection du front descendant du dernier bit EQ
+   \   01F0   712BBA         CLR1      0xFFBA.2
+   \   01F3   713BBA         CLR1      0xFFBA.3
+   \   01F6   EE12FF02       MOVW      S:0xFF12,#767
+   \   01FA   716BE1         CLR1      0xFFE1.6
+   \   01FD   712ABA         SET1      0xFFBA.2
+   \   0200   713ABA         SET1      0xFFBA.3
+   1024          
+   1025                  u8ReceivedBits    = 0;
+   \   0203   9E....         MOV       u8ReceivedBits,A
+   1026                  u16TimeMeasured    = 0;
+   \   0206   EE..0000       MOVW      S:u16TimeMeasured,#0
+   1027                  bDataSynchronized = cFalse;             //Synchronisation bit "1"
+   \   020A   9E....         MOV       bDataSynchronized,A
+   1028                  DecodingState     = cOpenWindowData;
+   \   020D   A101           MOV       A,#1
+   \   020F   9E....         MOV       DecodingState,A
+   1029                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0212   713AE7         SET1      0xFFE7.3
+   1030                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0215   713BE3         CLR1      0xFFE3.3
+   \   0218   9B....         BR        N:??LDBTrpControl_49
+   1031                  break;
+   1032          
+   1033                  case cOpenWindowData:
+   1034          
+   1035                  mRearmTimeOut(cTWindowClosing);         //580µs
+   \                     ??LDBTrpControl_36:
+   \   021B   A102           MOV       A,#2
+   \   021D   712BBA         CLR1      0xFFBA.2
+   \   0220   713BBA         CLR1      0xFFBA.3
+   \   0223   EE120F09       MOVW      S:0xFF12,#2319
+   \   0227   716BE1         CLR1      0xFFE1.6
+   \   022A   712ABA         SET1      0xFFBA.2
+   \   022D   713ABA         SET1      0xFFBA.3
+   1036                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0230   713AE7         SET1      0xFFE7.3
+   1037                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0233   713BE3         CLR1      0xFFE3.3
+   1038                  mLDBIntEnableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0236   713BE7         CLR1      0xFFE7.3
+   1039                  DecodingState = cDecoding;              //Decodage Data
+   \   0239   9B....         BR        N:??LDBTrpTimeOutIt_0
+   1040                  break;
+   1041          
+   1042                  case cDecoding:
+   1043          
+   1044                  StopCom();                              //Time Out => arret machine d'état
+   1045                  //DF : Diag
+   1046                  //Probleme Data sortie en Time Out
+   1047                  DATTrpCallBackRxWithAddr(0, cLDBError);
+   1048                  //DF : fin
+   1049                  break;
+   1050          
+   1051                  case cStartSleep:
+   1052          
+   1053                  if (u8RestartCounter < cMaxRestart)
+   \                     ??LDBTrpControl_44:
+   \   023C   8E....         MOV       A,u8RestartCounter
+   \   023F   4D05           CMP       A,#5
+   \   0241   9D33           BNC       ??LDBTrpControl_55
+   1054                  {
+   1055                      // Line must be set to 1
+   1056                      //QACJ 3325:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+   1057                      if (mReadTranspondeurLine() == (U8)0U)   // Short circuit to Gnd
+   \   0243   3153000A       BF        S:0xFF00.5, ??LDBTrpControl_56
+   1058                      //QACJ 3201:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+   1059                      {
+   1060                          if (u8ShortCircuitToGnd < cShortCircuitThreshold)
+   \   0247   8E....         MOV       A,u8ShortCircuitToGnd
+   \   024A   4DFF           CMP       A,#255
+   \   024C   AD08           BZ        ??LDBTrpControl_57
+   1061                          {
+   1062                              u8ShortCircuitToGnd++;            // Possible noise, wait sleep to ensure good high level
+   \   024E   41             INC       A
+   \   024F   FA02           BR        ??LDBTrpControl_58
+   1063                          }
+   1064                      }
+   1065                      else            
+   1066                      {
+   1067                          u8ShortCircuitToGnd = 0;            // no short circuit
+   \                     ??LDBTrpControl_56:
+   \   0251   A100           MOV       A,#0
+   \                     ??LDBTrpControl_58:
+   \   0253   9E....         MOV       u8ShortCircuitToGnd,A
+   1068                      }
+   1069                      mStartTimeOut(cTWaitBeforeSleepAck);
+   \                     ??LDBTrpControl_57:
+   \   0256   A10B           MOV       A,#11
+   \   0258   712BBA         CLR1      0xFFBA.2
+   \   025B   713BBA         CLR1      0xFFBA.3
+   \   025E   711BBB         CLR1      0xFFBB.1
+   \   0261   710ABB         SET1      0xFFBB.0
+   \   0264   EE12AF36       MOVW      S:0xFF12,#13999
+   \   0268   716BE1         CLR1      0xFFE1.6
+   \   026B   712ABA         SET1      0xFFBA.2
+   \   026E   713ABA         SET1      0xFFBA.3
+   1070                      mWriteTranspondeurLine(0);
+   \   0271   6A00           SET1      S:0xFF00.6
+   1071                      DecodingState = cStartSleepAckDetection;
+   \   0273   9B....         BR        N:??LDBTrpTimeOutIt_0
+   1072                  }
+   1073                  else
+   1074                  {
+   1075                      StopCom();
+   \                     ??LDBTrpControl_55:
+   \   0276   9A....         CALL      StopCom
+   1076                      if( u8ShortCircuitToGnd > cMaxShortCircuitToGnd )
+   \   0279   8E....         MOV       A,u8ShortCircuitToGnd
+   \   027C   4D07           CMP       A,#7
+   \   027E   8D04           BC        ??LDBTrpControl_59
+   1077                      {
+   1078                          DATTrpCallBackCtrl(cLDBTrpShortCircuitToGnd);
+   \   0280   A109           MOV       A,#9
+   \   0282   FA09           BR        ??LDBTrpControl_60
+   1079                      }
+   1080                      else if( u8ShortCircuitToBat > cMaxShortCircuitToBat)
+   \                     ??LDBTrpControl_59:
+   \   0284   8E....         MOV       A,u8ShortCircuitToBat
+   \   0287   4D04           CMP       A,#4
+   \   0289   8D08           BC        ??LDBTrpControl_61
+   1081                      {
+   1082                          DATTrpCallBackCtrl(cLDBTrpShortCircuitToBat);
+   \   028B   A108           MOV       A,#8
+   \                     ??LDBTrpControl_60:
+   \   028D   16....         MOVW      HL,#LWRD(DATTrpCallBackCtrl)
+   \   0290   A4..           MOV       E,#BYTE3(DATTrpCallBackCtrl)
+   \   0292   ..             CALLT     [__T_?FAR_CALL_L07]
+   1083                      }
+   1084                      else
+   1085                      {
+   1086                          //Nothing to do
+   1087                      }
+   1088                      DATTrpCallBackEndCtrl(cLDBTrpSleep, cLDBError);
+   \                     ??LDBTrpControl_61:
+   \   0293   A101           MOV       A,#1
+   \   0295   9B....         BR        N:??LDBTrpControl_62
+   1089                  }
+   1090                  break;
+   1091          
+   1092                  case cStartSleepAckDetection:    
+   1093          
+   1094                  // Line must be set to 0
+   1095                  //QACJ 3346:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+   1096                  if (mReadTranspondeurLine() != (U8)0U)   // Short circuit to Batt
+   \                     ??LDBTrpControl_45:
+   \   0298   DC000A         BT        S:0xFF00.5, ??LDBTrpControl_63
+   1097                  {
+   1098                      if (u8ShortCircuitToBat < cShortCircuitThreshold)
+   \   029B   8E....         MOV       A,u8ShortCircuitToBat
+   \   029E   4DFF           CMP       A,#255
+   \   02A0   AD08           BZ        ??LDBTrpControl_64
+   1099                      {
+   1100                          u8ShortCircuitToBat++;
+   \   02A2   41             INC       A
+   \   02A3   FA02           BR        ??LDBTrpControl_65
+   1101                      }
+   1102                  }
+   1103                  else
+   1104                  //QACJ 3201:amanevd: The 'if' expression is not analysed correct, because of incorrect inclusion of io78f0536_64.h
+   1105                  {
+   1106                      u8ShortCircuitToBat = 0;
+   \                     ??LDBTrpControl_63:
+   \   02A5   A100           MOV       A,#0
+   \                     ??LDBTrpControl_65:
+   \   02A7   9E....         MOV       u8ShortCircuitToBat,A
+   1107                  }
+   1108                  mStartTimeOut(cTTestLigneStateTimeOut);
+   \                     ??LDBTrpControl_64:
+   \   02AA   A101           MOV       A,#1
+   \   02AC   712BBA         CLR1      0xFFBA.2
+   \   02AF   713BBA         CLR1      0xFFBA.3
+   \   02B2   711BBB         CLR1      0xFFBB.1
+   \   02B5   710ABB         SET1      0xFFBB.0
+   \   02B8   EE122F07       MOVW      S:0xFF12,#1839
+   \   02BC   716BE1         CLR1      0xFFE1.6
+   \   02BF   712ABA         SET1      0xFFBA.2
+   \   02C2   713ABA         SET1      0xFFBA.3
+   1109                  mWriteTranspondeurLine(1);
+   \   02C5   6B00           CLR1      S:0xFF00.6
+   1110                  bDetectAckPulse = cTrue;
+   \   02C7   9E....         MOV       bDetectAckPulse,A
+   1111                  DecodingState   = cSleepAckDetection;
+   \   02CA   A103           MOV       A,#3
+   \   02CC   9B....         BR        N:??LDBTrpTimeOutIt_0
+   1112                  break;
+   1113          
+   1114                  case cSleepAckDetection:
+   1115          
+   1116                  if ((bDetectAckPulse != cFalse) && (mReadTranspondeurLine() != (U8)0U))
+   \                     ??LDBTrpControl_38:
+   \   02CF   8E....         MOV       A,bDetectAckPulse
+   \   02D2   4D00           CMP       A,#0
+   \   02D4   AD54           BZ        ??LDBTrpControl_66
+   \   02D6   DC0051         BT        S:0xFF00.5, ??LDBTrpControl_66
+   1117                  {
+   1118                      mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   02D9   A100           MOV       A,#0
+   \   02DB   713AE7         SET1      0xFFE7.3
+   1119                      mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   \   02DE   713BE3         CLR1      0xFFE3.3
+   1120                      mLDBIntEnableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   02E1   713BE7         CLR1      0xFFE7.3
+   1121          
+   1122                      mStartTimeOut(cTWaitSleepAckTimeOut);
+   \   02E4   712BBA         CLR1      0xFFBA.2
+   \   02E7   713BBA         CLR1      0xFFBA.3
+   \   02EA   711BBB         CLR1      0xFFBB.1
+   \   02ED   710ABB         SET1      0xFFBB.0
+   \   02F0   EE12EF0A       MOVW      S:0xFF12,#2799
+   \   02F4   716BE1         CLR1      0xFFE1.6
+   \   02F7   712ABA         SET1      0xFFBA.2
+   \   02FA   713ABA         SET1      0xFFBA.3
+   1123                      mStartBaseStationAckCapture();
+   \   02FD   712BB6         CLR1      0xFFB6.2
+   \   0300   713BB6         CLR1      0xFFB6.3
+   \   0303   711BB7         CLR1      0xFFB7.1
+   \   0306   710AB7         SET1      0xFFB7.0
+   \   0309   710BB8         CLR1      0xFFB8.0
+   \   030C   711BB8         CLR1      0xFFB8.1
+   \   030F   712AB8         SET1      0xFFB8.2
+   \   0312   710BB9         CLR1      0xFFB9.0
+   \   0315   714AB7         SET1      0xFFB7.4
+   \   0318   715AB7         SET1      0xFFB7.5
+   \   031B   EE..0000       MOVW      S:u16TimeMeasuredOld,#0
+   \   031F   712AB6         SET1      0xFFB6.2
+   \   0322   713BB6         CLR1      0xFFB6.3
+   1124                      bDetectAckPulse = cFalse;
+   \   0325   9E....         MOV       bDetectAckPulse,A
+   \   0328   FA68           BR        ??LDBTrpControl_49
+   1125                  }
+   1126                  else
+   1127                  {
+   1128                      mStopTimeCaptureTimer();
+   \                     ??LDBTrpControl_66:
+   \   032A   712BB6         CLR1      0xFFB6.2
+   \   032D   713BB6         CLR1      0xFFB6.3
+   1129                      mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0330   713AE7         SET1      0xFFE7.3
+   1130                      mStartTimeOut(cTRestartBaseStationControl);
+   \   0333   712BBA         CLR1      0xFFBA.2
+   \   0336   713BBA         CLR1      0xFFBA.3
+   \   0339   711BBB         CLR1      0xFFBB.1
+   \   033C   710ABB         SET1      0xFFBB.0
+   \   033F   EE127F0C       MOVW      S:0xFF12,#3199
+   \   0343   716BE1         CLR1      0xFFE1.6
+   \   0346   712ABA         SET1      0xFFBA.2
+   \   0349   713ABA         SET1      0xFFBA.3
+   1131                      u8RestartCounter++;
+   \   034C   8E....         MOV       A,u8RestartCounter
+   \   034F   41             INC       A
+   \   0350   9E....         MOV       u8RestartCounter,A
+   1132                      DecodingState = cStartSleep;
+   \   0353   A10A           MOV       A,#10
+   \   0355   9B....         BR        N:??LDBTrpTimeOutIt_0
+   1133                  }
+   1134                  break;
+   1135          
+   1136                  case cWaitTransponderSleep:
+   1137          
+   1138                  StopCom();
+   \                     ??LDBTrpControl_47:
+   \   0358   9A....         CALL      StopCom
+   1139                  DATTrpCallBackEndCtrl(cLDBTrpSleep, cLDBCorrect);
+   \   035B   A101           MOV       A,#1
+   \   035D   A300           MOV       B,#0
+   \   035F   FA2B           BR        ??LDBTrpControl_67
+   1140                  break;
+   1141          
+   1142                  case cGenerateRaisingEdge:
+   1143          
+   1144                  mStartTimeOut(cTWaitingWakeUp);
+   \                     ??LDBTrpControl_46:
+   \   0361   A10E           MOV       A,#14
+   \   0363   712BBA         CLR1      0xFFBA.2
+   \   0366   713BBA         CLR1      0xFFBA.3
+   \   0369   711BBB         CLR1      0xFFBB.1
+   \   036C   710ABB         SET1      0xFFBB.0
+   \   036F   EE12CF07       MOVW      S:0xFF12,#1999
+   \   0373   716BE1         CLR1      0xFFE1.6
+   \   0376   712ABA         SET1      0xFFBA.2
+   \   0379   713ABA         SET1      0xFFBA.3
+   1145                  mWriteTranspondeurLine(1);
+   \   037C   6B00           CLR1      S:0xFF00.6
+   1146                  DecodingState = cWaitingWakeUp;
+   \   037E   9B....         BR        N:??LDBTrpTimeOutIt_0
+   1147                  break;
+   1148          
+   1149                  case cWaitingWakeUp:
+   1150          
+   1151                  StopCom();
+   \                     ??LDBTrpControl_48:
+   \   0381   9A....         CALL      StopCom
+   1152                  DecodingState = cStop;
+   \   0384   A104           MOV       A,#4
+   \   0386   9E....         MOV       DecodingState,A
+   1153                  DATTrpCallBackEndCtrl(cLDBTrpWakeUp, cLDBCorrect);
+   \   0389   A100           MOV       A,#0
+   \                     ??LDBTrpControl_62:
+   \   038B   73             MOV       B,A
+   \                     ??LDBTrpControl_67:
+   \   038C   16....         MOVW      HL,#LWRD(DATTrpCallBackEndCtrl)
+   \   038F   A4..           MOV       E,#BYTE3(DATTrpCallBackEndCtrl)
+   \   0391   ..             CALLT     [__T_?FAR_CALL_L07]
+   1154                  break;  
+   1155          
+   1156                  default:
+   1157                  mLIBassert(cFalse);
+   1158                  break;
+   1159              }
+   1160          
+   1161              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);
+   \                     ??LDBTrpControl_49:
+   \   0392   716BE1         CLR1      0xFFE1.6
+   1162          #ifndef X90_PROJECT
+   1163              mLDBIntLeaveIsr(cLDBHarInterruptTrpTimeOutIt);
+   1164          #endif
+   1165          }
+   \   0395   B4             POP       DE
+   \   0396   B2             POP       BC
+   \   0397   AF             RET       
+   \   0398                  REQUIRE ?CL78K_V4_6_L00
+   \   0398                  REQUIRE _A_P0
+   \   0398                  REQUIRE CR001
+   \   0398                  REQUIRE CR011
+   \   0398                  REQUIRE _A_TMC01
+   \   0398                  REQUIRE _A_PRM01
+   \   0398                  REQUIRE _A_CRC01
+   \   0398                  REQUIRE _A_TOC01
+   \   0398                  REQUIRE _A_TMC00
+   \   0398                  REQUIRE _A_PRM00
+   \   0398                  REQUIRE _A_IF0
+   \   0398                  REQUIRE _A_IF1
+   \   0398                  REQUIRE _A_MK1
+   \   0398                  REQUIRE CR000
+   1166          
+   1167          //*****************************************************************************
+   1168          //  DESCRIPTION : Interruption of the Verlog output timer
+   1169          //  
+   1170          //  PARAMETERS (Type,Name,Min,Max) :   none
+   1171          //
+   1172          //  RETURN VALUE :   none
+   1173          // 
+   1174          //  DESIGN INFORMATION :   refer to Detailed Design Document
+   1175          //*****************************************************************************
+   1176          #ifndef X90_PROJECT
+   1177          mLDBIntDeclareIsr(cLDBHarInterruptTrpVerlogTimerIt)
+   1178          {
+   1179              mLDBIntEnterIsr(cLDBHarInterruptTrpVerlogTimerIt);
+   1180          #else
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1181          void LDBTrpVerlogTimerIt(void)
+   \                     LDBTrpVerlogTimerIt:
+   1182          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1183          #endif
+   1184          
+   1185              DATVlgCallBackCtrl();
+   \   0000   9A....         CALL      DATVlgCallBackCtrl
+   1186          
+   1187              mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpVerlogTimerIt);
+   \   0003   713BE1         CLR1      0xFFE1.3
+   1188          #ifndef X90_PROJECT
+   1189              mLDBIntLeaveIsr(cLDBHarInterruptTrpVerlogTimerIt);
+   1190          #endif
+   1191          }
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+   \   0007                  REQUIRE _A_IF0
+   1192          
+   1193          //*****************************************************************************
+   1194          //  DESCRIPTION         : Init of the LDB_TRP
+   1195          //
+   1196          //  PARAMETERS          : None
+   1197          //  (Type,Name,Min,Max) 
+   1198          //
+   1199          //  RETURN VALUE        : None
+   1200          //
+   1201          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+   1202          //
+   1203          //*****************************************************************************
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1204          MEM_TYPE void LDBTrpInit(void)
+   \                     LDBTrpInit:
+   1205          {  
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1206              mLDBHarWrite(cLDBHarTrpOut, 0);
+   \   0000   A104           MOV       A,#4
+   \   0002   6B00           CLR1      S:0xFF00.6
+   1207              mLDBHarConfig(cLDBHarTrpOut, cLDBHarOutput);
+   \   0004   716B20         CLR1      0xFF20.6
+   1208              mLDBHarConfig(cLDBHarTrpIn, cLDBHarInput);
+   \   0007   715A20         SET1      0xFF20.5
+   1209          
+   1210              mStopTimeOut();
+   \   000A   716BE1         CLR1      0xFFE1.6
+   \   000D   712BBA         CLR1      0xFFBA.2
+   \   0010   713BBA         CLR1      0xFFBA.3
+   1211              mStopTimeCaptureTimer();
+   \   0013   712BB6         CLR1      0xFFB6.2
+   \   0016   713BB6         CLR1      0xFFB6.3
+   1212              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   \   0019   713AE7         SET1      0xFFE7.3
+   1213              mLDBIntDisableIsr(cLDBHarInterruptTrpTimeOutIt);
+   \   001C   716AE5         SET1      0xFFE5.6
+   1214              mLDBIntDisableIsr(cLDBHarInterruptTrpPPGIt);
+   \   001F   712AE7         SET1      0xFFE7.2
+   1215              DecodingState = cStop;
+   \   0022   9E....         MOV       DecodingState,A
+   1216          
+   1217              u8ShortCircuitToGnd = 0;
+   \   0025   A100           MOV       A,#0
+   \   0027   9E....         MOV       u8ShortCircuitToGnd,A
+   1218              u8ShortCircuitToBat = 0;
+   \   002A   9E....         MOV       u8ShortCircuitToBat,A
+   1219          
+   1220              bLDBTrpIsVerlogTimerEnabled = cFalse;
+   \   002D   9E....         MOV       bLDBTrpIsVerlogTimerEnabled,A
+   1221          }
+   \   0030   AF             RET       
+   \   0031                  REQUIRE ?CL78K_V4_6_L00
+   \   0031                  REQUIRE _A_P0
+   \   0031                  REQUIRE _A_TMC01
+   \   0031                  REQUIRE _A_TMC00
+   \   0031                  REQUIRE _A_IF0
+   \   0031                  REQUIRE _A_MK0
+   \   0031                  REQUIRE _A_MK1
+   \   0031                  REQUIRE _A_PM0
+   1222          
+   1223          //*****************************************************************************
+   1224          //  DESCRIPTION         : Send data to the transponder
+   1225          //
+   1226          //  PARAMETERS          : None
+   1227          //  (Type,Name,Min,Max) 
+   1228          //    - Addr  : Transponder command
+   1229          //    - *pMsg : Data buffer
+   1230          //
+   1231          //  RETURN VALUE        : None
+   1232          //
+   1233          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+   1234          //
+   1235          //*****************************************************************************
+   1236          //QACJ 3206:amanevd: This is how it comes from STK
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1237          MEM_TYPE void LDBTrpSendWithAddr(tAddress Addr, const tMsg * const pMsg)
+   \                     LDBTrpSendWithAddr:
+   1238          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 4
+   \   0003   B7             PUSH      HL
+   1239              U8 u8NumberOfBytesToSend;
+   1240          
+   1241          
+   1242              mLIBassert(NULL != pMsg);
+   1243          
+   1244              //--------------------------------------
+   1245              // Command expects data responce
+   1246              //--------------------------------------
+   1247              bReceiveData = cTrue;
+   \   0004   9E....         MOV       bReceiveData,A
+   1248          
+   1249              //-------------------------------------------------------------
+   1250              // Compute the number of bytes to send
+   1251              //-------------------------------------------------------------
+   1252              //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+   1253              u8NumberOfBytesToSend = ((U8)pMsg->Lng >> cDivideBy8);
+   \   0007   891C           MOVW      AX,SP
+   \   0009   D6             MOVW      HL,AX
+   \   000A   B7             PUSH      HL
+   \   000B   B4             POP       DE
+   \   000C   AE02           MOV       A,[HL+0x02]
+   \   000E   70             MOV       X,A
+   \   000F   AE03           MOV       A,[HL+0x03]
+   \   0011   D6             MOVW      HL,AX
+   \   0012   AE02           MOV       A,[HL+0x02]
+   \   0014   24             ROR       A,0x1
+   \   0015   25             RORC      A,0x1
+   \   0016   25             RORC      A,0x1
+   \   0017   5D1F           AND       A,#31
+   \   0019   B5             PUSH      DE
+   \   001A   B6             POP       HL
+   \   001B   97             MOV       [HL],A
+   1254          
+   1255              //-------------------------------------------------------------
+   1256              // Store the data to write
+   1257              //-------------------------------------------------------------
+   1258              mLIBmemcpy(TransponderBuffer, pMsg->pBuffer, u8NumberOfBytesToSend);
+   \   001C   74             MOV       E,A
+   \   001D   A500           MOV       D,#0
+   \   001F   AE03           MOV       A,[HL+0x03]
+   \   0021   D6             MOVW      HL,AX
+   \   0022   87             MOV       A,[HL]
+   \   0023   70             MOV       X,A
+   \   0024   AE01           MOV       A,[HL+0x01]
+   \   0026   D2             MOVW      BC,AX
+   \   0027   10....         MOVW      AX,#S:TransponderBuffer
+   \   002A   9A....         CALL      memcpy
+   1259          
+   1260              //-------------------------------------------------------------
+   1261              // Prepare message to send the data
+   1262              //-------------------------------------------------------------
+   1263              TransponderMessage.pBuffer  = &TransponderBuffer[u8NumberOfBytesToSend - 1];
+   \   002D   891C           MOVW      AX,SP
+   \   002F   D6             MOVW      HL,AX
+   \   0030   87             MOV       A,[HL]
+   \   0031   70             MOV       X,A
+   \   0032   A100           MOV       A,#0
+   \   0034   CA....         ADDW      AX,#S:TransponderBuffer-1
+   \   0037   99..           MOVW      S:TransponderMessage,AX
+   1264              TransponderMessage.Lng      = pMsg->Lng;
+   \   0039   AE02           MOV       A,[HL+0x02]
+   \   003B   70             MOV       X,A
+   \   003C   AE03           MOV       A,[HL+0x03]
+   \   003E   D6             MOVW      HL,AX
+   \   003F   AE02           MOV       A,[HL+0x02]
+   \   0041   70             MOV       X,A
+   \   0042   AE03           MOV       A,[HL+0x03]
+   \   0044   99..           MOVW      S:TransponderMessage+2,AX
+   1265              pu8ReceptionBuffer          = TransponderMessage.pBuffer;
+   \   0046   89..           MOVW      AX,S:TransponderMessage
+   \   0048   03....         MOVW      pu8ReceptionBuffer,AX
+   1266          
+   1267              mLIBassert(NULL != pu8ReceptionBuffer);
+   1268          
+   1269              //-------------------------------------------------------------
+   1270              // Test if a writing in a transponder memory page is requested
+   1271              //-------------------------------------------------------------
+   1272              bTimeOutTProgRequested = ((U8)(pMsg->Lng) == cDataPageSizeInBit);
+   \   004B   891C           MOVW      AX,SP
+   \   004D   D6             MOVW      HL,AX
+   \   004E   AE02           MOV       A,[HL+0x02]
+   \   0050   70             MOV       X,A
+   \   0051   AE03           MOV       A,[HL+0x03]
+   \   0053   D6             MOVW      HL,AX
+   \   0054   AE02           MOV       A,[HL+0x02]
+   \   0056   4D20           CMP       A,#32
+   \   0058   BD04           BNZ       ??LDBTrpControl_68
+   \   005A   A101           MOV       A,#1
+   \   005C   FA02           BR        ??LDBTrpControl_69
+   \                     ??LDBTrpControl_68:
+   \   005E   A100           MOV       A,#0
+   \                     ??LDBTrpControl_69:
+   \   0060   9E....         MOV       bTimeOutTProgRequested,A
+   1273              
+   1274              DecodingState = cTimeOutInterCom;
+   \   0063   A105           MOV       A,#5
+   \   0065   9E....         MOV       DecodingState,A
+   1275              mWriteTranspondeurLine(1);
+   \   0068   A101           MOV       A,#1
+   \   006A   6B00           CLR1      S:0xFF00.6
+   1276              //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+   1277              mStartTimeOut(cTInterCom);
+   \   006C   712BBA         CLR1      0xFFBA.2
+   \   006F   713BBA         CLR1      0xFFBA.3
+   \   0072   711BBB         CLR1      0xFFBB.1
+   \   0075   710ABB         SET1      0xFFBB.0
+   \   0078   EE127F0C       MOVW      S:0xFF12,#3199
+   \   007C   716BE1         CLR1      0xFFE1.6
+   \   007F   712ABA         SET1      0xFFBA.2
+   \   0082   713ABA         SET1      0xFFBA.3
+   1278          
+   1279              InitCom();
+   \   0085   9E....         MOV       LDBIntInterruptOwnerTM00TM01,A
+   \   0088   716AE5         SET1      0xFFE5.6
+   \   008B   716BE1         CLR1      0xFFE1.6
+   \   008E   716BE5         CLR1      0xFFE5.6
+   \   0091   713AE7         SET1      0xFFE7.3
+   \   0094   713BE3         CLR1      0xFFE3.3
+   1280          }
+   \   0097   B0             POP       AX
+   \   0098   B0             POP       AX
+   \   0099   AF             RET       
+   \   009A                  REQUIRE ?CL78K_V4_6_L00
+   \   009A                  REQUIRE _A_P0
+   \   009A                  REQUIRE _A_TMC00
+   \   009A                  REQUIRE _A_PRM00
+   \   009A                  REQUIRE _A_IF0
+   \   009A                  REQUIRE CR000
+   \   009A                  REQUIRE _A_IF1
+   \   009A                  REQUIRE _A_MK0
+   \   009A                  REQUIRE _A_MK1
+   1281          
+   1282          //*****************************************************************************
+   1283          //  DESCRIPTION         : Receive data from the transponder
+   1284          //
+   1285          //  PARAMETERS          : None
+   1286          //  (Type,Name,Min,Max) 
+   1287          //    - Addr  : Transponder command
+   1288          //    - *pMsg : data buffer
+   1289          //
+   1290          //  RETURN VALUE        : None
+   1291          //
+   1292          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+   1293          //
+   1294          //*****************************************************************************
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1295          MEM_TYPE void LDBTrpReceiveWithAddr(const tAddress Addr, const tMsg * const pMsg)
+   \                     LDBTrpReceiveWithAddr:
+   1296          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   D6             MOVW      HL,AX
+   1297              mLIBassert(NULL != pMsg);
+   1298          
+   1299              //--------------------------------------
+   1300              // Command data responce is filled in pMsg
+   1301              //--------------------------------------
+   1302              bReceiveData = cFalse;
+   \   0001   A100           MOV       A,#0
+   \   0003   9E....         MOV       bReceiveData,A
+   1303          
+   1304              //--------------------------------------
+   1305              // Prepare message to send the command
+   1306              //--------------------------------------    
+   1307              if (Addr == cLDBTrpStartAuth)
+   \   0006   67             MOV       A,H
+   \   0007   EA1800         CMPW      AX,#24
+   \   000A   BD09           BNZ       ??LDBTrpControl_70
+   1308              {
+   1309                  TransponderMessage.Lng = cShortCommandLenght;
+   \   000C   EE..0500       MOVW      S:TransponderMessage+2,#5
+   1310                  CurrentCommand[1] = (U8)(Addr << cShiftBy3);
+   \   0010   11..C0         MOV       S:CurrentCommand+1,#192
+   \   0013   FA28           BR        ??LDBTrpControl_71
+   1311              }
+   1312              else
+   1313              {
+   1314                  TransponderMessage.Lng = cLongCommandLenght;
+   \                     ??LDBTrpControl_70:
+   \   0015   EE..0A00       MOVW      S:TransponderMessage+2,#10
+   1315                  CurrentCommand[1] = (U8)((U8)(Addr >> cShiftBy8) & cCommandLastByteMask);
+   \   0019   5DC0           AND       A,#192
+   \   001B   F2..           MOV       S:CurrentCommand+1,A
+   1316                  CurrentCommand[0] = (U8)(Addr >> cShiftBy6);
+   \   001D   67             MOV       A,H
+   \   001E   21             CLR1      CY
+   \   001F   25             RORC      A,0x1
+   \   0020   30             XCH       A,X
+   \   0021   25             RORC      A,0x1
+   \   0022   30             XCH       A,X
+   \   0023   21             CLR1      CY
+   \   0024   25             RORC      A,0x1
+   \   0025   30             XCH       A,X
+   \   0026   25             RORC      A,0x1
+   \   0027   30             XCH       A,X
+   \   0028   21             CLR1      CY
+   \   0029   25             RORC      A,0x1
+   \   002A   30             XCH       A,X
+   \   002B   25             RORC      A,0x1
+   \   002C   30             XCH       A,X
+   \   002D   21             CLR1      CY
+   \   002E   25             RORC      A,0x1
+   \   002F   30             XCH       A,X
+   \   0030   25             RORC      A,0x1
+   \   0031   30             XCH       A,X
+   \   0032   21             CLR1      CY
+   \   0033   25             RORC      A,0x1
+   \   0034   30             XCH       A,X
+   \   0035   25             RORC      A,0x1
+   \   0036   30             XCH       A,X
+   \   0037   21             CLR1      CY
+   \   0038   25             RORC      A,0x1
+   \   0039   60             MOV       A,X
+   \   003A   25             RORC      A,0x1
+   \   003B   F2..           MOV       S:CurrentCommand,A
+   1317              }
+   1318          
+   1319              TransponderMessage.pBuffer = ((U8*)&CurrentCommand[1]);
+   \                     ??LDBTrpControl_71:
+   \   003D   10....         MOVW      AX,#S:CurrentCommand+1
+   \   0040   99..           MOVW      S:TransponderMessage,AX
+   1320          
+   1321              //--------------------------------------
+   1322              // Prepare data to receive response
+   1323              //--------------------------------------
+   1324              //QACJ 0506:amanevd: The pointer is checked with assert in debug mode
+   1325              if (pMsg->Lng == cLongCommandLenght)
+   \   0042   C2             MOVW      AX,BC
+   \   0043   D6             MOVW      HL,AX
+   \   0044   AE02           MOV       A,[HL+0x02]
+   \   0046   70             MOV       X,A
+   \   0047   AE03           MOV       A,[HL+0x03]
+   \   0049   EA0A00         CMPW      AX,#10
+   \   004C   BD09           BNZ       ??LDBTrpControl_72
+   1326              {
+   1327                  pu8ReceptionBuffer = &pMsg->pBuffer[1];
+   \   004E   87             MOV       A,[HL]
+   \   004F   70             MOV       X,A
+   \   0050   AE01           MOV       A,[HL+0x01]
+   \   0052   D6             MOVW      HL,AX
+   \   0053   86             INCW      HL
+   \   0054   C6             MOVW      AX,HL
+   \   0055   FA1A           BR        ??LDBTrpControl_73
+   1328              }
+   1329              else
+   1330              {
+   1331                  pu8ReceptionBuffer = &pMsg->pBuffer[(U8)(pMsg->Lng >> cDivideBy8) - (U8)1U];
+   \                     ??LDBTrpControl_72:
+   \   0057   21             CLR1      CY
+   \   0058   25             RORC      A,0x1
+   \   0059   30             XCH       A,X
+   \   005A   25             RORC      A,0x1
+   \   005B   30             XCH       A,X
+   \   005C   21             CLR1      CY
+   \   005D   25             RORC      A,0x1
+   \   005E   30             XCH       A,X
+   \   005F   25             RORC      A,0x1
+   \   0060   30             XCH       A,X
+   \   0061   21             CLR1      CY
+   \   0062   25             RORC      A,0x1
+   \   0063   60             MOV       A,X
+   \   0064   25             RORC      A,0x1
+   \   0065   74             MOV       E,A
+   \   0066   87             MOV       A,[HL]
+   \   0067   70             MOV       X,A
+   \   0068   AE01           MOV       A,[HL+0x01]
+   \   006A   30             XCH       A,X
+   \   006B   610C           ADD       A,E
+   \   006D   30             XCH       A,X
+   \   006E   2D00           ADDC      A,#0
+   \   0070   90             DECW      AX
+   \                     ??LDBTrpControl_73:
+   \   0071   03....         MOVW      pu8ReceptionBuffer,AX
+   1332              }
+   1333          
+   1334              mLIBassert(NULL != pu8ReceptionBuffer);
+   1335              u8ExpectedBitsNb = (U8)pMsg->Lng;
+   \   0074   C2             MOVW      AX,BC
+   \   0075   D6             MOVW      HL,AX
+   \   0076   AE02           MOV       A,[HL+0x02]
+   \   0078   9E....         MOV       u8ExpectedBitsNb,A
+   1336          
+   1337              bTimeOutTProgRequested = cFalse;
+   \   007B   A100           MOV       A,#0
+   \   007D   9E....         MOV       bTimeOutTProgRequested,A
+   1338              DecodingState          = cTimeOutInterCom;
+   \   0080   A105           MOV       A,#5
+   \   0082   9E....         MOV       DecodingState,A
+   1339              mWriteTranspondeurLine(1);
+   \   0085   A101           MOV       A,#1
+   \   0087   6B00           CLR1      S:0xFF00.6
+   1340              //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+   1341              mStartTimeOut(cTInterCom);
+   \   0089   712BBA         CLR1      0xFFBA.2
+   \   008C   713BBA         CLR1      0xFFBA.3
+   \   008F   711BBB         CLR1      0xFFBB.1
+   \   0092   710ABB         SET1      0xFFBB.0
+   \   0095   EE127F0C       MOVW      S:0xFF12,#3199
+   \   0099   716BE1         CLR1      0xFFE1.6
+   \   009C   712ABA         SET1      0xFFBA.2
+   \   009F   713ABA         SET1      0xFFBA.3
+   1342          
+   1343              InitCom();
+   \   00A2                  REQUIRE ?CL78K_V4_6_L00
+   \   00A2                  REQUIRE ?Subroutine0
+   \   00A2                  REQUIRE _A_P0
+   \   00A2                  REQUIRE _A_TMC00
+   \   00A2                  REQUIRE _A_PRM00
+   \   00A2                  REQUIRE _A_IF0
+   \   00A2                  REQUIRE CR000
+   \   00A2                  REQUIRE _A_IF1
+   \   00A2                  REQUIRE _A_MK0
+   \   00A2                  REQUIRE _A_MK1
+   \   00A2                  ; // Fall through to label ?Subroutine0
+   1344          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   9E....         MOV       LDBIntInterruptOwnerTM00TM01,A
+   \   0003   716AE5         SET1      0xFFE5.6
+   \   0006   716BE1         CLR1      0xFFE1.6
+   \   0009   716BE5         CLR1      0xFFE5.6
+   \   000C   713AE7         SET1      0xFFE7.3
+   \   000F   713BE3         CLR1      0xFFE3.3
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+   1345          
+   1346          //*****************************************************************************
+   1347          //  DESCRIPTION         : Send a control to the base-station
+   1348          //
+   1349          //  PARAMETERS (Type,Name,Min,Max): 
+   1350          //      - Ctrl: Control send to the base-station
+   1351          //
+   1352          //  RETURN VALUE        : None
+   1353          //
+   1354          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+   1355          //
+   1356          //*****************************************************************************
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1357          MEM_TYPE void LDBTrpControl(const tCtrl Ctrl)
+   \                     LDBTrpControl:
+   1358          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1359              switch (Ctrl)
+   \   0000   4D00           CMP       A,#0
+   \   0002   AD15           BZ        ??LDBTrpControl_74
+   \   0004   4D01           CMP       A,#1
+   \   0006   AD39           BZ        ??LDBTrpControl_75
+   \   0008   4D02           CMP       A,#2
+   \   000A   AD5C           BZ        ??LDBTrpControl_76
+   \   000C   4D03           CMP       A,#3
+   \   000E   AD5F           BZ        ??LDBTrpControl_77
+   \   0010   4D04           CMP       A,#4
+   \   0012   AD64           BZ        ??LDBTrpControl_78
+   \   0014   4D05           CMP       A,#5
+   \   0016   AD53           BZ        ??LDBTrpControl_79
+   \   0018   AF             RET       
+   1360              {
+   1361                  case cLDBTrpWakeUp:    
+   1362          
+   1363                  //QACJ 0434:amanevd: 'CR000' is declared in io78f0536_64.h
+   1364                  mStartTimeOut(cTWaitBeforeWakeUpRaisingEdge);
+   \                     ??LDBTrpControl_74:
+   \   0019   A10C           MOV       A,#12
+   \   001B   712BBA         CLR1      0xFFBA.2
+   \   001E   713BBA         CLR1      0xFFBA.3
+   \   0021   711BBB         CLR1      0xFFBB.1
+   \   0024   710ABB         SET1      0xFFBB.0
+   \   0027   EE127F0C       MOVW      S:0xFF12,#3199
+   \   002B   716BE1         CLR1      0xFFE1.6
+   \   002E   712ABA         SET1      0xFFBA.2
+   \   0031   713ABA         SET1      0xFFBA.3
+   1365                  mWriteTranspondeurLine(0);
+   \   0034   6A00           SET1      S:0xFF00.6
+   1366                  DecodingState = cGenerateRaisingEdge;
+   \   0036   9E....         MOV       DecodingState,A
+   1367          
+   1368                  mStartVerlogTimer();
+   \   0039   A101           MOV       A,#1
+   \   003B   9E....         MOV       bLDBTrpIsVerlogTimerEnabled,A
+   1369                  InitCom();
+   \                     ??LDBTrpControl_80:
+   \   003E   9B....         BR        N:?Subroutine0
+   1370                  break;
+   1371          
+   1372                  case cLDBTrpSleep:    
+   1373          
+   1374                  mStartTimeOut(cTStartSleep);
+   \                     ??LDBTrpControl_75:
+   \   0041   A100           MOV       A,#0
+   \   0043   712BBA         CLR1      0xFFBA.2
+   \   0046   713BBA         CLR1      0xFFBA.3
+   \   0049   711BBB         CLR1      0xFFBB.1
+   \   004C   710ABB         SET1      0xFFBB.0
+   \   004F   EE127F0C       MOVW      S:0xFF12,#3199
+   \   0053   716BE1         CLR1      0xFFE1.6
+   \   0056   712ABA         SET1      0xFFBA.2
+   \   0059   713ABA         SET1      0xFFBA.3
+   1375                  u8RestartCounter = 0;
+   \   005C   9E....         MOV       u8RestartCounter,A
+   1376                  DecodingState    = cStartSleep;
+   \   005F   A10A           MOV       A,#10
+   \   0061   9E....         MOV       DecodingState,A
+   1377          
+   1378          #ifdef X90_PROJECT
+   1379                  mLDBIntGetInterruptTM00TM01(cLDBIntTrpOwnerTM00TM01);
+   \   0064   A101           MOV       A,#1
+   \   0066   FAD6           BR        ??LDBTrpControl_80
+   1380          #endif
+   1381                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeOutIt);
+   1382                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeOutIt);
+   1383                  mLDBIntEnableIsr(cLDBHarInterruptTrpTimeOutIt);
+   1384          
+   1385                  mLDBIntDisableIsr(cLDBHarInterruptTrpTimeCaptureIt);
+   1386                  mLDBIntClearIsrRequestFlag(cLDBHarInterruptTrpTimeCaptureIt);
+   1387                  break;
+   1388          
+   1389                  case cLDBTrpStop:
+   1390          
+   1391                  StopCom();
+   \                     ??LDBTrpControl_76:
+   \   0068   9B....         BR        N:StopCom
+   1392                  break;
+   1393          
+   1394                  case cLDBTrpStopVerlog:
+   1395          
+   1396                  mStopVerlogTimer();
+   \                     ??LDBTrpControl_79:
+   \   006B   A100           MOV       A,#0
+   \   006D   FA13           BR        ??LDBTrpControl_81
+   1397                  break;
+   1398          
+   1399                  case cLDBTrpEnterNominalMode:
+   1400          
+   1401                  mLDBHarWrite(cLDBHarTrpOut, 0);
+   \                     ??LDBTrpControl_77:
+   \   006F   6B00           CLR1      S:0xFF00.6
+   1402                  mLDBHarConfig(cLDBHarTrpOut, cLDBHarOutput);
+   \   0071   716B20         CLR1      0xFF20.6
+   1403                  mLDBHarConfig(cLDBHarTrpIn, cLDBHarInput);
+   \   0074   715A20         SET1      0xFF20.5
+   \   0077   AF             RET       
+   1404                  break;
+   1405          
+   1406                  case cLDBTrpEnterSleepMode:
+   1407          
+   1408                  mLDBHarWrite(cLDBHarTrpOut, 0);
+   \                     ??LDBTrpControl_78:
+   \   0078   A100           MOV       A,#0
+   \   007A   6B00           CLR1      S:0xFF00.6
+   1409                  mLDBHarConfig(cLDBHarTrpOut, cLDBHarOutput);
+   \   007C   716B20         CLR1      0xFF20.6
+   1410                  mLDBHarConfig(cLDBHarTrpIn, cLDBHarInput);
+   \   007F   715A20         SET1      0xFF20.5
+   1411                  mStopVerlogTimer();
+   \                     ??LDBTrpControl_81:
+   \   0082   9E....         MOV       bLDBTrpIsVerlogTimerEnabled,A
+   1412                  break;
+   1413          
+   1414                  default:
+   1415                  mLIBassert(cFalse);
+   1416                  break;
+   1417              }
+   1418          }
+   \   0085   AF             RET       
+   \   0086                  REQUIRE ?CL78K_V4_6_L00
+   \   0086                  REQUIRE _A_P0
+   \   0086                  REQUIRE _A_TMC00
+   \   0086                  REQUIRE _A_PRM00
+   \   0086                  REQUIRE _A_IF0
+   \   0086                  REQUIRE _A_IF1
+   \   0086                  REQUIRE _A_MK0
+   \   0086                  REQUIRE _A_MK1
+   \   0086                  REQUIRE CR000
+   \   0086                  REQUIRE _A_PM0
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_MUL_L02:
+   \   0000   ....           DW       ?I_MUL_L02
+
+   Segment part sizes:
+
+     Function/Label              Bytes
+     --------------              -----
+     _A_P0                          1
+     TM00                           2
+     CR000                          2
+     _A_PM0                         1
+     TM01                           2
+     CR001                          2
+     CR011                          2
+     _A_TMC01                       1
+     _A_PRM01                       1
+     _A_CRC01                       1
+     _A_TOC01                       1
+     _A_TMC00                       1
+     _A_PRM00                       1
+     _A_IF0                         2
+     _A_IF1                         2
+     _A_MK0                         2
+     _A_MK1                         2
+     DecodingState                  1
+     TransponderMessage             4
+     TransponderBuffer              8
+     CurrentCommand                 2
+     u8ReceivedBits                 1
+     u8ExpectedBitsNb               1
+     u8RestartCounter               1
+     bDataSynchronized              1
+     bTimeOutTProgRequested         1
+     bReceiveData                   1
+     bDetectAckPulse                1
+     u16TimeMeasured                2
+     u16TimeMeasuredOld             2
+     u16TimeDifference              2
+     u16TimeCapture                 2
+     u16TimeRearm                   2
+     pu8ReceptionBuffer             2
+     u8ShortCircuitToGnd            1
+     u8ShortCircuitToBat            1
+     bLDBTrpIsVerlogTimerEnabled    1
+     StopCom                       37
+     LDBTrpTimeCaptureIt          717
+     LDBTrpPPGIt                  199
+     LDBTrpTimeOutIt              920
+     LDBTrpVerlogTimerIt            7
+     LDBTrpInit                    49
+     LDBTrpSendWithAddr           154
+     LDBTrpReceiveWithAddr        162
+     ?Subroutine0                  19
+     LDBTrpControl                134
+     __T_?FAR_CALL_L07              2
+     __T_?I_MUL_L02                 2
+
+ 
+   518 bytes in segment BCODE
+     4 bytes in segment CLTVEC
+ 1 880 bytes in segment CODE
+    21 bytes in segment NEAR_A
+    13 bytes in segment NEAR_Z
+     5 bytes in segment SADDR_A
+    24 bytes in segment SADDR_Z
+ 
+ 2 398 bytes of CODE memory (+  4 bytes shared)
+    37 bytes of DATA memory (+ 26 bytes shared)
+
+Errors: none
+Warnings: none

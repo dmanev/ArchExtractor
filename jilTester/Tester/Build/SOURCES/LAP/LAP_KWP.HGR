@@ -1,0 +1,88 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date:   $
+// $Archive:   $
+// $Revision:   $
+// -----------------------------------------------------------------------------
+/* $Log: $
+*/
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef lap_kwp
+   extern const tTOSSeqGraphType LAPKwpTreatRequest;
+   extern const tTOSSeqGraphType LAPKwpTreatCommunication; 
+#endif
+
+#ifdef lap_kwp
+   extern void     LAPKwpAnalyseRequest(void);
+   extern BOOL LAPKwpComTimeOutIsElapsedOrStopComReceived(void);
+   extern void     LAPKwpExecuteCurrentSessionService(void);
+   extern BOOL LAPKwpIsWakeUpReceived(void);
+   extern BOOL LAPKwpNewRequestIsReceived(void);
+   extern void     LAPKwpReturnInWakeUpDetection(void);
+   extern void     LAPKwpSendResponse(void);
+   extern BOOL LAPKwpServiceIsFinishedOrTimeOutP2IsFinished(void);
+   extern void     LAPKwpStartCom(void);
+   extern void     LAPKwpStartTimeOutInit(void);
+   extern BOOL LAPKwpTimeOutInitElapsed(void);
+   extern void     LAPKwpTreatStopCom(void);
+   extern BOOL TOSSeqEvalVrai(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef lap_kwp
+  const tTOSSeqGraphType LAPKwpTreatRequest =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPKwpTreatRequest",
+    {
+#endif
+  /*   0*/  {LAPKwpNewRequestIsReceived,LAPKwpAnalyseRequest,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {TOSSeqEvalVrai,LAPKwpExecuteCurrentSessionService,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPKwpServiceIsFinishedOrTimeOutP2IsFinished,LAPKwpSendResponse,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(0)},
+  /*   3*/  {TOSSeqEvalVrai,LAPKwpExecuteCurrentSessionService,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef lap_kwp
+  const tTOSSeqGraphType LAPKwpTreatCommunication =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPKwpTreatCommunication",
+    {
+#endif
+  /*   0*/  {LAPKwpIsWakeUpReceived,LAPKwpStartTimeOutInit,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPKwpNewRequestIsReceived,LAPKwpStartCom,mTOSSeqRuleNumber(3),mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPKwpComTimeOutIsElapsedOrStopComReceived,LAPKwpTreatStopCom,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*   3*/  {LAPKwpTimeOutInitElapsed,LAPKwpReturnInWakeUpDetection,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

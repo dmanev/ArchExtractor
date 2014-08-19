@@ -1,0 +1,2038 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:27:09 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_ILL.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LAP_ILL.LST -o                           #
+#                    ..\EXE\TARGET_R\LAP_ILL.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_ILL.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\LAP_ILL.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LAP_ILL.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_ILL.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_ILL
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 04 2010 15:12:40  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/ILL/LAP_ILL.c-arc  $
+     16          // $Revision:   1.23  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/ILL/LAP_ILL.c-arc  $
+     19          // 
+     20          //    Rev 1.23   Mar 04 2010 15:12:40   adzhelp
+     21          // Cm006814: QAC corrections
+     22          // 
+     23          //    Rev 1.22   Mar 02 2010 10:34:02   adzhelp
+     24          // Cm006814: TPS_APC, TPS_PLAF normalized
+     25          // 
+     26          //    Rev 1.21   Feb 19 2010 10:19:08   adzhelp
+     27          // Cm007575: No wake-up if flag 'BcmSleepRequested' set
+     28          // 
+     29          //    Rev 1.20   Jan 19 2010 11:43:58   adzhelp
+     30          // Cm006834: Lighting timeout restarted by next unlock
+     31          // 
+     32          //    Rev 1.19   Jan 15 2010 15:57:44   adzhelp
+     33          // Cm006829, Cm006636: Active state is not maintained when lighting is active
+     34          // 
+     35          //    Rev 1.18   Nov 02 2009 18:58:28   amarinm1
+     36          // Cm006581: Elapsed TPS_PLAF now triggers gradual turn-off.
+     37          // 
+     38          //    Rev 1.17   Nov 02 2009 17:29:38   amarinm1
+     39          // Cm006499: Power relay is now cut when leaving active state.
+     40          // 
+     41          //    Rev 1.16   Nov 02 2009 11:46:44   adzhelp
+     42          // Cm006587: Clearing of flags added when switch off lights
+     43          // 
+     44          //    Rev 1.15   Oct 05 2009 11:46:24   amarinm1
+     45          // Cm006413: Dimming process is now interruptable.
+     46          // 
+     47          //    Rev 1.14   Oct 01 2009 15:18:22   amarinm1
+     48          // Cm006282: Integration modifications.
+     49          // 
+     50          //    Rev 1.13   Oct 01 2009 11:39:04   amarinm1
+     51          // Cm006282: Starting the power relay is now done in LeaveStartingStepState too.
+     52          // 
+     53          //    Rev 1.12   Oct 01 2009 10:28:50   amarinm1
+     54          // Cm006370: Dimming times and algorhythm changed to adapt to low levels PWM.
+     55          // 
+     56          //    Rev 1.11   Sep 15 2009 13:53:12   amarinm1
+     57          // Cm005593: u8TPS_APCStepCounter is initialized every time PowerRelayCtrlTimeOut is started.
+     58          // 
+     59          //    Rev 1.10   Jul 10 2009 09:22:34   adzhelp
+     60          // Cm005104, Cm004985: Set ALIM PLAF to 1 with immediate acess on wakeup
+     61          // 
+     62          //    Rev 1.9   Jun 26 2009 11:41:18   amarinm1
+     63          // Cm005023: Bug fixed;
+     64          // Problems found during the code review were fixed;
+     65          // 
+     66          //    Rev 1.8   May 07 2009 14:54:32   ailievb
+     67          // Cm004928: Internal Light: Bad management after several RKE Lock/unlock requests
+     68          // 
+     69          //    Rev 1.7   Apr 29 2009 14:18:56   adzhelp
+     70          // Cm003209: Functions moved to banked memory area
+     71          // 
+     72          //    Rev 1.6   23 Apr 2009 12:13:10   amarinm1
+     73          // Cm003209: ALIM_PLAF was made independent of AUTPLAF;
+     74          // ALIM_PLAF changing from 0 to 1 activates the power output without any other conditions;
+     75          // 
+     76          //    Rev 1.5   Mar 30 2009 17:52:50   amarinm1
+     77          // Cm003209: The power relay timer was corrected so it can handle times bigger than the limit of U16 timer.
+     78          // Cm004676: A timeout for the gradual turn off was changed because the component graphs were set to 20ms execution.
+     79          // 
+     80          //    Rev 1.4   Jan 06 2009 14:23:18   amarinm1
+     81          // Cm003209: Interior Lights component development.
+     82          // PVCS header comments were changed.
+     83          // 
+     84          //    Rev 1.3   Jan 06 2009 12:20:22   amarinm1
+     85          // Cm003209: Interior Lights component development.
+     86          // File updated to copmly with new QAC restrictions.
+     87          // 
+     88          //    Rev 1.2   Dec 03 2008 14:21:16   amarinm1
+     89          // Files updated to use the new method for indicating edges with TOS signals. Also the names of some EEP variables were changed.
+     90          // 
+     91          //    Rev 1.1   02 Dec 2008 16:18:26   ailievb
+     92          // LAP_ILL integration.
+     93          // 
+     94          //    Rev 1.0   Nov 24 2008 14:24:02   amarinm1
+     95          // Initial revision.
+     96          //
+     97          //******************************************************************************
+     98          #endif // _QAC_
+     99          
+    100          //------------------------------------------------------------------------------
+    101          // Body Identification
+    102          //------------------------------------------------------------------------------
+    103          #define LAP_ILL   "LAP_ILL"
+    104          
+    105          
+    106          //------------------------------------------------------------------------------
+    107          // Included files to resolve specific definitions in this file
+    108          //
+    109          // #include <system_file_name.h>
+    110          // #include "project_file_name.h"
+    111          //------------------------------------------------------------------------------
+    112          #include "lib.h"
+    113          #include "tos.h"
+    114          #include "dat.h" //to be uncommented if needed
+    115          #include "lap_ill.h"
+    116          #include "lap_ill.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPIllInternalLightsController[6]
+   \                     LAPIllInternalLightsController:
+   \   0000   ........       DW LAPIllLightsOnRequestIsTrue, LAPIllLightsOnExecution
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPIllLightsOffRequestIsTrue, LAPIllLightsOffExecution
+   \   000A   0200           DB 2, 0
+   \   000C   ....           DW LAPIllLightsGraduallyOffRequestIsTrue
+   \   000E   ....           DW LAPIllLightsGraduallyOffExecution
+   \   0010   FF03           DB 255, 3
+   \   0012   ........       DW LAPIllLightsOnRequestIsTrue, LAPIllLightsOnExecution
+   \   0016   0401           DB 4, 1
+   \   0018   ........       DW LAPIllGradualOffIsInProgress, LAPIllLightsGraduallyOffExecution
+   \   001C   0503           DB 5, 3
+   \   001E   ........       DW LAPIllLightsAreOff, TOSSeqNoAction
+   \   0022   FF00           DB 255, 0
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPIllInternalLightsManagement[1]
+   \                     LAPIllInternalLightsManagement:
+   \   0000   ........       DW TOSSeqTrueEval, LAPIllManagement
+   \   0004   FF00           DB 255, 0
+    117          
+    118          //------------------------------------------------------------------------------
+    119          // Local constants
+    120          //
+    121          // #define cConstantName   ((tType) ConstantValue)
+    122          //------------------------------------------------------------------------------
+    123          #define cLowPartStepTimeoutInMs      (20UL)
+    124          #define cHighPartStepTimeoutInMs     (100UL)
+    125          #define cLowHighBorderInPercents     ((U8)80UL)
+    126          #define cInternalLightsMaxOutput     ((U8)100UL)
+    127          
+    128          // Limits of cyclic ratio adjusted to respect padHSI-510 (the rule of 5%-95%)
+    129          // These macros should be synchronized with the ones in DAT_PWM.c
+    130          // 95 corresponds to 96% in LDB_PWM which is its first step.
+    131          #define cMaximalCyclicRatio     ((U8)95)
+    132          #define cMinimalCyclicRatio     ((U8)4)
+    133          
+    134          #define cTpsPlafStepInMs      (800UL)
+    135          #define cTpsApcStepInMs       (50000UL)
+    136          
+    137          #define cLightingOff          ((U8)0)
+    138          #define cLightingOn           ((U8)1)
+    139          
+    140          //------------------------------------------------------------------------------
+    141          // Local macros
+    142          //
+    143          // #define mMacroName   (MacroDefinition)
+    144          //------------------------------------------------------------------------------
+    145          #define mSetLightsOnTriggerEvent()                                             \
+    146                    (InternalLights.LightsOnTriggerEvent = cTrue)
+    147          #define mClearLightsOnTriggerEvent()                                           \
+    148                    (InternalLights.LightsOnTriggerEvent = cFalse)
+    149          #define mReadLightsOnTriggerEvent()                                            \
+    150                    ((BOOL)(InternalLights.LightsOnTriggerEvent == cTrue))
+    151          
+    152          #define mSetLightsOffTriggerEvent()                                            \
+    153                    (InternalLights.LightsOffTriggerEvent = cTrue)
+    154          #define mClearLightsOffTriggerEvent()                                          \
+    155                    (InternalLights.LightsOffTriggerEvent = cFalse)
+    156          #define mReadLightsOffTriggerEvent()                                           \
+    157                    ((BOOL)(InternalLights.LightsOffTriggerEvent == cTrue))
+    158          
+    159          #define mSetLightsGraduallyOffTriggerEvent()                                   \
+    160                    (InternalLights.LightsGraduallyOffTriggerEvent = cTrue)
+    161          #define mClearLightsGraduallyOffTriggerEvent()                                 \
+    162                    (InternalLights.LightsGraduallyOffTriggerEvent = cFalse)
+    163          #define mReadLightsGraduallyOffTriggerEvent()                                  \
+    164                    ((BOOL)(InternalLights.LightsGraduallyOffTriggerEvent == cTrue))
+    165          
+    166          #define mSetDoorsLockedTriggerEvent()                                          \
+    167                    (bDoorsLockedTriggerEvent = cTrue)
+    168          #define mClearDoorsLockedTriggerEvent()                                        \
+    169                    (bDoorsLockedTriggerEvent = cFalse)
+    170          #define mReadDoorsLockedTriggerEvent()                                         \
+    171                    ((BOOL)(bDoorsLockedTriggerEvent == cTrue))
+    172          
+    173          #define mSetDoorsUnlockedTriggerEvent()                                        \
+    174                    (bDoorsUnlockedTriggerEvent = cTrue)
+    175          #define mClearDoorsUnlockedTriggerEvent()                                      \
+    176                    (bDoorsUnlockedTriggerEvent = cFalse)
+    177          #define mReadDoorsUnlockedTriggerEvent()                                       \
+    178                    ((BOOL)(bDoorsUnlockedTriggerEvent == cTrue))
+    179          
+    180          #define mReadTPS_APCStepInTimerTicks                                           \
+    181              mTOSConvMsInTimerTick(cTpsApcStepInMs)
+    182          
+    183          #define cLowPartStepTimeoutInTimerTicks()                                      \
+    184              (mTOSConvMsInTimerTick(cLowPartStepTimeoutInMs) - (tTOSTimer)1U)
+    185          
+    186          #define cHighPartStepTimeoutInTimerTicks()                                     \
+    187              (mTOSConvMsInTimerTick(cHighPartStepTimeoutInMs) - (tTOSTimer)1U)
+    188          
+    189          #define mAllDoorsAreClosed()                                                   \
+    190           ((BOOL)(  (mDATRead(U1Bit, RR_DOORS_SW, Default) == 0)                        \
+    191          /* //QACJ 3443: amarinm1: No recursion in the definition! */                   \
+    192                  && (mDATRead(U1Bit, FR_DOORS_SW, Default) == 0)))
+    193          
+    194          #define mADoorIsOpened()                                                       \
+    195           ((BOOL)(  (mDATRead(U1Bit, RR_DOORS_SW, Default) == 1)                        \
+    196          /* //QACJ 3443: amarinm1: No recursion in the definition! */                   \
+    197                  || (mDATRead(U1Bit, FR_DOORS_SW, Default) == 1)))
+    198          
+    199          #define mIgnitionRisingEdgeIsPresent()                                         \
+    200           (TOSReadSignal(cTOSSignalRising_PWR_IGN_LAP_ILL))
+    201          
+    202          #define mIgnitionFallingEdgeIsPresent()                                        \
+    203           (TOSReadSignal(cTOSSignalFalling_PWR_IGN_LAP_ILL))
+    204          
+    205          #define mFrontDoorsChangingStateEventIsPresent()                               \
+    206           (TOSReadSignal(cTOSSignalChanging_FR_DOORS_SW_LAP_ILL))
+    207          
+    208          #define mRearDoorsChangingStateEventIsPresent()                                \
+    209           (TOSReadSignal(cTOSSignalChanging_RR_DOORS_SW_LAP_ILL))  
+    210          
+    211          //------------------------------------------------------------------------------
+    212          // Local types
+    213          //
+    214          // typedef Expression    tTypeName;
+    215          //------------------------------------------------------------------------------
+    216          typedef struct tInternalLightingStructure
+    217          {
+    218              tTOSTimer LightsOnTimeOut;
+    219              U8        State;
+    220              BOOL      LightsOnTriggerEvent;
+    221              BOOL      LightsOffTriggerEvent;
+    222              BOOL      LightsGraduallyOffTriggerEvent;
+    223          } sInternalLigthingStructure;
+    224          
+    225          
+    226          //------------------------------------------------------------------------------
+    227          // Data prefix
+    228          //
+    229          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    230          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    231          //
+    232          // -----------------------------------------------------------------------------
+    233          // Local data
+    234          //
+    235          // static  tType   u8VariableName;  
+    236          // static  tType*  pu8VariableName; 
+    237          //------------------------------------------------------------------------------
+    238          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    239          static sInternalLigthingStructure InternalLights;
+   \                     InternalLights:
+   \   0000                  DS 6
+   \   0006                  REQUIRE __INIT_NEAR_Z
+    240          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    241          static tTOSTimer    LogicalLightingTimeOut;
+   \                     LogicalLightingTimeOut:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    242          static tTOSTimer    LightsGraduallyOffDelay;
+   \                     LightsGraduallyOffDelay:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    243          static tTOSTimer    PowerRelayCtrlTimeOut;
+   \                     PowerRelayCtrlTimeOut:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    244          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    245          static U8           u8TPS_APCStepCounter;
+   \                     u8TPS_APCStepCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    246          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    247          static BOOL         bDoorsUnlockedTriggerEvent;
+   \                     bDoorsUnlockedTriggerEvent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    248          static BOOL         bDoorsLockedTriggerEvent;
+   \                     bDoorsLockedTriggerEvent:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    249          static BOOL         bComponentIsEnabled;
+   \                     bComponentIsEnabled:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    250          static BOOL         bALIM_PLAF_memo;
+   \                     bALIM_PLAF_memo:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    251          static BOOL         bPowerRelayStopIsAllowed;
+   \                     bPowerRelayStopIsAllowed:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    252          
+    253          
+    254          
+    255          //------------------------------------------------------------------------------
+    256          // Constant local data
+    257          //
+    258          // static const tType  VariableName;
+    259          //------------------------------------------------------------------------------
+    260          
+    261          //------------------------------------------------------------------------------
+    262          // Exported data
+    263          //
+    264          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    265          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    266          //------------------------------------------------------------------------------
+    267          
+    268          //------------------------------------------------------------------------------
+    269          // Constant exported data
+    270          //
+    271          //             (LAY: 3 characters to identify the layer)
+    272          //             (Cmp: 3 characters to identify this component)
+    273          // 
+    274          // const tType   LAYCmpVariableName;
+    275          //------------------------------------------------------------------------------
+    276          
+    277          //------------------------------------------------------------------------------
+    278          // Local function prototypes
+    279          // 
+    280          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    281          //------------------------------------------------------------------------------
+    282          static MEM_TYPE void LightingPowerRelayManagement (void);
+    283          static MEM_TYPE void DisableFunctionallity        (void);
+    284          static MEM_TYPE void ResumeAfterDisable           (void);
+    285          static MEM_TYPE void LAPIllInitPowerRelay         (void);
+    286          
+    287          #ifdef X90_PROJECT
+    288          static MEM_TYPE void LAPIllInitialize_Static(void);
+    289          static MEM_TYPE void LAPIllEnterActiveState_Static(void);
+    290          static MEM_TYPE void LAPIllLeaveActiveState_Static(void);
+    291          static MEM_TYPE BOOL LAPIllLightsOnRequestIsTrue_Static(void);
+    292          static MEM_TYPE BOOL LAPIllLightsOffRequestIsTrue_Static(void);
+    293          static MEM_TYPE BOOL LAPIllLightsGraduallyOffRequestIsTrue_Static(void);
+    294          static MEM_TYPE void LAPIllLightsGraduallyOffExecution_Static(void);
+    295          #endif
+    296          
+    297          //==============================================================================
+    298          //=========================== LOCAL FUNCTIONS ==================================
+    299          //==============================================================================
+    300          
+    301          
+    302          //==============================================================================
+    303          // DESCRIPTION :
+    304          //
+    305          // PARAMETERS (Type,Name,Min,Max) :   none
+    306          //
+    307          // RETURN VALUE :   none
+    308          //
+    309          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    310          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    311          static MEM_TYPE void LightingPowerRelayManagement (void)
+   \                     LightingPowerRelayManagement:
+    312          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    313              BOOL bPowerRelayTimerIsStartedL;
+    314              BOOL bPowerRelayTimerIsElapsedL;
+    315              BOOL bDoorsChangingStateIsPresentL;
+    316              BOOL bIgnitionRisingEdgeIsPresentL;
+    317              BOOL bIgnitionFallingEdgeIsPresentL;
+    318          
+    319              if (mDATRead(U1Bit, EEP_ALIM_PLAF, Default) == 0)
+   \   0001   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0004   31D60B         BT        [HL].5, ??LAPIllRKEUnlock_0
+    320              {
+    321                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 0, Default);
+   \   0007   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   000A   2B..           CLR1      S:DATPouSoftOutputBuffer+3.2
+    322                  TOSStopTimer(&PowerRelayCtrlTimeOut);
+   \   000C   ..             CALLT     [__T_TOSStopTimer]
+    323          
+    324                  bALIM_PLAF_memo = 0;
+   \   000D   A100           MOV       A,#0
+   \   000F   9B....         BR        N:??LAPIllRKEUnlock_1
+    325              }
+    326              else
+    327              {
+    328                  bDoorsChangingStateIsPresentL  = 
+    329                      mFrontDoorsChangingStateEventIsPresent();
+   \                     ??LAPIllRKEUnlock_0:
+   \   0012   100700         MOVW      AX,#7
+   \   0015   ..             CALLT     [__T_TOSReadSignal]
+   \   0016   72             MOV       C,A
+    330                  bDoorsChangingStateIsPresentL |= mRearDoorsChangingStateEventIsPresent();
+   \   0017   100400         MOVW      AX,#4
+   \   001A   ..             CALLT     [__T_TOSReadSignal]
+   \   001B   6162           OR        C,A
+    331                  bIgnitionFallingEdgeIsPresentL = mIgnitionFallingEdgeIsPresent();
+   \   001D   100A00         MOVW      AX,#10
+   \   0020   ..             CALLT     [__T_TOSReadSignal]
+   \   0021   70             MOV       X,A
+    332          
+    333                  if (   (bDoorsChangingStateIsPresentL   == cTrue) 
+    334                      || (bIgnitionFallingEdgeIsPresentL  == cTrue) )
+   \   0022   62             MOV       A,C
+   \   0023   51             DEC       A
+   \   0024   AD04           BZ        ??LAPIllRKEUnlock_2
+   \   0026   60             MOV       A,X
+   \   0027   51             DEC       A
+   \   0028   BD0C           BNZ       ??LAPIllRKEUnlock_3
+    335                  {
+    336                      mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 1, Default);
+   \                     ??LAPIllRKEUnlock_2:
+   \   002A   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   002D   2A..           SET1      S:DATPouSoftOutputBuffer+3.2
+    337                      TOSStopTimer(&PowerRelayCtrlTimeOut);
+   \   002F   ..             CALLT     [__T_TOSStopTimer]
+    338                      TOSStartTimer(&PowerRelayCtrlTimeOut);
+   \   0030   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   0033   ..             CALLT     [__T_TOSStartTimer]
+    339                      bPowerRelayStopIsAllowed = cFalse;
+   \   0034   FA55           BR        ??LAPIllRKEUnlock_4
+    340                      u8TPS_APCStepCounter = 0;
+    341                  }
+    342                  else
+    343                  {
+    344                      bIgnitionRisingEdgeIsPresentL = mIgnitionRisingEdgeIsPresent();
+    345          
+    346                      if (bIgnitionRisingEdgeIsPresentL == cTrue)
+   \                     ??LAPIllRKEUnlock_3:
+   \   0036   100B00         MOVW      AX,#11
+   \   0039   ..             CALLT     [__T_TOSReadSignal]
+   \   003A   51             DEC       A
+   \   003B   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   003E   BD0A           BNZ       ??LAPIllRKEUnlock_5
+    347                      {
+    348                          mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 1, Default);
+   \   0040   2A..           SET1      S:DATPouSoftOutputBuffer+3.2
+    349                          TOSStopTimer(&PowerRelayCtrlTimeOut);                
+   \   0042   ..             CALLT     [__T_TOSStopTimer]
+    350                          bPowerRelayStopIsAllowed = cFalse;
+   \   0043   A100           MOV       A,#0
+   \   0045   9E....         MOV       bPowerRelayStopIsAllowed,A
+   \   0048   FA49           BR        ??LAPIllRKEUnlock_6
+    351                      }
+    352                      else
+    353                      {
+    354                          bPowerRelayTimerIsStartedL = 
+    355                              TOSIsTimerStarted(&PowerRelayCtrlTimeOut);
+   \                     ??LAPIllRKEUnlock_5:
+   \   004A   9A....         CALL      TOSIsTimerStarted
+   \   004D   74             MOV       E,A
+    356                          bPowerRelayTimerIsElapsedL = 
+    357                              TOSIsTimerElapsed(&PowerRelayCtrlTimeOut, mReadTPS_APCStepInTimerTicks);
+   \   004E   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   0051   128813         MOVW      BC,#5000
+   \   0054   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0055   70             MOV       X,A
+    358                        
+    359                          if (bPowerRelayTimerIsStartedL && bPowerRelayTimerIsElapsedL)
+   \   0056   64             MOV       A,E
+   \   0057   4D00           CMP       A,#0
+   \   0059   AD23           BZ        ??LAPIllRKEUnlock_7
+   \   005B   60             MOV       A,X
+   \   005C   4D00           CMP       A,#0
+   \   005E   AD1E           BZ        ??LAPIllRKEUnlock_7
+    360                          {
+    361                              u8TPS_APCStepCounter++;
+   \   0060   8E....         MOV       A,u8TPS_APCStepCounter
+   \   0063   41             INC       A
+   \   0064   9E....         MOV       u8TPS_APCStepCounter,A
+    362                              TOSStartTimer(&PowerRelayCtrlTimeOut);
+   \   0067   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   006A   ..             CALLT     [__T_TOSStartTimer]
+    363                              
+    364                              if (u8TPS_APCStepCounter >= mDATRead(U8Bit, NEEP_TPS_APC, Default))
+   \   006B   8E....         MOV       A,u8TPS_APCStepCounter
+   \   006E   48....         CMP       A,DATPeeCalibrationData+2
+   \   0071   8D20           BC        ??LAPIllRKEUnlock_6
+    365                              {
+    366                                  bPowerRelayStopIsAllowed = cTrue;
+   \   0073   A101           MOV       A,#1
+   \   0075   9E....         MOV       bPowerRelayStopIsAllowed,A
+    367                                  TOSStopTimer(&PowerRelayCtrlTimeOut);
+   \   0078   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   007B   ..             CALLT     [__T_TOSStopTimer]
+   \   007C   FA15           BR        ??LAPIllRKEUnlock_6
+    368                              }
+    369                              else
+    370                              {
+    371                                  // Do nothing
+    372                              }
+    373                          }
+    374                          else
+    375                          {
+    376                              // Power relay output has just been enabled
+    377                              if ( bALIM_PLAF_memo == 0 )
+   \                     ??LAPIllRKEUnlock_7:
+   \   007E   8E....         MOV       A,bALIM_PLAF_memo
+   \   0081   4D00           CMP       A,#0
+   \   0083   BD0E           BNZ       ??LAPIllRKEUnlock_6
+    378                              {
+    379                                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 1, Default);
+   \   0085   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   0088   2A..           SET1      S:DATPouSoftOutputBuffer+3.2
+    380                                  TOSStartTimer(&PowerRelayCtrlTimeOut);                        
+   \   008A   ..             CALLT     [__T_TOSStartTimer]
+    381                                  bPowerRelayStopIsAllowed = cFalse;
+   \                     ??LAPIllRKEUnlock_4:
+   \   008B   A100           MOV       A,#0
+   \   008D   9E....         MOV       bPowerRelayStopIsAllowed,A
+    382                                  u8TPS_APCStepCounter = 0;
+   \   0090   9E....         MOV       u8TPS_APCStepCounter,A
+    383                              }
+    384                              else
+    385                              {
+    386                                  // Do nothing
+    387                              }
+    388                          }
+    389                      }
+    390                  }
+    391          
+    392                  bALIM_PLAF_memo = 1;
+   \                     ??LAPIllRKEUnlock_6:
+   \   0093   A101           MOV       A,#1
+   \                     ??LAPIllRKEUnlock_1:
+   \   0095   9E....         MOV       bALIM_PLAF_memo,A
+    393              }
+    394          }
+   \   0098   B2             POP       BC
+   \   0099   AF             RET       
+   \   009A                  REQUIRE ?CL78K_V4_6_L00
+    395          
+    396          
+    397          //==============================================================================
+    398          // DESCRIPTION :
+    399          //
+    400          // PARAMETERS (Type,Name,Min,Max) :   none
+    401          //
+    402          // RETURN VALUE :   none
+    403          //
+    404          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    405          //==============================================================================
+    406          static MEM_TYPE void DisableFunctionallity(void)
+    407          {
+    408              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPIllInternalLightsController);
+    409          
+    410              LAPIllLightsOffExecution();
+    411          
+    412              TOSStopTimer(&PowerRelayCtrlTimeOut);
+    413              TOSStopTimer(&LightsGraduallyOffDelay);  
+    414          
+    415              bComponentIsEnabled = cFalse;
+    416          }
+    417          
+    418          
+    419          //==============================================================================
+    420          // DESCRIPTION :
+    421          //
+    422          // PARAMETERS (Type,Name,Min,Max) :   none
+    423          //
+    424          // RETURN VALUE :   none
+    425          //
+    426          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    427          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    428          static MEM_TYPE void ResumeAfterDisable(void)
+   \                     ResumeAfterDisable:
+    429          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    430              if (mDATRead(U1Bit, EEP_ALIM_PLAF, Default) == 0)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0003   31D604         BT        [HL].5, ??LAPIllRKEUnlock_8
+    431              {
+    432                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 0, Default);
+   \   0006   2B..           CLR1      S:DATPouSoftOutputBuffer+3.2
+   \   0008   FA0E           BR        ??LAPIllRKEUnlock_9
+    433              }
+    434              else
+    435              {
+    436                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 1, Default);
+   \                     ??LAPIllRKEUnlock_8:
+   \   000A   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   000D   2A..           SET1      S:DATPouSoftOutputBuffer+3.2
+    437                  TOSStartTimer(&PowerRelayCtrlTimeOut);
+   \   000F   ..             CALLT     [__T_TOSStartTimer]
+    438                  bPowerRelayStopIsAllowed = cFalse;
+   \   0010   A100           MOV       A,#0
+   \   0012   9E....         MOV       bPowerRelayStopIsAllowed,A
+    439                  u8TPS_APCStepCounter = 0;
+   \   0015   9E....         MOV       u8TPS_APCStepCounter,A
+    440              }
+    441          
+    442              InternalLights.LightsOnTimeOut  = 0;
+   \                     ??LAPIllRKEUnlock_9:
+   \   0018   100000         MOVW      AX,#0
+   \   001B   03....         MOVW      InternalLights,AX
+    443              InternalLights.State            = cLightingOff;
+   \   001E   9E....         MOV       InternalLights+2,A
+    444              mClearLightsOnTriggerEvent();
+   \   0021   16....         MOVW      HL,#InternalLights+3
+   \   0024   97             MOV       [HL],A
+    445              mClearLightsOffTriggerEvent();
+   \   0025   86             INCW      HL
+   \   0026   97             MOV       [HL],A
+    446              mClearLightsGraduallyOffTriggerEvent();
+   \   0027   86             INCW      HL
+   \   0028   97             MOV       [HL],A
+    447              mClearDoorsLockedTriggerEvent();
+   \   0029   9E....         MOV       bDoorsLockedTriggerEvent,A
+    448              mClearDoorsUnlockedTriggerEvent();
+   \   002C   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+    449          
+    450              TOSSeqActivateGraph(cTOSSeqGraphIdLAPIllInternalLightsController);
+   \   002F   A122           MOV       A,#34
+   \   0031   ..             CALLT     [__T_TOSSeqActivateGraph]
+    451          
+    452              bComponentIsEnabled = cTrue;
+   \   0032   A101           MOV       A,#1
+   \   0034   9E....         MOV       bComponentIsEnabled,A
+    453          }
+   \   0037   AF             RET       
+   \   0038                  REQUIRE ?CL78K_V4_6_L00
+    454          
+    455          
+    456          //==============================================================================
+    457          // DESCRIPTION :
+    458          //
+    459          // PARAMETERS (Type,Name,Min,Max) :   none
+    460          //
+    461          // RETURN VALUE :   none
+    462          //
+    463          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    464          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    465          static MEM_TYPE void LAPIllInitPowerRelay(void)
+   \                     LAPIllInitPowerRelay:
+    466          {    
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    467              if (mDATRead(U1Bit, EEP_ALIM_PLAF, Default) == 0)
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0003   31D606         BT        [HL].5, ??LAPIllRKEUnlock_10
+    468              {
+    469                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 0, Default);
+   \   0006   A100           MOV       A,#0
+   \   0008   2B..           CLR1      S:DATPouSoftOutputBuffer+3.2
+    470                  bALIM_PLAF_memo = 0;
+   \   000A   FA19           BR        ??LAPIllRKEUnlock_11
+    471              }
+    472              else
+    473              {
+    474                  mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 1, Immediate);
+   \                     ??LAPIllRKEUnlock_10:
+   \   000C   AC..08         BT        S:DATPouSoftOutputBuffer+3.2, ??LAPIllRKEUnlock_12
+   \   000F   101000         MOVW      AX,#16
+   \   0012   2A..           SET1      S:DATPouSoftOutputBuffer+3.2
+   \   0014   9A....         CALL      TOSActivateTask
+    475                  TOSStartTimer(&PowerRelayCtrlTimeOut);
+   \                     ??LAPIllRKEUnlock_12:
+   \   0017   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   001A   ..             CALLT     [__T_TOSStartTimer]
+    476                  bPowerRelayStopIsAllowed = cFalse;
+   \   001B   A100           MOV       A,#0
+   \   001D   9E....         MOV       bPowerRelayStopIsAllowed,A
+    477                  u8TPS_APCStepCounter = 0;
+   \   0020   9E....         MOV       u8TPS_APCStepCounter,A
+    478                  bALIM_PLAF_memo = 1;
+   \   0023   A101           MOV       A,#1
+   \                     ??LAPIllRKEUnlock_11:
+   \   0025   9E....         MOV       bALIM_PLAF_memo,A
+    479              }
+    480          }
+   \   0028   AF             RET       
+   \   0029                  REQUIRE ?CL78K_V4_6_L00
+    481          
+    482          
+    483          //==============================================================================
+    484          //=========================== EXPORTED FUNCTIONS ===============================
+    485          //==============================================================================
+    486          
+    487          //==============================================================================
+    488          // DESCRIPTION :
+    489          //
+    490          // PARAMETERS (Type,Name,Min,Max) :   none
+    491          //
+    492          // RETURN VALUE :   none
+    493          //
+    494          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    495          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    496          void LAPIllInitialize(void)
+   \                     LAPIllInitialize:
+    497          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    498          #ifdef X90_PROJECT
+    499              LAPIllInitialize_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllInitialize_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllInitialize_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    500          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    501          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    502          static MEM_TYPE void LAPIllInitialize_Static(void)
+   \                     LAPIllInitialize_Static:
+    503          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    504          #endif
+    505              PowerRelayCtrlTimeOut           = 0;
+   \   0000   100000         MOVW      AX,#0
+   \   0003   03....         MOVW      PowerRelayCtrlTimeOut,AX
+    506              u8TPS_APCStepCounter            = 0;
+   \   0006   9E....         MOV       u8TPS_APCStepCounter,A
+    507              InternalLights.LightsOnTimeOut  = 0;
+   \   0009   03....         MOVW      InternalLights,AX
+    508              InternalLights.State            = cLightingOff;
+   \   000C   9E....         MOV       InternalLights+2,A
+    509          
+    510              mClearLightsOnTriggerEvent();
+   \   000F   16....         MOVW      HL,#InternalLights+3
+   \   0012   97             MOV       [HL],A
+    511              mClearLightsOffTriggerEvent();
+   \   0013   86             INCW      HL
+   \   0014   97             MOV       [HL],A
+    512              mClearLightsGraduallyOffTriggerEvent();
+   \   0015   86             INCW      HL
+   \   0016   97             MOV       [HL],A
+    513              mClearDoorsLockedTriggerEvent();
+   \   0017   9E....         MOV       bDoorsLockedTriggerEvent,A
+    514              mClearDoorsUnlockedTriggerEvent();
+   \   001A   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+    515          }
+   \   001D   AF             RET       
+   \   001E                  REQUIRE ?CL78K_V4_6_L00
+    516          
+    517          
+    518          //==============================================================================
+    519          // DESCRIPTION :
+    520          //
+    521          // PARAMETERS (Type,Name,Min,Max) :   none
+    522          //
+    523          // RETURN VALUE :   none
+    524          //
+    525          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    526          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    527          void LAPIllLeaveStartingStepState(void)
+   \                     LAPIllLeaveStartingStepState:
+    528          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    529              if (mDATRead(U1Bit, BcmSleepRequested, Default) == cFalse)
+   \   0001   16....         MOVW      HL,#LWRD(DATCmnGetBcmSleepRequested)
+   \   0004   A4..           MOV       E,#BYTE3(DATCmnGetBcmSleepRequested)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD0F           BNZ       ??LAPIllRKEUnlock_38
+    530              {
+    531                  // BCM wakes up if EEP_ALIM_PLAF is set
+    532          
+    533                  LAPIllInitPowerRelay();
+   \   000B   16....         MOVW      HL,#LWRD(LAPIllInitPowerRelay)
+   \   000E   A4..           MOV       E,#BYTE3(LAPIllInitPowerRelay)
+   \   0010   ..             CALLT     [__T_?FAR_CALL_L07]
+    534          
+    535                  if (mDATRead(U1Bit, BAT_LIGHT_TEMPO, Default) != cFalse)
+   \   0011   3123..0D       BF        S:DATPouSoftOutputBuffer+3.2, ??LAPIllRKEUnlock_39
+    536                  {
+    537                      TOSSendControl(cTOSControlWakeUpRequest);
+   \   0015   A102           MOV       A,#2
+   \   0017   ..             CALLT     [__T_TOSSendControl]
+   \   0018   FA08           BR        ??LAPIllRKEUnlock_39
+    538                  }
+    539              }
+    540              else
+    541              {
+    542                  mDATWrite(U1Bit, BcmSleepRequested, cFalse, Default);
+   \                     ??LAPIllRKEUnlock_38:
+   \   001A   A100           MOV       A,#0
+   \   001C   16....         MOVW      HL,#LWRD(DATCmnSetBcmSleepRequested)
+   \   001F   A4..           MOV       E,#BYTE3(DATCmnSetBcmSleepRequested)
+   \   0021   ..             CALLT     [__T_?FAR_CALL_L07]
+    543                  // do not wake up
+    544              }
+    545          }
+   \                     ??LAPIllRKEUnlock_39:
+   \   0022   B4             POP       DE
+   \   0023   AF             RET       
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    546          
+    547          
+    548          //==============================================================================
+    549          // DESCRIPTION :
+    550          //
+    551          // PARAMETERS (Type,Name,Min,Max) :   none
+    552          //
+    553          // RETURN VALUE :   none
+    554          //
+    555          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    556          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    557          void LAPIllEnterActiveState(void)
+   \                     LAPIllEnterActiveState:
+    558          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    559          #ifdef X90_PROJECT
+    560              LAPIllEnterActiveState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllEnterActiveState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllEnterActiveState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    561          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    562          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    563          static MEM_TYPE void LAPIllEnterActiveState_Static(void)
+   \                     LAPIllEnterActiveState_Static:
+    564          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    565          #endif
+    566              
+    567              LAPIllInitPowerRelay();
+   \   0000   16....         MOVW      HL,#LWRD(LAPIllInitPowerRelay)
+   \   0003   A4..           MOV       E,#BYTE3(LAPIllInitPowerRelay)
+   \   0005   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    568          
+    569              if (mDATRead(U1Bit, EEP_AUTPLAF, Default) == 1)
+   \   0006   A100           MOV       A,#0
+   \   0008   16....         MOVW      HL,#DATDbkMirrors+27
+   \   000B   31970B         BF        [HL].1, ??LAPIllRKEUnlock_13
+    570              {
+    571                  mClearDoorsLockedTriggerEvent();
+   \   000E   9E....         MOV       bDoorsLockedTriggerEvent,A
+    572                  mClearDoorsUnlockedTriggerEvent();
+   \   0011   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+    573          
+    574                  TOSSeqActivateGraph(cTOSSeqGraphIdLAPIllInternalLightsController);
+   \   0014   A122           MOV       A,#34
+   \   0016   ..             CALLT     [__T_TOSSeqActivateGraph]
+    575          
+    576                  bComponentIsEnabled = cTrue;
+   \   0017   A101           MOV       A,#1
+    577              }
+    578              else // AUTPLAF = 0, component is disabled
+    579              {        
+    580                  bComponentIsEnabled = cFalse;
+   \                     ??LAPIllRKEUnlock_13:
+   \   0019   9E....         MOV       bComponentIsEnabled,A
+    581              }
+    582              TOSSeqActivateGraph(cTOSSeqGraphIdLAPIllInternalLightsManagement);
+   \   001C   A121           MOV       A,#33
+   \   001E   ..             CALLT     [__T_TOSSeqActivateGraph]
+    583          }
+   \   001F   AF             RET       
+   \   0020                  REQUIRE ?CL78K_V4_6_L00
+    584          
+    585          
+    586          //==============================================================================
+    587          // DESCRIPTION :
+    588          //
+    589          // PARAMETERS (Type,Name,Min,Max) :   none
+    590          //
+    591          // RETURN VALUE :   none
+    592          //
+    593          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    594          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    595          void LAPIllLeaveActiveState(void)
+   \                     LAPIllLeaveActiveState:
+    596          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    597          #ifdef X90_PROJECT
+    598              LAPIllLeaveActiveState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllLeaveActiveState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllLeaveActiveState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    599          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    600          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    601          static MEM_TYPE void LAPIllLeaveActiveState_Static(void)
+   \                     LAPIllLeaveActiveState_Static:
+    602          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    603          #endif
+    604              if (bComponentIsEnabled == cTrue)
+   \   0000   8E....         MOV       A,bComponentIsEnabled
+   \   0003   51             DEC       A
+   \   0004   A121           MOV       A,#33
+   \   0006   BD11           BNZ       ??LAPIllRKEUnlock_14
+    605              {
+    606                  TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPIllInternalLightsManagement);
+   \   0008   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    607                  TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPIllInternalLightsController);
+   \   0009   A122           MOV       A,#34
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    608          
+    609                  LAPIllLightsOffExecution();
+   \   000C   9A....         CALL      LAPIllLightsOffExecution
+    610          
+    611                  TOSStopTimer(&PowerRelayCtrlTimeOut);
+   \   000F   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   0012   ..             CALLT     [__T_TOSStopTimer]
+    612                  TOSStopTimer(&LightsGraduallyOffDelay); 
+   \   0013   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0016   ..             CALLT     [__T_TOSStopTimer]
+   \   0017   FA01           BR        ??LAPIllRKEUnlock_15
+    613              }
+    614              else
+    615              {
+    616                  TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPIllInternalLightsManagement);
+   \                     ??LAPIllRKEUnlock_14:
+   \   0019   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    617              }
+    618               
+    619              mDATWrite(U1Bit, BAT_LIGHT_TEMPO, 0, Default);
+   \                     ??LAPIllRKEUnlock_15:
+   \   001A   2B..           CLR1      S:DATPouSoftOutputBuffer+3.2
+    620          }
+   \   001C   AF             RET       
+   \   001D                  REQUIRE ?CL78K_V4_6_L00
+    621          
+    622          
+    623          //==============================================================================
+    624          // DESCRIPTION :
+    625          //
+    626          // PARAMETERS (Type,Name,Min,Max) :   none
+    627          //
+    628          // RETURN VALUE :   none
+    629          //
+    630          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    631          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    632          void LAPIllIsAnybodyMaintainActiveState(void)
+   \                     LAPIllIsAnybodyMaintainActiveState:
+    633          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    634              if (  (mDATRead(U1Bit, BAT_LIGHT_TEMPO, Default) == 0)
+    635                  ||(bPowerRelayStopIsAllowed == cTrue)   
+    636                 )
+   \   0000   3123..0A       BF        S:DATPouSoftOutputBuffer+3.2, ??LAPIllRKEUnlock_40
+   \   0004   8E....         MOV       A,bPowerRelayStopIsAllowed
+   \   0007   51             DEC       A
+   \   0008   AD04           BZ        ??LAPIllRKEUnlock_40
+    637              {
+    638                // Do nothing
+    639              }
+    640              else
+    641              {
+    642                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   000A   102900         MOVW      AX,#41
+   \   000D   ..             CALLT     [__T_TOSWriteSignal]
+    643              }
+    644          }
+   \                     ??LAPIllRKEUnlock_40:
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+    645          
+    646          
+    647          //==============================================================================
+    648          // DESCRIPTION :
+    649          //
+    650          // PARAMETERS (Type,Name,Min,Max) :   none
+    651          //
+    652          // RETURN VALUE :   none
+    653          //
+    654          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    655          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    656          void LAPIllManagement(void)
+   \                     LAPIllManagement:
+    657          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    658              if (mDATRead(U1Bit, EEP_AUTPLAF, Default) == 1)
+   \   0002   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0005   8E....         MOV       A,bComponentIsEnabled
+   \   0008   31970C         BF        [HL].1, ??LAPIllRKEUnlock_41
+    659              {
+    660                  if (bComponentIsEnabled == cFalse)
+   \   000B   4D00           CMP       A,#0
+   \   000D   BD42           BNZ       ??LAPIllRKEUnlock_42
+    661                  {
+    662                      ResumeAfterDisable();
+   \   000F   16....         MOVW      HL,#LWRD(ResumeAfterDisable)
+   \   0012   A4..           MOV       E,#BYTE3(ResumeAfterDisable)
+   \   0014   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0015   FA3A           BR        ??LAPIllRKEUnlock_42
+    663                  }
+    664                  else
+    665                  {
+    666                      // Do nothing
+    667                  }
+    668              }
+    669              else // AUTPLAF = 0, Internal Lights disabled
+    670              {
+    671                  if (bComponentIsEnabled == cTrue)
+   \                     ??LAPIllRKEUnlock_41:
+   \   0017   51             DEC       A
+   \   0018   BD37           BNZ       ??LAPIllRKEUnlock_42
+    672                  {
+    673                      DisableFunctionallity();
+   \   001A   A122           MOV       A,#34
+   \   001C   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+   \   001D   A000           MOV       X,#0
+   \   001F   60             MOV       A,X
+   \   0020   74             MOV       E,A
+   \   0021   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0024   D2             MOVW      BC,AX
+   \   0025   64             MOV       A,E
+   \   0026   70             MOV       X,A
+   \   0027   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   002A   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   002C   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   002D   A100           MOV       A,#0
+   \   002F   9E....         MOV       InternalLights+2,A
+   \   0032   16....         MOVW      HL,#InternalLights+3
+   \   0035   97             MOV       [HL],A
+   \   0036   86             INCW      HL
+   \   0037   97             MOV       [HL],A
+   \   0038   86             INCW      HL
+   \   0039   97             MOV       [HL],A
+   \   003A   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+   \   003D   9E....         MOV       bDoorsLockedTriggerEvent,A
+   \   0040   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0043   ..             CALLT     [__T_TOSStopTimer]
+   \   0044   10....         MOVW      AX,#PowerRelayCtrlTimeOut
+   \   0047   ..             CALLT     [__T_TOSStopTimer]
+   \   0048   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   004B   ..             CALLT     [__T_TOSStopTimer]
+   \   004C   A100           MOV       A,#0
+   \   004E   9E....         MOV       bComponentIsEnabled,A
+    674                  }
+    675                  else
+    676                  {
+    677                      // Do nothing
+    678                  }
+    679                  
+    680              }
+    681          
+    682              LightingPowerRelayManagement();
+   \                     ??LAPIllRKEUnlock_42:
+   \   0051   16....         MOVW      HL,#LWRD(LightingPowerRelayManagement)
+   \   0054   A4..           MOV       E,#BYTE3(LightingPowerRelayManagement)
+   \   0056   ..             CALLT     [__T_?FAR_CALL_L07]
+    683          }
+   \   0057   B4             POP       DE
+   \   0058   B2             POP       BC
+   \   0059   AF             RET       
+   \   005A                  REQUIRE ?CL78K_V4_6_L00
+    684          
+    685          
+    686          //==============================================================================
+    687          // DESCRIPTION :
+    688          //
+    689          // PARAMETERS (Type,Name,Min,Max) :   none
+    690          //
+    691          // RETURN VALUE :   none
+    692          //
+    693          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    694          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    695          BOOL LAPIllLightsOnRequestIsTrue(void)
+   \                     LAPIllLightsOnRequestIsTrue:
+    696          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    697          #ifdef X90_PROJECT
+    698              return LAPIllLightsOnRequestIsTrue_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllLightsOnRequestIsTrue_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllLightsOnRequestIsTrue_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    699          }
+    700          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    701          static MEM_TYPE BOOL LAPIllLightsOnRequestIsTrue_Static(void)
+   \                     LAPIllLightsOnRequestIsTrue_Static:
+    702          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    703          #endif
+    704          
+    705              if (mADoorIsOpened() == cTrue) 
+   \   0001   8C..04         BT        S:DATDinInputBuffers+8.0, ??LAPIllRKEUnlock_16
+   \   0004   3133..08       BF        S:DATDinInputBuffers+6.3, ??LAPIllRKEUnlock_17
+    706              {
+    707                  mSetLightsOnTriggerEvent();
+   \                     ??LAPIllRKEUnlock_16:
+   \   0008   A101           MOV       A,#1
+   \   000A   16....         MOVW      HL,#InternalLights+3
+   \   000D   97             MOV       [HL],A
+   \   000E   FA32           BR        ??LAPIllRKEUnlock_18
+    708              }
+    709              else 
+    710              {
+    711                  if (   (mDATRead(U1Bit, EEP_PIL_PLAF, Default) == 1)
+    712                      && (mReadDoorsUnlockedTriggerEvent() == cTrue) )
+   \                     ??LAPIllRKEUnlock_17:
+   \   0010   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0013   31E726         BF        [HL].6, ??LAPIllRKEUnlock_19
+   \   0016   8E....         MOV       A,bDoorsUnlockedTriggerEvent
+   \   0019   51             DEC       A
+   \   001A   BD20           BNZ       ??LAPIllRKEUnlock_19
+    713                  {
+    714                      mSetLightsOnTriggerEvent();
+   \   001C   A101           MOV       A,#1
+   \   001E   16....         MOVW      HL,#InternalLights+3
+   \   0021   97             MOV       [HL],A
+    715                      InternalLights.LightsOnTimeOut = 
+    716                      
+    717                      // Max(NEEP_TPS_PLAF) * Step fits in U16
+    718                      mTOSConvMsInTimerTick
+    719                          ((U32)((U16)mDATRead(U8Bit,NEEP_TPS_PLAF,Default) *
+    720                                                                       (U16)cTpsPlafStepInMs ));
+   \   0022   122003         MOVW      BC,#800
+   \   0025   8E....         MOV       A,DATPeeCalibrationData+3
+   \   0028   70             MOV       X,A
+   \   0029   A100           MOV       A,#0
+   \   002B   ..             CALLT     [__T_?I_MUL_L02]
+   \   002C   A20A           MOV       C,#10
+   \   002E   3182           DIVUW     C
+   \   0030   03....         MOVW      InternalLights,AX
+    721                      TOSStartTimer(&LogicalLightingTimeOut);
+   \   0033   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0036   ..             CALLT     [__T_TOSStartTimer]
+    722                      mClearDoorsUnlockedTriggerEvent();
+   \   0037   A100           MOV       A,#0
+   \   0039   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+    723                  }
+    724                  else
+    725                  {
+    726                      // Do nothing
+    727                  }
+    728              }
+    729                  
+    730              return (mReadLightsOnTriggerEvent());
+   \                     ??LAPIllRKEUnlock_19:
+   \   003C   8E....         MOV       A,InternalLights+3
+   \   003F   51             DEC       A
+   \   0040   BD04           BNZ       ??LAPIllRKEUnlock_20
+   \                     ??LAPIllRKEUnlock_18:
+   \   0042   A101           MOV       A,#1
+   \   0044   FA02           BR        ??LAPIllRKEUnlock_21
+   \                     ??LAPIllRKEUnlock_20:
+   \   0046   A100           MOV       A,#0
+   \                     ??LAPIllRKEUnlock_21:
+   \   0048   B2             POP       BC
+   \   0049   AF             RET       
+   \   004A                  REQUIRE ?CL78K_V4_6_L00
+    731          }
+    732          
+    733          
+    734          //==============================================================================
+    735          // DESCRIPTION :
+    736          //
+    737          // PARAMETERS (Type,Name,Min,Max) :   none
+    738          //
+    739          // RETURN VALUE :   none
+    740          //
+    741          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    742          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    743          void LAPIllLightsOnExecution(void)
+   \                     LAPIllLightsOnExecution:
+    744          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    745              mDATWrite(U8Bit, PWM_ROOMLAMP, cInternalLightsMaxOutput, Default);
+   \   0002   A064           MOV       X,#100
+   \   0004   60             MOV       A,X
+   \   0005   74             MOV       E,A
+   \   0006   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0009   D2             MOVW      BC,AX
+   \   000A   64             MOV       A,E
+   \   000B   70             MOV       X,A
+   \   000C   A100           MOV       A,#0
+   \   000E   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   0011   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   0013   ..             CALLT     [__T_?FAR_CALL_L07]
+    746              InternalLights.State = cLightingOn;
+   \   0014   A101           MOV       A,#1
+   \   0016   9E....         MOV       InternalLights+2,A
+    747              mClearLightsOnTriggerEvent();
+   \   0019   A100           MOV       A,#0
+   \   001B   16....         MOVW      HL,#InternalLights+3
+   \   001E   97             MOV       [HL],A
+    748              mClearLightsOffTriggerEvent();
+   \   001F   86             INCW      HL
+   \   0020   97             MOV       [HL],A
+    749              mClearLightsGraduallyOffTriggerEvent();
+   \   0021   86             INCW      HL
+   \   0022   97             MOV       [HL],A
+    750              // In case of interrupted dimming cycle
+    751              TOSStopTimer(&LightsGraduallyOffDelay);
+   \   0023   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0026   ..             CALLT     [__T_TOSStopTimer]
+    752          }
+   \   0027   B4             POP       DE
+   \   0028   B2             POP       BC
+   \   0029   AF             RET       
+   \   002A                  REQUIRE ?CL78K_V4_6_L00
+    753          
+    754          
+    755          //==============================================================================
+    756          // DESCRIPTION :
+    757          //
+    758          // PARAMETERS (Type,Name,Min,Max) :   none
+    759          //
+    760          // RETURN VALUE :   none
+    761          //
+    762          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    763          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    764          BOOL LAPIllLightsOffRequestIsTrue(void)
+   \                     LAPIllLightsOffRequestIsTrue:
+    765          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    766          #ifdef X90_PROJECT
+    767              return LAPIllLightsOffRequestIsTrue_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllLightsOffRequestIsTrue_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllLightsOffRequestIsTrue_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    768          }
+    769          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    770          static MEM_TYPE BOOL LAPIllLightsOffRequestIsTrue_Static(void)
+   \                     LAPIllLightsOffRequestIsTrue_Static:
+    771          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    772          #endif
+    773          
+    774              if (mAllDoorsAreClosed() == cTrue)
+   \   0000   8C..27         BT        S:DATDinInputBuffers+8.0, ??LAPIllRKEUnlock_22
+   \   0003   BC..24         BT        S:DATDinInputBuffers+6.3, ??LAPIllRKEUnlock_22
+    775              {
+    776                  if (mDATRead(U1Bit, EEP_PIL_PLAF, Default) == 0)
+   \   0006   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0009   31E608         BT        [HL].6, ??LAPIllRKEUnlock_23
+    777                  {
+    778                      mSetLightsOffTriggerEvent();
+   \   000C   A101           MOV       A,#1
+   \   000E   16....         MOVW      HL,#InternalLights+4
+   \   0011   97             MOV       [HL],A
+   \   0012   FA20           BR        ??LAPIllRKEUnlock_24
+    779                  }
+    780                  else // PIL_PLAF == 1
+    781                  {
+    782                      if (   (mDATRead(U1Bit, PWR_IGN, Default) == 0)
+    783                          && (mReadDoorsLockedTriggerEvent() == cTrue)   )
+   \                     ??LAPIllRKEUnlock_23:
+   \   0014   8C..17         BT        S:DATDinInputBuffers+6.0, ??LAPIllRKEUnlock_25
+   \   0017   8E....         MOV       A,bDoorsLockedTriggerEvent
+   \   001A   51             DEC       A
+   \   001B   BD11           BNZ       ??LAPIllRKEUnlock_25
+    784                      {
+    785                          mSetLightsOffTriggerEvent();
+   \   001D   A101           MOV       A,#1
+   \   001F   16....         MOVW      HL,#InternalLights+4
+   \   0022   97             MOV       [HL],A
+    786                          mClearDoorsLockedTriggerEvent();                    
+   \   0023   A100           MOV       A,#0
+   \   0025   9E....         MOV       bDoorsLockedTriggerEvent,A
+   \   0028   FA0A           BR        ??LAPIllRKEUnlock_24
+    787                      }
+    788                      else
+    789                      {
+    790                          // Do nothing
+    791                      }
+    792                  }
+    793              }
+    794              else
+    795              {
+    796                  TOSStopTimer(&LogicalLightingTimeOut);
+   \                     ??LAPIllRKEUnlock_22:
+   \   002A   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   002D   ..             CALLT     [__T_TOSStopTimer]
+    797              }
+    798          
+    799              return (mReadLightsOffTriggerEvent() == cTrue);
+   \                     ??LAPIllRKEUnlock_25:
+   \   002E   8E....         MOV       A,InternalLights+4
+   \   0031   51             DEC       A
+   \   0032   BD03           BNZ       ??LAPIllRKEUnlock_26
+   \                     ??LAPIllRKEUnlock_24:
+   \   0034   A101           MOV       A,#1
+   \   0036   AF             RET       
+   \                     ??LAPIllRKEUnlock_26:
+   \   0037   A100           MOV       A,#0
+   \   0039   AF             RET       
+   \   003A                  REQUIRE ?CL78K_V4_6_L00
+    800          }
+    801          
+    802          
+    803          //==============================================================================
+    804          // DESCRIPTION :
+    805          //
+    806          // PARAMETERS (Type,Name,Min,Max) :   none
+    807          //
+    808          // RETURN VALUE :   none
+    809          //
+    810          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    811          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    812          BOOL LAPIllLightsGraduallyOffRequestIsTrue(void)
+   \                     LAPIllLightsGraduallyOffRequestIsTrue:
+    813          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    814          #ifdef X90_PROJECT
+    815              return LAPIllLightsGraduallyOffRequestIsTrue_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllLightsGraduallyOffRequestIsTrue_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllLightsGraduallyOffRequestIsTrue_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    816          }
+    817          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    818          static MEM_TYPE BOOL LAPIllLightsGraduallyOffRequestIsTrue_Static(void)
+   \                     LAPIllLightsGraduallyOffRequestIsTrue_Static:
+    819          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    820          #endif
+    821          
+    822              BOOL bLightsOnTimerIsStarted;
+    823              BOOL bLightsOnTimerIsElapsed;
+    824          
+    825              if (   (mDATRead(U1Bit, EEP_PIL_PLAF, Default) ==     1)
+    826                  && (mAllDoorsAreClosed()                   == cTrue)   )
+   \   0001   16....         MOVW      HL,#DATDbkMirrors+25
+   \   0004   31E72B         BF        [HL].6, ??LAPIllRKEUnlock_27
+   \   0007   8C..28         BT        S:DATDinInputBuffers+8.0, ??LAPIllRKEUnlock_27
+   \   000A   BC..25         BT        S:DATDinInputBuffers+6.3, ??LAPIllRKEUnlock_27
+    827              {
+    828                  if (mDATRead(U1Bit, PWR_IGN, Default) == 0)
+   \   000D   8C..59         BT        S:DATDinInputBuffers+6.0, ??LAPIllRKEUnlock_28
+    829                  {
+    830                      bLightsOnTimerIsStarted = 
+    831                          TOSIsTimerStarted(&LogicalLightingTimeOut);
+   \   0010   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0013   9A....         CALL      TOSIsTimerStarted
+   \   0016   74             MOV       E,A
+    832                      bLightsOnTimerIsElapsed = 
+    833                          TOSIsTimerElapsed(&LogicalLightingTimeOut, 
+    834                                             InternalLights.LightsOnTimeOut);
+   \   0017   02....         MOVW      AX,InternalLights
+   \   001A   D2             MOVW      BC,AX
+   \   001B   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   001E   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   001F   70             MOV       X,A
+    835          
+    836                      if (   (bLightsOnTimerIsStarted == cTrue)
+    837                          && (bLightsOnTimerIsElapsed == cTrue) )    
+   \   0020   64             MOV       A,E
+   \   0021   51             DEC       A
+   \   0022   BD18           BNZ       ??LAPIllRKEUnlock_29
+   \   0024   60             MOV       A,X
+   \   0025   51             DEC       A
+   \   0026   BD30           BNZ       ??LAPIllRKEUnlock_30
+    838                      {
+    839                          mSetLightsGraduallyOffTriggerEvent();
+   \   0028   A101           MOV       A,#1
+   \   002A   16....         MOVW      HL,#InternalLights+5
+   \   002D   97             MOV       [HL],A
+    840                          TOSStopTimer(&LogicalLightingTimeOut);
+   \   002E   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0031   ..             CALLT     [__T_TOSStopTimer]
+    841                      }
+    842                      else
+    843                      {
+    844                          if (bLightsOnTimerIsStarted == cFalse)
+    845                          {
+    846                              InternalLights.LightsOnTimeOut = 
+    847                              
+    848                              // Max(NEEP_TPS_PLAF) * Step fits in U16
+    849                              mTOSConvMsInTimerTick
+    850                              ((U32)((U16)mDATRead(U8Bit, NEEP_TPS_PLAF, Default) *
+    851                                                               (U16)cTpsPlafStepInMs ));
+    852                              TOSStartTimer(&LogicalLightingTimeOut);
+    853                          }
+    854                          else if (mReadDoorsUnlockedTriggerEvent() != cFalse)
+    855                          {
+    856                              // Restart of lighting timeout due to unlock
+    857                              TOSStartTimer(&LogicalLightingTimeOut);
+    858                              mClearDoorsUnlockedTriggerEvent();                        
+    859                          }
+    860                          else
+    861                          {
+    862                              // Do nothing
+    863                          }
+    864                      }
+    865                  }
+    866                  else // (mDATRead(U1Bit, PWR_IGN, Default) == 1)
+    867                  {
+    868                      mSetLightsGraduallyOffTriggerEvent();
+    869                  }
+    870              }
+    871              else
+    872              {
+    873                  // Do nothing
+    874              }
+    875              
+    876              return (mReadLightsGraduallyOffTriggerEvent() == cTrue);
+   \                     ??LAPIllRKEUnlock_27:
+   \   0032   8E....         MOV       A,InternalLights+5
+   \   0035   51             DEC       A
+   \   0036   BD39           BNZ       ??LAPIllRKEUnlock_31
+   \                     ??LAPIllLightsGraduallyOffRequestIsTrue_Static_0:
+   \   0038   A101           MOV       A,#1
+   \   003A   FA37           BR        ??LAPIllRKEUnlock_32
+   \                     ??LAPIllRKEUnlock_29:
+   \   003C   64             MOV       A,E
+   \   003D   4D00           CMP       A,#0
+   \   003F   BD17           BNZ       ??LAPIllRKEUnlock_30
+   \   0041   122003         MOVW      BC,#800
+   \   0044   8E....         MOV       A,DATPeeCalibrationData+3
+   \   0047   70             MOV       X,A
+   \   0048   A100           MOV       A,#0
+   \   004A   ..             CALLT     [__T_?I_MUL_L02]
+   \   004B   A20A           MOV       C,#10
+   \   004D   3182           DIVUW     C
+   \   004F   03....         MOVW      InternalLights,AX
+   \   0052   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0055   ..             CALLT     [__T_TOSStartTimer]
+   \   0056   FADA           BR        ??LAPIllRKEUnlock_27
+   \                     ??LAPIllRKEUnlock_30:
+   \   0058   8E....         MOV       A,bDoorsUnlockedTriggerEvent
+   \   005B   51             DEC       A
+   \   005C   BDD4           BNZ       ??LAPIllRKEUnlock_27
+   \   005E   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0061   ..             CALLT     [__T_TOSStartTimer]
+   \   0062   A100           MOV       A,#0
+   \   0064   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+   \   0067   FAC9           BR        ??LAPIllRKEUnlock_27
+   \                     ??LAPIllRKEUnlock_28:
+   \   0069   A101           MOV       A,#1
+   \   006B   16....         MOVW      HL,#InternalLights+5
+   \   006E   97             MOV       [HL],A
+   \   006F   FAC7           BR        ??LAPIllLightsGraduallyOffRequestIsTrue_Static_0
+   \                     ??LAPIllRKEUnlock_31:
+   \   0071   A100           MOV       A,#0
+   \                     ??LAPIllRKEUnlock_32:
+   \   0073   B2             POP       BC
+   \   0074   AF             RET       
+   \   0075                  REQUIRE ?CL78K_V4_6_L00
+    877          }
+    878          
+    879          
+    880          //==============================================================================
+    881          // DESCRIPTION :
+    882          //
+    883          // PARAMETERS (Type,Name,Min,Max) :   none
+    884          //
+    885          // RETURN VALUE :   none
+    886          //
+    887          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    888          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    889          void LAPIllLightsOffExecution(void)
+   \                     LAPIllLightsOffExecution:
+    890          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    891              mDATWrite(U8Bit, PWM_ROOMLAMP, 0, Default);
+   \   0002   A000           MOV       X,#0
+   \   0004   60             MOV       A,X
+   \   0005   74             MOV       E,A
+   \   0006   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0009   D2             MOVW      BC,AX
+   \   000A   64             MOV       A,E
+   \   000B   70             MOV       X,A
+   \   000C   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   000F   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   0011   ..             CALLT     [__T_?FAR_CALL_L07]
+    892              InternalLights.State = cLightingOff;
+   \   0012   A100           MOV       A,#0
+   \   0014   9E....         MOV       InternalLights+2,A
+    893              mClearLightsOnTriggerEvent();
+   \   0017   16....         MOVW      HL,#InternalLights+3
+   \   001A   97             MOV       [HL],A
+    894              mClearLightsOffTriggerEvent();
+   \   001B   86             INCW      HL
+   \   001C   97             MOV       [HL],A
+    895              mClearLightsGraduallyOffTriggerEvent();
+   \   001D   86             INCW      HL
+   \   001E   97             MOV       [HL],A
+    896              mClearDoorsUnlockedTriggerEvent();
+   \   001F   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+    897              mClearDoorsLockedTriggerEvent();
+   \   0022   9E....         MOV       bDoorsLockedTriggerEvent,A
+    898              TOSStopTimer(&LogicalLightingTimeOut);
+   \   0025   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0028   ..             CALLT     [__T_TOSStopTimer]
+    899          }
+   \   0029   B4             POP       DE
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+    900          
+    901          
+    902          //==============================================================================
+    903          // DESCRIPTION :
+    904          //
+    905          // PARAMETERS (Type,Name,Min,Max) :   none
+    906          //
+    907          // RETURN VALUE :   none
+    908          //
+    909          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    910          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    911          void LAPIllLightsGraduallyOffExecution(void)
+   \                     LAPIllLightsGraduallyOffExecution:
+    912          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    913          #ifdef X90_PROJECT
+    914              LAPIllLightsGraduallyOffExecution_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPIllLightsGraduallyOffExecution_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPIllLightsGraduallyOffExecution_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    915          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    916          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    917          static MEM_TYPE void LAPIllLightsGraduallyOffExecution_Static(void)
+   \                     LAPIllLightsGraduallyOffExecution_Static:
+    918          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    919          #endif
+    920          
+    921              U8   u8TempValue;
+    922              BOOL bTimeoutElapsed;
+    923          
+    924              if (mDATRead(U8Bit, PWM_ROOMLAMP, Default) < cLowHighBorderInPercents)                                                       
+   \   0001   8E....         MOV       A,DATPwmSoftBuffer+2
+   \   0004   4D50           CMP       A,#80
+   \   0006   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0009   9D06           BNC       ??LAPIllRKEUnlock_33
+    925              {
+    926                  bTimeoutElapsed = 
+    927                      TOSIsTimerElapsed(&LightsGraduallyOffDelay, 
+    928                                        cLowPartStepTimeoutInTimerTicks());
+   \   000B   120100         MOVW      BC,#1
+   \   000E   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   000F   FA04           BR        ??LAPIllRKEUnlock_34
+    929              }
+    930              else
+    931              {
+    932                  bTimeoutElapsed = 
+    933                      TOSIsTimerElapsed(&LightsGraduallyOffDelay, 
+    934                                        cHighPartStepTimeoutInTimerTicks());
+   \                     ??LAPIllRKEUnlock_33:
+   \   0011   120900         MOVW      BC,#9
+   \   0014   ..             CALLT     [__T_TOSIsTimerElapsed]
+    935              }
+    936          
+    937              if (bTimeoutElapsed == cTrue)
+   \                     ??LAPIllRKEUnlock_34:
+   \   0015   51             DEC       A
+   \   0016   BD66           BNZ       ??LAPIllRKEUnlock_35
+    938              {
+    939                  u8TempValue = mDATRead(U8Bit, PWM_ROOMLAMP, Default);
+   \   0018   8E....         MOV       A,DATPwmSoftBuffer+2
+    940                  if (u8TempValue > cMaximalCyclicRatio) 
+   \   001B   4D60           CMP       A,#96
+   \   001D   8D1C           BC        ??LAPIllRKEUnlock_36
+    941                  {
+    942                      u8TempValue = cMaximalCyclicRatio;
+    943                      mDATWrite(U8Bit, PWM_ROOMLAMP, u8TempValue, Default);
+   \   001F   A05F           MOV       X,#95
+   \   0021   60             MOV       A,X
+   \   0022   74             MOV       E,A
+   \   0023   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0026   D2             MOVW      BC,AX
+   \   0027   64             MOV       A,E
+   \   0028   70             MOV       X,A
+   \   0029   A100           MOV       A,#0
+   \   002B   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   002E   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   0030   ..             CALLT     [__T_?FAR_CALL_L07]
+    944                      TOSStopTimer(&LightsGraduallyOffDelay);
+   \   0031   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0034   ..             CALLT     [__T_TOSStopTimer]
+    945                      TOSStartTimer(&LightsGraduallyOffDelay); 
+   \   0035   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0038   ..             CALLT     [__T_TOSStartTimer]
+   \   0039   FA43           BR        ??LAPIllRKEUnlock_35
+    946                  }
+    947                  else if (u8TempValue <= cMinimalCyclicRatio) 
+   \                     ??LAPIllRKEUnlock_36:
+   \   003B   4D05           CMP       A,#5
+   \   003D   9D27           BNC       ??LAPIllRKEUnlock_37
+    948                  {
+    949                      u8TempValue = 0;
+    950                      mDATWrite(U8Bit, PWM_ROOMLAMP, u8TempValue, Default);
+   \   003F   A000           MOV       X,#0
+   \   0041   60             MOV       A,X
+   \   0042   74             MOV       E,A
+   \   0043   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0046   D2             MOVW      BC,AX
+   \   0047   64             MOV       A,E
+   \   0048   70             MOV       X,A
+   \   0049   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   004C   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   004E   ..             CALLT     [__T_?FAR_CALL_L07]
+    951                      TOSStopTimer(&LightsGraduallyOffDelay);
+   \   004F   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0052   ..             CALLT     [__T_TOSStopTimer]
+    952                      InternalLights.State = cLightingOff;
+   \   0053   A100           MOV       A,#0
+   \   0055   9E....         MOV       InternalLights+2,A
+    953                      mClearLightsOnTriggerEvent();
+   \   0058   16....         MOVW      HL,#InternalLights+3
+   \   005B   97             MOV       [HL],A
+    954                      mClearLightsOffTriggerEvent();
+   \   005C   86             INCW      HL
+   \   005D   97             MOV       [HL],A
+    955                      mClearLightsGraduallyOffTriggerEvent();
+   \   005E   86             INCW      HL
+   \   005F   97             MOV       [HL],A
+    956                      TOSStopTimer(&LogicalLightingTimeOut);
+   \   0060   10....         MOVW      AX,#LogicalLightingTimeOut
+   \   0063   ..             CALLT     [__T_TOSStopTimer]
+   \   0064   FA18           BR        ??LAPIllRKEUnlock_35
+    957                  }
+    958                  else // Value in the working range
+    959                  {
+    960                      u8TempValue--;
+    961                      mDATWrite(U8Bit, PWM_ROOMLAMP, u8TempValue, Default);
+   \                     ??LAPIllRKEUnlock_37:
+   \   0066   51             DEC       A
+   \   0067   74             MOV       E,A
+   \   0068   02....         MOVW      AX,DATPwmSoftBuffer
+   \   006B   D2             MOVW      BC,AX
+   \   006C   64             MOV       A,E
+   \   006D   70             MOV       X,A
+   \   006E   A100           MOV       A,#0
+   \   0070   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   0073   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   0075   ..             CALLT     [__T_?FAR_CALL_L07]
+    962                      TOSStopTimer(&LightsGraduallyOffDelay);
+   \   0076   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   0079   ..             CALLT     [__T_TOSStopTimer]
+    963                      TOSStartTimer(&LightsGraduallyOffDelay); 
+   \   007A   10....         MOVW      AX,#LightsGraduallyOffDelay
+   \   007D   ..             CALLT     [__T_TOSStartTimer]
+    964                  }
+    965              }
+    966              else
+    967              {
+    968                  // Do nothing
+    969              }
+    970          }
+   \                     ??LAPIllRKEUnlock_35:
+   \   007E   B2             POP       BC
+   \   007F   AF             RET       
+   \   0080                  REQUIRE ?CL78K_V4_6_L00
+    971          
+    972          
+    973          //==============================================================================
+    974          // DESCRIPTION :
+    975          //
+    976          // PARAMETERS (Type,Name,Min,Max) :   none
+    977          //
+    978          // RETURN VALUE :   none
+    979          //
+    980          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    981          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    982          BOOL LAPIllGradualOffIsInProgress(void)
+   \                     LAPIllGradualOffIsInProgress:
+    983          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    984              return (mDATRead(U8Bit, PWM_ROOMLAMP, Default) != 0);
+   \   0000   8E....         MOV       A,DATPwmSoftBuffer+2
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD03           BZ        ??LAPIllRKEUnlock_43
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPIllRKEUnlock_43:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    985          }
+    986          
+    987          
+    988          //==============================================================================
+    989          // DESCRIPTION :
+    990          //
+    991          // PARAMETERS (Type,Name,Min,Max) :   none
+    992          //
+    993          // RETURN VALUE :   none
+    994          //
+    995          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    996          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    997          BOOL LAPIllLightsAreOff(void)
+   \                     LAPIllLightsAreOff:
+    998          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    999              return (mDATRead(U8Bit, PWM_ROOMLAMP, Default) == 0);
+   \   0000   8E....         MOV       A,DATPwmSoftBuffer+2
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD03           BNZ       ??LAPIllRKEUnlock_44
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??LAPIllRKEUnlock_44:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1000          }
+   1001          
+   1002          
+   1003          //==============================================================================
+   1004          // DESCRIPTION :
+   1005          //
+   1006          // PARAMETERS (Type,Name,Min,Max) :   none
+   1007          //
+   1008          // RETURN VALUE :   none
+   1009          //
+   1010          // DESIGN INFORMATION : The doors are closed because the control is sending only
+   1011          // if the door are closed
+   1012          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1013          void LAPIllRKELock(void)
+   \                     LAPIllRKELock:
+   1014          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1015              mSetDoorsLockedTriggerEvent(); 
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bDoorsLockedTriggerEvent,A
+   1016              mClearDoorsUnlockedTriggerEvent();
+   \   0005   A100           MOV       A,#0
+   \   0007   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+   1017          }
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+   1018          
+   1019          
+   1020          //==============================================================================
+   1021          // DESCRIPTION :
+   1022          //
+   1023          // PARAMETERS (Type,Name,Min,Max) :   none
+   1024          //
+   1025          // RETURN VALUE :   none
+   1026          //
+   1027          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+   1028          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1029          void LAPIllRKEUnlock(void)
+   \                     LAPIllRKEUnlock:
+   1030          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1031              mSetDoorsUnlockedTriggerEvent();
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bDoorsUnlockedTriggerEvent,A
+   1032              mClearDoorsLockedTriggerEvent();
+   \   0005   A100           MOV       A,#0
+   \   0007   9E....         MOV       bDoorsLockedTriggerEvent,A
+   1033          //QACJ 0862: amarinm1: .hgr file is automatically included when generating the .c file with the Graph Designer
+   1034          }
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSReadSignal:
+   \   0000   ....           DW       TOSReadSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_MUL_L02:
+   \   0000   ....           DW       ?I_MUL_L02
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LAPIllInternalLightsController   36
+     LAPIllInternalLightsManagement    6
+     InternalLights                    6
+     LogicalLightingTimeOut            2
+     LightsGraduallyOffDelay           2
+     PowerRelayCtrlTimeOut             2
+     u8TPS_APCStepCounter              1
+     bDoorsUnlockedTriggerEvent        1
+     bDoorsLockedTriggerEvent          1
+     bComponentIsEnabled               1
+     bALIM_PLAF_memo                   1
+     bPowerRelayStopIsAllowed          1
+     LightingPowerRelayManagement    154
+     ResumeAfterDisable               56
+     LAPIllInitPowerRelay             41
+     LAPIllInitialize                  9
+     LAPIllInitialize_Static          30
+     LAPIllLeaveStartingStepState     36
+     LAPIllEnterActiveState            9
+     LAPIllEnterActiveState_Static    32
+     LAPIllLeaveActiveState            9
+     LAPIllLeaveActiveState_Static    29
+     LAPIllIsAnybodyMaintainActiveState
+                                      15
+     LAPIllManagement                 90
+     LAPIllLightsOnRequestIsTrue       9
+     LAPIllLightsOnRequestIsTrue_Static
+                                      74
+     LAPIllLightsOnExecution          42
+     LAPIllLightsOffRequestIsTrue      9
+     LAPIllLightsOffRequestIsTrue_Static
+                                      58
+     LAPIllLightsGraduallyOffRequestIsTrue
+                                       9
+     LAPIllLightsGraduallyOffRequestIsTrue_Static
+                                     117
+     LAPIllLightsOffExecution         44
+     LAPIllLightsGraduallyOffExecution
+                                       9
+     LAPIllLightsGraduallyOffExecution_Static
+                                     128
+     LAPIllGradualOffIsInProgress     13
+     LAPIllLightsAreOff               13
+     LAPIllRKELock                    11
+     LAPIllRKEUnlock                  11
+     __T_TOSStopTimer                  2
+     __T_TOSReadSignal                 2
+     __T_TOSStartTimer                 2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSSeqActivateGraph           2
+     __T_?FAR_CALL_L07                 2
+     __T_TOSSendControl                2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_TOSSeqDeactivateGraph         2
+     __T_TOSWriteSignal                2
+     __T_?I_MUL_L02                    2
+
+ 
+ 719 bytes in segment BCODE
+  22 bytes in segment CLTVEC
+ 338 bytes in segment CODE
+  42 bytes in segment CONST
+  18 bytes in segment NEAR_Z
+ 
+ 1 057 bytes of CODE  memory (+ 22 bytes shared)
+    42 bytes of CONST memory
+    18 bytes of DATA  memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,3 @@
+class IAnalyzer
+!!!128879.python!!!	scan(in self : , in topDir : , inout inoutAEModel : AEModel)
+        return inoutAEModel

@@ -1,0 +1,245 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date:   27 Oct 2008 09:22:26  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/TOOLS/CmpTestFramework/GRAPHDESIGNER/SqueletteHgrDebug.txt-arc  $
+
+   Rev 1.0   27 Oct 2008 09:22:26   avidoly
+Initial revision.
+
+   Rev 1.2   10 Mar 2005 16:30:22   abarbae
+PON URD42 DEV 2514 / PON URD42 BODY_SW 851 : Update component template for compatibility with VSS 
+*/
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef LAP_LRN
+   extern const tTOSSeqGraphType LRNManageLearningService;
+   extern const tTOSSeqGraphType LRNUpdateLearningAuthorization; 
+#endif
+
+#ifdef LAP_LRN
+   extern BOOL LRNAfterSaleTimeoutElapsed(void);
+   extern void     LRNAuthentWithCorrectISK(void);
+   extern BOOL LRNAuthenticationNOK(void);
+   extern BOOL LRNAuthenticationOK(void);
+   extern void     LRNAuthenticationWithCalculateISK(void);
+   extern void     LRNAuthenticationWithCalculatedISKHigh(void);
+   extern void     LRNAuthenticationWithCalculatedISKLow(void);
+   extern void     LRNAuthenticationWithCarISK(void);
+   extern void     LRNAuthenticationWithTransportISK(void);
+   extern void     LRNBCMReplacementAuthentError(void);
+   extern void     LRNBcmReplacementResyncNOK(void);
+   extern void     LRNCalculateCodesInAfterSaleMode(void);
+   extern void     LRNCalculateISKandAuthenticate(void);
+   extern void     LRNCalculateTranspCodes(void);
+   extern void     LRNEepromWritingError(void);
+   extern BOOL LRNEnterAfterSaleBCMReplacementMode(void);
+   extern BOOL LRNEnterAfterSaleKeyReassigmentMode(void);
+   extern BOOL LRNEnterFactoryMode(void);
+   extern void     LRNFactoryModeAuthentNewISKNOK(void);
+   extern BOOL LRNFactoryModeInProgress(void);
+   extern void     LRNISKWritingError(void);
+   extern BOOL LRNIgnitionOFF(void);
+   extern BOOL LRNIgnitionON(void);
+   extern void     LRNKeyAlreadyLaerned(void);
+   extern BOOL LRNKeyAlreadyLearned(void);
+   extern BOOL LRNKeyIsLocked(void);
+   extern BOOL LRNKeyKnownByBCM(void);
+   extern void     LRNKeyLockedForEver(void);
+   extern BOOL LRNKeyNotAlreadyRelearnt(void);
+   extern void     LRNKeyNotBlank(void);
+   extern BOOL LRNKeyOKforLearning(void);
+   extern BOOL LRNKeyTypeWithRF(void);
+   extern void     LRNLearningModeNotSuccess(void);
+   extern void     LRNLearningModeSuccess(void);
+   extern void     LRNLockingTransponder(void);
+   extern void     LRNLockingTransponderError(void);
+   extern BOOL LRNLockingTrpIsAuthorized(void);
+   extern void     LRNMemoTransponderType(void);
+   extern void     LRNMemoriseNewTransp(void);
+   extern void     LRNMemorizeTranspAlreadyKnown(void);
+   extern void     LRNPutImmobilizerAntennaInSleepMode(void);
+   extern BOOL LRNReassignmentCannotBeDone(void);
+   extern void     LRNResynchroErrorAction(void);
+   extern BOOL LRNResynchroFinishedNOK(void);
+   extern BOOL LRNResynchroFinishedOK(void);
+   extern void     LRNResynchronizeTransponder(void);
+   extern void     LRNSelectRemoteConfigBlockForRFKey(void);
+   extern BOOL LRNSleepModeFinished(void);
+   extern BOOL LRNSleepModeNOK(void);
+   extern BOOL LRNSleepModeOK(void);
+   extern void     LRNUpdateDiagData(void);
+   extern void     LRNUpdateLearningAuthorizationConditions(void);
+   extern void     LRNWriteISKHighIntoTransponder(void);
+   extern void     LRNWriteISKLowIntoTransponder(void);
+   extern void     LRNWriteInEepromFirstTransponderCodes(void);
+   extern void     LRNWriteInEepromTransponderCodes(void);
+   extern void     LRNWriteRSKErrorAction(void);
+   extern void     LRNWriteRSKHighIntoTransponder(void);
+   extern void     LRNWriteRSKLowIntoTransponder(void);
+   extern BOOL LRNWritingFinishedNOK(void);
+   extern BOOL LRNWritingFinishedOK(void);
+   extern BOOL LRNWritingISKFinishedOK(void);
+   extern BOOL LRNWritingInEepromFinishedNOK(void);
+   extern BOOL LRNWritingInEepromFinishedOK(void);
+   extern BOOL LRNWritingRSKFinishedOK(void);
+   extern BOOL TOSSeqEvalVrai(void);
+   extern void     TOSSeqNop(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef LAP_LRN
+  const tTOSSeqGraphType LRNManageLearningService =
+  {
+#ifdef COMPILATION_NATIVE
+    "LRNManageLearningService",
+    {
+#endif
+  /*   0*/  {LRNIgnitionON,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {LRNEnterFactoryMode,LRNAuthenticationWithTransportISK,mTOSSeqRuleNumber(66),mTOSSeqRuleNumber(2)},
+  /*   2*/  {LRNAuthenticationOK,LRNMemoTransponderType,mTOSSeqRuleNumber(60),mTOSSeqRuleNumber(3)},
+  /*   3*/  {LRNKeyIsLocked,LRNPutImmobilizerAntennaInSleepMode,mTOSSeqRuleNumber(6),mTOSSeqRuleNumber(4)},
+  /*   4*/  {LRNSleepModeFinished,LRNLearningModeNotSuccess,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)},
+  /*   5*/  {LRNIgnitionOFF,LRNUpdateDiagData,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*   6*/  {LRNKeyOKforLearning,LRNCalculateTranspCodes,mTOSSeqRuleNumber(57),mTOSSeqRuleNumber(7)},
+  /*   7*/  {TOSSeqEvalVrai,LRNAuthenticationWithTransportISK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(8)},
+  /*   8*/  {LRNAuthenticationOK,TOSSeqNop,mTOSSeqRuleNumber(56),mTOSSeqRuleNumber(9)},
+  /*   9*/  {LRNKeyTypeWithRF,LRNWriteRSKLowIntoTransponder,mTOSSeqRuleNumber(55),mTOSSeqRuleNumber(10)},
+  /*  10*/  {LRNWritingFinishedOK,LRNWriteRSKHighIntoTransponder,mTOSSeqRuleNumber(53),mTOSSeqRuleNumber(11)},
+  /*  11*/  {LRNWritingRSKFinishedOK,LRNResynchronizeTransponder,mTOSSeqRuleNumber(51),mTOSSeqRuleNumber(12)},
+  /*  12*/  {LRNResynchroFinishedOK,LRNWriteISKLowIntoTransponder,mTOSSeqRuleNumber(49),mTOSSeqRuleNumber(13)},
+  /*  13*/  {LRNWritingFinishedOK,LRNWriteISKHighIntoTransponder,mTOSSeqRuleNumber(42),mTOSSeqRuleNumber(14)},
+  /*  14*/  {LRNWritingISKFinishedOK,LRNPutImmobilizerAntennaInSleepMode,mTOSSeqRuleNumber(35),mTOSSeqRuleNumber(15)},
+  /*  15*/  {LRNSleepModeOK,LRNAuthenticationWithCalculateISK,mTOSSeqRuleNumber(34),mTOSSeqRuleNumber(16)},
+  /*  16*/  {LRNAfterSaleTimeoutElapsed,LRNFactoryModeAuthentNewISKNOK,mTOSSeqRuleNumber(18),mTOSSeqRuleNumber(17)},
+  /*  17*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  18*/  {LRNAuthenticationOK,TOSSeqNop,mTOSSeqRuleNumber(30),mTOSSeqRuleNumber(19)},
+  /*  19*/  {LRNLockingTrpIsAuthorized,LRNLockingTransponder,mTOSSeqRuleNumber(21),mTOSSeqRuleNumber(20)},
+  /*  20*/  {LRNWritingFinishedOK,LRNKeyLockedForEver,mTOSSeqRuleNumber(28),mTOSSeqRuleNumber(21)},
+  /*  21*/  {LRNFactoryModeInProgress,LRNWriteInEepromTransponderCodes,mTOSSeqRuleNumber(26),mTOSSeqRuleNumber(22)},
+  /*  22*/  {LRNWritingInEepromFinishedOK,LRNPutImmobilizerAntennaInSleepMode,mTOSSeqRuleNumber(24),mTOSSeqRuleNumber(23)},
+  /*  23*/  {LRNSleepModeFinished,LRNLearningModeSuccess,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)},
+  /*  24*/  {LRNWritingInEepromFinishedNOK,LRNEepromWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(25)},
+  /*  25*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  26*/  {TOSSeqEvalVrai,LRNMemoriseNewTransp,cTOSSeqInvalidRule,mTOSSeqRuleNumber(27)},
+  /*  27*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(23)},
+  /*  28*/  {LRNWritingFinishedNOK,LRNLockingTransponderError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(29)},
+  /*  29*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  30*/  {LRNAuthenticationNOK,LRNAuthenticationWithCalculateISK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(31)},
+  /*  31*/  {LRNAuthenticationOK,TOSSeqNop,mTOSSeqRuleNumber(32),mTOSSeqRuleNumber(19)},
+  /*  32*/  {LRNAuthenticationNOK,LRNFactoryModeAuthentNewISKNOK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(33)},
+  /*  33*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  34*/  {LRNSleepModeNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  35*/  {LRNWritingFinishedNOK,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(36)},
+  /*  36*/  {LRNAuthenticationNOK,LRNAuthenticationWithCalculatedISKHigh,mTOSSeqRuleNumber(40),mTOSSeqRuleNumber(37)},
+  /*  37*/  {LRNAuthenticationOK,TOSSeqNop,mTOSSeqRuleNumber(38),mTOSSeqRuleNumber(19)},
+  /*  38*/  {LRNAuthenticationNOK,LRNISKWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(39)},
+  /*  39*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  40*/  {TOSSeqEvalVrai,LRNISKWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(41)},
+  /*  41*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  42*/  {LRNWritingFinishedNOK,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(43)},
+  /*  43*/  {LRNAuthenticationNOK,LRNAuthenticationWithCalculatedISKLow,mTOSSeqRuleNumber(47),mTOSSeqRuleNumber(44)},
+  /*  44*/  {LRNAuthenticationOK,LRNWriteISKHighIntoTransponder,mTOSSeqRuleNumber(45),mTOSSeqRuleNumber(14)},
+  /*  45*/  {LRNAuthenticationNOK,LRNISKWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(46)},
+  /*  46*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  47*/  {TOSSeqEvalVrai,LRNISKWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(48)},
+  /*  48*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  49*/  {LRNResynchroFinishedNOK,LRNResynchroErrorAction,cTOSSeqInvalidRule,mTOSSeqRuleNumber(50)},
+  /*  50*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  51*/  {LRNWritingFinishedNOK,LRNWriteRSKErrorAction,cTOSSeqInvalidRule,mTOSSeqRuleNumber(52)},
+  /*  52*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  53*/  {LRNWritingFinishedNOK,LRNWriteRSKErrorAction,cTOSSeqInvalidRule,mTOSSeqRuleNumber(54)},
+  /*  54*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  55*/  {TOSSeqEvalVrai,LRNWriteISKLowIntoTransponder,cTOSSeqInvalidRule,mTOSSeqRuleNumber(13)},
+  /*  56*/  {LRNAuthenticationNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  57*/  {TOSSeqEvalVrai,LRNSelectRemoteConfigBlockForRFKey,cTOSSeqInvalidRule,mTOSSeqRuleNumber(58)},
+  /*  58*/  {LRNWritingFinishedOK,LRNCalculateTranspCodes,mTOSSeqRuleNumber(59),mTOSSeqRuleNumber(7)},
+  /*  59*/  {LRNWritingFinishedNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  60*/  {LRNAuthenticationNOK,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(61)},
+  /*  61*/  {LRNKeyAlreadyLearned,LRNAuthenticationWithCalculateISK,mTOSSeqRuleNumber(65),mTOSSeqRuleNumber(62)},
+  /*  62*/  {LRNAuthenticationOK,LRNKeyAlreadyLaerned,mTOSSeqRuleNumber(64),mTOSSeqRuleNumber(63)},
+  /*  63*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  64*/  {LRNAuthenticationNOK,LRNKeyNotBlank,cTOSSeqInvalidRule,mTOSSeqRuleNumber(63)},
+  /*  65*/  {TOSSeqEvalVrai,LRNKeyNotBlank,cTOSSeqInvalidRule,mTOSSeqRuleNumber(63)},
+  /*  66*/  {LRNEnterAfterSaleBCMReplacementMode,LRNCalculateISKandAuthenticate,mTOSSeqRuleNumber(81),mTOSSeqRuleNumber(67)},
+  /*  67*/  {LRNAuthenticationOK,LRNMemoTransponderType,mTOSSeqRuleNumber(79),mTOSSeqRuleNumber(68)},
+  /*  68*/  {TOSSeqEvalVrai,LRNCalculateCodesInAfterSaleMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(69)},
+  /*  69*/  {LRNKeyTypeWithRF,LRNAuthentWithCorrectISK,mTOSSeqRuleNumber(78),mTOSSeqRuleNumber(70)},
+  /*  70*/  {LRNAuthenticationOK,LRNResynchronizeTransponder,mTOSSeqRuleNumber(77),mTOSSeqRuleNumber(71)},
+  /*  71*/  {LRNResynchroFinishedOK,LRNWriteInEepromFirstTransponderCodes,mTOSSeqRuleNumber(75),mTOSSeqRuleNumber(72)},
+  /*  72*/  {LRNWritingInEepromFinishedOK,LRNPutImmobilizerAntennaInSleepMode,mTOSSeqRuleNumber(73),mTOSSeqRuleNumber(23)},
+  /*  73*/  {LRNWritingInEepromFinishedNOK,LRNEepromWritingError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(74)},
+  /*  74*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  75*/  {LRNResynchroFinishedNOK,LRNBcmReplacementResyncNOK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(76)},
+  /*  76*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  77*/  {LRNAuthenticationNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  78*/  {TOSSeqEvalVrai,LRNWriteInEepromFirstTransponderCodes,cTOSSeqInvalidRule,mTOSSeqRuleNumber(72)},
+  /*  79*/  {LRNAuthenticationNOK,LRNBCMReplacementAuthentError,cTOSSeqInvalidRule,mTOSSeqRuleNumber(80)},
+  /*  80*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  81*/  {LRNEnterAfterSaleKeyReassigmentMode,TOSSeqNop,mTOSSeqRuleNumber(103),mTOSSeqRuleNumber(82)},
+  /*  82*/  {LRNReassignmentCannotBeDone,LRNLearningModeNotSuccess,mTOSSeqRuleNumber(83),mTOSSeqRuleNumber(5)},
+  /*  83*/  {TOSSeqEvalVrai,LRNAuthenticationWithCarISK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(84)},
+  /*  84*/  {LRNAuthenticationOK,TOSSeqNop,mTOSSeqRuleNumber(102),mTOSSeqRuleNumber(85)},
+  /*  85*/  {LRNKeyNotAlreadyRelearnt,TOSSeqNop,mTOSSeqRuleNumber(101),mTOSSeqRuleNumber(86)},
+  /*  86*/  {LRNKeyKnownByBCM,TOSSeqNop,mTOSSeqRuleNumber(92),mTOSSeqRuleNumber(87)},
+  /*  87*/  {LRNKeyTypeWithRF,LRNResynchronizeTransponder,mTOSSeqRuleNumber(91),mTOSSeqRuleNumber(88)},
+  /*  88*/  {LRNResynchroFinishedOK,LRNMemorizeTranspAlreadyKnown,mTOSSeqRuleNumber(90),mTOSSeqRuleNumber(89)},
+  /*  89*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(23)},
+  /*  90*/  {LRNResynchroFinishedNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  91*/  {TOSSeqEvalVrai,LRNMemorizeTranspAlreadyKnown,cTOSSeqInvalidRule,mTOSSeqRuleNumber(89)},
+  /*  92*/  {TOSSeqEvalVrai,LRNMemoTransponderType,cTOSSeqInvalidRule,mTOSSeqRuleNumber(93)},
+  /*  93*/  {TOSSeqEvalVrai,LRNCalculateTranspCodes,cTOSSeqInvalidRule,mTOSSeqRuleNumber(94)},
+  /*  94*/  {LRNKeyTypeWithRF,LRNAuthenticationWithCarISK,mTOSSeqRuleNumber(100),mTOSSeqRuleNumber(95)},
+  /*  95*/  {LRNAuthenticationOK,LRNResynchronizeTransponder,mTOSSeqRuleNumber(99),mTOSSeqRuleNumber(96)},
+  /*  96*/  {LRNResynchroFinishedOK,LRNMemoriseNewTransp,mTOSSeqRuleNumber(98),mTOSSeqRuleNumber(97)},
+  /*  97*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(23)},
+  /*  98*/  {LRNResynchroFinishedNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  99*/  {LRNAuthenticationNOK,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  100*/  {TOSSeqEvalVrai,LRNMemoriseNewTransp,cTOSSeqInvalidRule,mTOSSeqRuleNumber(97)},
+  /*  101*/  {TOSSeqEvalVrai,LRNPutImmobilizerAntennaInSleepMode,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*  102*/  {LRNAuthenticationNOK,LRNAuthenticationWithTransportISK,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*  103*/  {TOSSeqEvalVrai,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef LAP_LRN
+  const tTOSSeqGraphType LRNUpdateLearningAuthorization =
+  {
+#ifdef COMPILATION_NATIVE
+    "LRNUpdateLearningAuthorization",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,LRNUpdateLearningAuthorizationConditions,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

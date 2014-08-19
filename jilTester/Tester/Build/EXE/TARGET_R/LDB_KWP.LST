@@ -1,0 +1,1695 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:12 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_KWP.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_KWP.LST -o                           #
+#                    ..\EXE\TARGET_R\LDB_KWP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_KWP.C                                                  #
+#    List file    =  ..\EXE\TARGET_R\LDB_KWP.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LDB_KWP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_KWP.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LDB_KWP
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Oct 13 2010 09:25:12  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_KWP/LDB_KWP.C-arc  $
+     16          // $Revision:   1.10  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_KWP/LDB_KWP.C-arc   $
+     19          // 
+     20          //    Rev 1.10   Oct 13 2010 09:25:12   adzhelp
+     21          // Cm009704: QAC updates
+     22          // 
+     23          //    Rev 1.9   Oct 12 2010 17:22:36   adzhelp
+     24          // Cm009704: Disregard SC GND (local binary changes)
+     25          // 
+     26          //    Rev 1.8   Oct 12 2010 17:20:46   adzhelp
+     27          // Cm009704: Revert to rev. 1.6 (used in V03.05)
+     28          // 
+     29          //    Rev 1.7   Jul 06 2010 11:29:40   adzhelp
+     30          // Cm009704: Different callback status on SC VBAT / SC GND
+     31          // 
+     32          //    Rev 1.6   Jan 14 2010 14:26:50   adzhelp
+     33          // Cm006828: Implementation of new control for StartCom waiting
+     34          // 
+     35          //    Rev 1.5   Dec 14 2009 11:29:56   adzhelp
+     36          // Cm005566: SC detection of KLine
+     37          // 
+     38          //    Rev 1.4   Jul 13 2009 13:54:38   adzhelp
+     39          // Cm005100: Code review corrections
+     40          // 
+     41          //    Rev 1.3   Jul 13 2009 10:32:42   adzhelp
+     42          // Cm005100: Functions moved to banked area; QAC updates
+     43          // 
+     44          //    Rev 1.2   Jul 09 2009 16:37:16   akodzhh
+     45          // Cm005100: before all instances of mLDBIntEnableIsr(<interrupt>), there should be instance of mLDBIntClearIsrRequestFlag(<interrupt>).
+     46          // mLDBRegNop()usage adjusted. QAC warnings justified.
+     47          // 
+     48          //    Rev 1.1   Mar 17 2009 14:18:46   adzhelp
+     49          // Cm003128: Adaptation of LDB_KWP for NEC K0
+     50          //
+     51          //    Rev 1.0   10 Mar 2009 09:03:18   akodzhh
+     52          // Initial revision.
+     53          //******************************************************************************
+     54          #endif
+     55          
+     56          //------------------------------------------------------------------------------
+     57          // Body Identification
+     58          //------------------------------------------------------------------------------
+     59          #define ldb_kwp   "ldb_kwp"
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Included files to resolve specific definitions in this file
+     63          //------------------------------------------------------------------------------
+     64          #include "lib.h"
+     65          #include "ldb.h"
+     66          #include "ldb_int.h"
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff70
+   \   union <unnamed> volatile __sfr _A_ASIM0
+   \                     _A_ASIM0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff71
+   \   unsigned char volatile __sfr __no_bit_access BRGC0
+   \                     BRGC0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff72
+   \   unsigned char const volatile __sfr __no_bit_access RXB0
+   \                     RXB0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff73
+   \   unsigned char const volatile __sfr __no_bit_access ASIS0
+   \                     ASIS0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff74
+   \   unsigned char volatile __sfr __no_bit_access TXS0
+   \                     TXS0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     67          #include "ldb_tim.h"
+     68          #include "ldb_ioc.h"
+     69          #include "ldb_har.h"
+     70          #include "ldb_kwp.h"
+     71          
+     72          //------------------------------------------------------------------------------
+     73          // Local constants
+     74          //------------------------------------------------------------------------------
+     75          #define cUARTBufferLgth           70
+     76          
+     77          #define cTimeOutPeriodInUs        ((U16)10000)
+     78          #define cP1TimeOutInUs            ((U16)20000)
+     79          
+     80          // Required UART baud rate is 10400
+     81          // Fprs = 16MHz, TPS01 = 1, TPS00 = 1 ->  Fxclk0 = 16000000/32 = 500kHz
+     82          // k = 24,    ( 16000000/32  )/2*k      => 10416.667 bps  => error = 0.16%
+     83          #define cUARTBaudRateRegValue   ((U8)0xD8)
+     84          
+     85          #define cDisable                        0
+     86          #define cEnable                         1
+     87          
+     88          //ParitySelection ASIMnPS
+     89          #define cNoParity                       0
+     90          
+     91          //DataCharacterLength ASIMnCL
+     92          #define	c8Bits                          1
+     93          
+     94          //StopBitLength ASIMnSL
+     95          #define c1Bit                           0
+     96          
+     97          // Position of ASIMn - operation mode register
+     98          #define cASIMnPWR                         7
+     99          #define cASIMnTXE                         6
+    100          #define cASIMnRXE                         5
+    101          #define cASIMnPS1                         4
+    102          #define cASIMnPS0                         3
+    103          #define cASIMnCL                          2
+    104          #define cASIMnSL                          1
+    105          #define cASIMnBit0                        0
+    106          
+    107          // ASISn register bits 2,1,0: PE0, FE0, OVE0
+    108          #define cRxStatusMask            0x07
+    109                    
+    110          
+    111          #define cStateUndefined                       ((U8)0)
+    112          #define cStateRx                              ((U8)1)
+    113          #define cStateTx                              ((U8)2)
+    114          #define cStateWaitWakeUpPatternInitialState   ((U8)3)
+    115          #define cStateWaitWakeUpPatternLowState       ((U8)4)
+    116          #define cStateWaitWakeUpPatternHighState      ((U8)5)
+    117          #define cStateWaitWakeUpPatternByte           ((U8)6)
+    118          
+    119          // Maximal tolerance is 2 ms
+    120          
+    121          #define cMinLowWakeUpPointNumber              ((U8)2)
+    122          #define cMaxLowWakeUpPointNumber              ((U8)4)
+    123          #define cMinHighWakeUpPointNumber             ((U8)2)
+    124          #define cMaxHighWakeUpPointNumber             ((U8)4)
+    125          
+    126          // HW Protection
+    127          #define cNumberBytesScBatDetection            ((U8)3U)
+    128          #define cNumberBytesScGndDetection            ((U8)3U)
+    129          #define cIndexSubtractCompare                 ((U8)2U)  
+    130          
+    131          //------------------------------------------------------------------------------
+    132          // Local macros
+    133          //------------------------------------------------------------------------------
+    134            #define mConfigureUARTControl(UARTPort, Value)  mConfigureUARTControl2(UARTPort, Value)
+    135            #define mConfigureUARTControl2(UARTPort, Value) mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnPWR,(Value))
+    136          
+    137            #define mConfigureUARTInRxMode(UARTPort)        mConfigureUARTInIdleMode(UARTPort);               \
+    138                                                            mConfigureUARTControl(UARTPort,cDisable);   \
+    139                                                            /* wait 2 cpu clock cycles */               \
+    140                                                            mLDBRegNop(); \
+    141                                                            /*//QACJ 3435: akodzhh: there is no side effect*/ \
+    142                                                            /*//QACJ 3456: akodzhh: there is no side effect*/ \
+    143                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    144                                                            mConfigureUARTInRxMode2(UARTPort)
+    145          
+    146            #define mConfigureUARTInRxMode2(UARTPort)       mConfigureUARTControl(UARTPort,cEnable);   \
+    147                                                            mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnRXE, cEnable);   \
+    148                                                            mLDBIntClearIsrRequestFlag(cLDBHarInterruptKwpRx);  \
+    149                                                            /*//QACJ 3435: akodzhh: there is no side effect*/ \
+    150                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    151                                                            mLDBIntEnableIsr(cLDBHarInterruptKwpRx)
+    152          
+    153            #define mConfigureUARTInRxModeHwp(UARTPort)     mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnRXE, cEnable);   \
+    154                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    155                                                            mLDBIntClearIsrRequestFlag(cLDBHarInterruptKwpRx)
+    156                                                          
+    157            #define mConfigureUARTInTxMode(UARTPort)        mConfigureUARTInTxMode2(UARTPort); \
+    158                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    159                                                            /*//QACJ 3435: adzhelp: Parameter is always const*/ \
+    160                                                            /*//QACJ 3456: adzhelp: Parameter is always const*/ \
+    161                                                            mConfigureUARTInRxModeHwp(UARTPort)  
+    162          
+    163            #define mConfigureUARTInTxMode2(UARTPort)       mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnTXE, cEnable);   \
+    164                                                            /* wait 2 cpu clock cycles - one is needed */                    \
+    165                                                            mLDBRegNop(); \
+    166                                                            mLDBIntClearIsrRequestFlag(cLDBHarInterruptKwpTx);    \
+    167                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    168                                                            mLDBIntEnableIsr(cLDBHarInterruptKwpTx)
+    169            
+    170            #define mConfigureUARTInIdleMode(UARTPort)      mConfigureUARTInIdleMode2(UARTPort)
+    171          
+    172            #define mConfigureUARTInIdleMode2(UARTPort)     mLDBIntDisableIsr(cLDBHarInterruptKwpTx);         \
+    173                                                            mLDBIntDisableIsr(cLDBHarInterruptKwpRx);         \
+    174                                                            mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnTXE, cDisable);   \
+    175                                                            /*//QACJ 3435: akodzhh: there is no side effect*/ \
+    176                                                            /*//QACJ 0881: akodzhh: there is no side effect*/ \
+    177                                                            /*//QACJ 3412: adzhelp: This macro calls another macro*/ \
+    178                                                            mLDBRegWrite1BitInRegister(ASIM##UARTPort,cASIMnRXE, cDisable)
+    179                                                            
+    180                                                            
+    181            #define mSetTransfertRate(UARTPort, Value)      mSetTransfertRate2(UARTPort, Value)
+    182            #define mSetTransfertRate2(UARTPort, Value)     mLDBRegWrite8BitRegister(BRGC##UARTPort,Value)
+    183                                                          
+    184            #define mSetTransmissionData(UARTPort,Value)    mSetTransmissionData2(UARTPort,Value)
+    185            #define mSetTransmissionData2(UARTPort,Value)   mLDBRegWrite8BitRegister(TXS##UARTPort,Value)
+    186                                                          
+    187            #define mReadReceivedData(UARTPort)             mReadReceivedData2(UARTPort)
+    188            #define mReadReceivedData2(UARTPort)            mLDBRegRead8BitRegister(RXB##UARTPort)
+    189                                                          
+    190            #define mReadReceivedStatus(UARTPort)           mReadReceivedStatus2(UARTPort)
+    191            #define mReadReceivedStatus2(UARTPort)          (mLDBRegRead8BitRegister(ASIS##UARTPort) & cRxStatusMask)
+    192          
+    193            #define mSetParity(UARTPort,Value)              mSetParity2(UARTPort,Value)
+    194            #define mSetParity2(UARTPort,Value)            {mLDBRegWrite1BitInRegister(ASIM##UARTPort, cASIMnPS0, (Value)&0x01);\
+    195                                                            /*//QACJ 3435: akodzhh: there is no side effect*/ \
+    196                                                            /*//QACJ 3456: akodzhh: there is no side effect*/ \
+    197                                                            /*//QACJ 0881: akodzhh: there is no side effect*/ \
+    198                                                            mLDBRegWrite1BitInRegister(ASIM##UARTPort, cASIMnPS1, ((Value)>>1)&0x01);}
+    199            
+    200            #define mSetCharacterLength(UARTPort,Value)     mSetCharacterLength2(UARTPort,Value)
+    201            #define mSetCharacterLength2(UARTPort,Value)    mLDBRegWrite1BitInRegister(ASIM##UARTPort, cASIMnCL,  (Value))
+    202          
+    203            #define mSetStopBitLength(UARTPort,Value)       mSetStopBitLength2(UARTPort,Value)
+    204            #define mSetStopBitLength2(UARTPort,Value)      mLDBRegWrite1BitInRegister(ASIM##UARTPort, cASIMnSL,  (Value))
+    205          
+    206            #define mSetASIMnBit0(UARTPort,Value)           mSetASIMnBit0_2(UARTPort,Value)
+    207            #define mSetASIMnBit0_2(UARTPort,Value)         mLDBRegWrite1BitInRegister(ASIM##UARTPort, cASIMnBit0,  (Value))
+    208          
+    209          //------------------------------------------------------------------------------
+    210          // Local types
+    211          //------------------------------------------------------------------------------
+    212          
+    213          // This is an example:
+    214          // typedef Expression   tTypeName;
+    215          
+    216          //------------------------------------------------------------------------------
+    217          // Local data
+    218          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    219          static U8 u8UARTBuffer[cUARTBufferLgth];
+   \                     u8UARTBuffer:
+   \   0000                  DS 70
+   \   0046                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    220          static U8 u8UARTBufferDataLength;
+   \                     u8UARTBufferDataLength:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    221          static U8 u8TransmitDataIndex;
+   \                     u8TransmitDataIndex:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    222          static U8 u8State;
+   \                     u8State:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    223          static U8 u8WakeUpPointNumber;
+   \                     u8WakeUpPointNumber:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment SADDR_Z, align 1, align-sorted
+    224          static MEM_FAST tDelay volatile CounterTempo;
+   \                     CounterTempo:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_SADDR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    225          static tMsg RxMsg;
+   \                     RxMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    226          
+    227          // HW protection
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    228          static U8 u8ScBatCounter;
+   \                     u8ScBatCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    229          static U8 u8ScGndCounter;
+   \                     u8ScGndCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    230          
+    231          //------------------------------------------------------------------------------
+    232          // Constant local data
+    233          //------------------------------------------------------------------------------
+    234          
+    235          // This is an example:
+    236          // static const tType  cConstantName;
+    237          
+    238          //------------------------------------------------------------------------------
+    239          // Exported data
+    240          //------------------------------------------------------------------------------
+    241          
+    242          // This is an example:
+    243          // Reduce to minimum the usage of extern data members!!!
+    244          // tType   LAYCmpVariableName;  //LAY: 3 characters to identify the layer
+    245          // tType*  pLAYCmpVariableName; //Cmp: 3-4 characters to identify the component
+    246          // U8      u8LAYCmpVariableName;
+    247          // U16*    pu16LAYCmpVariableName;
+    248          
+    249          //------------------------------------------------------------------------------
+    250          // Constant exported data
+    251          //------------------------------------------------------------------------------
+    252          
+    253          // This is an example:
+    254          // Reduce to minimum the usage of extern constant data members!!!
+    255          // extern const tType  cLAYCmpConstantName;
+    256          // extern const U32    cu32LAYCmpConstantName;
+    257          
+    258          //------------------------------------------------------------------------------
+    259          // Local function prototypes
+    260          //------------------------------------------------------------------------------
+    261          static void StartLocalTimeOut(const tDelay DurationP);
+    262          static void StopLocalTimeOut(void);
+    263          static void LocalTimeOutElapsed(void);
+    264          static BOOL DetectShortCircuit (void);
+    265          
+    266          //==============================================================================
+    267          //=========================== LOCAL FUNCTIONS ==================================
+    268          //==============================================================================
+    269          
+    270          //==============================================================================
+    271          //  DESCRIPTION : StartLocalTimeOut (void)
+    272          //                Start local timeout
+    273          //  
+    274          //  PARAMETERS (Type,Name,Min,Max) : duration in cLDBTick 
+    275          //
+    276          //  RETURN VALUE : none
+    277          // 
+    278          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    279          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    280          static void StartLocalTimeOut(const tDelay DurationP)
+   \                     StartLocalTimeOut:
+    281          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    282              TOSDisableOSInterrupts();
+   \   0000   7B1E           DI
+    283          
+    284              // Verify that tempo is not currently set
+    285              mLIBassert(CounterTempo == (tDelay)0);
+    286          
+    287              // Initialize count
+    288              CounterTempo = DurationP + (tDelay)1;  // +1 for ensure that tempo is upper that duree
+   \   0002   41             INC       A
+   \   0003   F2..           MOV       S:CounterTempo,A
+    289          
+    290              mLDBTimEnableTimeOut(LDBKwpCallBackTimer);
+   \   0005   A101           MOV       A,#1
+   \   0007   9E....         MOV       bLDBTimEnabled_LDBKwpCallBackTimer,A
+    291          
+    292              //Adapt PON URD45 DEV 2496 "StopTimer service from LDB_TIM is not protected against real time IT."
+    293              TOSEnableOSInterrupts();
+   \   000A   7A1E           EI
+    294          }
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    295          
+    296          
+    297          //==============================================================================
+    298          //  DESCRIPTION         : StopLocalTimeOut 
+    299          //                        Stop Local timeout
+    300          //  
+    301          //  PARAMETERS          : None
+    302          //
+    303          //  RETURN VALUE        : None
+    304          // 
+    305          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    306          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    307          static void StopLocalTimeOut(void)
+   \                     StopLocalTimeOut:
+    308          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    309              TOSDisableOSInterrupts();
+   \   0000   A100           MOV       A,#0
+   \   0002   7B1E           DI
+    310          
+    311              mLDBTimDisableTimeOut(LDBKwpCallBackTimer);
+   \   0004   9E....         MOV       bLDBTimEnabled_LDBKwpCallBackTimer,A
+    312          
+    313              // Clear count
+    314              CounterTempo = (tDelay)0;
+   \   0007   F2..           MOV       S:CounterTempo,A
+    315          
+    316              TOSEnableOSInterrupts();
+   \   0009   7A1E           EI
+    317          }
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    318          
+    319          //==============================================================================
+    320          //  DESCRIPTION : LocalTimeOutElapsed
+    321          //  
+    322          //  PARAMETERS (Type,Name,Min,Max) : none 
+    323          //
+    324          //  RETURN VALUE : none
+    325          // 
+    326          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    327          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    328          static void LocalTimeOutElapsed(void)
+   \                     LocalTimeOutElapsed:
+    329          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A103           MOV       A,#3
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+    330              // Restart time out
+    331              StartLocalTimeOut((tDelay)(mLDBTimConvUsInTick(cTimeOutPeriodInUs) - 1UL));
+   \   0003   9A....         CALL      StartLocalTimeOut
+    332          
+    333              switch(u8State)
+   \   0006   8E....         MOV       A,u8State
+   \   0009   4D01           CMP       A,#1
+   \   000B   BD03           BNZ       $+5
+   \   000D   9B....         BR        N:??LDBKwpCallBackTimer_0
+   \   0010   4D03           CMP       A,#3
+   \   0012   AD12           BZ        ??LDBKwpCallBackTimer_1
+   \   0014   4D04           CMP       A,#4
+   \   0016   AD21           BZ        ??LDBKwpCallBackTimer_2
+   \   0018   4D05           CMP       A,#5
+   \   001A   AD47           BZ        ??LDBKwpCallBackTimer_3
+   \   001C   4D06           CMP       A,#6
+   \   001E   BD03           BNZ       $+5
+   \   0020   9B....         BR        N:??LDBKwpCallBackTimer_4
+   \   0023   9B....         BR        N:??LDBKwpCallBackTimer_5
+    334              {
+    335              case cStateWaitWakeUpPatternInitialState:
+    336                  //QACJ 3325: akodzhh: input state is checked here
+    337                  if (mLDBHarRead(cLDBHarRxKwp) == 1) // Initial state detected
+   \                     ??LDBKwpCallBackTimer_1:
+   \   0026   9C0103         BT        S:0xFF01.1, $+6
+   \   0029   9B....         BR        N:??LDBKwpCallBackTimer_5
+    338                  //QACJ 3201: akodzhh: on input state condition
+    339                  {
+    340                      u8WakeUpPointNumber = 0;
+   \   002C   A100           MOV       A,#0
+   \   002E   9E....         MOV       u8WakeUpPointNumber,A
+    341                      u8State = cStateWaitWakeUpPatternLowState;
+   \   0031   A104           MOV       A,#4
+   \                     ??LocalTimeOutElapsed_0:
+   \   0033   9E....         MOV       u8State,A
+   \   0036   9B....         BR        N:??LDBKwpCallBackTimer_5
+    342                  }
+    343                  break;
+    344              case cStateWaitWakeUpPatternLowState:
+    345                  // Try to recognize Low u8State
+    346                  //QACJ 3346: akodzhh: input state is checked here
+    347                  if (mLDBHarRead(cLDBHarRxKwp) == 0) // Count low state
+   \                     ??LDBKwpCallBackTimer_2:
+   \   0039   8E....         MOV       A,u8WakeUpPointNumber
+   \   003C   9C010F         BT        S:0xFF01.1, ??LDBKwpCallBackTimer_6
+    348                  {
+    349                      u8WakeUpPointNumber++;
+   \   003F   41             INC       A
+   \   0040   9E....         MOV       u8WakeUpPointNumber,A
+    350                      if (u8WakeUpPointNumber > cMaxLowWakeUpPointNumber) // Bad low state
+   \   0043   4D05           CMP       A,#5
+   \   0045   9D03           BNC       $+5
+   \   0047   9B....         BR        N:??LDBKwpCallBackTimer_5
+    351                      {
+    352                          u8State = cStateWaitWakeUpPatternInitialState;
+   \                     ??LocalTimeOutElapsed_1:
+   \   004A   A103           MOV       A,#3
+   \   004C   FAE5           BR        ??LocalTimeOutElapsed_0
+    353                      }
+    354                  }
+    355                  else  // High level
+    356                  //QACJ 3201: akodzhh: on input state condition
+    357                  {
+    358                      if (u8WakeUpPointNumber < cMinLowWakeUpPointNumber)  
+   \                     ??LDBKwpCallBackTimer_6:
+   \   004E   4D02           CMP       A,#2
+   \   0050   9D08           BNC       ??LDBKwpCallBackTimer_7
+    359                      {
+    360                          u8WakeUpPointNumber = 0;
+   \   0052   A100           MOV       A,#0
+   \   0054   9E....         MOV       u8WakeUpPointNumber,A
+   \   0057   9B....         BR        N:??LDBKwpCallBackTimer_5
+    361                      }
+    362                      else  // Good low state
+    363                      {
+    364                          u8WakeUpPointNumber = 1;  // High state detected
+   \                     ??LDBKwpCallBackTimer_7:
+   \   005A   A101           MOV       A,#1
+   \   005C   9E....         MOV       u8WakeUpPointNumber,A
+    365                          u8State = cStateWaitWakeUpPatternHighState;
+   \   005F   A105           MOV       A,#5
+   \   0061   FAD0           BR        ??LocalTimeOutElapsed_0
+    366                      }
+    367                  }
+    368                  break;
+    369              case cStateWaitWakeUpPatternHighState:
+    370                  //QACJ 3325: akodzhh: input state is checked here
+    371                  if (mLDBHarRead(cLDBHarRxKwp) == 1)   // Wait minimum high state duration
+   \                     ??LDBKwpCallBackTimer_3:
+   \   0063   311301E3       BF        S:0xFF01.1, ??LocalTimeOutElapsed_1
+    372                  //QACJ 3201: akodzhh: on input state condition
+    373                  {
+    374                      u8WakeUpPointNumber++;
+   \   0067   8E....         MOV       A,u8WakeUpPointNumber
+   \   006A   41             INC       A
+   \   006B   9E....         MOV       u8WakeUpPointNumber,A
+    375                      if (u8WakeUpPointNumber >= cMinHighWakeUpPointNumber) // Good high WakeUp
+   \   006E   4D02           CMP       A,#2
+   \   0070   9D03           BNC       $+5
+   \   0072   9B....         BR        N:??LDBKwpCallBackTimer_5
+    376                      {
+    377                          u8UARTBufferDataLength  = 0;
+   \   0075   A100           MOV       A,#0
+   \   0077   9E....         MOV       u8UARTBufferDataLength,A
+    378                          mConfigureUARTInRxMode(cLDBHarUARTKwp);
+   \   007A   7B1E           DI
+   \   007C   2A..           SET1      S:LDBIntGroup1.2
+   \   007E   C8..00         CMP       S:LDBIntLevel,#0
+   \   0081   BD03           BNZ       ??LDBKwpCallBackTimer_8
+   \   0083   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_8:
+   \   0086   C8..02         CMP       S:LDBIntLevel,#2
+   \   0089   AD02           BZ        ??LDBKwpCallBackTimer_9
+   \   008B   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_9:
+   \   008D   7B1E           DI
+   \   008F   1A..           SET1      S:LDBIntGroup1+1.1
+   \   0091   C8..00         CMP       S:LDBIntLevel,#0
+   \   0094   BD03           BNZ       ??LDBKwpCallBackTimer_10
+   \   0096   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_10:
+   \   0099   C8..02         CMP       S:LDBIntLevel,#2
+   \   009C   AD02           BZ        ??LDBKwpCallBackTimer_11
+   \   009E   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_11:
+   \   00A0   716B70         CLR1      0xFF70.6
+   \   00A3   715B70         CLR1      0xFF70.5
+   \   00A6   717B70         CLR1      0xFF70.7
+   \   00A9   00             NOP       
+   \   00AA   717A70         SET1      0xFF70.7
+   \   00AD   715A70         SET1      0xFF70.5
+   \   00B0   711BE2         CLR1      0xFFE2.1
+   \   00B3   7B1E           DI
+   \   00B5   1B..           CLR1      S:LDBIntGroup1+1.1
+   \   00B7   C8..00         CMP       S:LDBIntLevel,#0
+   \   00BA   BD03           BNZ       ??LDBKwpCallBackTimer_12
+   \   00BC   711BE6         CLR1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_12:
+   \   00BF   C8..02         CMP       S:LDBIntLevel,#2
+   \   00C2   AD02           BZ        ??LDBKwpCallBackTimer_13
+   \   00C4   7A1E           EI
+    379                          
+    380                          u8State = cStateWaitWakeUpPatternByte;
+   \                     ??LDBKwpCallBackTimer_13:
+   \   00C6   A106           MOV       A,#6
+   \   00C8   9B....         BR        N:??LocalTimeOutElapsed_0
+    381                      }
+    382                  }
+    383                  else  // Bad high state
+    384                  {
+    385                      u8State = cStateWaitWakeUpPatternInitialState;
+    386                  }
+    387                  break;
+    388              case cStateWaitWakeUpPatternByte:
+    389                  // Wait maximum high state duration
+    390                  u8WakeUpPointNumber++;
+   \                     ??LDBKwpCallBackTimer_4:
+   \   00CB   8E....         MOV       A,u8WakeUpPointNumber
+   \   00CE   41             INC       A
+   \   00CF   9E....         MOV       u8WakeUpPointNumber,A
+    391                  if (u8WakeUpPointNumber > cMaxHighWakeUpPointNumber)  // Detect bad high wakeUp pattern
+   \   00D2   4D05           CMP       A,#5
+   \   00D4   8D4E           BC        ??LDBKwpCallBackTimer_5
+    392                  {
+    393                      // Stop reception and return in Initial Wake Up mode detection
+    394                      mConfigureUARTInIdleMode(cLDBHarUARTKwp);
+   \   00D6   7B1E           DI
+   \   00D8   2A..           SET1      S:LDBIntGroup1.2
+   \   00DA   C8..00         CMP       S:LDBIntLevel,#0
+   \   00DD   BD03           BNZ       ??LDBKwpCallBackTimer_14
+   \   00DF   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_14:
+   \   00E2   C8..02         CMP       S:LDBIntLevel,#2
+   \   00E5   AD02           BZ        ??LDBKwpCallBackTimer_15
+   \   00E7   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_15:
+   \   00E9   7B1E           DI
+   \   00EB   1A..           SET1      S:LDBIntGroup1+1.1
+   \   00ED   C8..00         CMP       S:LDBIntLevel,#0
+   \   00F0   BD03           BNZ       ??LDBKwpCallBackTimer_16
+   \   00F2   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_16:
+   \   00F5   C8..02         CMP       S:LDBIntLevel,#2
+   \   00F8   AD02           BZ        ??LDBKwpCallBackTimer_17
+   \   00FA   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_17:
+   \   00FC   A103           MOV       A,#3
+   \   00FE   716B70         CLR1      0xFF70.6
+   \   0101   715B70         CLR1      0xFF70.5
+    395          
+    396                      u8State = cStateWaitWakeUpPatternInitialState;
+   \   0104   9B....         BR        N:??LocalTimeOutElapsed_0
+    397                  }
+    398                  break;
+    399              case cStateRx:  // Rx time out
+    400                  StopLocalTimeOut();  // Automatically ReActivated
+   \                     ??LDBKwpCallBackTimer_0:
+   \   0107   9A....         CALL      StopLocalTimeOut
+    401                  RxMsg.pBuffer           = u8UARTBuffer;
+   \   010A   10....         MOVW      AX,#u8UARTBuffer
+   \   010D   03....         MOVW      RxMsg,AX
+    402                  RxMsg.Lng               = u8UARTBufferDataLength;
+   \   0110   8E....         MOV       A,u8UARTBufferDataLength
+   \   0113   70             MOV       X,A
+   \   0114   A100           MOV       A,#0
+   \   0116   03....         MOVW      RxMsg+2,AX
+    403                  DATKwpCallBackRxSpontWithoutAddr(cLDBCorrect,&RxMsg);
+   \   0119   12....         MOVW      BC,#RxMsg
+   \   011C   9A....         CALL      DATKwpCallBackRxSpontWithoutAddr
+    404                  u8UARTBufferDataLength = 0;
+   \   011F   A100           MOV       A,#0
+   \   0121   9E....         MOV       u8UARTBufferDataLength,A
+    405                  break;
+    406              default:
+    407                  mLIBassert(cFalse);
+    408                  break;
+    409              }
+    410          
+    411          }
+   \                     ??LDBKwpCallBackTimer_5:
+   \   0124   B2             POP       BC
+   \   0125   AF             RET       
+   \   0126                  REQUIRE ?CL78K_V4_6_L00
+   \   0126                  REQUIRE _A_P1
+   \   0126                  REQUIRE _A_ASIM0
+   \   0126                  REQUIRE _A_IF1
+   \   0126                  REQUIRE _A_MK0
+   \   0126                  REQUIRE _A_MK1
+    412          
+    413          //==============================================================================
+    414          //  DESCRIPTION : Check transmitted byte to detect short circuit
+    415          //  
+    416          //  PARAMETERS (Type,Name,Min,Max) : none 
+    417          //
+    418          //  RETURN VALUE : none
+    419          // 
+    420          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    421          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    422          static BOOL DetectShortCircuit (void)
+   \                     DetectShortCircuit:
+    423          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    424              BOOL bShortCircuitL = cFalse;
+   \   0001   A200           MOV       C,#0
+    425          
+    426              if (u8TransmitDataIndex == (U8)1U)
+   \   0003   8E....         MOV       A,u8TransmitDataIndex
+   \   0006   51             DEC       A
+   \   0007   BD0A           BNZ       ??LDBKwpCallBackTimer_18
+    427              {
+    428                  // Tx interrupt occurs before own reception finished.
+    429                  // Each transmitted byte is checked during next interrupt
+    430                  u8ScBatCounter = 0;
+   \   0009   A100           MOV       A,#0
+   \   000B   9E....         MOV       u8ScBatCounter,A
+    431                  u8ScGndCounter = 0;
+   \   000E   9E....         MOV       u8ScGndCounter,A
+   \   0011   FA7C           BR        ??LDBKwpCallBackTimer_19
+    432              }
+    433              else 
+    434              {
+    435                  if (mReadReceivedData(cLDBHarUARTKwp) != u8UARTBuffer[u8TransmitDataIndex - cIndexSubtractCompare])
+   \                     ??LDBKwpCallBackTimer_18:
+   \   0013   8E....         MOV       A,u8TransmitDataIndex
+   \   0016   73             MOV       B,A
+   \   0017   16....         MOVW      HL,#u8UARTBuffer-2
+   \   001A   AB             MOV       A,[HL+B]
+   \   001B   70             MOV       X,A
+   \   001C   F472           MOV       A,0xFF72
+   \   001E   6148           CMP       A,X
+   \   0020   AD65           BZ        ??LDBKwpCallBackTimer_20
+    436                  {
+    437                      //QACJ 3325: adzhelp: Value depends on MCU register
+    438                      if ((U8)(mLDBRegRead8BitRegister(ASIS0) & (U8)0x01U) != (U8)0) // Overrun condition
+   \   0022   31067369       BT        0xFF73.0, ??LDBKwpCallBackTimer_19
+    439                      //QACJ 3201: adzhelp: Value depends on MCU register
+    440                      {
+    441                          // byte cannot be checked because previous byte is lost
+    442                      }
+    443                      else
+    444                      {
+    445                          // difference: there is SC or disturbance
+    446                          //QACJ 3325: adzhelp: Value depends on MCU register
+    447                          if (mLDBHarRead(cLDBHarRxKwp) != 0)
+   \   0026   3113014C       BF        S:0xFF01.1, ??LDBKwpCallBackTimer_21
+    448                          //QACJ 3201: adzhelp: Reachability depends on MCU register
+    449                          {
+    450                              // SC to BAT occured
+    451                              u8ScBatCounter++;
+   \   002A   8E....         MOV       A,u8ScBatCounter
+   \   002D   41             INC       A
+   \   002E   9E....         MOV       u8ScBatCounter,A
+    452          
+    453                          #ifdef X90_PROJECT // adzhelp: Add 4 NOPs to preserve original location
+    454                              NOP();NOP();NOP();NOP();
+   \   0031   00             nop
+   \   0032   00             nop
+   \   0033   00             nop
+   \   0034   00             nop
+    455                          #endif
+    456          
+    457                              if (u8ScBatCounter >= cNumberBytesScBatDetection)
+   \   0035   8E....         MOV       A,u8ScBatCounter
+   \   0038   4D03           CMP       A,#3
+   \   003A   8D53           BC        ??LDBKwpCallBackTimer_19
+    458                              {
+    459                                  // SC to BAT occured
+    460                                  bShortCircuitL = cTrue;
+   \   003C   A100           MOV       A,#0
+   \   003E   A201           MOV       C,#1
+    461                                  u8State = cStateUndefined;
+   \   0040   9E....         MOV       u8State,A
+    462                                  mConfigureUARTInIdleMode(cLDBHarUARTKwp);
+   \   0043   7B1E           DI
+   \   0045   2A..           SET1      S:LDBIntGroup1.2
+   \   0047   C8..00         CMP       S:LDBIntLevel,#0
+   \   004A   BD03           BNZ       ??LDBKwpCallBackTimer_22
+   \   004C   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_22:
+   \   004F   C8..02         CMP       S:LDBIntLevel,#2
+   \   0052   AD02           BZ        ??LDBKwpCallBackTimer_23
+   \   0054   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_23:
+   \   0056   7B1E           DI
+   \   0058   1A..           SET1      S:LDBIntGroup1+1.1
+   \   005A   C8..00         CMP       S:LDBIntLevel,#0
+   \   005D   BD03           BNZ       ??LDBKwpCallBackTimer_24
+   \   005F   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_24:
+   \   0062   C8..02         CMP       S:LDBIntLevel,#2
+   \   0065   AD02           BZ        ??LDBKwpCallBackTimer_25
+   \   0067   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_25:
+   \   0069   A101           MOV       A,#1
+   \   006B   716B70         CLR1      0xFF70.6
+   \   006E   715B70         CLR1      0xFF70.5
+    463                                  DATKwpCallBackTxWithoutAddr(cLDBError);
+   \   0071   9A....         CALL      DATKwpCallBackTxWithoutAddr
+   \   0074   FA19           BR        ??LDBKwpCallBackTimer_19
+    464                              }
+    465                          }
+    466                          else
+    467                          {        
+    468                              // SC to GND occured
+    469                              // No protection needed
+    470                              // Management of GND counter is not needed; kept to preserved original code
+    471                              u8ScGndCounter++;
+   \                     ??LDBKwpCallBackTimer_21:
+   \   0076   8E....         MOV       A,u8ScGndCounter
+   \   0079   41             INC       A
+   \   007A   9E....         MOV       u8ScGndCounter,A
+    472                              u8ScBatCounter = 0;
+   \   007D   A100           MOV       A,#0
+   \   007F   9E....         MOV       u8ScBatCounter,A
+    473                  
+    474                          #ifdef X90_PROJECT // adzhelp: Add 3 NOPs to preserve original location
+    475                              NOP();NOP();NOP();
+   \   0082   00             nop
+   \   0083   00             nop
+   \   0084   00             nop
+   \   0085   FA08           BR        ??LDBKwpCallBackTimer_19
+    476                          #endif
+    477                          }
+    478                      }
+    479                  }
+    480                  else
+    481                  {
+    482                      // only problems in consequtive bytes are regarded
+    483                      u8ScGndCounter = 0;
+   \                     ??LDBKwpCallBackTimer_20:
+   \   0087   A100           MOV       A,#0
+   \   0089   9E....         MOV       u8ScGndCounter,A
+    484                      u8ScBatCounter = 0;
+   \   008C   9E....         MOV       u8ScBatCounter,A
+    485                  }
+    486              }
+    487              return bShortCircuitL;
+   \                     ??LDBKwpCallBackTimer_19:
+   \   008F   62             MOV       A,C
+   \   0090   B2             POP       BC
+   \   0091   AF             RET       
+   \   0092                  REQUIRE ?CL78K_V4_6_L00
+   \   0092                  REQUIRE _A_P1
+   \   0092                  REQUIRE _A_ASIM0
+   \   0092                  REQUIRE RXB0
+   \   0092                  REQUIRE ASIS0
+   \   0092                  REQUIRE _A_MK0
+   \   0092                  REQUIRE _A_MK1
+    488          }
+    489          
+    490          //==============================================================================
+    491          //=========================== EXPORTED FUNCTIONS ===============================
+    492          //==============================================================================
+    493          
+    494          //==============================================================================
+    495          //  DESCRIPTION :void LDBKwpInit(void)
+    496          //                Init of the LDB layer
+    497          //  
+    498          //  PARAMETERS (Type,Name,Min,Max) :  none
+    499          //
+    500          //  RETURN VALUE :  none
+    501          // 
+    502          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    503          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    504          MEM_TYPE void LDBKwpInit(void)
+   \                     LDBKwpInit:
+    505          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    506              u8State             = cStateUndefined;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       u8State,A
+    507              u8WakeUpPointNumber = 0;
+   \   0005   9E....         MOV       u8WakeUpPointNumber,A
+    508              CounterTempo      = 0;
+   \   0008   F2..           MOV       S:CounterTempo,A
+    509          
+    510              mSetTransfertRate(cLDBHarUARTKwp,cUARTBaudRateRegValue);
+   \   000A   1371D8         MOV       0xFF71,#216
+    511          
+    512              //QACJ 3109: adzhelp: Empty statement due to macro implementation
+    513              mSetParity(cLDBHarUARTKwp,cNoParity);           
+   \   000D   713B70         CLR1      0xFF70.3
+   \   0010   714B70         CLR1      0xFF70.4
+    514              mSetCharacterLength(cLDBHarUARTKwp,c8Bits);
+   \   0013   712A70         SET1      0xFF70.2
+    515              mSetStopBitLength(cLDBHarUARTKwp,c1Bit);  
+   \   0016   711B70         CLR1      0xFF70.1
+    516              mSetASIMnBit0(cLDBHarUARTKwp,1);      
+   \   0019   710A70         SET1      0xFF70.0
+    517          
+    518              mConfigureUARTControl(cLDBHarUARTKwp,cEnable);
+   \   001C   717A70         SET1      0xFF70.7
+    519          
+    520              mLDBHarWrite(cLDBHarTxKwp, 1);
+   \   001F   0A01           SET1      S:0xFF01.0
+    521              mLDBHarConfig(cLDBHarTxKwp,cLDBHarOutput);
+   \   0021   710B21         CLR1      0xFF21.0
+    522              mLDBHarConfig(cLDBHarRxKwp,cLDBHarInput);
+   \   0024   711A21         SET1      0xFF21.1
+    523          }
+   \   0027   AF             RET       
+   \   0028                  REQUIRE ?CL78K_V4_6_L00
+   \   0028                  REQUIRE _A_P1
+   \   0028                  REQUIRE _A_ASIM0
+   \   0028                  REQUIRE BRGC0
+   \   0028                  REQUIRE _A_PM1
+    524          
+    525          
+    526          //==============================================================================
+    527          //  DESCRIPTION :void LDBKwpSendWithoutAddr(tChannel Channel,tMsg *pMsg )
+    528          //                Switching of the send without address access
+    529          //  
+    530          //  PARAMETERS (Type,Name,Min,Max) :  
+    531          //      - Channel: Channel identifier
+    532          //      - *pMsg: datas buffer
+    533          //
+    534          //  RETURN VALUE : none
+    535          // 
+    536          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    537          //==============================================================================
+    538          //QACJ 3673: akodzhh: standard interface
+    539          //QACJ 1330: akodzhh: standard interface
+    540          //QACJ 3227: akodzhh: standard interface
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    541          MEM_TYPE void LDBKwpSendWithoutAddr(tMsg *pMsg )
+   \                     LDBKwpSendWithoutAddr:
+    542          {   
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B1             PUSH      AX
+   \   0002                  ; Total Auto size: 2
+    543          #ifndef TESTU
+    544              mLIBassert(u8State == cStateUndefined);
+    545          #endif
+    546              mLIBassert((pMsg !=NULL)&&(pMsg->pBuffer !=NULL));
+    547              mLIBassert((pMsg->Lng !=0) && (pMsg->Lng <cUARTBufferLgth));
+    548          
+    549          
+    550          #ifdef X90_PROJECT // adzhelp: add 56 NOPs to preserve binary location
+    551              if (mLDBHarRead(cLDBHarRxKwp) == 0) // possible SC GND
+   \   0002   9C0138         BT        S:0xFF01.1, ??LDBKwpCallBackTimer_42
+    552              {
+    553                  // No protection needed
+    554                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0005   00             nop
+   \   0006   00             nop
+   \   0007   00             nop
+   \   0008   00             nop
+   \   0009   00             nop
+    555                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   000A   00             nop
+   \   000B   00             nop
+   \   000C   00             nop
+   \   000D   00             nop
+   \   000E   00             nop
+    556                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   000F   00             nop
+   \   0010   00             nop
+   \   0011   00             nop
+   \   0012   00             nop
+   \   0013   00             nop
+    557                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0014   00             nop
+   \   0015   00             nop
+   \   0016   00             nop
+   \   0017   00             nop
+   \   0018   00             nop
+    558                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0019   00             nop
+   \   001A   00             nop
+   \   001B   00             nop
+   \   001C   00             nop
+   \   001D   00             nop
+    559                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   001E   00             nop
+   \   001F   00             nop
+   \   0020   00             nop
+   \   0021   00             nop
+   \   0022   00             nop
+    560                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0023   00             nop
+   \   0024   00             nop
+   \   0025   00             nop
+   \   0026   00             nop
+   \   0027   00             nop
+    561                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0028   00             nop
+   \   0029   00             nop
+   \   002A   00             nop
+   \   002B   00             nop
+   \   002C   00             nop
+    562                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   002D   00             nop
+   \   002E   00             nop
+   \   002F   00             nop
+   \   0030   00             nop
+   \   0031   00             nop
+    563                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0032   00             nop
+   \   0033   00             nop
+   \   0034   00             nop
+   \   0035   00             nop
+   \   0036   00             nop
+    564                  NOP(); NOP(); NOP(); NOP(); NOP();
+   \   0037   00             nop
+   \   0038   00             nop
+   \   0039   00             nop
+   \   003A   00             nop
+   \   003B   00             nop
+    565                  NOP();
+   \   003C   00             nop
+    566              }
+    567          #endif
+    568          
+    569              u8State = cStateTx;
+   \                     ??LDBKwpCallBackTimer_42:
+   \   003D   A102           MOV       A,#2
+   \   003F   9E....         MOV       u8State,A
+    570              mLIBmemcpy(u8UARTBuffer,pMsg->pBuffer,pMsg->Lng);
+   \   0042   891C           MOVW      AX,SP
+   \   0044   D6             MOVW      HL,AX
+   \   0045   87             MOV       A,[HL]
+   \   0046   70             MOV       X,A
+   \   0047   AE01           MOV       A,[HL+0x01]
+   \   0049   D6             MOVW      HL,AX
+   \   004A   AE02           MOV       A,[HL+0x02]
+   \   004C   70             MOV       X,A
+   \   004D   AE03           MOV       A,[HL+0x03]
+   \   004F   D4             MOVW      DE,AX
+   \   0050   891C           MOVW      AX,SP
+   \   0052   D6             MOVW      HL,AX
+   \   0053   87             MOV       A,[HL]
+   \   0054   70             MOV       X,A
+   \   0055   AE01           MOV       A,[HL+0x01]
+   \   0057   D6             MOVW      HL,AX
+   \   0058   87             MOV       A,[HL]
+   \   0059   70             MOV       X,A
+   \   005A   AE01           MOV       A,[HL+0x01]
+   \   005C   D2             MOVW      BC,AX
+   \   005D   10....         MOVW      AX,#u8UARTBuffer
+   \   0060   9A....         CALL      memcpy
+    571              //QACJ 0506: akodzhh: a correct pointer value is always set in DAT_KWP
+    572              u8UARTBufferDataLength =(U8)pMsg->Lng;
+   \   0063   891C           MOVW      AX,SP
+   \   0065   D6             MOVW      HL,AX
+   \   0066   87             MOV       A,[HL]
+   \   0067   70             MOV       X,A
+   \   0068   AE01           MOV       A,[HL+0x01]
+   \   006A   D6             MOVW      HL,AX
+   \   006B   AE02           MOV       A,[HL+0x02]
+   \   006D   9E....         MOV       u8UARTBufferDataLength,A
+    573          
+    574              mConfigureUARTInTxMode(cLDBHarUARTKwp);
+   \   0070   716A70         SET1      0xFF70.6
+   \   0073   00             NOP       
+   \   0074   712BE1         CLR1      0xFFE1.2
+   \   0077   7B1E           DI
+   \   0079   2B..           CLR1      S:LDBIntGroup1.2
+   \   007B   C8..00         CMP       S:LDBIntLevel,#0
+   \   007E   BD03           BNZ       ??LDBKwpCallBackTimer_43
+   \   0080   712BE5         CLR1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_43:
+   \   0083   C8..02         CMP       S:LDBIntLevel,#2
+   \   0086   AD02           BZ        ??LDBKwpCallBackTimer_44
+   \   0088   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_44:
+   \   008A   715A70         SET1      0xFF70.5
+   \   008D   711BE2         CLR1      0xFFE2.1
+    575              mSetTransmissionData(cLDBHarUARTKwp,u8UARTBuffer[0]);
+   \   0090   8E....         MOV       A,u8UARTBuffer
+   \   0093   F674           MOV       0xFF74,A
+    576              u8TransmitDataIndex = 1;
+   \   0095   A101           MOV       A,#1
+   \   0097   9E....         MOV       u8TransmitDataIndex,A
+    577          }
+   \   009A   B0             POP       AX
+   \   009B   B2             POP       BC
+   \   009C   AF             RET       
+   \   009D                  REQUIRE ?CL78K_V4_6_L00
+   \   009D                  REQUIRE _A_P1
+   \   009D                  REQUIRE _A_ASIM0
+   \   009D                  REQUIRE TXS0
+   \   009D                  REQUIRE _A_IF0
+   \   009D                  REQUIRE _A_IF1
+   \   009D                  REQUIRE _A_MK0
+    578          
+    579          //==============================================================================
+    580          //  DESCRIPTION :void LDBKwpControl (tCtrl Ctrl)
+    581          //                Switching of the control access
+    582          //  
+    583          //  PARAMETERS (Type,Name,Min,Max) :  
+    584          //      - Channel: Channel identifier
+    585          //      - Ctrl: Control type
+    586          //
+    587          //  RETURN VALUE : none
+    588          // 
+    589          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    590          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    591          MEM_TYPE void LDBKwpControl(tCtrl Ctrl)
+   \                     LDBKwpControl:
+    592          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    593              switch(Ctrl)
+   \   0002   4D00           CMP       A,#0
+   \   0004   BD03           BNZ       $+5
+   \   0006   9B....         BR        N:??LDBKwpCallBackTimer_45
+   \   0009   4D01           CMP       A,#1
+   \   000B   AD0E           BZ        ??LDBKwpCallBackTimer_46
+   \   000D   4D02           CMP       A,#2
+   \   000F   AD66           BZ        ??LDBKwpCallBackTimer_47
+   \   0011   4D04           CMP       A,#4
+   \   0013   BD03           BNZ       $+5
+   \   0015   9B....         BR        N:??LDBKwpCallBackTimer_48
+   \   0018   9B....         BR        N:??LDBKwpCallBackTimer_49
+    594              {
+    595              case cLDBKwpEnableRx:
+    596                  mLIBassert(u8State == cStateUndefined);   // WakeUp must have been detected
+    597                  u8State = cStateRx;
+   \                     ??LDBKwpCallBackTimer_46:
+   \   001B   A101           MOV       A,#1
+   \   001D   9E....         MOV       u8State,A
+    598                  u8UARTBufferDataLength = 0;
+   \   0020   A100           MOV       A,#0
+   \   0022   9E....         MOV       u8UARTBufferDataLength,A
+    599                  mConfigureUARTInRxMode(cLDBHarUARTKwp);
+   \   0025   7B1E           DI
+   \   0027   2A..           SET1      S:LDBIntGroup1.2
+   \   0029   C8..00         CMP       S:LDBIntLevel,#0
+   \   002C   BD03           BNZ       ??LDBKwpCallBackTimer_50
+   \   002E   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_50:
+   \   0031   C8..02         CMP       S:LDBIntLevel,#2
+   \   0034   AD02           BZ        ??LDBKwpCallBackTimer_51
+   \   0036   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_51:
+   \   0038   7B1E           DI
+   \   003A   1A..           SET1      S:LDBIntGroup1+1.1
+   \   003C   C8..00         CMP       S:LDBIntLevel,#0
+   \   003F   BD03           BNZ       ??LDBKwpCallBackTimer_52
+   \   0041   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_52:
+   \   0044   C8..02         CMP       S:LDBIntLevel,#2
+   \   0047   AD02           BZ        ??LDBKwpCallBackTimer_53
+   \   0049   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_53:
+   \   004B   716B70         CLR1      0xFF70.6
+   \   004E   715B70         CLR1      0xFF70.5
+   \   0051   717B70         CLR1      0xFF70.7
+   \   0054   00             NOP       
+   \   0055   717A70         SET1      0xFF70.7
+   \   0058   715A70         SET1      0xFF70.5
+   \   005B   711BE2         CLR1      0xFFE2.1
+   \   005E   7B1E           DI
+   \   0060   1B..           CLR1      S:LDBIntGroup1+1.1
+   \   0062   C8..00         CMP       S:LDBIntLevel,#0
+   \   0065   BD03           BNZ       ??LDBKwpCallBackTimer_54
+   \   0067   711BE6         CLR1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_54:
+   \   006A   C8..02         CMP       S:LDBIntLevel,#2
+   \   006D   BD03           BNZ       $+5
+   \   006F   9B....         BR        N:??LDBKwpCallBackTimer_49
+   \   0072   7A1E           EI
+   \   0074   9B....         BR        N:??LDBKwpCallBackTimer_49
+    600                  break;
+    601              case cLDBKwpDisableRx:
+    602                  mLIBassert(u8State == cStateRx);
+    603                  StopLocalTimeOut();
+   \                     ??LDBKwpCallBackTimer_47:
+   \   0077   9A....         CALL      StopLocalTimeOut
+    604                  u8State = cStateUndefined;
+   \   007A   A100           MOV       A,#0
+   \   007C   9E....         MOV       u8State,A
+    605                  mConfigureUARTInIdleMode(cLDBHarUARTKwp);
+   \   007F   7B1E           DI
+   \   0081   2A..           SET1      S:LDBIntGroup1.2
+   \   0083   C8..00         CMP       S:LDBIntLevel,#0
+   \   0086   BD03           BNZ       ??LDBKwpCallBackTimer_55
+   \   0088   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_55:
+   \   008B   C8..02         CMP       S:LDBIntLevel,#2
+   \   008E   AD02           BZ        ??LDBKwpCallBackTimer_56
+   \   0090   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_56:
+   \   0092   7B1E           DI
+   \   0094   1A..           SET1      S:LDBIntGroup1+1.1
+   \   0096   C8..00         CMP       S:LDBIntLevel,#0
+   \   0099   BD03           BNZ       ??LDBKwpCallBackTimer_57
+   \   009B   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_57:
+   \   009E   C8..02         CMP       S:LDBIntLevel,#2
+   \   00A1   AD02           BZ        ??LDBKwpCallBackTimer_58
+   \   00A3   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_58:
+   \   00A5   716B70         CLR1      0xFF70.6
+   \   00A8   715B70         CLR1      0xFF70.5
+   \   00AB   FA6F           BR        ??LDBKwpCallBackTimer_49
+    606                  break;
+    607              case cLDBKwpWaitForWakeUp:
+    608                  mLIBassert(u8State == cStateUndefined);
+    609                  u8State = cStateWaitWakeUpPatternInitialState;
+   \                     ??LDBKwpCallBackTimer_45:
+   \   00AD   A103           MOV       A,#3
+   \   00AF   9E....         MOV       u8State,A
+    610                  StartLocalTimeOut(mLDBTimConvUsInTick(cTimeOutPeriodInUs));
+   \   00B2   A104           MOV       A,#4
+   \   00B4   9A....         CALL      StartLocalTimeOut
+   \   00B7   FA63           BR        ??LDBKwpCallBackTimer_49
+    611                  break;
+    612              case cLDBKwpWaitForStartCom:
+    613                  if ((u8State == cStateWaitWakeUpPatternInitialState) ||
+    614                      (u8State == cStateWaitWakeUpPatternLowState) )
+   \                     ??LDBKwpCallBackTimer_48:
+   \   00B9   8E....         MOV       A,u8State
+   \   00BC   4D03           CMP       A,#3
+   \   00BE   AD04           BZ        ??LDBKwpCallBackTimer_59
+   \   00C0   4D04           CMP       A,#4
+   \   00C2   BD58           BNZ       ??LDBKwpCallBackTimer_49
+    615                  {
+    616                      u8UARTBufferDataLength  = 0;
+   \                     ??LDBKwpCallBackTimer_59:
+   \   00C4   A100           MOV       A,#0
+   \   00C6   9E....         MOV       u8UARTBufferDataLength,A
+    617                      mConfigureUARTInRxMode(cLDBHarUARTKwp);        
+   \   00C9   7B1E           DI
+   \   00CB   2A..           SET1      S:LDBIntGroup1.2
+   \   00CD   C8..00         CMP       S:LDBIntLevel,#0
+   \   00D0   BD03           BNZ       ??LDBKwpCallBackTimer_60
+   \   00D2   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_60:
+   \   00D5   C8..02         CMP       S:LDBIntLevel,#2
+   \   00D8   AD02           BZ        ??LDBKwpCallBackTimer_61
+   \   00DA   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_61:
+   \   00DC   7B1E           DI
+   \   00DE   1A..           SET1      S:LDBIntGroup1+1.1
+   \   00E0   C8..00         CMP       S:LDBIntLevel,#0
+   \   00E3   BD03           BNZ       ??LDBKwpCallBackTimer_62
+   \   00E5   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_62:
+   \   00E8   C8..02         CMP       S:LDBIntLevel,#2
+   \   00EB   AD02           BZ        ??LDBKwpCallBackTimer_63
+   \   00ED   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_63:
+   \   00EF   716B70         CLR1      0xFF70.6
+   \   00F2   715B70         CLR1      0xFF70.5
+   \   00F5   717B70         CLR1      0xFF70.7
+   \   00F8   00             NOP       
+   \   00F9   717A70         SET1      0xFF70.7
+   \   00FC   715A70         SET1      0xFF70.5
+   \   00FF   711BE2         CLR1      0xFFE2.1
+   \   0102   7B1E           DI
+   \   0104   1B..           CLR1      S:LDBIntGroup1+1.1
+   \   0106   C8..00         CMP       S:LDBIntLevel,#0
+   \   0109   BD03           BNZ       ??LDBKwpCallBackTimer_64
+   \   010B   711BE6         CLR1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_64:
+   \   010E   C8..02         CMP       S:LDBIntLevel,#2
+   \   0111   AD02           BZ        ??LDBKwpCallBackTimer_65
+   \   0113   7A1E           EI
+    618                      u8State = cStateWaitWakeUpPatternByte;
+   \                     ??LDBKwpCallBackTimer_65:
+   \   0115   A106           MOV       A,#6
+   \   0117   9E....         MOV       u8State,A
+    619                      Ctrl = cLDBKwpWaitForWakeUp;
+   \   011A   A200           MOV       C,#0
+    620                  }
+    621                  else
+    622                  {
+    623                      mLIBassert(cFalse);
+    624                  }
+    625                  break;
+    626              default:
+    627                  mLIBassert(cFalse);
+    628                  break;
+    629              }
+    630              DATKwpCallBackEndCtrl(Ctrl, cLDBCorrect);
+   \                     ??LDBKwpCallBackTimer_49:
+   \   011C   62             MOV       A,C
+   \   011D   A300           MOV       B,#0
+   \   011F   9A....         CALL      DATKwpCallBackEndCtrl
+    631          }
+   \   0122   B2             POP       BC
+   \   0123   AF             RET       
+   \   0124                  REQUIRE ?CL78K_V4_6_L00
+   \   0124                  REQUIRE _A_ASIM0
+   \   0124                  REQUIRE _A_IF1
+   \   0124                  REQUIRE _A_MK0
+   \   0124                  REQUIRE _A_MK1
+    632          
+    633          //==============================================================================
+    634          //  DESCRIPTION : End Tx interrupt
+    635          //  
+    636          //  PARAMETERS (Type,Name,Min,Max) : none 
+    637          //
+    638          //  RETURN VALUE : none
+    639          // 
+    640          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    641          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    642          mLDBIntDeclareIsr(cLDBHarInterruptKwpTx)
+   \                     LDBIntIsrINTST0:
+    643          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    644              mLDBIntEnterIsr(cLDBHarInterruptKwpTx);
+   \   0003   11..01         MOV       S:LDBIntLevel,#1
+   \   0006   F4E5           MOV       A,0xFFE5
+   \   0008   6D1E           OR        A,#30
+   \   000A   F6E5           MOV       0xFFE5,A
+   \   000C   F4E6           MOV       A,0xFFE6
+   \   000E   6D46           OR        A,#70
+   \   0010   F6E6           MOV       0xFFE6,A
+   \   0012   7A1E           EI
+    645              mLIBassert(u8State == cStateTx);
+    646          
+    647              // HW Protection: checking of transmitted bytes to determine SC
+    648              //QACJ 3416: adzhelp: function has no side effects
+    649              if (DetectShortCircuit() == cFalse)
+   \   0014   9A....         CALL      DetectShortCircuit
+   \   0017   4D00           CMP       A,#0
+   \   0019   BD4C           BNZ       ??LDBKwpCallBackTimer_26
+    650              {
+    651                  if(u8TransmitDataIndex < u8UARTBufferDataLength)
+   \   001B   8E....         MOV       A,u8TransmitDataIndex
+   \   001E   48....         CMP       A,u8UARTBufferDataLength
+   \   0021   9D10           BNC       ??LDBKwpCallBackTimer_27
+    652                  {
+    653                      mSetTransmissionData(cLDBHarUARTKwp,u8UARTBuffer[u8TransmitDataIndex]);
+   \   0023   73             MOV       B,A
+   \   0024   16....         MOVW      HL,#u8UARTBuffer
+   \   0027   AB             MOV       A,[HL+B]
+   \   0028   F674           MOV       0xFF74,A
+    654                      u8TransmitDataIndex++;
+   \   002A   8E....         MOV       A,u8TransmitDataIndex
+   \   002D   41             INC       A
+   \   002E   9E....         MOV       u8TransmitDataIndex,A
+   \   0031   FA34           BR        ??LDBKwpCallBackTimer_26
+    655                  }
+    656                  else
+    657                  {
+    658                      u8State = cStateUndefined;
+   \                     ??LDBKwpCallBackTimer_27:
+   \   0033   A100           MOV       A,#0
+   \   0035   9E....         MOV       u8State,A
+    659                      mConfigureUARTInIdleMode(cLDBHarUARTKwp);
+   \   0038   7B1E           DI
+   \   003A   2A..           SET1      S:LDBIntGroup1.2
+   \   003C   C8..00         CMP       S:LDBIntLevel,#0
+   \   003F   BD03           BNZ       ??LDBKwpCallBackTimer_28
+   \   0041   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_28:
+   \   0044   C8..02         CMP       S:LDBIntLevel,#2
+   \   0047   AD02           BZ        ??LDBKwpCallBackTimer_29
+   \   0049   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_29:
+   \   004B   7B1E           DI
+   \   004D   1A..           SET1      S:LDBIntGroup1+1.1
+   \   004F   C8..00         CMP       S:LDBIntLevel,#0
+   \   0052   BD03           BNZ       ??LDBKwpCallBackTimer_30
+   \   0054   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_30:
+   \   0057   C8..02         CMP       S:LDBIntLevel,#2
+   \   005A   AD02           BZ        ??LDBKwpCallBackTimer_31
+   \   005C   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_31:
+   \   005E   716B70         CLR1      0xFF70.6
+   \   0061   715B70         CLR1      0xFF70.5
+    660                      DATKwpCallBackTxWithoutAddr(cLDBCorrect);
+   \   0064   9A....         CALL      DATKwpCallBackTxWithoutAddr
+    661                  }
+    662              }
+    663              mLDBIntLeaveIsr(cLDBHarInterruptKwpTx);
+   \                     ??LDBKwpCallBackTimer_26:
+   \   0067                  REQUIRE ?CL78K_V4_6_L00
+   \   0067                  REQUIRE ?Subroutine0
+   \   0067                  REQUIRE _A_ASIM0
+   \   0067                  REQUIRE TXS0
+   \   0067                  REQUIRE _A_MK0
+   \   0067                  REQUIRE _A_MK1
+   \   0067                  ; // Fall through to label ?Subroutine0
+    664          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   7B1E           DI
+   \   0002   11..00         MOV       S:LDBIntLevel,#0
+   \   0005   F0..           MOV       A,S:LDBIntGroup1
+   \   0007   70             MOV       X,A
+   \   0008   F4E5           MOV       A,0xFFE5
+   \   000A   6158           AND       A,X
+   \   000C   F6E5           MOV       0xFFE5,A
+   \   000E   F0..           MOV       A,S:LDBIntGroup1+1
+   \   0010   70             MOV       X,A
+   \   0011   F4E6           MOV       A,0xFFE6
+   \   0013   6158           AND       A,X
+   \   0015   F6E6           MOV       0xFFE6,A
+   \   0017   B6             POP       HL
+   \   0018   B2             POP       BC
+   \   0019   B0             POP       AX
+   \   001A   8F             RETI      
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+    665          
+    666          //==============================================================================
+    667          //  DESCRIPTION :Byte Rx interrupt
+    668          //  
+    669          //  PARAMETERS (Type,Name,Min,Max) : none 
+    670          //
+    671          //  RETURN VALUE : none
+    672          // 
+    673          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    674          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    675          mLDBIntDeclareIsr(cLDBHarInterruptKwpRx)
+   \                     LDBIntIsrINTSR0:
+    676          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B3             PUSH      BC
+   \   0002   B7             PUSH      HL
+   \   0003                  ; Total Auto size: 0
+    677              mLDBIntEnterIsr(cLDBHarInterruptKwpRx);
+   \   0003   11..01         MOV       S:LDBIntLevel,#1
+   \   0006   F4E5           MOV       A,0xFFE5
+   \   0008   6D1E           OR        A,#30
+   \   000A   F6E5           MOV       0xFFE5,A
+   \   000C   F4E6           MOV       A,0xFFE6
+   \   000E   6D46           OR        A,#70
+   \   0010   F6E6           MOV       0xFFE6,A
+   \   0012   7A1E           EI
+    678              //QACJ 3346: akodzhh: a register value is checked here
+    679              if(mReadReceivedStatus(cLDBHarUARTKwp) == 0)  // Reception Ok
+   \   0014   F473           MOV       A,0xFF73
+   \   0016   5D07           AND       A,#7
+   \   0018   BD35           BNZ       ??LDBKwpCallBackTimer_32
+    680              {
+    681                  StopLocalTimeOut();  // Can be preempted because Tempo is stopped
+   \   001A   9A....         CALL      StopLocalTimeOut
+    682          
+    683                  if (u8State == cStateWaitWakeUpPatternByte)   // WakeUp waiting
+   \   001D   8E....         MOV       A,u8State
+   \   0020   4D06           CMP       A,#6
+   \   0022   BD0A           BNZ       ??LDBKwpCallBackTimer_33
+    684                  {
+    685                      mLIBassert(u8UARTBufferDataLength == 0);
+    686                      u8State = cStateRx;                           // To leave WakeUp state
+   \   0024   A101           MOV       A,#1
+   \   0026   9E....         MOV       u8State,A
+    687                      DATKwpCallBackCtrl(cLDBKwpWakeUp);
+   \   0029   A103           MOV       A,#3
+   \   002B   9A....         CALL      DATKwpCallBackCtrl
+    688                  }
+    689          
+    690                  if(u8UARTBufferDataLength < cUARTBufferLgth)
+   \                     ??LDBKwpCallBackTimer_33:
+   \   002E   8E....         MOV       A,u8UARTBufferDataLength
+   \   0031   4D46           CMP       A,#70
+   \   0033   9D13           BNC       ??LDBKwpCallBackTimer_34
+    691                  {
+    692                      u8UARTBuffer[u8UARTBufferDataLength] = mReadReceivedData(cLDBHarUARTKwp);
+   \   0035   F472           MOV       A,0xFF72
+   \   0037   70             MOV       X,A
+   \   0038   8E....         MOV       A,u8UARTBufferDataLength
+   \   003B   73             MOV       B,A
+   \   003C   60             MOV       A,X
+   \   003D   16....         MOVW      HL,#u8UARTBuffer
+   \   0040   BB             MOV       [HL+B],A
+    693                      u8UARTBufferDataLength++;
+   \   0041   8E....         MOV       A,u8UARTBufferDataLength
+   \   0044   41             INC       A
+   \   0045   9E....         MOV       u8UARTBufferDataLength,A
+    694                  }
+    695          
+    696                  StartLocalTimeOut(mLDBTimConvUsInTick(cP1TimeOutInUs));
+   \                     ??LDBKwpCallBackTimer_34:
+   \   0048   A108           MOV       A,#8
+   \   004A   9A....         CALL      StartLocalTimeOut
+   \   004D   FA4C           BR        ??LDBKwpCallBackTimer_35
+    697              }
+    698              else
+    699              //QACJ 3201: akodzhh: on input state condition
+    700              {
+    701                  mConfigureUARTInRxMode(cLDBHarUARTKwp);
+   \                     ??LDBKwpCallBackTimer_32:
+   \   004F   7B1E           DI
+   \   0051   2A..           SET1      S:LDBIntGroup1.2
+   \   0053   C8..00         CMP       S:LDBIntLevel,#0
+   \   0056   BD03           BNZ       ??LDBKwpCallBackTimer_36
+   \   0058   712AE5         SET1      0xFFE5.2
+   \                     ??LDBKwpCallBackTimer_36:
+   \   005B   C8..02         CMP       S:LDBIntLevel,#2
+   \   005E   AD02           BZ        ??LDBKwpCallBackTimer_37
+   \   0060   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_37:
+   \   0062   7B1E           DI
+   \   0064   1A..           SET1      S:LDBIntGroup1+1.1
+   \   0066   C8..00         CMP       S:LDBIntLevel,#0
+   \   0069   BD03           BNZ       ??LDBKwpCallBackTimer_38
+   \   006B   711AE6         SET1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_38:
+   \   006E   C8..02         CMP       S:LDBIntLevel,#2
+   \   0071   AD02           BZ        ??LDBKwpCallBackTimer_39
+   \   0073   7A1E           EI
+   \                     ??LDBKwpCallBackTimer_39:
+   \   0075   716B70         CLR1      0xFF70.6
+   \   0078   715B70         CLR1      0xFF70.5
+   \   007B   717B70         CLR1      0xFF70.7
+   \   007E   00             NOP       
+   \   007F   717A70         SET1      0xFF70.7
+   \   0082   715A70         SET1      0xFF70.5
+   \   0085   711BE2         CLR1      0xFFE2.1
+   \   0088   7B1E           DI
+   \   008A   1B..           CLR1      S:LDBIntGroup1+1.1
+   \   008C   C8..00         CMP       S:LDBIntLevel,#0
+   \   008F   BD03           BNZ       ??LDBKwpCallBackTimer_40
+   \   0091   711BE6         CLR1      0xFFE6.1
+   \                     ??LDBKwpCallBackTimer_40:
+   \   0094   C8..02         CMP       S:LDBIntLevel,#2
+   \   0097   AD02           BZ        ??LDBKwpCallBackTimer_35
+   \   0099   7A1E           EI
+    702              }
+    703              
+    704              mLDBIntLeaveIsr(cLDBHarInterruptKwpRx);
+   \                     ??LDBKwpCallBackTimer_35:
+   \   009B   9B....         BR        N:?Subroutine0
+   \   009E                  REQUIRE ?CL78K_V4_6_L00
+   \   009E                  REQUIRE _A_ASIM0
+   \   009E                  REQUIRE RXB0
+   \   009E                  REQUIRE ASIS0
+   \   009E                  REQUIRE _A_IF1
+   \   009E                  REQUIRE _A_MK0
+   \   009E                  REQUIRE _A_MK1
+    705          }
+    706          
+    707          
+    708          //==============================================================================
+    709          //  DESCRIPTION : LDBKwpCallBackTimer (void)
+    710          //                Increment timer counter
+    711          //  
+    712          //  PARAMETERS (Type,Name,Min,Max) : none 
+    713          //
+    714          //  RETURN VALUE : none
+    715          // 
+    716          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    717          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    718          void LDBKwpCallBackTimer(void)
+   \                     LDBKwpCallBackTimer:
+    719          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    720              //QACJ 3416: akodzhh: there is no side effects
+    721              if (CounterTempo != (tDelay)0)      // Tempo is set
+   \   0000   C8..00         CMP       S:CounterTempo,#0
+   \   0003   AD0A           BZ        ??LDBKwpCallBackTimer_41
+    722              {
+    723                  CounterTempo--;
+   \   0005   91..           DEC       S:CounterTempo
+    724          
+    725                  //QACJ 3416: akodzhh: there is no side effects
+    726                  if (CounterTempo == (tDelay)0)    // Tempo is elapsed
+   \   0007   C8..00         CMP       S:CounterTempo,#0
+   \   000A   BD03           BNZ       ??LDBKwpCallBackTimer_41
+    727                  {
+    728                      LocalTimeOutElapsed();        // Treatment
+   \   000C   9A....         CALL      LocalTimeOutElapsed
+    729                  }
+    730              }
+    731          }
+   \                     ??LDBKwpCallBackTimer_41:
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment INTVEC, offset 0x18, root
+   \                     `??LDBIntIsrINTST0??INTVEC 24`:
+   \   0018   ....           DW LDBIntIsrINTST0
+
+   \                                 In  segment INTVEC, offset 0x26, root
+   \                     `??LDBIntIsrINTSR0??INTVEC 38`:
+   \   0026   ....           DW LDBIntIsrINTSR0
+    732          
+    733          
+
+   Segment part sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     _A_P1                           1
+     _A_PM1                          1
+     _A_ASIM0                        1
+     BRGC0                           1
+     RXB0                            1
+     ASIS0                           1
+     TXS0                            1
+     _A_IF0                          2
+     _A_IF1                          2
+     _A_MK0                          2
+     _A_MK1                          2
+     u8UARTBuffer                   70
+     u8UARTBufferDataLength          1
+     u8TransmitDataIndex             1
+     u8State                         1
+     u8WakeUpPointNumber             1
+     CounterTempo                    1
+     RxMsg                           4
+     u8ScBatCounter                  1
+     u8ScGndCounter                  1
+     StartLocalTimeOut              13
+     StopLocalTimeOut               12
+     LocalTimeOutElapsed           294
+     DetectShortCircuit            146
+     LDBKwpInit                     40
+     LDBKwpSendWithoutAddr         157
+     LDBKwpControl                 292
+     LDBIntIsrINTST0               103
+     ?Subroutine0                   27
+     LDBIntIsrINTSR0               158
+     LDBKwpCallBackTimer            16
+     ??LDBIntIsrINTST0??INTVEC 24    2
+     ??LDBIntIsrINTSR0??INTVEC 38    2
+
+ 
+ 489 bytes in segment BCODE
+ 769 bytes in segment CODE
+   4 bytes in segment INTVEC
+  14 bytes in segment NEAR_A
+  80 bytes in segment NEAR_Z
+   1 byte  in segment SADDR_A
+   1 byte  in segment SADDR_Z
+ 
+ 1 258 bytes of CODE memory (+  4 bytes shared)
+    81 bytes of DATA memory (+ 15 bytes shared)
+
+Errors: none
+Warnings: none

@@ -1,0 +1,1612 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:55 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_VLG.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_VLG.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_VLG.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_VLG.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_VLG.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_VLG.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_VLG.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_VLG
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Feb 14 2011 17:58:12  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_VLG/DAT_VLG.C-arc  $
+     15          // $Revision:   1.30  $
+     16          // -----------------------------------------------------------------------------  
+     17          //  $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_VLG/DAT_VLG.C-arc  $
+     18          // 
+     19          //    Rev 1.30   Feb 14 2011 17:58:12   amanevd
+     20          // Cm026229: Return rev. 1.27
+     21          // 
+     22          //    Rev 1.29   Jun 21 2010 11:09:52   amanevd
+     23          // Cm009203: EEP_CDVerlog is not increased on SC GND
+     24          // 
+     25          //    Rev 1.28   Jun 16 2010 15:22:14   adzhelp
+     26          // Cm008639: Merge rev. 1.27 and rev. 1.26
+     27          // 
+     28          //    Rev 1.27   Jun 16 2010 15:17:08   adzhelp
+     29          // Cm009191: Return rev. 1.25 and set HW protection threshold to 60
+     30          // 
+     31          //    Rev 1.26   May 20 2010 14:13:30   amanevd
+     32          // Cm008639: function DATVlgIsFrameEmissionStopped updated
+     33          // 
+     34          //    Rev 1.25   Mar 08 2010 16:07:44   amanevd
+     35          // Cm007673: Checking of (0 == EEP_CodeAFSAvailable) replaced with
+     36          // (1 == EEP_EraseAFSCodeRequest)
+     37          // 
+     38          //    Rev 1.24   Feb 20 2010 11:38:26   amanevd
+     39          // Cm007272: Check if EEP_CodeAFSAvailable==1  in function DATVlgControlDigitalOutput
+     40          // instead on cDATVlgStart control
+     41          // 
+     42          //    Rev 1.23   Feb 10 2010 16:44:00   amanevd
+     43          // Cm007075: Volatile Faults and Deprotection cleared at IGN ON
+     44          // 
+     45          //    Rev 1.22   Feb 02 2010 14:57:20   amanevd
+     46          // Cm005797: Input update on VlgStart control
+     47          // 
+     48          //    Rev 1.21   Jan 27 2010 10:00:12   amanevd
+     49          // Cm007119: Correction of PWR_IGN rising edge detection
+     50          // 
+     51          //    Rev 1.20   Jan 15 2010 17:48:04   amanevd
+     52          // Cm005797: Refreshed LIB inputs on Authentication controls
+     53          // 
+     54          //    Rev 1.19   Jan 15 2010 11:35:04   amanevd
+     55          // Cm007164: Defect counter is increased only if defect is reported for the current
+     56          // sample
+     57          // 
+     58          //    Rev 1.18   Dec 21 2009 13:45:16   amanevd
+     59          // Cm005797: On input change LIBVlg2ProcessData() is called
+     60          // 
+     61          //    Rev 1.17   Dec 15 2009 10:45:22   amanevd
+     62          // Cm005566: DO_VERLOG is not protected in case of SC GND
+     63          // 
+     64          //    Rev 1.16   Dec 14 2009 10:52:16   amanevd
+     65          // Cm005566: Full Hardware Protection
+     66          // 
+     67          //    Rev 1.15   Dec 03 2009 11:37:28   amanevd
+     68          // Cm006751: DO_VERLOG set to 0 when not sending frame
+     69          // 
+     70          //    Rev 1.14   Nov 04 2009 16:32:00   amanevd
+     71          // Cm005566: Simplified Protection
+     72          // 
+     73          //    Rev 1.13   Oct 06 2009 17:25:32   amanevd
+     74          // Cm006446: 'EEP_EraseAFSCodeRequest' substituted with 'EEP_CodeAFSAvailable'
+     75          // 
+     76          //    Rev 1.12   Oct 05 2009 16:32:16   amanevd
+     77          // Cm005791: Verlog Serial Line test included
+     78          // 
+     79          //    Rev 1.11   Sep 21 2009 12:01:56   amanevd
+     80          // Cm005044: Now Verlog frame is sent while in Permanent Authentication
+     81          // 
+     82          //    Rev 1.10   Sep 18 2009 14:19:14   amanevd
+     83          // Cm005178: Taking in account AUTVERLOG on the fly
+     84          // 
+     85          //    Rev 1.9   Sep 18 2009 11:41:48   amanevd
+     86          // Cm005178: EEP_AUTVERLOG included as starting condition for Verlog
+     87          // 
+     88          //    Rev 1.8   Aug 28 2009 10:14:48   amanevd
+     89          // Cm004914: Code review corrections
+     90          // 
+     91          //    Rev 1.7   Jul 17 2009 10:52:58   amanevd
+     92          // Cm004914: AFS code is either erased on Routine request or after Ignition counting reaches N_MISE_APC
+     93          // 
+     94          //    Rev 1.6   Jul 16 2009 13:56:14   amanevd
+     95          // Cm005277: NRZ encoding applied
+     96          // 
+     97          //    Rev 1.5   May 21 2009 11:30:20   amanevd
+     98          // Cm003272 - CCover justification - NO IMPACT ON REAL CODE
+     99          // 
+    100          //    Rev 1.4   May 13 2009 14:45:22   amanevd
+    101          // Cm003272 - QAC fix - NO IMPACT ON REAL CODE
+    102          // 
+    103          //    Rev 1.3   Apr 29 2009 13:12:30   amanevd
+    104          // Cm003272 - Intermediate part 3 
+    105          // - PRS compliance
+    106          // 
+    107          //    Rev 1.2   Apr 24 2009 17:17:12   amanevd
+    108          // Cm003272 - Finishing part 2 - pre-integration
+    109          // 
+    110          //    Rev 1.1   Mar 23 2009 18:16:50   amanevd
+    111          // Cm003272 - Correction after DCD_LIB_VLG2 Review
+    112          // 
+    113          //    Rev 1.0   Mar 17 2009 15:53:50   amanevd
+    114          // Initial revision.
+    115          //
+    116          //=============================================================================
+    117          
+    118          //-----------------------------------------------------------------------------
+    119          //  Body Identification
+    120          //-----------------------------------------------------------------------------
+    121          #define DAT_VLG  "DAT_VLG"
+    122          
+    123          //-----------------------------------------------------------------------------
+    124          //  Included files
+    125          //
+    126          //  #include <system_file_name.h>
+    127          //  #include "project_file_name.h"
+    128          //-----------------------------------------------------------------------------
+    129          #include "lib.h"
+    130          #include "tos.h"
+    131          #include "dat.h"
+    132          #include "dat_vlg.h"
+    133          #include "dat_vlg.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near DATVlgInput[3]
+   \                     DATVlgInput:
+   \   0000   ........       DW TOSSeqTrueEval, DATVlgInputProcess
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW DATVlgIsFrameEmissionStopped, DATVlgStopVerlogTimer
+   \   000A   02FF           DB 2, 255
+   \   000C   ........       DW TOSSeqTrueEval, DATVlgInputProcess
+   \   0010   FF01           DB 255, 1
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near DATVlgOutputProtection[1]
+   \                     DATVlgOutputProtection:
+   \   0000   ........       DW TOSSeqTrueEval, DATVlgProtectionTask
+   \   0004   FF00           DB 255, 0
+    134          #include "lib_vlg2.h"
+    135          
+    136          //-----------------------------------------------------------------------------
+    137          //  Local constants
+    138          //
+    139          //  #define cConstantName   ((tType) ConstantValue)
+    140          //-----------------------------------------------------------------------------
+    141          
+    142          #define cNumberOfBytesToSend    ((U8) 10U)
+    143          
+    144          #define cByteSize               ((U8) 8U)
+    145          
+    146          #define cMaxSerialTestCount     ((U8) cByteSize*cNumberOfBytesToSend)
+    147          
+    148          #define cMod2                   ((U8) 2U)
+    149          
+    150          //HW Protection
+    151          #define cFaultCountWarnThreshold    ((U8) 2U)
+    152          #define cFaultCountProtectThreshold ((U8) 60U)
+    153          #define cMaxU8                      ((U8) 0xFFU)
+    154          
+    155          #define cVlgHighState           ((U8) 0U)
+    156          #define cVlgLowState            ((U8) 1U)
+    157          
+    158          #define cOverloadThreshold      ((U16)600UL)
+    159          
+    160          //-----------------------------------------------------------------------------
+    161          //  Local macros
+    162          //
+    163          //  #define mMacroName   (MacroDefinition)
+    164          //-----------------------------------------------------------------------------
+    165          
+    166          //-----------------------------------------------------------------------------
+    167          //  Local types
+    168          //
+    169          //  struct  sStructureName { ... };
+    170          //  union   uUnionName { ... };
+    171          //  enum    eEnumerationName { ... };
+    172          //  typedef Expression tTypeName;
+    173          //-----------------------------------------------------------------------------
+    174          
+    175          typedef struct tDatVlgLocalDataType
+    176          {
+    177              U16     SecretKey;
+    178              BOOL    Ignition;
+    179          }tDatVlgLocalData;
+    180          
+    181          //-----------------------------------------------------------------------------
+    182          //  Local data
+    183          //
+    184          //  static  tType   VariableName;
+    185          //  static  tType*  pVariableName; 
+    186          //-----------------------------------------------------------------------------
+    187          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    188          static tDatVlgLocalData DatVlgLocalData;
+   \                     DatVlgLocalData:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    189          //QACJ 3207:amanevd: This is because QAC sees mLIBmem(..) macros as NOP
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    190          static tDatVlgLocalData DatVlgLocalDataPrev;
+   \                     DatVlgLocalDataPrev:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+    191          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    192          static U8   u8LibVlg2TickCounter;
+   \                     u8LibVlg2TickCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    193          static U8   u8LibVlg2SerialTestCounter;
+   \                     u8LibVlg2SerialTestCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    194          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    195          static BOOL bPWR_IGNOld;
+   \                     bPWR_IGNOld:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    196          static BOOL bDO_VERLOGSCtoGnd;
+   \                     bDO_VERLOGSCtoGnd:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    197          static BOOL bDO_VERLOGSCtoBat;
+   \                     bDO_VERLOGSCtoBat:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    198          static U8   u8FaultCounter;
+   \                     u8FaultCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    199          
+    200          //-----------------------------------------------------------------------------
+    201          //  Constant local data
+    202          //
+    203          //  static const tType  VariableName;
+    204          //-----------------------------------------------------------------------------
+    205          
+    206          
+    207          //-----------------------------------------------------------------------------
+    208          //  Exported data
+    209          //
+    210          //  tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    211          //  tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    212          //-----------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    213          BOOL bDATVlgSerialTestInProgress;
+   \                     bDATVlgSerialTestInProgress:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    214          
+    215          //-----------------------------------------------------------------------------
+    216          //  Constant exported data
+    217          //
+    218          //              (LAY: 3 characters to identify the layer)
+    219          //              (Cmp: 3 characters to identify this component)
+    220          // 
+    221          //  const tType   LAYCmpVariableName;
+    222          //-----------------------------------------------------------------------------
+    223          
+    224          //-----------------------------------------------------------------------------
+    225          //  Local function prototypes
+    226          //  
+    227          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    228          //-----------------------------------------------------------------------------
+    229          static MEM_TYPE void DATVlgSerialLineTest(void);
+    230          static MEM_TYPE void DATVlgForceInputUpdate(void);
+    231          
+    232          #ifdef X90_PROJECT
+    233          static MEM_TYPE void DATVlgInit_Static(void);
+    234          static MEM_TYPE void DATVlgInputProcess_Static(void);
+    235          static MEM_TYPE void DATVlgProtectionTask_Static(void);
+    236          #endif
+    237          //=============================================================================
+    238          //=========================== LOCAL FUNCTIONS =================================
+    239          //=============================================================================
+    240          
+    241          //=============================================================================
+    242          //  DESCRIPTION :
+    243          //  
+    244          //  PARAMETERS (Type,Name,Min,Max) :   none
+    245          //
+    246          //  RETURN VALUE :   none
+    247          // 
+    248          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    249          //=============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    250          static MEM_TYPE void DATVlgSerialLineTest(void)
+   \                     DATVlgSerialLineTest:
+    251          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    252              BOOL    bTempL;
+    253          
+    254              // Sends 0x55 pattern, which is 01010101b
+    255              if(cMaxSerialTestCount > u8LibVlg2SerialTestCounter)
+   \   0000   8E....         MOV       A,u8LibVlg2SerialTestCounter
+   \   0003   4D50           CMP       A,#80
+   \   0005   9D32           BNC       ??DATVlgFalling_PWR_IGN_0
+    256              {
+    257                  #ifdef X90_PROJECT // amanevd: Add 42 NOPs to preserve original location
+    258                  NOP();NOP();NOP();NOP();NOP();
+   \   0007   00             nop
+   \   0008   00             nop
+   \   0009   00             nop
+   \   000A   00             nop
+   \   000B   00             nop
+    259                  NOP();NOP();NOP();NOP();NOP();
+   \   000C   00             nop
+   \   000D   00             nop
+   \   000E   00             nop
+   \   000F   00             nop
+   \   0010   00             nop
+    260                  NOP();NOP();NOP();NOP();NOP();
+   \   0011   00             nop
+   \   0012   00             nop
+   \   0013   00             nop
+   \   0014   00             nop
+   \   0015   00             nop
+    261                  NOP();NOP();NOP();NOP();NOP();
+   \   0016   00             nop
+   \   0017   00             nop
+   \   0018   00             nop
+   \   0019   00             nop
+   \   001A   00             nop
+    262                  NOP();NOP();NOP();NOP();NOP();
+   \   001B   00             nop
+   \   001C   00             nop
+   \   001D   00             nop
+   \   001E   00             nop
+   \   001F   00             nop
+    263                  NOP();NOP();NOP();NOP();NOP();
+   \   0020   00             nop
+   \   0021   00             nop
+   \   0022   00             nop
+   \   0023   00             nop
+   \   0024   00             nop
+    264                  NOP();NOP();NOP();NOP();NOP();
+   \   0025   00             nop
+   \   0026   00             nop
+   \   0027   00             nop
+   \   0028   00             nop
+   \   0029   00             nop
+    265                  NOP();NOP();NOP();NOP();NOP();
+   \   002A   00             nop
+   \   002B   00             nop
+   \   002C   00             nop
+   \   002D   00             nop
+   \   002E   00             nop
+    266                  NOP();NOP();
+   \   002F   00             nop
+   \   0030   00             nop
+    267                  #endif
+    268                  u8LibVlg2SerialTestCounter++;
+   \   0031   8E....         MOV       A,u8LibVlg2SerialTestCounter
+   \   0034   41             INC       A
+   \   0035   9E....         MOV       u8LibVlg2SerialTestCounter,A
+   \   0038   AF             RET       
+    269              }
+    270              else
+    271              {
+    272                  //CCOV: amanevd: Cannot be covered because this function is left in order to preserve original location
+    273                  // function to be removed with TCR: 
+    274                  #ifdef X90_PROJECT // amanevd: Add 17 NOPs to preserve original location
+    275                  NOP();NOP();NOP();NOP();NOP();
+   \                     ??DATVlgFalling_PWR_IGN_0:
+   \   0039   A100           MOV       A,#0
+   \   003B   00             nop
+   \   003C   00             nop
+   \   003D   00             nop
+   \   003E   00             nop
+   \   003F   00             nop
+    276                  NOP();NOP();NOP();NOP();NOP();
+   \   0040   00             nop
+   \   0041   00             nop
+   \   0042   00             nop
+   \   0043   00             nop
+   \   0044   00             nop
+    277                  NOP();NOP();NOP();NOP();NOP();
+   \   0045   00             nop
+   \   0046   00             nop
+   \   0047   00             nop
+   \   0048   00             nop
+   \   0049   00             nop
+    278                  NOP();NOP();
+   \   004A   00             nop
+   \   004B   00             nop
+    279                  #endif
+    280                  u8LibVlg2SerialTestCounter = 0;
+   \   004C   9E....         MOV       u8LibVlg2SerialTestCounter,A
+    281                  bDATVlgSerialTestInProgress = cFalse;
+   \   004F   9E....         MOV       bDATVlgSerialTestInProgress,A
+    282                  bTempL = LIBVlg2FrameEmissionStopped();
+    283                  //CCOV: amanevd: Cannot be covered because this function is left in order to preserve original location
+    284                  if(cFalse != bTempL)
+   \   0052   16....         MOVW      HL,#LWRD(LIBVlg2FrameEmissionStopped)
+   \   0055   A4..           MOV       E,#BYTE3(LIBVlg2FrameEmissionStopped)
+   \   0057   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0058   4D00           CMP       A,#0
+   \   005A   AD03           BZ        ??DATVlgFalling_PWR_IGN_1
+    285                  {
+    286                      #ifdef X90_PROJECT // amanevd: Add 3 NOPs to preserve original location
+    287                      NOP();NOP();NOP();
+   \   005C   00             nop
+   \   005D   00             nop
+   \   005E   00             nop
+    288                      #endif
+    289                  }
+    290              }
+    291          }
+   \                     ??DATVlgFalling_PWR_IGN_1:
+   \   005F   AF             RET       
+   \   0060                  REQUIRE ?CL78K_V4_6_L00
+    292          
+    293          //=============================================================================
+    294          //  DESCRIPTION : Forces PWR_IGN and SKey update
+    295          //  
+    296          //  PARAMETERS (Type,Name,Min,Max) :   none
+    297          //
+    298          //  RETURN VALUE :   none
+    299          // 
+    300          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    301          //=============================================================================
+    302          static MEM_TYPE void DATVlgForceInputUpdate(void)
+    303          {
+    304              LIBVlg2UpdateSecretKey(mDATRead(U16Bit, EEP_VerlogSKey, Default));
+    305              LIBVlg2UpdateIgnition(mDATRead(U1Bit, PWR_IGN, Default));
+    306              LIBVlg2ProcessData();
+    307          }
+    308          //=============================================================================
+    309          //============================ EXPORTED FUNCTIONS =============================
+    310          //=============================================================================
+    311          
+    312          //=============================================================================
+    313          //  DESCRIPTION         : Control Digital Output
+    314          //
+    315          //  PARAMETERS          : None
+    316          //  (Type,Name,Min,Max) 
+    317          //
+    318          //  RETURN VALUE        : None
+    319          //
+    320          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    321          //
+    322          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    323          void DATVlgControlDigitalOutput(const BOOL bStateP)
+   \                     DATVlgControlDigitalOutput:
+    324          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001   70             MOV       X,A
+    325              if(     (cTrue == mDATRead(U1Bit, EEP_AUTVERLOG, Default))
+    326                  &&  (cTrue == mDATRead(U1Bit, EEP_EraseAFSCodeRequest, Default))
+    327                )
+   \   0002   16....         MOVW      HL,#DATDbkMirrors+27
+   \   0005   318722         BF        [HL].0, ??DATVlgFalling_PWR_IGN_16
+   \   0008   16....         MOVW      HL,#DATDbkMirrors+143
+   \   000B   31B71C         BF        [HL].3, ??DATVlgFalling_PWR_IGN_16
+    328              {
+    329                  mDATWrite(U1Bit, DO_VERLOG, (!bStateP), Default);
+   \   000E   8E....         MOV       A,bDO_VERLOGDiagEnabled
+   \   0011   4D00           CMP       A,#0
+   \   0013   BD30           BNZ       ??DATVlgFalling_PWR_IGN_17
+   \   0015   60             MOV       A,X
+   \   0016   4D00           CMP       A,#0
+   \   0018   BD1E           BNZ       ??DATVlgFalling_PWR_IGN_18
+   \   001A   A101           MOV       A,#1
+   \   001C   9E....         MOV       bDO_VERLOG,A
+   \   001F   8E....         MOV       A,bDO_VERLOGProtected
+   \   0022   4D00           CMP       A,#0
+   \   0024   BD17           BNZ       ??DATVlgFalling_PWR_IGN_19
+   \   0026   A105           MOV       A,#5
+   \   0028   FA15           BR        ??DATVlgFalling_PWR_IGN_20
+    330              }
+    331              else
+    332              {
+    333                  if(0 != mDATRead(U1Bit, DO_VERLOG, Default))
+   \                     ??DATVlgFalling_PWR_IGN_16:
+   \   002A   8E....         MOV       A,bDO_VERLOG
+   \   002D   4D00           CMP       A,#0
+   \   002F   AD14           BZ        ??DATVlgFalling_PWR_IGN_17
+    334                  {
+    335                      mDATWrite(U1Bit, DO_VERLOG, 0, Default);
+   \   0031   8E....         MOV       A,bDO_VERLOGDiagEnabled
+   \   0034   4D00           CMP       A,#0
+   \   0036   BD0D           BNZ       ??DATVlgFalling_PWR_IGN_17
+   \                     ??DATVlgFalling_PWR_IGN_18:
+   \   0038   A100           MOV       A,#0
+   \   003A   9E....         MOV       bDO_VERLOG,A
+   \                     ??DATVlgFalling_PWR_IGN_19:
+   \   003D   A106           MOV       A,#6
+   \                     ??DATVlgFalling_PWR_IGN_20:
+   \   003F   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   0042   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0044   ..             CALLT     [__T_?FAR_CALL_L07]
+    336                  }
+    337              }
+    338          }
+   \                     ??DATVlgFalling_PWR_IGN_17:
+   \   0045   B4             POP       DE
+   \   0046   AF             RET       
+   \   0047                  REQUIRE ?CL78K_V4_6_L00
+    339          
+    340          //=============================================================================
+    341          //  DESCRIPTION         : Component initialization.
+    342          //
+    343          //  PARAMETERS          : None
+    344          //  (Type,Name,Min,Max) 
+    345          //
+    346          //  RETURN VALUE        : None
+    347          //
+    348          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    349          //
+    350          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    351          void DATVlgInit(void)
+   \                     DATVlgInit:
+    352          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    353          #ifdef X90_PROJECT
+    354              DATVlgInit_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATVlgInit_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATVlgInit_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    355          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    356          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    357          static MEM_TYPE void DATVlgInit_Static(void)
+   \                     DATVlgInit_Static:
+    358          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    359          #endif
+    360              DatVlgLocalData.SecretKey   = mDATRead(U16Bit, EEP_VerlogSKey, Default);
+   \   0001   02....         MOVW      AX,DATDbkMirrors+136
+   \   0004   03....         MOVW      DatVlgLocalData,AX
+    361              DatVlgLocalData.Ignition    = mDATRead(U1Bit, PWR_IGN, Default);
+   \   0007   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0009   5D01           AND       A,#1
+   \   000B   9E....         MOV       DatVlgLocalData+2,A
+    362              u8LibVlg2TickCounter        = 0;
+   \   000E   A100           MOV       A,#0
+   \   0010   9E....         MOV       u8LibVlg2TickCounter,A
+    363              bDATVlgSerialTestInProgress = cFalse;
+   \   0013   9E....         MOV       bDATVlgSerialTestInProgress,A
+    364              bPWR_IGNOld                 = cFalse;
+   \   0016   9E....         MOV       bPWR_IGNOld,A
+    365              u8FaultCounter  = 0;
+   \   0019   9E....         MOV       u8FaultCounter,A
+    366          
+    367              LIBVlg2Init(DatVlgLocalData.SecretKey, 
+    368                          (tpLIBVlg2ControlDigitalOutput)&DATVlgControlDigitalOutput);
+   \   001C   12....         MOVW      BC,#DATVlgControlDigitalOutput
+   \   001F   8E....         MOV       A,DatVlgLocalData+1
+   \   0022   16....         MOVW      HL,#LWRD(LIBVlg2Init)
+   \   0025   A4..           MOV       E,#BYTE3(LIBVlg2Init)
+   \   0027   ..             CALLT     [__T_?FAR_CALL_L07]
+    369              mLIBmemcpy(&DatVlgLocalDataPrev, &DatVlgLocalData, sizeof(tDatVlgLocalData));
+   \   0028   14....         MOVW      DE,#DatVlgLocalData
+   \   002B   16....         MOVW      HL,#DatVlgLocalDataPrev
+   \   002E   A304           MOV       B,#4
+   \                     ??DATVlgInit_Static_0:
+   \   0030   85             MOV       A,[DE]
+   \   0031   97             MOV       [HL],A
+   \   0032   86             INCW      HL
+   \   0033   84             INCW      DE
+   \   0034   8BFA           DBNZ      B, ??DATVlgInit_Static_0
+    370          }
+   \   0036   B2             POP       BC
+   \   0037   AF             RET       
+   \   0038                  REQUIRE ?CL78K_V4_6_L00
+    371          
+    372          //=============================================================================
+    373          //  DESCRIPTION         : Process DAT Vlg control
+    374          //
+    375          //  PARAMETERS          : None
+    376          //  (Type,Name,Min,Max) 
+    377          //
+    378          //  RETURN VALUE        : None
+    379          //
+    380          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    381          //
+    382          //=============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    383          MEM_TYPE void DATVlgControl(const tCtrl Ctrl)
+   \                     DATVlgControl:
+    384          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    385              tTOSSeqGraphStateType tGraphState;
+    386          
+    387              switch (Ctrl)
+   \   0000   4D00           CMP       A,#0
+   \   0002   AD09           BZ        ??DATVlgFalling_PWR_IGN_2
+   \   0004   4D01           CMP       A,#1
+   \   0006   AD36           BZ        ??DATVlgFalling_PWR_IGN_3
+   \   0008   4D02           CMP       A,#2
+   \   000A   AD3B           BZ        ??DATVlgFalling_PWR_IGN_4
+   \   000C   AF             RET       
+    388              {
+    389                  case cDATVlgStart:
+    390          
+    391                  tGraphState = TOSSeqGraphState(cTOSSeqGraphIdDATVlgInput);
+    392          
+    393                  if (cTOSSeqActiveGraph != tGraphState)
+   \                     ??DATVlgFalling_PWR_IGN_2:
+   \   000D   A129           MOV       A,#41
+   \   000F   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0010   51             DEC       A
+   \   0011   AD62           BZ        ??DATVlgFalling_PWR_IGN_5
+    394                  {
+    395                      TOSSeqActivateGraph(cTOSSeqGraphIdDATVlgInput);
+   \   0013   A129           MOV       A,#41
+   \   0015   ..             CALLT     [__T_TOSSeqActivateGraph]
+    396          
+    397                      DATVlgForceInputUpdate();
+   \   0016   02....         MOVW      AX,DATDbkMirrors+136
+   \   0019   16....         MOVW      HL,#LWRD(LIBVlg2UpdateSecretKey)
+   \   001C   A4..           MOV       E,#BYTE3(LIBVlg2UpdateSecretKey)
+   \   001E   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   001F   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0021   5D01           AND       A,#1
+   \   0023   16....         MOVW      HL,#LWRD(LIBVlg2UpdateIgnition)
+   \   0026   A4..           MOV       E,#BYTE3(LIBVlg2UpdateIgnition)
+   \   0028   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0029   16....         MOVW      HL,#LWRD(LIBVlg2ProcessData)
+   \   002C   A4..           MOV       E,#BYTE3(LIBVlg2ProcessData)
+   \   002E   ..             CALLT     [__T_?FAR_CALL_L07]
+    398          
+    399                      tGraphState = TOSSeqGraphState(cTOSSeqGraphIdDATVlgOutputProtection);
+    400          
+    401                      if (cTOSSeqActiveGraph != tGraphState)
+   \   002F   A102           MOV       A,#2
+   \   0031   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0032   51             DEC       A
+   \   0033   AD40           BZ        ??DATVlgFalling_PWR_IGN_5
+    402                      {
+    403                          bPWR_IGNOld = cFalse;
+   \   0035   A100           MOV       A,#0
+   \   0037   9E....         MOV       bPWR_IGNOld,A
+    404          
+    405                          TOSSeqActivateGraph(cTOSSeqGraphIdDATVlgOutputProtection);
+   \   003A   A102           MOV       A,#2
+   \   003C   ..             CALLT     [__T_TOSSeqActivateGraph]
+   \   003D   AF             RET       
+    406                      }
+    407                  }
+    408                  break;
+    409          
+    410                  case cDATVlgStop:
+    411                  LDBControl(cLDBChannelTrp, cLDBTrpStopVerlog);
+   \                     ??DATVlgFalling_PWR_IGN_3:
+   \   003E   A105           MOV       A,#5
+   \   0040   16....         MOVW      HL,#LWRD(LDBTrpControl)
+   \   0043   A4..           MOV       E,#BYTE3(LDBTrpControl)
+   \   0045   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0046   AF             RET       
+    412                  break;
+    413          
+    414                  case cDATVlgSerialTest:
+    415                  u8LibVlg2SerialTestCounter  = 0;
+   \                     ??DATVlgFalling_PWR_IGN_4:
+   \   0047   A100           MOV       A,#0
+   \   0049   9E....         MOV       u8LibVlg2SerialTestCounter,A
+    416                  DATVlgSerialLineTest();
+   \   004C   16....         MOVW      HL,#LWRD(DATVlgSerialLineTest)
+   \   004F   A4..           MOV       E,#BYTE3(DATVlgSerialLineTest)
+   \   0051   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    417          
+    418                  #ifdef X90_PROJECT // amanevd: Add 2 NOPs to preserve original location
+    419                  NOP();NOP();
+   \   0052   A102           MOV       A,#2
+   \   0054   00             nop
+   \   0055   00             nop
+    420                  #endif
+    421                  tGraphState = TOSSeqGraphState(cTOSSeqGraphIdDATVlgOutputProtection);
+    422                  if (cTOSSeqActiveGraph != tGraphState)
+   \   0056   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0057   51             DEC       A
+   \   0058   AD1B           BZ        ??DATVlgFalling_PWR_IGN_5
+    423                  {
+    424                      #ifdef X90_PROJECT // amanevd: Add 27 NOPs to preserve original location
+    425                      NOP();NOP();NOP();NOP();NOP();
+   \   005A   00             nop
+   \   005B   00             nop
+   \   005C   00             nop
+   \   005D   00             nop
+   \   005E   00             nop
+    426                      NOP();NOP();NOP();NOP();NOP();
+   \   005F   00             nop
+   \   0060   00             nop
+   \   0061   00             nop
+   \   0062   00             nop
+   \   0063   00             nop
+    427                      NOP();NOP();NOP();NOP();NOP();
+   \   0064   00             nop
+   \   0065   00             nop
+   \   0066   00             nop
+   \   0067   00             nop
+   \   0068   00             nop
+    428                      NOP();NOP();NOP();NOP();NOP();
+   \   0069   00             nop
+   \   006A   00             nop
+   \   006B   00             nop
+   \   006C   00             nop
+   \   006D   00             nop
+    429                      NOP();NOP();NOP();NOP();NOP();
+   \   006E   00             nop
+   \   006F   00             nop
+   \   0070   00             nop
+   \   0071   00             nop
+   \   0072   00             nop
+    430                      NOP();NOP();
+   \   0073   00             nop
+   \   0074   00             nop
+    431                      #endif
+    432                  }
+    433                  break;
+    434          
+    435                  //CCOV: amanevd: Cannot be covered because this default case rises explicit assert
+    436                  default:
+    437                  mLIBassert(cFalse);
+    438                  break;
+    439              }
+    440          }
+   \                     ??DATVlgFalling_PWR_IGN_5:
+   \   0075   AF             RET       
+   \   0076                  REQUIRE ?CL78K_V4_6_L00
+    441          
+    442          //=============================================================================
+    443          //  DESCRIPTION         : Maintain active state
+    444          //
+    445          //  PARAMETERS          : None
+    446          //  (Type,Name,Min,Max) 
+    447          //
+    448          //  RETURN VALUE        : None
+    449          //
+    450          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    451          //
+    452          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    453          void DATVlgIsAnybodyMaintainActiveState(void)
+   \                     DATVlgIsAnybodyMaintainActiveState:
+    454          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    455              tTOSSeqGraphStateType tGraphState;
+    456          
+    457              tGraphState = TOSSeqGraphState(cTOSSeqGraphIdDATVlgInput);
+    458          
+    459              if (    (cTOSSeqActiveGraph == tGraphState)
+    460                  ||  (cFalse != bDATVlgSerialTestInProgress)
+    461                 )
+   \   0000   A129           MOV       A,#41
+   \   0002   ..             CALLT     [__T_TOSSeqGraphState]
+   \   0003   51             DEC       A
+   \   0004   AD07           BZ        ??DATVlgFalling_PWR_IGN_21
+   \   0006   8E....         MOV       A,bDATVlgSerialTestInProgress
+   \   0009   4D00           CMP       A,#0
+   \   000B   AD04           BZ        ??DATVlgFalling_PWR_IGN_22
+    462              {
+    463                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \                     ??DATVlgFalling_PWR_IGN_21:
+   \   000D   102900         MOVW      AX,#41
+   \   0010   ..             CALLT     [__T_TOSWriteSignal]
+    464              }
+    465              else
+    466              {
+    467                  //Nothing
+    468              }
+    469          }
+   \                     ??DATVlgFalling_PWR_IGN_22:
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    470          
+    471          //=============================================================================
+    472          //  DESCRIPTION         : Process Input.
+    473          //
+    474          //  PARAMETERS          : None
+    475          //  (Type,Name,Min,Max) 
+    476          //
+    477          //  RETURN VALUE        : None
+    478          //
+    479          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    480          //
+    481          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    482          void DATVlgInputProcess(void)
+   \                     DATVlgInputProcess:
+    483          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    484          #ifdef X90_PROJECT
+    485              DATVlgInputProcess_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATVlgInputProcess_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATVlgInputProcess_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    486          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    487          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    488          static MEM_TYPE void DATVlgInputProcess_Static(void)
+   \                     DATVlgInputProcess_Static:
+    489          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    490          #endif
+    491          
+    492              REG rResL;
+    493          
+    494              DatVlgLocalData.SecretKey   = mDATRead(U16Bit, EEP_VerlogSKey, Default);
+   \   0001   02....         MOVW      AX,DATDbkMirrors+136
+   \   0004   03....         MOVW      DatVlgLocalData,AX
+    495              DatVlgLocalData.Ignition    = mDATRead(U1Bit, PWR_IGN, Default);
+   \   0007   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0009   5D01           AND       A,#1
+   \   000B   9E....         MOV       DatVlgLocalData+2,A
+    496          
+    497              //QACJ 0543:amanevd: Result of mLIBmemcmp() expansion to NOP() in LIB.h
+    498              rResL = (REG)mLIBmemcmp(&DatVlgLocalData, 
+    499                          &DatVlgLocalDataPrev, 
+    500                          sizeof(tDatVlgLocalData));
+   \   000E   10....         MOVW      AX,#DatVlgLocalData
+   \   0011   140400         MOVW      DE,#4
+   \   0014   12....         MOVW      BC,#DatVlgLocalDataPrev
+   \   0017   9A....         CALL      memcmp
+   \   001A   60             MOV       A,X
+    501          
+    502              if ((REG)0 != rResL)
+   \   001B   4D00           CMP       A,#0
+   \   001D   AD12           BZ        ??DATVlgFalling_PWR_IGN_6
+    503              {
+    504                  LIBVlg2UpdateSecretKey(DatVlgLocalData.SecretKey);
+   \   001F   02....         MOVW      AX,DatVlgLocalData
+   \   0022   16....         MOVW      HL,#LWRD(LIBVlg2UpdateSecretKey)
+   \   0025   A4..           MOV       E,#BYTE3(LIBVlg2UpdateSecretKey)
+   \   0027   ..             CALLT     [__T_?FAR_CALL_L07]
+    505                  LIBVlg2UpdateIgnition(DatVlgLocalData.Ignition);
+   \   0028   8E....         MOV       A,DatVlgLocalData+2
+   \   002B   16....         MOVW      HL,#LWRD(LIBVlg2UpdateIgnition)
+   \   002E   A4..           MOV       E,#BYTE3(LIBVlg2UpdateIgnition)
+   \   0030   ..             CALLT     [__T_?FAR_CALL_L07]
+    506              }
+    507          
+    508              LIBVlg2ProcessData();
+   \                     ??DATVlgFalling_PWR_IGN_6:
+   \   0031   16....         MOVW      HL,#LWRD(LIBVlg2ProcessData)
+   \   0034   A4..           MOV       E,#BYTE3(LIBVlg2ProcessData)
+   \   0036   ..             CALLT     [__T_?FAR_CALL_L07]
+    509              mLIBmemcpy(&DatVlgLocalDataPrev, &DatVlgLocalData, sizeof(tDatVlgLocalData));
+   \   0037   14....         MOVW      DE,#DatVlgLocalData
+   \   003A   16....         MOVW      HL,#DatVlgLocalDataPrev
+   \   003D   A304           MOV       B,#4
+   \                     ??DATVlgInputProcess_Static_0:
+   \   003F   85             MOV       A,[DE]
+   \   0040   97             MOV       [HL],A
+   \   0041   86             INCW      HL
+   \   0042   84             INCW      DE
+   \   0043   8BFA           DBNZ      B, ??DATVlgInputProcess_Static_0
+    510          }
+   \   0045   B2             POP       BC
+   \   0046   AF             RET       
+   \   0047                  REQUIRE ?CL78K_V4_6_L00
+    511          
+    512          //=============================================================================
+    513          //  DESCRIPTION         : Check if frame emission is stopped
+    514          //
+    515          //  PARAMETERS          : None
+    516          //  (Type,Name,Min,Max) 
+    517          //
+    518          //  RETURN VALUE        : BOOL
+    519          //
+    520          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    521          //
+    522          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    523          BOOL DATVlgIsFrameEmissionStopped(void)
+   \                     DATVlgIsFrameEmissionStopped:
+    524          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    525              const BOOL bFrameEmissionStopped = LIBVlg2FrameEmissionStopped();
+    526          
+    527              return (    (cFalse != bFrameEmissionStopped)
+    528                       && (cFalse == mDATRead(U1Bit, PWR_IGN, Default)));
+   \   0001   16....         MOVW      HL,#LWRD(LIBVlg2FrameEmissionStopped)
+   \   0004   A4..           MOV       E,#BYTE3(LIBVlg2FrameEmissionStopped)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   4D00           CMP       A,#0
+   \   0009   A100           MOV       A,#0
+   \   000B   AD05           BZ        ??DATVlgFalling_PWR_IGN_23
+   \   000D   7104..         MOV1      CY,S:DATDinInputBuffers+6.0
+   \   0010   01             NOT1      CY
+   \   0011   27             ROLC      A,0x1
+   \                     ??DATVlgFalling_PWR_IGN_23:
+   \   0012   B4             POP       DE
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    529          }
+    530          
+    531          //=============================================================================
+    532          //  DESCRIPTION         : process KeyIsAuthenticated control
+    533          //
+    534          //  PARAMETERS          : None
+    535          //  (Type,Name,Min,Max) 
+    536          //
+    537          //  RETURN VALUE        : None
+    538          //
+    539          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    540          //
+    541          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    542          void DATVlgKeyIsAuthenticated(void)
+   \                     DATVlgKeyIsAuthenticated:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002                  REQUIRE ?CL78K_V4_6_L00
+   \   0002                  REQUIRE ?Subroutine0
+   \   0002                  ; // Fall through to label ?Subroutine0
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001                  ; Total Auto size: 0
+   \   0001   16....         MOVW      HL,#LWRD(LIBVlg2AuthenticationSuccess)
+   \   0004   A4..           MOV       E,#BYTE3(LIBVlg2AuthenticationSuccess)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   02....         MOVW      AX,DATDbkMirrors+136
+   \   000A   16....         MOVW      HL,#LWRD(LIBVlg2UpdateSecretKey)
+   \   000D   A4..           MOV       E,#BYTE3(LIBVlg2UpdateSecretKey)
+   \   000F   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0010   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0012   5D01           AND       A,#1
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+   \   0014                  REQUIRE ??Subroutine2_0
+   \   0014                  ; // Fall through to label ??Subroutine2_0
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ??Subroutine2_0:
+   \   0000   16....         MOVW      HL,#LWRD(LIBVlg2UpdateIgnition)
+   \   0003   A4..           MOV       E,#BYTE3(LIBVlg2UpdateIgnition)
+   \   0005   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0006   16....         MOVW      HL,#LWRD(LIBVlg2ProcessData)
+   \   0009   A4..           MOV       E,#BYTE3(LIBVlg2ProcessData)
+   \   000B   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   000C   B4             POP       DE
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    543          {
+    544              LIBVlg2AuthenticationSuccess(cTrue);
+    545              DATVlgForceInputUpdate();
+    546          }
+    547          
+    548          //=============================================================================
+    549          //  DESCRIPTION         : process KeyIsNotAuthenticated control
+    550          //
+    551          //  PARAMETERS          : None
+    552          //  (Type,Name,Min,Max) 
+    553          //
+    554          //  RETURN VALUE        : None
+    555          //
+    556          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    557          //
+    558          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    559          void DATVlgKeyIsNotAuthenticated(void)
+   \                     DATVlgKeyIsNotAuthenticated:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   9B....         BR        N:?Subroutine0
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    560          {
+    561              LIBVlg2AuthenticationSuccess(cFalse);
+    562              DATVlgForceInputUpdate();
+    563          }
+    564          
+    565          //=============================================================================
+    566          //  DESCRIPTION         : Callback from LDB controling frame generation
+    567          //
+    568          //  PARAMETERS          : None
+    569          //  (Type,Name,Min,Max) 
+    570          //
+    571          //  RETURN VALUE        : None
+    572          //
+    573          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    574          //
+    575          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    576          void DATVlgCallBackCtrl(void)
+   \                     DATVlgCallBackCtrl:
+    577          {   
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    578              #ifdef X90_PROJECT // amanevd: Add 1 NOPs to preserve original location 
+    579              NOP();
+   \   0000   00             nop
+    580              #endif
+    581              if(u8LibVlg2TickCounter > 0)
+   \   0001   8E....         MOV       A,u8LibVlg2TickCounter
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD0C           BZ        ??DATVlgFalling_PWR_IGN_24
+    582              {
+    583                  #ifdef X90_PROJECT // amanevd: Add 5 NOPs to preserve original location 
+    584                  NOP();NOP();NOP();NOP();NOP();
+   \   0008   00             nop
+   \   0009   00             nop
+   \   000A   00             nop
+   \   000B   00             nop
+   \   000C   00             nop
+    585                  #endif
+    586                  LIBVlg2TimerTick();
+   \   000D   9A....         CALL      LIBVlg2TimerTick
+    587          
+    588                  u8LibVlg2TickCounter = 0;
+   \   0010   A100           MOV       A,#0
+   \   0012   FA02           BR        ??DATVlgFalling_PWR_IGN_25
+    589              }
+    590              else
+    591              {
+    592                  u8LibVlg2TickCounter++;
+   \                     ??DATVlgFalling_PWR_IGN_24:
+   \   0014   A101           MOV       A,#1
+   \                     ??DATVlgFalling_PWR_IGN_25:
+   \   0016   9E....         MOV       u8LibVlg2TickCounter,A
+    593              }
+    594          }
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    595          
+    596          //=============================================================================
+    597          //  DESCRIPTION         : Callback from LDB check for SC to GND of DIO_ECM
+    598          //
+    599          //  PARAMETERS          : None
+    600          //  (Type,Name,Min,Max) 
+    601          //
+    602          //  RETURN VALUE        : None
+    603          //
+    604          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    605          //
+    606          //=============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    607          MEM_TYPE void DATVlgCallBackEndCtrl(const tCtrl CtrlP, const tStatus StatusP)
+   \                     DATVlgCallBackEndCtrl:
+    608          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    609              U8  u8TempL;
+    610          
+    611              if(CtrlP == cLDBControlCheckDO_VERLOGSCGnd)
+   \   0000   4D0C           CMP       A,#12
+   \   0002   BD3F           BNZ       ??DATVlgFalling_PWR_IGN_7
+    612              {
+    613                  if(cLDBError == StatusP)
+   \   0004   63             MOV       A,B
+   \   0005   51             DEC       A
+   \   0006   BD35           BNZ       ??DATVlgFalling_PWR_IGN_8
+    614                  {
+    615                      bDO_VERLOGSCtoGnd = cTrue;
+   \   0008   A101           MOV       A,#1
+   \   000A   9E....         MOV       bDO_VERLOGSCtoGnd,A
+    616          
+    617                      u8FaultCounter++;
+   \   000D   8E....         MOV       A,u8FaultCounter
+   \   0010   41             INC       A
+   \   0011   9E....         MOV       u8FaultCounter,A
+    618                      if(u8FaultCounter >= cFaultCountProtectThreshold)
+   \   0014   4D3C           CMP       A,#60
+   \   0016   8D6E           BC        ??DATVlgFalling_PWR_IGN_9
+    619                      {
+    620                          mDATWrite(U1Bit, DefVerlogToGnd, 1, Default);
+   \   0018   A101           MOV       A,#1
+   \   001A   16....         MOVW      HL,#DATCmnData+9
+   \   001D   97             MOV       [HL],A
+    621                          mDATWrite(U1Bit, DefVerlogToBat, 0, Default);
+   \   001E   A100           MOV       A,#0
+   \   0020   16....         MOVW      HL,#DATCmnData+8
+   \   0023   97             MOV       [HL],A
+    622                          mDATWrite(U1Bit, EEP_DefVerlogToGnd, 1, Default);
+   \   0024   16....         MOVW      HL,#DATDbkMirrors+20
+   \   0027   318605         BT        [HL].0, ??DATVlgFalling_PWR_IGN_10
+   \   002A   7182           SET1      [HL].0
+   \   002C   9A....         CALL      DATDbkStartUpdate
+    623          
+    624                          // Enter in IgnOff State
+    625                          u8TempL = mDATRead(U8Bit, EEP_CDVerlog, Default);
+   \                     ??DATVlgFalling_PWR_IGN_10:
+   \   002F   8E....         MOV       A,DATDbkMirrors+17
+    626                          if(u8TempL < cMaxU8)
+   \   0032   41             INC       A
+   \   0033   AD51           BZ        ??DATVlgFalling_PWR_IGN_9
+    627                          {
+    628                              u8TempL ++;
+    629                              mDATWrite(U8Bit, EEP_CDVerlog, u8TempL, Default);
+   \   0035   9E....         MOV       DATDbkMirrors+17,A
+   \   0038   A100           MOV       A,#0
+   \   003A   9B....         BR        N:DATDbkStartUpdate
+    630                          }
+    631                      }
+    632                      else
+    633                      {
+    634                          // Nothing to do
+    635                      }
+    636                  }
+    637                  else
+    638                  {
+    639                      bDO_VERLOGSCtoGnd = cFalse;
+   \                     ??DATVlgFalling_PWR_IGN_8:
+   \   003D   A100           MOV       A,#0
+   \   003F   9E....         MOV       bDO_VERLOGSCtoGnd,A
+   \   0042   AF             RET       
+    640                  }
+    641              }
+    642              else if(CtrlP == cLDBControlCheckDO_VERLOGSCBat)
+   \                     ??DATVlgFalling_PWR_IGN_7:
+   \   0043   4D0D           CMP       A,#13
+   \   0045   BD3F           BNZ       ??DATVlgFalling_PWR_IGN_9
+    643              {
+    644                  if(cLDBError == StatusP)
+   \   0047   63             MOV       A,B
+   \   0048   51             DEC       A
+   \   0049   BD36           BNZ       ??DATVlgFalling_PWR_IGN_11
+    645                  {
+    646                      bDO_VERLOGSCtoBat = cTrue;
+   \   004B   A101           MOV       A,#1
+   \   004D   9E....         MOV       bDO_VERLOGSCtoBat,A
+    647          
+    648                      u8FaultCounter++;
+   \   0050   8E....         MOV       A,u8FaultCounter
+   \   0053   41             INC       A
+   \   0054   9E....         MOV       u8FaultCounter,A
+    649                      if(u8FaultCounter >= cFaultCountProtectThreshold)
+   \   0057   4D3C           CMP       A,#60
+   \   0059   8D2B           BC        ??DATVlgFalling_PWR_IGN_9
+    650                      {
+    651                          mDATWrite(U1Bit, DefVerlogToGnd, 0, Default);
+   \   005B   A100           MOV       A,#0
+   \   005D   16....         MOVW      HL,#DATCmnData+9
+   \   0060   97             MOV       [HL],A
+    652                          mDATWrite(U1Bit, DefVerlogToBat, 1, Default);
+   \   0061   A101           MOV       A,#1
+   \   0063   16....         MOVW      HL,#DATCmnData+8
+   \   0066   97             MOV       [HL],A
+    653                          mDATWrite(U1Bit, DO_VERLOGProtection, 1, Default);
+   \   0067   9E....         MOV       bDO_VERLOGProtected,A
+   \   006A   A106           MOV       A,#6
+   \   006C   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   006F   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0071   ..             CALLT     [__T_?FAR_CALL_L07]
+    654                          mDATWrite(U1Bit, EEP_DefVerlogToBat, 1, Default);
+   \   0072   16....         MOVW      HL,#DATDbkMirrors+20
+   \   0075   3196B7         BT        [HL].1, ??DATVlgFalling_PWR_IGN_10
+   \   0078   A100           MOV       A,#0
+   \   007A   7192           SET1      [HL].1
+   \   007C   9A....         CALL      DATDbkStartUpdate
+   \   007F   FAAE           BR        ??DATVlgFalling_PWR_IGN_10
+    655          
+    656                          // Enter in IgnOff State
+    657                          u8TempL = mDATRead(U8Bit, EEP_CDVerlog, Default);
+    658                          if(u8TempL < cMaxU8)
+    659                          {
+    660                              u8TempL ++;
+    661                              mDATWrite(U8Bit, EEP_CDVerlog, u8TempL, Default);
+    662                          }
+    663                      }
+    664                      else
+    665                      {
+    666                          // Nothing to do
+    667                      }
+    668                  }
+    669                  else
+    670                  {
+    671                      bDO_VERLOGSCtoBat = cFalse;
+   \                     ??DATVlgFalling_PWR_IGN_11:
+   \   0081   A100           MOV       A,#0
+   \   0083   9E....         MOV       bDO_VERLOGSCtoBat,A
+    672                  }
+    673              }
+    674              else
+    675              {
+    676                  //CCOV: amanevd: Cannot be covered because this else section rises explicit assert
+    677                  mLIBassert(cFalse);
+    678              }
+    679          }
+   \                     ??DATVlgFalling_PWR_IGN_9:
+   \   0086   AF             RET       
+   \   0087                  REQUIRE ?CL78K_V4_6_L00
+    680          //=============================================================================
+    681          //  DESCRIPTION         : Send LDB Trp control for stopping Verlog Timer
+    682          //
+    683          //  PARAMETERS          : None
+    684          //  (Type,Name,Min,Max) 
+    685          //
+    686          //  RETURN VALUE        : None
+    687          //
+    688          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    689          //
+    690          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    691          void DATVlgStopVerlogTimer(void)
+   \                     DATVlgStopVerlogTimer:
+    692          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A105           MOV       A,#5
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    693              LDBControl(cLDBChannelTrp, cLDBTrpStopVerlog);
+   \   0003   16....         MOVW      HL,#LWRD(LDBTrpControl)
+   \   0006   A4..           MOV       E,#BYTE3(LDBTrpControl)
+   \   0008   ..             CALLT     [__T_?FAR_CALL_L07]
+    694              TOSSeqDeactivateGraph(cTOSSeqGraphIdDATVlgOutputProtection);
+   \   0009   A102           MOV       A,#2
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    695              mDATWrite(U1Bit, DO_VERLOG, 0, Default);
+   \   000C   8E....         MOV       A,bDO_VERLOGDiagEnabled
+   \   000F   4D00           CMP       A,#0
+   \   0011   BD0D           BNZ       ??DATVlgFalling_PWR_IGN_26
+   \   0013   A100           MOV       A,#0
+   \   0015   9E....         MOV       bDO_VERLOG,A
+   \   0018   A106           MOV       A,#6
+   \   001A   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   001D   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   001F   ..             CALLT     [__T_?FAR_CALL_L07]
+    696          }
+   \                     ??DATVlgFalling_PWR_IGN_26:
+   \   0020   B4             POP       DE
+   \   0021   AF             RET       
+   \   0022                  REQUIRE ?CL78K_V4_6_L00
+    697          
+    698          //=============================================================================
+    699          //  DESCRIPTION         : Protection Task
+    700          //
+    701          //  PARAMETERS          : None
+    702          //  (Type,Name,Min,Max) 
+    703          //
+    704          //  RETURN VALUE        : None
+    705          //
+    706          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    707          //
+    708          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    709          void DATVlgProtectionTask(void)
+   \                     DATVlgProtectionTask:
+    710          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    711          #ifdef X90_PROJECT
+    712              DATVlgProtectionTask_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATVlgProtectionTask_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATVlgProtectionTask_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    713          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    714          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    715          static MEM_TYPE void DATVlgProtectionTask_Static(void)
+   \                     DATVlgProtectionTask_Static:
+    716          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    717          #endif
+    718          
+    719              if(     (cFalse != mDATRead(U1Bit, PWR_IGN, Default))
+    720                  &&  (cFalse == bPWR_IGNOld)
+    721                )
+   \   0000   3103..2C       BF        S:DATDinInputBuffers+6.0, ??DATVlgFalling_PWR_IGN_12
+   \   0004   8E....         MOV       A,bPWR_IGNOld
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD25           BNZ       ??DATVlgFalling_PWR_IGN_12
+    722              {
+    723                  mDATWrite(U1Bit, DO_VERLOGProtection, 0, Default);
+   \   000B   A100           MOV       A,#0
+   \   000D   9E....         MOV       bDO_VERLOGProtected,A
+   \   0010   8E....         MOV       A,bDO_VERLOG
+   \   0013   4D00           CMP       A,#0
+   \   0015   AD04           BZ        ??DATVlgFalling_PWR_IGN_13
+   \   0017   A105           MOV       A,#5
+   \   0019   FA02           BR        ??DATVlgFalling_PWR_IGN_14
+   \                     ??DATVlgFalling_PWR_IGN_13:
+   \   001B   A106           MOV       A,#6
+   \                     ??DATVlgFalling_PWR_IGN_14:
+   \   001D   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   0020   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0022   ..             CALLT     [__T_?FAR_CALL_L07]
+    724                  mDATWrite(U1Bit, DefVerlogToGnd, 0, Default);
+   \   0023   A100           MOV       A,#0
+   \   0025   16....         MOVW      HL,#DATCmnData+9
+   \   0028   97             MOV       [HL],A
+    725                  mDATWrite(U1Bit, DefVerlogToBat, 0, Default);
+   \   0029   16....         MOVW      HL,#DATCmnData+8
+   \   002C   97             MOV       [HL],A
+    726                  u8FaultCounter  = 0;
+   \   002D   9E....         MOV       u8FaultCounter,A
+    727              }
+    728          
+    729              if(     (cFalse != mDATRead(U1Bit, PWR_IGN, Immediate))
+    730                  &&  (cFalse == mDATRead(U1Bit, DO_VERLOGProtection, Default))
+    731                )
+   \                     ??DATVlgFalling_PWR_IGN_12:
+   \   0030   3103..2A       BF        S:DATDinInputBuffers+15.0, ??DATVlgFalling_PWR_IGN_15
+   \   0034   8E....         MOV       A,bDO_VERLOGProtected
+   \   0037   4D00           CMP       A,#0
+   \   0039   BD23           BNZ       ??DATVlgFalling_PWR_IGN_15
+    732              {
+    733                  LDBControl(cLDBChannelDou, cLDBControlCheckDO_VERLOGSCDetect);
+   \   003B   A10B           MOV       A,#11
+   \   003D   16....         MOVW      HL,#LWRD(LDBDouControl)
+   \   0040   A4..           MOV       E,#BYTE3(LDBDouControl)
+   \   0042   ..             CALLT     [__T_?FAR_CALL_L07]
+    734          
+    735                  if(     (cFalse == bDO_VERLOGSCtoGnd) 
+    736                      &&  (cFalse == bDO_VERLOGSCtoBat)
+    737                    )
+   \   0043   8E....         MOV       A,bDO_VERLOGSCtoGnd
+   \   0046   4D00           CMP       A,#0
+   \   0048   BD14           BNZ       ??DATVlgFalling_PWR_IGN_15
+   \   004A   8E....         MOV       A,bDO_VERLOGSCtoBat
+   \   004D   4D00           CMP       A,#0
+   \   004F   BD0D           BNZ       ??DATVlgFalling_PWR_IGN_15
+    738                  {
+    739                      u8FaultCounter = 0;
+   \   0051   A100           MOV       A,#0
+   \   0053   9E....         MOV       u8FaultCounter,A
+    740                      mDATWrite(U1Bit, DefVerlogToGnd, 0, Default);
+   \   0056   16....         MOVW      HL,#DATCmnData+9
+   \   0059   97             MOV       [HL],A
+    741                      mDATWrite(U1Bit, DefVerlogToBat, 0, Default);
+   \   005A   16....         MOVW      HL,#DATCmnData+8
+   \   005D   97             MOV       [HL],A
+    742                  }
+    743              }
+    744          
+    745              bPWR_IGNOld = mDATRead(U1Bit, PWR_IGN, Default);
+   \                     ??DATVlgFalling_PWR_IGN_15:
+   \   005E   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0060   5D01           AND       A,#1
+   \   0062   9E....         MOV       bPWR_IGNOld,A
+    746          }
+   \   0065   AF             RET       
+   \   0066                  REQUIRE ?CL78K_V4_6_L00
+    747          //=============================================================================
+    748          //  DESCRIPTION         : process StartPermanentAuthentication control
+    749          //
+    750          //  PARAMETERS          : None
+    751          //  (Type,Name,Min,Max) 
+    752          //
+    753          //  RETURN VALUE        : None
+    754          //
+    755          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    756          //
+    757          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    758          void DATVlgStartAuthentPermKey(void)
+   \                     DATVlgStartAuthentPermKey:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002                  REQUIRE ?CL78K_V4_6_L00
+   \   0002                  REQUIRE ?Subroutine1
+   \   0002                  ; // Fall through to label ?Subroutine1
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine1:
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   \   0001                  ; Total Auto size: 0
+   \   0001   16....         MOVW      HL,#LWRD(LIBVlg2PermanentAuthenticationEnabled)
+   \   0004   A4..           MOV       E,#BYTE3(LIBVlg2PermanentAuthenticationEnabled)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    759          {
+    760              LIBVlg2PermanentAuthenticationEnabled(cTrue);
+    761          }
+    762          
+    763          //=============================================================================
+    764          //  DESCRIPTION         : process StopPermanentAuthentication control
+    765          //
+    766          //  PARAMETERS          : None
+    767          //  (Type,Name,Min,Max) 
+    768          //
+    769          //  RETURN VALUE        : None
+    770          //
+    771          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    772          //
+    773          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    774          void DATVlgExitFromAuthentPermKey(void)
+   \                     DATVlgExitFromAuthentPermKey:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   9B....         BR        N:?Subroutine1
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    775          {
+    776              LIBVlg2PermanentAuthenticationEnabled(cFalse);
+    777          }
+    778          
+    779          //=============================================================================
+    780          //  DESCRIPTION         : process Falling_PWR_IGN control
+    781          //
+    782          //  PARAMETERS          : None
+    783          //  (Type,Name,Min,Max) 
+    784          //
+    785          //  RETURN VALUE        : None
+    786          //
+    787          //  DESIGN INFORMATION  : Refer to Detailed Design Document
+    788          //
+    789          //=============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    790          void DATVlgFalling_PWR_IGN(void)
+   \                     DATVlgFalling_PWR_IGN:
+    791          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    792              LIBVlg2UpdateIgnition(cFalse);
+   \   0003   9B....         BR        N:??Subroutine2_0
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    793              LIBVlg2ProcessData();
+    794          }
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqGraphState:
+   \   0000   ....           DW       TOSSeqGraphState
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     DATVlgInput                      18
+     DATVlgOutputProtection            6
+     DatVlgLocalData                   4
+     DatVlgLocalDataPrev               4
+     u8LibVlg2TickCounter              1
+     u8LibVlg2SerialTestCounter        1
+     bPWR_IGNOld                       1
+     bDO_VERLOGSCtoGnd                 1
+     bDO_VERLOGSCtoBat                 1
+     u8FaultCounter                    1
+     bDATVlgSerialTestInProgress       1
+     DATVlgSerialLineTest             96
+     DATVlgControlDigitalOutput       71
+     DATVlgInit                        9
+     DATVlgInit_Static                56
+     DATVlgControl                   118
+     DATVlgIsAnybodyMaintainActiveState
+                                      18
+     DATVlgInputProcess                9
+     DATVlgInputProcess_Static        71
+     DATVlgIsFrameEmissionStopped     20
+     DATVlgKeyIsAuthenticated          2
+     ?Subroutine0                     20
+     ??Subroutine2_0                  14
+     DATVlgKeyIsNotAuthenticated       5
+     DATVlgCallBackCtrl               26
+     DATVlgCallBackEndCtrl           135
+     DATVlgStopVerlogTimer            34
+     DATVlgProtectionTask              9
+     DATVlgProtectionTask_Static     102
+     DATVlgStartAuthentPermKey         2
+     ?Subroutine1                      9
+     DATVlgExitFromAuthentPermKey      5
+     DATVlgFalling_PWR_IGN             6
+     __T_?FAR_CALL_L07                 2
+     __T_TOSSeqGraphState              2
+     __T_TOSSeqActivateGraph           2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_TOSWriteSignal                2
+     __T_TOSSeqDeactivateGraph         2
+
+ 
+ 578 bytes in segment BCODE
+  12 bytes in segment CLTVEC
+ 259 bytes in segment CODE
+  24 bytes in segment CONST
+  15 bytes in segment NEAR_Z
+ 
+ 837 bytes of CODE  memory (+ 12 bytes shared)
+  24 bytes of CONST memory
+  15 bytes of DATA  memory
+
+Errors: none
+Warnings: none

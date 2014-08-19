@@ -1,0 +1,10 @@
+class StkCHeaderProvDATControlCriteria
+!!!231919.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+        for datControl in re.findall(r'\#define\s+mDATControl(\w+)\s*\(\s*\w+\s*\)', inpTextContent):
+            pif = self.getPortInterfaceFactory()
+            dtf = self.getDataTypeFactory()
+            clSrvIntIf = pif.getStkDATControlIf(datControl, dtf)               
+            provPort = PortInterface.ProvidedPort.ProvidedPort(clSrvIntIf)
+            provPort.setName(datControl)
+            provPort.setInterface(clSrvIntIf)
+            inoutIComponent.addPort(provPort)

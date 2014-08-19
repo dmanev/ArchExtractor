@@ -1,0 +1,110 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef lap_ala
+   extern const tTOSSeqGraphType LAPAlarms;
+   extern const tTOSSeqGraphType AlarmAfterReset; 
+#endif
+
+#ifdef lap_ala
+   extern void     LAPAlaAfterResetFinished(void);
+   extern BOOL LAPAlaArmFollowedByDisarm(void);
+   extern BOOL LAPAlaDoorStateCommandIsRequested(void);
+   extern BOOL LAPAlaFallingEdges(void);
+   extern BOOL LAPAlaIsCarSecure(void);
+   extern BOOL LAPAlaIsNotSecure(void);
+   extern BOOL LAPAlaNoFallingEdges(void);
+   extern BOOL LAPAlaPauseIsFinished(void);
+   extern void     LAPAlaSendArmCommand(void);
+   extern void     LAPAlaSendDisarmCommand(void);
+   extern void     LAPAlaSendDoorState(void);
+   extern BOOL LAPAlaSendingIsFinished(void);
+   extern void     LAPAlaSetSleepingAuthorisation(void);
+   extern void     LAPAlaStartPauseBetweenMessage(void);
+   extern void     TOSSeqNop(void);
+   extern BOOL TOSSeqTrueEval(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef lap_ala
+  const tTOSSeqGraphType LAPAlarms =
+  {
+#ifdef COMPILATION_NATIVE
+    "LAPAlarms",
+    {
+#endif
+  /*   0*/  {LAPAlaIsNotSecure,LAPAlaSendDisarmCommand,mTOSSeqRuleNumber(12),mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPAlaPauseIsFinished,LAPAlaSendDoorState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)},
+  /*   3*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*   4*/  {LAPAlaPauseIsFinished,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)},
+  /*   5*/  {LAPAlaDoorStateCommandIsRequested,LAPAlaSendDoorState,mTOSSeqRuleNumber(8),mTOSSeqRuleNumber(6)},
+  /*   6*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(7)},
+  /*   7*/  {LAPAlaPauseIsFinished,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*   8*/  {LAPAlaArmFollowedByDisarm,LAPAlaStartPauseBetweenMessage,mTOSSeqRuleNumber(10),mTOSSeqRuleNumber(9)},
+  /*   9*/  {LAPAlaPauseIsFinished,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)},
+  /*  10*/  {LAPAlaNoFallingEdges,LAPAlaSetSleepingAuthorisation,mTOSSeqRuleNumber(11),mTOSSeqRuleNumber(0)},
+  /*  11*/  {LAPAlaFallingEdges,LAPAlaSendDoorState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(6)},
+  /*  12*/  {LAPAlaIsCarSecure,LAPAlaSendArmCommand,mTOSSeqRuleNumber(17),mTOSSeqRuleNumber(13)},
+  /*  13*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(14)},
+  /*  14*/  {LAPAlaPauseIsFinished,LAPAlaSendDoorState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(15)},
+  /*  15*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(16)},
+  /*  16*/  {LAPAlaPauseIsFinished,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)},
+  /*  17*/  {TOSSeqTrueEval,TOSSeqNop,cTOSSeqInvalidRule,mTOSSeqRuleNumber(5)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef lap_ala
+  const tTOSSeqGraphType AlarmAfterReset =
+  {
+#ifdef COMPILATION_NATIVE
+    "AlarmAfterReset",
+    {
+#endif
+  /*   0*/  {LAPAlaIsNotSecure,LAPAlaSendDisarmCommand,mTOSSeqRuleNumber(5),mTOSSeqRuleNumber(1)},
+  /*   1*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(2)},
+  /*   2*/  {LAPAlaPauseIsFinished,LAPAlaSendDoorState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(3)},
+  /*   3*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(4)},
+  /*   4*/  {LAPAlaPauseIsFinished,LAPAlaAfterResetFinished,cTOSSeqInvalidRule,cTOSSeqInvalidRule},
+  /*   5*/  {LAPAlaIsCarSecure,LAPAlaSendArmCommand,cTOSSeqInvalidRule,mTOSSeqRuleNumber(6)},
+  /*   6*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(7)},
+  /*   7*/  {LAPAlaPauseIsFinished,LAPAlaSendDoorState,cTOSSeqInvalidRule,mTOSSeqRuleNumber(8)},
+  /*   8*/  {LAPAlaSendingIsFinished,LAPAlaStartPauseBetweenMessage,cTOSSeqInvalidRule,mTOSSeqRuleNumber(9)},
+  /*   9*/  {LAPAlaPauseIsFinished,LAPAlaAfterResetFinished,cTOSSeqInvalidRule,cTOSSeqInvalidRule}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

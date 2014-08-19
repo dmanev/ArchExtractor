@@ -1,0 +1,249 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:04 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\L #
+#                    IB_RND.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LIB_RND.LST -o                           #
+#                    ..\EXE\TARGET_R\LIB_RND.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\L #
+#                    IB_RND.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\LIB_RND.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LIB_RND.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LIB\LIB_RND.C
+      1          /*============================================================================
+      2            Project ......................... common
+      3            Component ....................... LIB_RND
+      4            File revision.................... 
+      5            Last modification date .......... 
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20            
+     21            -------------------------------------------------------------------------
+     22            LIB_RND.c file review : 
+     23          
+     24          
+     25            ==========================================================================*/
+     26          
+     27          /*--------------------------------------------------------------------------
+     28            Body Identification
+     29            --------------------------------------------------------------------------*/
+     30          
+     31          #define LIBRnd   "LIB_RND"
+     32          
+     33          /*-------------------------------------------------------------------------
+     34            Included files
+     35          
+     36            #include <system_file_name.h>
+     37            #include "project_file_name.h"
+     38            --------------------------------------------------------------------------*/
+     39          #include "LIB_RND.h"
+     40          
+     41          /*--------------------------------------------------------------------------
+     42            Local constants
+     43          
+     44            #define cConstantName   ((tType) ConstantValue)
+     45            --------------------------------------------------------------------------*/
+     46          // Constants for the algorithm of generation of a random number
+     47          #define cConstA                 ((U32) 0x0343FD)
+     48          #define cConstB                 ((U32) 0x269EC3)
+     49          
+     50          /*--------------------------------------------------------------------------
+     51            Local macross
+     52          
+     53            #define mMacroName   (MacroDefinition)
+     54            --------------------------------------------------------------------------*/
+     55          
+     56          
+     57          /*--------------------------------------------------------------------------
+     58            Local types
+     59          
+     60            struct  sStructureName { ... };
+     61            union   uUnionName { ... };
+     62            enum    eEnumerationName { ... };
+     63            typedef Expression tTypeName;
+     64            --------------------------------------------------------------------------*/
+     65          
+     66          
+     67          /*--------------------------------------------------------------------------
+     68            Local data
+     69          
+     70            static  tType   VariableName;
+     71            static  tType*  pVariableName; 
+     72            --------------------------------------------------------------------------*/
+     73          
+     74          
+     75          /*--------------------------------------------------------------------------
+     76            Constant local data
+     77          
+     78            static const tType  VariableName;
+     79            --------------------------------------------------------------------------*/
+     80          
+     81          
+     82          /*--------------------------------------------------------------------------
+     83            Exported data
+     84          
+     85            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     86            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     87            --------------------------------------------------------------------------*/
+     88          
+     89          
+     90          /*--------------------------------------------------------------------------
+     91            Constant exported data
+     92           
+     93            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+     94            --------------------------------------------------------------------------*/
+     95          
+     96          
+     97          /*--------------------------------------------------------------------------
+     98            Local function prototypes
+     99            
+    100            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    101            --------------------------------------------------------------------------*/
+    102          
+    103          
+    104          /*============================================================================
+    105            =========================== LOCAL FUNCTIONS ================================
+    106            ==========================================================================*/
+    107          
+    108          /*============================================================================
+    109            DESCRIPTION :
+    110            
+    111            PARAMETERS (Type,Name,Min,Max) :   none
+    112          
+    113            RETURN VALUE :   none
+    114           
+    115            DESIGN INFORMATION :   refer to Detailed Design Document
+    116            ==========================================================================*/
+    117          //static type FunctionName(...)
+    118          
+    119          
+    120          /*============================================================================
+    121            =========================== EXPORTED FUNCTIONS =============================
+    122            ==========================================================================*/
+    123          
+    124          
+    125          /*============================================================================
+    126            DESCRIPTION : Calculate a random number
+    127            
+    128            PARAMETERS (Type,Name,Min,Max) :  U32 ulSeedValue
+    129          
+    130            RETURN VALUE :  calculated number
+    131           
+    132            DESIGN INFORMATION :  refer to Detailed Design Document
+    133          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    134          U32 LIBCalculateRandomNb(U32 ulSeedValue)
+   \                     LIBCalculateRandomNb:
+    135          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    136            static U32 ulCurrentValue;
+    137          
+    138            // take in account the new Input Number
+    139            ulCurrentValue += ulSeedValue; 
+    140            ulCurrentValue  = ((cConstA * ulCurrentValue) + cConstB);
+   \   0000   160300         MOVW      HL,#3
+   \   0003   B7             PUSH      HL
+   \   0004   16FD43         MOVW      HL,#17405
+   \   0007   B7             PUSH      HL
+   \   0008   B3             PUSH      BC
+   \   0009   B1             PUSH      AX
+   \   000A   02....         MOVW      AX,??ulCurrentValue+2
+   \   000D   D2             MOVW      BC,AX
+   \   000E   02....         MOVW      AX,??ulCurrentValue
+   \   0011   D6             MOVW      HL,AX
+   \   0012   891C           MOVW      AX,SP
+   \   0014   E6             XCHW      AX,HL
+   \   0015   30             XCH       A,X
+   \   0016   0F             ADD       A,[HL]
+   \   0017   30             XCH       A,X
+   \   0018   2901           ADDC      A,[HL+0x01]
+   \   001A   E2             XCHW      AX,BC
+   \   001B   30             XCH       A,X
+   \   001C   2902           ADDC      A,[HL+0x02]
+   \   001E   30             XCH       A,X
+   \   001F   2903           ADDC      A,[HL+0x03]
+   \   0021   E2             XCHW      AX,BC
+   \   0022   B6             POP       HL
+   \   0023   B6             POP       HL
+   \   0024   ..             CALLT     [__T_?L_MUL_L03]
+   \   0025   30             XCH       A,X
+   \   0026   0DC3           ADD       A,#195
+   \   0028   30             XCH       A,X
+   \   0029   2D9E           ADDC      A,#158
+   \   002B   E2             XCHW      AX,BC
+   \   002C   30             XCH       A,X
+   \   002D   2D26           ADDC      A,#38
+   \   002F   30             XCH       A,X
+   \   0030   2D00           ADDC      A,#0
+   \   0032   E2             XCHW      AX,BC
+   \   0033   03....         MOVW      ??ulCurrentValue,AX
+   \   0036   C2             MOVW      AX,BC
+   \   0037   03....         MOVW      ??ulCurrentValue+2,AX
+    141          
+    142            return (ulCurrentValue);
+   \   003A   02....         MOVW      AX,??ulCurrentValue
+   \   003D   AF             RET       
+   \   003E                  REQUIRE ?CL78K_V4_6_L00
+    143          }
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+   \                     ??ulCurrentValue:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?L_MUL_L03:
+   \   0000   ....           DW       ?L_MUL_L03
+
+   Segment part sizes:
+
+     Function/Label       Bytes
+     --------------       -----
+     LIBCalculateRandomNb   62
+     ulCurrentValue          4
+     __T_?L_MUL_L03          2
+
+ 
+  2 bytes in segment CLTVEC
+ 62 bytes in segment CODE
+  4 bytes in segment NEAR_Z
+ 
+ 62 bytes of CODE memory (+ 2 bytes shared)
+  4 bytes of DATA memory
+
+Errors: none
+Warnings: none

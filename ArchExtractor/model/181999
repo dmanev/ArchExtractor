@@ -1,0 +1,955 @@
+format 74
+"PortInterface" // EA_Model::System::Base::SwComponent::PortInterface
+  revision 13
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Base/SwComponent/PortInterface/"
+  python_package "PortInterface"
+  classview 174447 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 261871 "PortInterfaceFactory class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 174319 "ParamData class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 167663 "SenderReceiverInterface class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 167535 "ClientServerInterface class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 167407 "RequiredPort class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 167279 "ProvidedPort class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 215023 "Operation class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 164335 "DataElement"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      classrelation 175599 // itsDataType (<directional composition>)
+	relation 175343 *-->
+	  a role_name "itsDataType" private
+	    python "${comment}${self}${name} = ${type}()
+"
+	    classrelation_ref 175599 // itsDataType (<directional composition>)
+	  b parent class_ref 170991 // DataType
+	get_oper operation_ref 307311 // get_itsDataType
+	set_oper operation_ref 307439 // set_itsDataType
+      end
+
+      classrelation 278639 // <generalisation>
+	relation 278127 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278639 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
+      end
+
+      operation 307311 "get_itsDataType"
+	force_body_gen const cpp_inline public return_type class_ref 170991 // DataType
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataType
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 175599 // itsDataType (<directional composition>)
+      end
+
+      operation 307439 "set_itsDataType"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 170991 // DataType
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsDataType = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 175599 // itsDataType (<directional composition>)
+      end
+    end
+
+    class 164207 "Operation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+      classrelation 278255 // <generalisation>
+	relation 277743 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278255 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
+      end
+
+      classrelation 175727 // itsParamList (<directional composition>)
+	relation 175471 *-->
+	  stereotype "list"
+	  a role_name "itsParamList" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 175727 // itsParamList (<directional composition>)
+	  b parent class_ref 171119 // ParamData
+	get_oper operation_ref 313967 // get_itsParamList
+	set_oper operation_ref 314095 // set_itsParamList
+      end
+
+      classrelation 219759 // itsDataType (<directional composition>)
+	relation 219503 *-->
+	  a role_name "itsDataType" private
+	    python "${comment}${self}${name} = ${type}()
+"
+	    classrelation_ref 219759 // itsDataType (<directional composition>)
+	  b parent class_ref 170991 // DataType
+	get_oper operation_ref 320879 // get_itsDataType
+	set_oper operation_ref 321007 // set_itsDataType
+      end
+
+      operation 211311 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 313967 "get_itsParamList"
+	stereotype "list"
+	force_body_gen const cpp_inline public return_type class_ref 171119 // ParamData
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsParamList
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 175727 // itsParamList (<directional composition>)
+      end
+
+      operation 314095 "set_itsParamList"
+	stereotype "list"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 171119 // ParamData
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsParamList = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 175727 // itsParamList (<directional composition>)
+      end
+
+      operation 320879 "get_itsDataType"
+	force_body_gen const cpp_inline public return_type class_ref 170991 // DataType
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataType
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 219759 // itsDataType (<directional composition>)
+      end
+
+      operation 321007 "set_itsDataType"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 170991 // DataType
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsDataType = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 219759 // itsDataType (<directional composition>)
+      end
+    end
+
+    class 164079 "SenderReceiverInterface"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 167407 // <generalisation>
+	relation 167151 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 167407 // <generalisation>
+	  b parent class_ref 163823 // IPortInterface
+      end
+
+      classrelation 167919 // itsDataElementList (<directional composition>)
+	relation 167663 *-->
+	  stereotype "list"
+	  a role_name "itsDataElementList" multiplicity "1..*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 167919 // itsDataElementList (<directional composition>)
+	  b parent class_ref 164335 // DataElement
+	get_oper operation_ref 284399 // get_itsDataElementList
+	set_oper operation_ref 284527 // set_itsDataElementList
+      end
+
+      classrelation 278127 // <generalisation>
+	relation 277615 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278127 // <generalisation>
+	  b parent class_ref 258799 // PackageableElement
+      end
+
+      operation 284399 "get_itsDataElementList"
+	stereotype "list"
+	force_body_gen const cpp_inline public return_type class_ref 164335 // DataElement
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataElementList
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 167919 // itsDataElementList (<directional composition>)
+      end
+
+      operation 284527 "set_itsDataElementList"
+	stereotype "list"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 164335 // DataElement
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsDataElementList = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 167919 // itsDataElementList (<directional composition>)
+      end
+    end
+
+    class 163695 "ProvidedPort"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 167151 // <generalisation>
+	relation 166895 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 167151 // <generalisation>
+	  b parent class_ref 130287 // IPort
+      end
+
+      classrelation 167535 // itsIPortInterface (<directional composition>)
+	relation 167279 *-->
+	  a role_name "itsIPortInterface" private
+	    python "${comment}${self}${name} = ${type}()
+"
+	    classrelation_ref 167535 // itsIPortInterface (<directional composition>)
+	  b parent class_ref 163823 // IPortInterface
+      end
+
+      operation 166767 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortIf" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      classrelation 168175 // <generalisation>
+	relation 167919 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 168175 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
+      end
+
+      operation 202991 "getInterface"
+	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 203119 "setInterface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpIf" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 163951 "ClientServerInterface"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 167279 // <generalisation>
+	relation 167023 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 167279 // <generalisation>
+	  b parent class_ref 163823 // IPortInterface
+      end
+
+      classrelation 167791 // itsOperationList (<directional composition>)
+	relation 167535 *-->
+	  stereotype "list"
+	  a role_name "itsOperationList" multiplicity "1..*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 167791 // itsOperationList (<directional composition>)
+	  b parent class_ref 164207 // Operation
+	get_oper operation_ref 293615 // get_itsOperationList
+      end
+
+      classrelation 278511 // <generalisation>
+	relation 277999 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278511 // <generalisation>
+	  b parent class_ref 258799 // PackageableElement
+      end
+
+      operation 293615 "get_itsOperationList"
+	stereotype "list"
+	force_body_gen const cpp_inline public return_type class_ref 164207 // Operation
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsOperationList
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 167791 // itsOperationList (<directional composition>)
+      end
+    end
+
+    class 163823 "IPortInterface"
+      visibility package stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+      explicit_switch_type ""
+      
+    end
+
+    class 163567 "RequiredPort"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 167023 // <generalisation>
+	relation 166767 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 167023 // <generalisation>
+	  b parent class_ref 130287 // IPort
+      end
+
+      classrelation 167663 // itsIPortInterface (<directional composition>)
+	relation 167407 *-->
+	  a role_name "itsIPortInterface" private
+	    python "${comment}${self}${name} = ${type}()
+"
+	    classrelation_ref 167663 // itsIPortInterface (<directional composition>)
+	  b parent class_ref 163823 // IPortInterface
+      end
+
+      operation 166895 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpIPortIf" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      classrelation 168303 // <generalisation>
+	relation 168047 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 168303 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
+      end
+
+      operation 203247 "getInterface"
+	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 203375 "setInterface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpIf" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 130287 "IPort"
+      abstract visibility public stereotype "interface"
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 166255 "getInterface"
+	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 166383 "setInterface"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpIf" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 171119 "ParamData"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 175983 // itsDataType (<directional composition>)
+	relation 175727 *-->
+	  a role_name "itsDataType" private
+	    python "${comment}${self}${name} = ${type}()
+"
+	    classrelation_ref 175983 // itsDataType (<directional composition>)
+	  b parent class_ref 170991 // DataType
+	get_oper operation_ref 314223 // get_itsDataType
+	set_oper operation_ref 314351 // set_itsDataType
+      end
+
+      classrelation 278383 // <generalisation>
+	relation 277871 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 278383 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
+      end
+
+      operation 314223 "get_itsDataType"
+	force_body_gen const cpp_inline public return_type class_ref 170991 // DataType
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsDataType
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 175983 // itsDataType (<directional composition>)
+      end
+
+      operation 314351 "set_itsDataType"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" type class_ref 170991 // DataType
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.itsDataType = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_relation classrelation_ref 175983 // itsDataType (<directional composition>)
+      end
+    end
+
+    class 258287 "PortInterfaceFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 275311 // itsIPortInterfaceMap (<directional aggregation>)
+	relation 274927 o-->
+	  stereotype "map"
+	  a role_name "itsIPortInterfaceMap" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 275311 // itsIPortInterfaceMap (<directional aggregation>)
+	  b parent class_ref 163823 // IPortInterface
+	get_oper operation_ref 300655 // get_itsIPortInterfaceMap
+      end
+
+      operation 252783 "getAbstractPortInterface"
+	preserve_cpp_body_indent private return_type class_ref 163823 // IPortInterface
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpClass" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 252143 "getSenderReceiverIf"
+	preserve_cpp_body_indent public return_type class_ref 164079 // SenderReceiverInterface
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpDataElementList" type class_ref 164335 // DataElement
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 252271 "getClientServerIf"
+	preserve_cpp_body_indent public return_type class_ref 163951 // ClientServerInterface
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 275439 // <dependency>
+	relation 275055 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 275439 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
+
+      classrelation 275567 // <dependency>
+	relation 275183 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 275567 // <dependency>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      operation 300655 "get_itsIPortInterfaceMap"
+	stereotype "map"
+	force_body_gen const cpp_inline public return_type class_ref 163823 // IPortInterface
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsIPortInterfaceMap
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 275311 // itsIPortInterfaceMap (<directional aggregation>)
+      end
+    end
+  end
+
+  deploymentview 141167 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 169839 "ParamData"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 171119 // ParamData
+      end
+    end
+
+    artifact 169583 "Operation"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 164207 // Operation
+      end
+    end
+
+    artifact 169455 "DataElement"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 164335 // DataElement
+      end
+    end
+
+    artifact 162927 "SenderReceiverInterface"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 164079 // SenderReceiverInterface
+      end
+    end
+
+    artifact 162799 "ClientServerInterface"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 163951 // ClientServerInterface
+      end
+    end
+
+    artifact 162671 "IPortInterface"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      php_src "<?php
+${comment}
+${require_once}
+${definition}
+?>
+"
+      python_src "${comment}
+${import}
+${definition}"
+      idl_src "#ifndef ${MODULE}_${NAME}_H
+#define ${MODULE}_${NAME}_H
+
+${comment}
+${includes}
+${module_start}
+${definition}
+${module_end}
+#endif
+"
+      associated_classes
+	class_ref 163823 // IPortInterface
+      end
+    end
+
+    artifact 162543 "RequiredPort"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 163567 // RequiredPort
+      end
+    end
+
+    artifact 162415 "ProvidedPort"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 163695 // ProvidedPort
+      end
+    end
+
+    artifact 162287 "IPort"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 130287 // IPort
+      end
+    end
+
+    artifact 162031 "IPortCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 130415 // IPortCriteria
+      end
+    end
+
+    artifact 250607 "PortInterfaceFactory"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 258287 // PortInterfaceFactory
+      end
+    end
+  end
+end

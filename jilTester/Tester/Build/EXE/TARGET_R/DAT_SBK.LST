@@ -1,0 +1,1275 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:22 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_SBK.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_SBK.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_SBK.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_SBK.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_SBK.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_SBK.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_SBK.C
+      1          /*=========================================================================
+      2            Function ........................ DAT
+      3            Component ....................... DAT_SBK
+      4            PVCS File revision............... :   1.0  $
+      5            Last modification date .......... $Modtime:   Apr 25 2009 21:02:24  $
+      6            ------------------------------------------------------------------------- 
+      7            Copyright ...... This software is JCI property. Duplication or 
+      8            disclosure is prohibited without the JCI writen authorization
+      9            ------------------------------------------------------------------------- 
+     10            DAT_SBK component exported function definition 
+     11            
+     12            This file DAT_SBK.c is compile and a DAT_SBK.o is generated
+     13            The object file includes the functions exported by the component.
+     14            
+     15            - The macros, constatnts et types wich are not exported are defined in 
+     16            this file
+     17            - The variables and functions which are not exported are defined in this 
+     18            file wich the static key word
+     19            
+     20            -------------------------------------------------------------------------
+     21            Document reference : see the DAT_SBK.h file
+     22            ------------------------------------------------------------------------- 
+     23            Component presentation : see the DAT_SBK.h file
+     24            -------------------------------------------------------------------------
+     25            Comments on the component (algorithm, structure, limitations, ...)
+     26          
+     27            -------------------------------------------------------------------------
+     28            DAT_SBK.c file review : 
+     29            
+     30            21/08/2001 : AV - Alexandre Vion (OW1003)
+     31          
+     32            =========================================================================*/
+     33          
+     34          /*-------------------------------------------------------------------------
+     35            Body Identification
+     36            -------------------------------------------------------------------------*/
+     37          
+     38          
+     39          #define DAT_SBK    "dat_sbk"
+     40          
+     41          /*-------------------------------------------------------------------------
+     42            Included files
+     43          
+     44            #include <nom_du_ficher_systeme.h>
+     45            #include "nom_du_ficher_utilisateur.h"
+     46            -------------------------------------------------------------------------*/ 
+     47          
+     48          
+     49          #include "lib.h"              /* defini les types et constantes de bases */
+     50          #include "DAT_Sbk.h"
+     51          #include "Dat_Eep.h"
+     52          
+     53          /*-------------------------------------------------------------------------
+     54            Local constants
+     55          
+     56            #define cNomConstante   ValeurDeLaConstante
+     57            -------------------------------------------------------------------------*/  
+     58          
+     59          /////////////////////////////////////////////////////////////////////////////
+     60          // Bank flags : Mask definitions
+     61          /////////////////////////////////////////////////////////////////////////////
+     62          
+     63          // ModeFlag ? WriteMode : ReadMode
+     64          #define   cFlag_ModeFlag          ((U8) 0x01)
+     65          
+     66          // ErrorFlag ? WritingError : NoError
+     67          #define   cFlag_ErrorFlag         ((U8) 0x02)
+     68          
+     69          /*-------------------------------------------------------------------------
+     70            Local macro
+     71          
+     72            #define mNomMacro   (DefinitionDeLaMacro)
+     73            -------------------------------------------------------------------------*/  
+     74          
+     75          /////////////////////////////////////////////////////////////////////////////
+     76          // Handle conversions (between DAT_SBK and DAT_EEP)
+     77          /////////////////////////////////////////////////////////////////////////////
+     78          
+     79          #define mConv_DatSbkHandle_To_DatEepHandle(HandleSbk)        \
+     80                      ((tDATEepProcessHandle)     (HandleSbk + cDATSbkFirstProcessHandle))
+     81          
+     82          #define mConv_DatEepHandle_To_DatSbkHandle(HandleEep)        \
+     83                      ((tDATSbkSingleBankHandle)  (HandleEep - cDATSbkFirstProcessHandle))
+     84          
+     85          
+     86          /////////////////////////////////////////////////////////////////////////////
+     87          // Bank flag acces
+     88          /////////////////////////////////////////////////////////////////////////////
+     89          
+     90          // Macro for "Mode" acces
+     91          #define   mBankFlag_SetReadMode(SINGLE_BANK_HANDLE)                   \
+     92                      { SingleBankFlags[SINGLE_BANK_HANDLE] &= ~cFlag_ModeFlag; } /* Reset    "cFlag_ModeFlag"  */  
+     93          
+     94          #define   mBankFlag_SetWriteMode(SINGLE_BANK_HANDLE)                  \
+     95                      { SingleBankFlags[SINGLE_BANK_HANDLE] |=  cFlag_ModeFlag; }  /* Set      "cFlag_ModeFlag"  */  
+     96          
+     97          // Macro for "Mode" tests
+     98          #define   mBankFlag_IsReadMode(SINGLE_BANK_HANDLE)                    \
+     99                      ( mBankFlag_IsWriteMode(SINGLE_BANK_HANDLE) == cFalse)       /* !"cFlag_ModeFlag" ?        */  
+    100          
+    101          #define   mBankFlag_IsWriteMode(SINGLE_BANK_HANDLE)                   \
+    102                      ( SingleBankFlags[SINGLE_BANK_HANDLE] & cFlag_ModeFlag )    /* "cFlag_ModeFlag" ?         */  
+    103          
+    104          
+    105          // Macro for "Error" acces
+    106          #define   mBankFlag_SetNoError(SINGLE_BANK_HANDLE)                    \
+    107                      { SingleBankFlags[SINGLE_BANK_HANDLE] &= ~cFlag_ErrorFlag; }  /* Reset  "cFlag_ErrorFlag" */
+    108          
+    109          #define   mBankFlag_SetWritingError(SINGLE_BANK_HANDLE)               \
+    110                      { SingleBankFlags[SINGLE_BANK_HANDLE] |=  cFlag_ErrorFlag; }  /* Set    "cFlag_ErrorFlag" */
+    111          
+    112          // Macro for "Error" test
+    113          #define   mBankFlag_IsWritingError(SINGLE_BANK_HANDLE)                  \
+    114                      ( SingleBankFlags[SINGLE_BANK_HANDLE] & cFlag_ErrorFlag )     /* "cFlag_ErrorFlag" ?      */
+    115          
+    116          
+    117          /*-------------------------------------------------------------------------
+    118            Local type
+    119          
+    120            struct  sNomStructure { ... };
+    121            union   uNomUnion { ... };
+    122            enum    eNomEnumeration { ... };
+    123            typedef Expression tNomType;
+    124            -------------------------------------------------------------------------*/
+    125          
+    126          // StateChart State's ...
+    127          typedef enum
+    128          {
+    129              cChartState_Wait,
+    130              cChartState_Writing,
+    131              cChartState_Reading,
+    132              cChartState_CompareAfterReading
+    133          }     S8tState;
+    134          
+    135          /*-------------------------------------------------------------------------
+    136            Local data
+    137          
+    138            static  tType   NomVariable;
+    139            static  tType*  pNomVariable; 
+    140            -------------------------------------------------------------------------*/
+    141          
+    142          // Bank Flags
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    143          static  U8          SingleBankFlags[cNbSbk];
+   \                     SingleBankFlags:
+   \   0000                  DS 5
+   \   0005                  REQUIRE __INIT_NEAR_Z
+    144          
+    145          // StateChart current state
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    146          static  S8tState     ChartState;
+   \                     ChartState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    147          
+    148          // StateChart current reading retry
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    149          static  U8          DatSbk_CurrentNumberOfReadingRetry;
+   \                     DatSbk_CurrentNumberOfReadingRetry:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    150          
+    151          /*-------------------------------------------------------------------------
+    152            Constant local Data
+    153          
+    154            static const tType  NomVariable;
+    155            -------------------------------------------------------------------------*/  
+    156          
+    157          // Structure en ROM qui permet d'acceder aux adresses des SBK
+
+   \                                 In  segment CONST, align 2
+    158          const tDATSbkTableBankRom DATSbkTableBankRom [cNbSbk] =
+   \                     DATSbkTableBankRom:
+   \   0000   ....           DW DATSbkMirrors
+   \   0002   0500           DB 5, 0
+   \   0004   ....           DW DATSbkMirrors + 0AH
+   \   0006   0D00           DB 13, 0
+   \   0008   ....           DW DATSbkMirrors + 24H
+   \   000A   0100           DB 1, 0
+   \   000C   ....           DW DATSbkMirrors + 26H
+   \   000E   0A00           DB 10, 0
+   \   0010   ....           DW DATSbkMirrors + 3AH
+   \   0012   0100           DB 1, 0
+    159              {
+    160                  mDATSbkInitTableBankROM()
+    161              };
+    162          
+    163          /*-------------------------------------------------------------------------
+    164            Exported data
+    165          
+    166            tType   COMNomVariable;          (COM: 3 lettres identifiant ce composant)
+    167            tType*  pCOMNomVariable;         (COM: 3 lettres identifiant ce composant)
+    168            -------------------------------------------------------------------------*/ 
+    169          
+    170          // variable definissant toutes les simples banques en RAM
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    171          tDATSbkMirrors    DATSbkMirrors;
+   \                     DATSbkMirrors:
+   \   0000                  DS 60
+   \   003C                  REQUIRE __INIT_NEAR_Z
+    172          
+    173          /*-------------------------------------------------------------------------
+    174            Constant exported data
+    175           
+    176            const tType   COMNomVariable;    (COM: 3 lettres identifiant ce composant)
+    177            -------------------------------------------------------------------------*/ 
+    178          
+    179          /*-------------------------------------------------------------------------
+    180            Local functions prototype
+    181            
+    182            static tTypeRetour NomFonction(tTypeArgument1 NomArgument1, ... );
+    183            -------------------------------------------------------------------------*/
+    184          
+    185          // 16bits CheckSum (general) Computing function
+    186          static  U16 Compute16BitsCheckSum (U16* Buffer, U16 BufferSizeInWords);
+    187          
+    188          #ifdef X90_PROJECT
+    189          static MEM_TYPE void DATSbkCallBackEep_Static( tDATEepProcessHandle DATEepProcessHandle, BOOL DATEepCallBackStatusIsOk );
+    190          #endif
+    191          
+    192          /*.........................................................................
+    193            ........................... LOCAL FUNCTIONS..............................
+    194            .........................................................................*/
+    195          
+    196          /*=========================================================================
+    197          ! Function .........
+    198          ! void DATSbkInit (void)
+    199          !--------------------------------------------------------------------------
+    200          ! Function purpose :
+    201          ! init for DAT_SBK component
+    202          !--------------------------------------------------------------------------
+    203          ! Precondition (parameters):
+    204          !
+    205          ! Type            Name                           Min          Max
+    206          ! -------------------------------------------------------------------------
+    207          !
+    208          !--------------------------------------------------------------------------
+    209          ! Postcondition (return values):
+    210          !
+    211          ! Type            Name                           Min          Max
+    212          ! -------------------------------------------------------------------------
+    213          !
+    214          !--------------------------------------------------------------------------
+    215          ! Function review:
+    216          !
+    217          !
+    218          !==========================================================================*/
+    219          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    220          void DATSbkInit (void)
+   \                     DATSbkInit:
+    221          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    222              // StateChart Reset (very important)
+    223              ChartState                          =  cChartState_Wait;
+   \   0004   9E....         MOV       ChartState,A
+    224          
+    225              // Current reading retry reset (not important)
+    226              DatSbk_CurrentNumberOfReadingRetry  = 0;
+   \   0007   9E....         MOV       DatSbk_CurrentNumberOfReadingRetry,A
+    227          
+    228              // Single Bank flags reset (not important)
+    229              mLIBmemset(SingleBankFlags, 0x00, sizeof(SingleBankFlags));
+   \   000A   10....         MOVW      AX,#SingleBankFlags
+   \   000D   140500         MOVW      DE,#5
+   \   0010   120000         MOVW      BC,#0
+   \   0013   9A....         CALL      memset
+    230          }
+   \   0016   B4             POP       DE
+   \   0017   B2             POP       BC
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    231          
+    232          /*=========================================================================
+    233          ! Function .........
+    234          ! U16 Compute16BitsCheckSum (U16* Buffer, U16 BufferSizeInWords)
+    235          !--------------------------------------------------------------------------
+    236          ! Function purpose :
+    237          ! 16bits CheckSum calculation on a *16bits* buffer 
+    238          !
+    239          !--------------------------------------------------------------------------
+    240          ! Precondition (parameters):
+    241          !
+    242          ! Type            Name                           Min          Max
+    243          ! -------------------------------------------------------------------------
+    244          ! U16*        Buffer                         16bits Buffer pointor 
+    245          ! U16         BufferSizeInWords              0            ...          
+    246          !--------------------------------------------------------------------------
+    247          ! Postcondition (return values):
+    248          !
+    249          ! Type            Name                           Min          Max
+    250          ! -------------------------------------------------------------------------
+    251          ! U16         CheckSum                        0            0xFFFF
+    252          !--------------------------------------------------------------------------
+    253          ! Function review:
+    254          !
+    255          ! Return the sum'inverse
+    256          !==========================================================================*/
+    257          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    258          U16 Compute16BitsCheckSum (U16* Buffer, U16 BufferSizeInWords)
+   \                     Compute16BitsCheckSum:
+    259          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001   B3             PUSH      BC
+   \   0002                  ; Total Auto size: 2
+   \   0002   D4             MOVW      DE,AX
+    260              U16 Checksum = 0;
+   \   0003   120000         MOVW      BC,#0
+   \   0006   891C           MOVW      AX,SP
+   \   0008   D6             MOVW      HL,AX
+   \   0009   87             MOV       A,[HL]
+   \   000A   70             MOV       X,A
+   \   000B   AE01           MOV       A,[HL+0x01]
+   \   000D   6168           OR        A,X
+   \   000F   AD20           BZ        ??DATSbkCallBackEep_Static_0
+    261          
+    262              //// Used in debug mode to check param  ////
+    263              mLIBassert(Buffer != NULL);
+    264          
+    265              // Compute the check-sum
+    266              while (BufferSizeInWords > 0)
+    267              {
+    268                  Checksum += *Buffer;
+   \                     ??Compute16BitsCheckSum_0:
+   \   0011   C4             MOVW      AX,DE
+   \   0012   D6             MOVW      HL,AX
+   \   0013   87             MOV       A,[HL]
+   \   0014   70             MOV       X,A
+   \   0015   AE01           MOV       A,[HL+0x01]
+   \   0017   30             XCH       A,X
+   \   0018   610A           ADD       A,C
+   \   001A   30             XCH       A,X
+   \   001B   612B           ADDC      A,B
+   \   001D   D2             MOVW      BC,AX
+    269          
+    270                  // Inc./Dec.
+    271                  Buffer++;
+   \   001E   84             INCW      DE
+   \   001F   84             INCW      DE
+    272                  BufferSizeInWords--;
+    273              }
+   \   0020   891C           MOVW      AX,SP
+   \   0022   D6             MOVW      HL,AX
+   \   0023   87             MOV       A,[HL]
+   \   0024   70             MOV       X,A
+   \   0025   AE01           MOV       A,[HL+0x01]
+   \   0027   90             DECW      AX
+   \   0028   30             XCH       A,X
+   \   0029   97             MOV       [HL],A
+   \   002A   30             XCH       A,X
+   \   002B   BE01           MOV       [HL+0x01],A
+   \   002D   6168           OR        A,X
+   \   002F   BDE0           BNZ       ??Compute16BitsCheckSum_0
+    274          
+    275              // Return the inverse of the check-sum value
+    276              return (~Checksum);
+   \                     ??DATSbkCallBackEep_Static_0:
+   \   0031   C2             MOVW      AX,BC
+   \   0032   30             XCH       A,X
+   \   0033   7DFF           XOR       A,#255
+   \   0035   30             XCH       A,X
+   \   0036   7DFF           XOR       A,#255
+   \   0038   B2             POP       BC
+   \   0039   B4             POP       DE
+   \   003A   AF             RET       
+   \   003B                  REQUIRE ?CL78K_V4_6_L00
+    277          }
+    278          
+    279          
+    280          
+    281          /*.........................................................................
+    282            ........................... EXPORTED FUNCTIONS. .........................
+    283            .........................................................................*/
+    284          
+    285          
+    286          
+    287          
+    288          /*=========================================================================
+    289          ! Function .........
+    290          BOOL DATSbkIsBankProcessing ( tDATSbkSingleBankHandle HandleSbk )
+    291          !--------------------------------------------------------------------------
+    292          ! Function purpose :
+    293          ! check if single bank writing is terminated
+    294          !--------------------------------------------------------------------------
+    295          ! Precondition (parameters):
+    296          !
+    297          ! Type            Name                           Min          Max
+    298          ! -------------------------------------------------------------------------
+    299          !tDATSbkSingleBankHandle HandleSbk                0            cNbSbk-1
+    300          !--------------------------------------------------------------------------
+    301          ! Postcondition (return values):
+    302          !
+    303          ! Type            Name                           Min          Max
+    304          ! -------------------------------------------------------------------------
+    305          ! BOOL    IsBankProcessing                    cFalse        cTrue
+    306          !--------------------------------------------------------------------------
+    307          ! Function review:
+    308          !
+    309          !
+    310          !==========================================================================*/
+    311          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    312          BOOL DATSbkIsBankProcessing ( tDATSbkSingleBankHandle HandleSbk )
+   \                     DATSbkIsBankProcessing:
+    313          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    314              /// Used in debug mode to check param  ////
+    315              mLIBassert( HandleSbk < cNbSbk );
+    316          
+    317              // Return ("HandleSbk" Bank is processing ?)
+    318              return DATEepIsActivate (mConv_DatSbkHandle_To_DatEepHandle(HandleSbk));
+   \   0000   9B....         BR        N:DATEepIsActivate
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    319          }
+    320          
+    321          
+    322          /*=========================================================================
+    323          ! Function .........
+    324          BOOL DATSbkIsProcessing ( void )
+    325          !--------------------------------------------------------------------------
+    326          ! Function purpose :
+    327          ! check if all single bank writing is terminated
+    328          !--------------------------------------------------------------------------
+    329          ! Precondition (parameters):
+    330          !
+    331          ! Type            Name                           Min          Max
+    332          ! -------------------------------------------------------------------------
+    333          !
+    334          !--------------------------------------------------------------------------
+    335          ! Postcondition (return values):
+    336          !
+    337          ! Type            Name                           Min          Max
+    338          ! -------------------------------------------------------------------------
+    339          ! BOOL    IsTerminate                          cFalse        cTrue
+    340          !--------------------------------------------------------------------------
+    341          ! Function review:
+    342          !
+    343          !
+    344          !==========================================================================*/
+    345          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    346          BOOL DATSbkIsProcessing ( void )
+   \                     DATSbkIsProcessing:
+    347          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    348              tDATSbkSingleBankHandle HandleSbk;
+    349              BOOL                IsProcessing = cFalse;
+   \   0001   A300           MOV       B,#0
+    350          
+    351              // Check all banks ...
+    352              for (HandleSbk = 0; HandleSbk < cNbSbk; HandleSbk++)
+   \   0003   A200           MOV       C,#0
+    353              {
+    354                  if (DATSbkIsBankProcessing(HandleSbk) == cTrue)
+   \                     ??DATSbkIsProcessing_0:
+   \   0005   62             MOV       A,C
+   \   0006   9A....         CALL      DATEepIsActivate
+   \   0009   51             DEC       A
+   \   000A   BD04           BNZ       ??DATSbkCallBackEep_Static_1
+    355                  {
+    356                      /* ok */
+    357                      IsProcessing = cTrue;
+   \   000C   A301           MOV       B,#1
+    358          
+    359                      /* Force "End of checking" */
+    360                      HandleSbk = cNbSbk;         // <=> break; (in order to avoid a QAC warning)
+   \   000E   A205           MOV       C,#5
+    361                  }
+    362              }
+   \                     ??DATSbkCallBackEep_Static_1:
+   \   0010   42             INC       C
+   \   0011   62             MOV       A,C
+   \   0012   4D05           CMP       A,#5
+   \   0014   8DEF           BC        ??DATSbkIsProcessing_0
+    363          
+    364              // Return
+    365              return IsProcessing;
+   \   0016   63             MOV       A,B
+   \   0017   B2             POP       BC
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    366          }
+    367          
+    368          /*=========================================================================
+    369          ! Function .........
+    370          void DATSbkStartReadingAllBanks ( void )
+    371          !--------------------------------------------------------------------------
+    372          ! Function purpose :
+    373          ! reading EEPROM to RAM for all single banks
+    374          !--------------------------------------------------------------------------
+    375          ! Precondition (parameters):
+    376          !
+    377          ! Type            Name                           Min          Max
+    378          ! -------------------------------------------------------------------------
+    379          !
+    380          !--------------------------------------------------------------------------
+    381          ! Postcondition (return values):
+    382          !
+    383          ! Type            Name                           Min          Max
+    384          ! -------------------------------------------------------------------------
+    385          ! 
+    386          !--------------------------------------------------------------------------
+    387          ! Function review:
+    388          !
+    389          !
+    390          !==========================================================================*/
+    391          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    392          void DATSbkStartReadingAllBanks ( void )
+   \                     DATSbkStartReadingAllBanks:
+    393          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    394              tDATSbkSingleBankHandle HandleSbk;
+    395          
+    396              // Reading request for all banks ...
+    397              for (HandleSbk = 0; HandleSbk < cNbSbk; HandleSbk++)
+   \   0002   A200           MOV       C,#0
+   \   0004   14....         MOVW      DE,#SingleBankFlags
+    398              {
+    399                  DATSbkStartReading (HandleSbk);
+   \                     ??DATSbkStartReadingAllBanks_0:
+   \   0007   C4             MOVW      AX,DE
+   \   0008   D6             MOVW      HL,AX
+   \   0009   62             MOV       A,C
+   \   000A   7183           CLR1      [HL].0
+   \   000C   9A....         CALL      DATEepProcessRequest
+    400              }
+   \   000F   42             INC       C
+   \   0010   62             MOV       A,C
+   \   0011   84             INCW      DE
+   \   0012   4D05           CMP       A,#5
+   \   0014   8DF1           BC        ??DATSbkStartReadingAllBanks_0
+    401          }
+   \   0016   B4             POP       DE
+   \   0017   B2             POP       BC
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    402          
+    403          /*=========================================================================
+    404          ! Function .........
+    405          void DATSbkStartReading ( tDATSbkSingleBankHandle Handle )
+    406          !--------------------------------------------------------------------------
+    407          ! Function purpose :
+    408          ! reading EEPROM to RAM for one single bank
+    409          !--------------------------------------------------------------------------
+    410          ! Precondition (parameters):
+    411          !
+    412          ! Type            Name                           Min          Max
+    413          ! -------------------------------------------------------------------------
+    414          !tDATSbkSingleBankHandle HandleSbk                0            cNbSbk-1
+    415          !--------------------------------------------------------------------------
+    416          ! Postcondition (return values):
+    417          !
+    418          ! Type            Name                           Min          Max
+    419          ! -------------------------------------------------------------------------
+    420          ! 
+    421          !--------------------------------------------------------------------------
+    422          ! Function review:
+    423          !
+    424          !
+    425          !==========================================================================*/
+    426          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    427          void DATSbkStartReading ( tDATSbkSingleBankHandle HandleSbk )
+   \                     DATSbkStartReading:
+    428          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    429              //// Used in debug mode to check param  ////
+    430              mLIBassert( HandleSbk < cNbSbk );
+    431          
+    432              //// This assert check that this single-bank is'nt processing yet ////
+    433              mLIBassert(DATSbkIsBankProcessing(HandleSbk) == cFalse);
+    434          
+    435              //// Starting Reading process ...
+    436              mBankFlag_SetReadMode(HandleSbk);
+   \   0002   70             MOV       X,A
+   \   0003   A100           MOV       A,#0
+   \   0005   CA....         ADDW      AX,#SingleBankFlags
+   \   0008   D6             MOVW      HL,AX
+   \   0009   62             MOV       A,C
+   \   000A   7183           CLR1      [HL].0
+    437              DATEepProcessRequest(mConv_DatSbkHandle_To_DatEepHandle(HandleSbk));
+   \   000C   9A....         CALL      DATEepProcessRequest
+    438          }
+   \   000F   B2             POP       BC
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    439          
+    440          
+    441          /*=========================================================================
+    442          ! Function .........
+    443          void DATSbkStartUpdate ( tDATSbkSingleBankHandle HandleSbk )
+    444          !--------------------------------------------------------------------------
+    445          ! Function purpose :
+    446          ! writing RAM to EEPROM for one single bank
+    447          !--------------------------------------------------------------------------
+    448          ! Precondition (parameters):
+    449          !
+    450          ! Type            Name                           Min          Max
+    451          ! -------------------------------------------------------------------------
+    452          !tDATSbkSingleBankHandle HandleSbk                0            cNbSbk-1
+    453          !--------------------------------------------------------------------------
+    454          ! Postcondition (return values):
+    455          !
+    456          ! Type            Name                           Min          Max
+    457          ! -------------------------------------------------------------------------
+    458          ! 
+    459          !--------------------------------------------------------------------------
+    460          ! Function review:
+    461          !
+    462          !
+    463          !==========================================================================*/
+    464          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    465          void DATSbkStartUpdate ( tDATSbkSingleBankHandle HandleSbk )
+   \                     DATSbkStartUpdate:
+    466          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    467              //// Used in debug mode to check param  ////
+    468              mLIBassert( HandleSbk < cNbSbk );
+    469          
+    470              // If a write request occurs during a read operation,
+    471              // this request is ignored.
+    472              // This test is a robustness test. The else branch can'not be
+    473              // covered in unitary test.
+    474              if(  (DATSbkIsBankProcessing(HandleSbk) == cFalse) ||
+    475                   (mBankFlag_IsReadMode (HandleSbk)  == cFalse)    )
+   \   0002   9A....         CALL      DATEepIsActivate
+   \   0005   4D00           CMP       A,#0
+   \   0007   AD0B           BZ        ??DATSbkCallBackEep_Static_2
+   \   0009   62             MOV       A,C
+   \   000A   70             MOV       X,A
+   \   000B   A100           MOV       A,#0
+   \   000D   CA....         ADDW      AX,#SingleBankFlags
+   \   0010   D6             MOVW      HL,AX
+   \   0011   31870E         BF        [HL].0, ??DATSbkCallBackEep_Static_3
+    476              {
+    477                  //// Starting Writing process ...
+    478                  mBankFlag_SetWriteMode(HandleSbk);
+   \                     ??DATSbkCallBackEep_Static_2:
+   \   0014   62             MOV       A,C
+   \   0015   70             MOV       X,A
+   \   0016   A100           MOV       A,#0
+   \   0018   CA....         ADDW      AX,#SingleBankFlags
+   \   001B   D6             MOVW      HL,AX
+   \   001C   62             MOV       A,C
+   \   001D   7182           SET1      [HL].0
+    479                  DATEepProcessRequest(mConv_DatSbkHandle_To_DatEepHandle(HandleSbk));
+   \   001F   9A....         CALL      DATEepProcessRequest
+    480              }
+    481              else
+    482              {
+    483                  // The EEPROM users can'not request to write during the reading.
+    484                  mLIBassert( cFalse );
+    485              }
+    486          }
+   \                     ??DATSbkCallBackEep_Static_3:
+   \   0022   B2             POP       BC
+   \   0023   AF             RET       
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    487          
+    488          
+    489          /*=========================================================================
+    490          ! Function .........
+    491          BOOL DATSbkIsWriteOk( tDATSbkSingleBankHandle HandleSbk )
+    492          !--------------------------------------------------------------------------
+    493          ! Function purpose :
+    494          ! check if single bank writing is correctly terminated
+    495          !--------------------------------------------------------------------------
+    496          ! Precondition (parameters):
+    497          !
+    498          ! Type            Name                           Min          Max
+    499          ! -------------------------------------------------------------------------
+    500          !tDATSbkSingleBankHandle HandleSbk                0            cNbSbk-1
+    501          !--------------------------------------------------------------------------
+    502          ! Postcondition (return values):
+    503          !
+    504          ! Type            Name                           Min          Max
+    505          ! -------------------------------------------------------------------------
+    506          ! BOOL        IsWriteOk                        cFalse        cTrue
+    507          !--------------------------------------------------------------------------
+    508          ! Function review:
+    509          !
+    510          !
+    511          !==========================================================================*/
+    512          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    513          BOOL DATSbkIsWriteOk( tDATSbkSingleBankHandle HandleSbk )
+   \                     DATSbkIsWriteOk:
+    514          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    515              BOOL IsWriteOk = cFalse;
+   \   0001   A200           MOV       C,#0
+    516          
+    517              //// Used in debug mode to check param  ////
+    518              mLIBassert( HandleSbk < cNbSbk );
+    519          
+    520              // Check error flag ...
+    521              if (mBankFlag_IsWritingError(HandleSbk) == cFalse)
+   \   0003   70             MOV       X,A
+   \   0004   A100           MOV       A,#0
+   \   0006   CA....         ADDW      AX,#SingleBankFlags
+   \   0009   D6             MOVW      HL,AX
+   \   000A   319602         BT        [HL].1, ??DATSbkCallBackEep_Static_4
+    522              {
+    523                  /* ok */
+    524                  IsWriteOk = cTrue;
+   \   000D   A201           MOV       C,#1
+    525              }
+    526          
+    527              // Return
+    528              return IsWriteOk;
+   \                     ??DATSbkCallBackEep_Static_4:
+   \   000F   62             MOV       A,C
+   \   0010   B2             POP       BC
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    529          }
+    530          
+    531          
+    532          /*=========================================================================
+    533          ! Function .........
+    534          void DATSbkCallBackEep ( tDATEepProcessHandle DATEepProcessHandle, BOOL DATEepCallBackStatusIsOk )
+    535          !--------------------------------------------------------------------------
+    536          ! Function purpose :
+    537          !  DAT_EEP call this function when previous treatment is terminated
+    538          !
+    539          !--------------------------------------------------------------------------
+    540          ! Precondition (parameters):
+    541          !
+    542          ! Type            Name                           Min          Max
+    543          ! -------------------------------------------------------------------------
+    544          !
+    545          !--------------------------------------------------------------------------
+    546          ! Postcondition (return values):
+    547          !
+    548          ! Type            Name                           Min          Max
+    549          ! -------------------------------------------------------------------------
+    550          ! 
+    551          !--------------------------------------------------------------------------
+    552          ! Function review:
+    553          !
+    554          ! Callback musn't return before calling DAT_EEP function !
+    555          !
+    556          !==========================================================================*/
+    557          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    558          void DATSbkCallBackEep ( tDATEepProcessHandle DATEepProcessHandle, BOOL DATEepCallBackStatusIsOk )
+   \                     DATSbkCallBackEep:
+    559          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    560          #ifdef X90_PROJECT
+    561              DATSbkCallBackEep_Static(DATEepProcessHandle, DATEepCallBackStatusIsOk);
+   \   0001   16....         MOVW      HL,#LWRD(DATSbkCallBackEep_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATSbkCallBackEep_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    562          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    563          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    564          static MEM_TYPE void DATSbkCallBackEep_Static( tDATEepProcessHandle DATEepProcessHandle, BOOL DATEepCallBackStatusIsOk )
+   \                     DATSbkCallBackEep_Static:
+    565          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 4
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+   \   0003   72             MOV       C,A
+    566          #endif    
+    567              tDATSbkSingleBankHandle       HandleSbk;
+    568                  
+    569              U16*                      Sbk_AddBlockRam;
+    570              tDATEepOffset                 Sbk_SizeBlockRam;
+    571          
+    572              // Get the current Sbk Handle
+    573              HandleSbk         = mConv_DatEepHandle_To_DatSbkHandle(DATEepProcessHandle);
+    574          
+    575              //// Used in debug mode to check param  ////
+    576              mLIBassert(HandleSbk < cNbSbk);
+    577          
+    578              // Get information on current Sbk bank
+    579              Sbk_AddBlockRam   = DATSbkTableBankRom[HandleSbk].AddBlockRam;
+   \   0004   74             MOV       E,A
+   \   0005   A500           MOV       D,#0
+   \   0007   C4             MOVW      AX,DE
+   \   0008   21             CLR1      CY
+   \   0009   30             XCH       A,X
+   \   000A   27             ROLC      A,0x1
+   \   000B   30             XCH       A,X
+   \   000C   27             ROLC      A,0x1
+   \   000D   30             XCH       A,X
+   \   000E   27             ROLC      A,0x1
+   \   000F   30             XCH       A,X
+   \   0010   27             ROLC      A,0x1
+   \   0011   CA....         ADDW      AX,#DATSbkTableBankRom
+   \   0014   D6             MOVW      HL,AX
+   \   0015   87             MOV       A,[HL]
+   \   0016   70             MOV       X,A
+   \   0017   AE01           MOV       A,[HL+0x01]
+   \   0019   D6             MOVW      HL,AX
+   \   001A   891C           MOVW      AX,SP
+   \   001C   E6             XCHW      AX,HL
+   \   001D   BE03           MOV       [HL+0x03],A
+   \   001F   60             MOV       A,X
+   \   0020   BE02           MOV       [HL+0x02],A
+    580              Sbk_SizeBlockRam  = DATSbkTableBankRom[HandleSbk].SizeBlockRam;
+   \   0022   C4             MOVW      AX,DE
+   \   0023   21             CLR1      CY
+   \   0024   30             XCH       A,X
+   \   0025   27             ROLC      A,0x1
+   \   0026   30             XCH       A,X
+   \   0027   27             ROLC      A,0x1
+   \   0028   30             XCH       A,X
+   \   0029   27             ROLC      A,0x1
+   \   002A   30             XCH       A,X
+   \   002B   27             ROLC      A,0x1
+   \   002C   CA....         ADDW      AX,#DATSbkTableBankRom+2
+   \   002F   D6             MOVW      HL,AX
+   \   0030   87             MOV       A,[HL]
+   \   0031   77             MOV       H,A
+   \   0032   891C           MOVW      AX,SP
+   \   0034   E6             XCHW      AX,HL
+   \   0035   97             MOV       [HL],A
+    581          
+    582              ///////////////////////////////////////////////////////////////////////
+    583              // State Mate :)
+    584              // (Continue treatment routine ...)
+    585              ///////////////////////////////////////////////////////////////////////
+    586              switch (ChartState)
+   \   0036   8E....         MOV       A,ChartState
+   \   0039   4D00           CMP       A,#0
+   \   003B   AD15           BZ        ??DATSbkCallBackEep_Static_5
+   \   003D   4D01           CMP       A,#1
+   \   003F   AD6F           BZ        ??DATSbkCallBackEep_Static_6
+   \   0041   4D02           CMP       A,#2
+   \   0043   BD03           BNZ       $+5
+   \   0045   9B....         BR        N:??DATSbkCallBackEep_Static_7
+   \   0048   4D03           CMP       A,#3
+   \   004A   BD03           BNZ       $+5
+   \   004C   9B....         BR        N:??DATSbkCallBackEep_Static_8
+   \   004F   9B....         BR        N:??DATSbkCallBackEep_Static_9
+    587              {
+    588          
+    589                  ///////////////////////////////////////////////////////////////////////
+    590                  // Waiting for the activated process ?
+    591                  ///////////////////////////////////////////////////////////////////////
+    592              case cChartState_Wait:
+    593          
+    594                  ////////////////////////////////////////////////////
+    595                  // Performe a writing operation ?
+    596                  ////////////////////////////////////////////////////
+    597                  if (mBankFlag_IsWriteMode(HandleSbk) == cTrue)
+   \                     ??DATSbkCallBackEep_Static_5:
+   \   0052   C4             MOVW      AX,DE
+   \   0053   CA....         ADDW      AX,#SingleBankFlags
+   \   0056   D6             MOVW      HL,AX
+   \   0057   31873B         BF        [HL].0, ??DATSbkCallBackEep_Static_10
+    598                  {
+    599                      // >>> Get ready for "Writing" <<<
+    600                      ChartState = cChartState_Writing;
+   \   005A   A101           MOV       A,#1
+   \   005C   9E....         MOV       ChartState,A
+    601          
+    602                      // Store data into DAT_EEP buffer
+    603                      // (keep one 16bits-word for check-sum at the buffer'top)
+    604                      mLIBmemcpy ((U8 *) (DATEepBuffer + 1),
+    605                                  (U8 *) (Sbk_AddBlockRam), Sbk_SizeBlockRam * sizeof(U16));
+   \   005F   891C           MOVW      AX,SP
+   \   0061   D6             MOVW      HL,AX
+   \   0062   87             MOV       A,[HL]
+   \   0063   A002           MOV       X,#2
+   \   0065   3188           MULU      X
+   \   0067   D4             MOVW      DE,AX
+   \   0068   AE02           MOV       A,[HL+0x02]
+   \   006A   70             MOV       X,A
+   \   006B   AE03           MOV       A,[HL+0x03]
+   \   006D   D2             MOVW      BC,AX
+   \   006E   10....         MOVW      AX,#DATEepBuffer+2
+   \   0071   9A....         CALL      memcpy
+    606          
+    607                      // Compute the 16bits check-sum (of DAT_EEP)
+    608                      // and store it at the DAT_EEP buffer'top
+    609                      DATEepBuffer[0] = Compute16BitsCheckSum (DATEepBuffer+1, Sbk_SizeBlockRam);
+   \   0074   891C           MOVW      AX,SP
+   \   0076   D6             MOVW      HL,AX
+   \   0077   87             MOV       A,[HL]
+   \   0078   72             MOV       C,A
+   \   0079   10....         MOVW      AX,#DATEepBuffer+2
+   \   007C   A300           MOV       B,#0
+   \   007E   9A....         CALL      Compute16BitsCheckSum
+   \   0081   03....         MOVW      DATEepBuffer,AX
+    610          
+    611          
+    612                      // Now, let's go for writing operation by the way of DAT_EEP
+    613                      DATEepWrite (DATEepBuffer, (tDATEepOffset)0, (tDATEepOffset)(1 + Sbk_SizeBlockRam));
+   \   0084   891C           MOVW      AX,SP
+   \   0086   D6             MOVW      HL,AX
+   \   0087   87             MOV       A,[HL]
+   \   0088   41             INC       A
+   \   0089   72             MOV       C,A
+   \   008A   10....         MOVW      AX,#DATEepBuffer
+   \   008D   A300           MOV       B,#0
+   \   008F   9A....         CALL      DATEepWrite
+   \   0092   9B....         BR        N:??DATSbkCallBackEep_Static_9
+    614                      // NOTA : "+1" is for the 16bits check-sum (at the top of the bank)
+    615                  }
+    616                  else
+    617                      ////////////////////////////////////////////////////
+    618                      // or Performe a reading operation ?
+    619                      ////////////////////////////////////////////////////
+    620                  {
+    621                      // >>> Get ready for "Reading" state <<<
+    622                      ChartState = cChartState_Reading;
+   \                     ??DATSbkCallBackEep_Static_10:
+   \   0095   A102           MOV       A,#2
+   \   0097   9E....         MOV       ChartState,A
+    623          
+    624                      // Reset "current number of reading retry"
+    625                      DatSbk_CurrentNumberOfReadingRetry = 0;
+   \   009A   A100           MOV       A,#0
+   \   009C   9E....         MOV       DatSbk_CurrentNumberOfReadingRetry,A
+    626          
+    627                      // Now, let's go for reading operation by the way of DAT_EEP
+    628                      DATEepRead(DATEepBuffer, (tDATEepOffset)0, (tDATEepOffset)(1 + Sbk_SizeBlockRam));
+   \   009F   891C           MOVW      AX,SP
+   \   00A1   D6             MOVW      HL,AX
+   \   00A2   87             MOV       A,[HL]
+   \   00A3   41             INC       A
+   \   00A4   72             MOV       C,A
+   \   00A5   10....         MOVW      AX,#DATEepBuffer
+   \   00A8   A300           MOV       B,#0
+   \   00AA   9A....         CALL      DATEepRead
+   \   00AD   9B....         BR        N:??DATSbkCallBackEep_Static_9
+    629                      // NOTA : "+1" is for the 16bits check-sum (at the top of the bank)
+    630                  }
+    631          
+    632          
+    633          
+    634                  break;
+    635          
+    636          
+    637                  ///////////////////////////////////////////////////////////////////////
+    638                  // Waiting for the terminated writing process ?
+    639                  ///////////////////////////////////////////////////////////////////////
+    640              case cChartState_Writing:
+    641          
+    642                  // Writing process is done (bye bye)
+    643                  ChartState = cChartState_Wait;
+   \                     ??DATSbkCallBackEep_Static_6:
+   \   00B0   A100           MOV       A,#0
+   \   00B2   9E....         MOV       ChartState,A
+    644                  DATEepTerminateProcess();
+   \   00B5   9A....         CALL      DATEepTerminateProcess
+    645          
+    646                  // Check for error reporting
+    647                  if (DATEepCallBackStatusIsOk == cTrue)
+   \   00B8   63             MOV       A,B
+   \   00B9   51             DEC       A
+   \   00BA   C4             MOVW      AX,DE
+   \   00BB   BD09           BNZ       ??DATSbkCallBackEep_Static_11
+    648                  {
+    649                      /* No error detected */
+    650                      mBankFlag_SetNoError(HandleSbk);
+   \   00BD   CA....         ADDW      AX,#SingleBankFlags
+   \   00C0   D6             MOVW      HL,AX
+   \   00C1   7193           CLR1      [HL].1
+   \   00C3   9B....         BR        N:??DATSbkCallBackEep_Static_9
+    651                  }
+    652                  else
+    653                  {
+    654                      /* Write Error detected ! */
+    655                      mBankFlag_SetWritingError(HandleSbk);
+   \                     ??DATSbkCallBackEep_Static_11:
+   \   00C6   CA....         ADDW      AX,#SingleBankFlags
+   \   00C9   D6             MOVW      HL,AX
+   \   00CA   62             MOV       A,C
+   \   00CB   7192           SET1      [HL].1
+    656                      DATPeeSingleBankErrorIndication(HandleSbk, cDATSbkErrorWriting);
+   \   00CD   A301           MOV       B,#1
+   \   00CF   16....         MOVW      HL,#LWRD(DATPeeSingleBankErrorIndication)
+   \   00D2   A4..           MOV       E,#BYTE3(DATPeeSingleBankErrorIndication)
+   \   00D4   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   00D5   9B....         BR        N:??DATSbkCallBackEep_Static_9
+    657                  }
+    658          
+    659                  break;
+    660          
+    661          
+    662                  ///////////////////////////////////////////////////////////////////////
+    663                  // Waiting for the terminated reading process ?
+    664                  ///////////////////////////////////////////////////////////////////////
+    665              case cChartState_Reading:
+    666          
+    667                  // Make a copy of DAT_EEP buffer into DAT_SBK current ram buffer (without the 16bits check-sum)...
+    668                  mLIBmemcpy ((U8 *) (Sbk_AddBlockRam),
+    669                              (U8 *) (DATEepBuffer + 1), Sbk_SizeBlockRam * sizeof(U16));
+   \                     ??DATSbkCallBackEep_Static_7:
+   \   00D8   87             MOV       A,[HL]
+   \   00D9   A002           MOV       X,#2
+   \   00DB   3188           MULU      X
+   \   00DD   D4             MOVW      DE,AX
+   \   00DE   12....         MOVW      BC,#DATEepBuffer+2
+   \   00E1   AE02           MOV       A,[HL+0x02]
+   \   00E3   70             MOV       X,A
+   \   00E4   AE03           MOV       A,[HL+0x03]
+   \   00E6   9A....         CALL      memcpy
+    670          
+    671          
+    672                  // Check the 16bits check-sum (locate at the bank'top) ...
+    673                  if (Compute16BitsCheckSum(DATEepBuffer + 1, Sbk_SizeBlockRam) == DATEepBuffer[0])
+   \   00E9   891C           MOVW      AX,SP
+   \   00EB   D6             MOVW      HL,AX
+   \   00EC   87             MOV       A,[HL]
+   \   00ED   72             MOV       C,A
+   \   00EE   10....         MOVW      AX,#DATEepBuffer+2
+   \   00F1   A300           MOV       B,#0
+   \   00F3   9A....         CALL      Compute16BitsCheckSum
+   \   00F6   30             XCH       A,X
+   \   00F7   18....         SUB       A,DATEepBuffer
+   \   00FA   30             XCH       A,X
+   \   00FB   38....         SUBC      A,DATEepBuffer+1
+   \   00FE   6168           OR        A,X
+   \   0100   BD0A           BNZ       ??DATSbkCallBackEep_Static_12
+    674                  {
+    675                      // The Reading process is done (bye bye)
+    676                      ChartState = cChartState_Wait;
+   \   0102   A100           MOV       A,#0
+   \   0104   9E....         MOV       ChartState,A
+    677                      DATEepTerminateProcess();
+   \   0107   9A....         CALL      DATEepTerminateProcess
+   \   010A   FA5B           BR        ??DATSbkCallBackEep_Static_9
+    678                  }
+    679                  else  // Error detected, start "Compare" process
+    680                  {
+    681                      // >>> Get ready for "Compare" state <<<
+    682                      ChartState = cChartState_CompareAfterReading;
+   \                     ??DATSbkCallBackEep_Static_12:
+   \   010C   A103           MOV       A,#3
+   \   010E   9E....         MOV       ChartState,A
+    683          
+    684                      // Now, let's go for compare operation by the way of DAT_EEP
+    685                      DATEepCompare(DATEepBuffer, (tDATEepOffset)0, (tDATEepOffset)(1 + Sbk_SizeBlockRam));
+   \   0111   891C           MOVW      AX,SP
+   \   0113   D6             MOVW      HL,AX
+   \   0114   87             MOV       A,[HL]
+   \   0115   41             INC       A
+   \   0116   72             MOV       C,A
+   \   0117   10....         MOVW      AX,#DATEepBuffer
+   \   011A   A300           MOV       B,#0
+   \   011C   9A....         CALL      DATEepCompare
+   \   011F   FA46           BR        ??DATSbkCallBackEep_Static_9
+    686                      // NOTA : "+1" is for the 16bits check-sum (at the top of the bank)
+    687                  }
+    688          
+    689                  break;
+    690          
+    691          
+    692                  ///////////////////////////////////////////////////////////////////////
+    693                  // Waiting for the terminated "Compare After Reading" process ?
+    694                  ///////////////////////////////////////////////////////////////////////
+    695              case cChartState_CompareAfterReading:
+    696          
+    697                  // Check compare error status (Compare Ok ?)
+    698                  if (DATEepCallBackStatusIsOk == cTrue)
+   \                     ??DATSbkCallBackEep_Static_8:
+   \   0121   63             MOV       A,B
+   \   0122   51             DEC       A
+   \   0123   BD0A           BNZ       ??DATSbkCallBackEep_Static_13
+    699                  {
+    700                      // Compare process is done (bye bye)
+    701                      ChartState = cChartState_Wait;
+   \   0125   A100           MOV       A,#0
+   \   0127   9E....         MOV       ChartState,A
+    702                      DATEepTerminateProcess();
+   \   012A   9A....         CALL      DATEepTerminateProcess
+    703          
+    704                      // Compare Ok => bank is broken (this bank must be rebuild par DAT_PEE)
+    705                      DATPeeRebuildSingleBank(HandleSbk);
+   \   012D   FA31           BR        ??DATSbkCallBackEep_Static_14
+    706                  }
+    707                  else  // Noisy reading => re-start reading process !
+    708                  {
+    709                      // Can we re-start reading process ?
+    710                      if (DatSbk_CurrentNumberOfReadingRetry < cSbk_NbRetryReadDatEepMax)
+   \                     ??DATSbkCallBackEep_Static_13:
+   \   012F   8E....         MOV       A,DatSbk_CurrentNumberOfReadingRetry
+   \   0132   4D64           CMP       A,#100
+   \   0134   9D19           BNC       ??DATSbkCallBackEep_Static_15
+    711                      {
+    712                          // >>> Get ready for "Reading" state <<<
+    713                          ChartState = cChartState_Reading;
+   \   0136   A102           MOV       A,#2
+   \   0138   9E....         MOV       ChartState,A
+    714          
+    715                          // Now, let's go for retry reading operation
+    716                          DatSbk_CurrentNumberOfReadingRetry++;
+   \   013B   8E....         MOV       A,DatSbk_CurrentNumberOfReadingRetry
+   \   013E   41             INC       A
+   \   013F   9E....         MOV       DatSbk_CurrentNumberOfReadingRetry,A
+    717                          DATEepRead(DATEepBuffer, (tDATEepOffset)0, (tDATEepOffset)(1 + Sbk_SizeBlockRam));
+   \   0142   87             MOV       A,[HL]
+   \   0143   41             INC       A
+   \   0144   72             MOV       C,A
+   \   0145   10....         MOVW      AX,#DATEepBuffer
+   \   0148   A300           MOV       B,#0
+   \   014A   9A....         CALL      DATEepRead
+   \   014D   FA18           BR        ??DATSbkCallBackEep_Static_9
+    718                          // NOTA : "+1" is for the 16bits check-sum (at the top of the bank)
+    719          
+    720                      } else  // Max retry reached !
+    721                      {
+    722                          // Compare process is done (bye bye)
+    723                          ChartState = cChartState_Wait;
+   \                     ??DATSbkCallBackEep_Static_15:
+   \   014F   A100           MOV       A,#0
+   \   0151   9E....         MOV       ChartState,A
+    724                          DATEepTerminateProcess();
+   \   0154   9A....         CALL      DATEepTerminateProcess
+    725          
+    726                          /* Write Error reporting (external only) and
+    727                             Inform the DAT_PEE compoment in order to rebuild the current bank */
+    728                          DATPeeSingleBankErrorIndication(HandleSbk, cDATSbkErrorReading);
+   \   0157   62             MOV       A,C
+   \   0158   A300           MOV       B,#0
+   \   015A   16....         MOVW      HL,#LWRD(DATPeeSingleBankErrorIndication)
+   \   015D   A4..           MOV       E,#BYTE3(DATPeeSingleBankErrorIndication)
+   \   015F   ..             CALLT     [__T_?FAR_CALL_L07]
+    729                          DATPeeRebuildSingleBank(HandleSbk);
+   \                     ??DATSbkCallBackEep_Static_14:
+   \   0160   62             MOV       A,C
+   \   0161   16....         MOVW      HL,#LWRD(DATPeeRebuildSingleBank)
+   \   0164   A4..           MOV       E,#BYTE3(DATPeeRebuildSingleBank)
+   \   0166   ..             CALLT     [__T_?FAR_CALL_L07]
+    730                      }
+    731                  }
+    732          
+    733                  break;
+    734          
+    735          
+    736                  ///////////////////////////////////////////////////////////////////////
+    737                  // Default/Error State
+    738                  ///////////////////////////////////////////////////////////////////////
+    739              default:
+    740                  mLIBassert(cFalse);    /* error report */
+    741                  break;
+    742              }
+    743          }
+   \                     ??DATSbkCallBackEep_Static_9:
+   \   0167   B0             POP       AX
+   \   0168   B0             POP       AX
+   \   0169   B2             POP       BC
+   \   016A   AF             RET       
+   \   016B                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+    744          
+    745          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     SingleBankFlags                   5
+     ChartState                        1
+     DatSbk_CurrentNumberOfReadingRetry
+                                       1
+     DATSbkTableBankRom               20
+     DATSbkMirrors                    60
+     DATSbkInit                       25
+     Compute16BitsCheckSum            59
+     DATSbkIsBankProcessing            3
+     DATSbkIsProcessing               25
+     DATSbkStartReadingAllBanks       25
+     DATSbkStartReading               17
+     DATSbkStartUpdate                36
+     DATSbkIsWriteOk                  18
+     DATSbkCallBackEep                 9
+     DATSbkCallBackEep_Static        363
+     __T_?FAR_CALL_L07                 2
+
+ 
+ 363 bytes in segment BCODE
+   2 bytes in segment CLTVEC
+ 217 bytes in segment CODE
+  20 bytes in segment CONST
+  67 bytes in segment NEAR_Z
+ 
+ 580 bytes of CODE  memory (+ 2 bytes shared)
+  20 bytes of CONST memory
+  67 bytes of DATA  memory
+
+Errors: none
+Warnings: none

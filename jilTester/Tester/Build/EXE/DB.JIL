@@ -1,0 +1,4498 @@
+   /*==================  IMPLEMENTATION ==============*/ 
+
+IMPLEMENTATION Implementation 
+{
+AnalogInputManager
+{
+	UINT32 SamplingPeriodMs[0..1] = 10;
+	UINT32[1..32] ConverterBitSize;
+	UINT32[8..32] CalculationBitSize[0..1] = 32;
+	UINT32[1..255] NbrOfChannels;
+	UINT32 DefaultTimeConstantMs[0..1] = 80;
+	UINT32 DefaultAllowedShiftPerCent[0..1] = 10;
+	BOOLEAN ForceFastAlogorithm[0..1] = FALSE;
+
+};
+
+Channel
+{
+	STRING LDBPCFileName :"Ex : ParamCAN.cpp";
+	STRING LDBChannelID :"Ex: cLDBCanalCan";
+	BOOLEAN IsAddressed[0..1] = FALSE;
+	BOOLEAN FlowPI[0..1] = FALSE;
+	BOOLEAN FlowCI[0..1] = FALSE;
+	BOOLEAN FlowPNI[0..1] = FALSE;
+	BOOLEAN FlowCNI[0..1] = FALSE;
+	Channel\Intel_TYPE Intel[0..*];
+	Channel\Motorola_TYPE Motorola[0..*];
+	ENUM [
+		Motorola
+,		Intel
+
+		]Format;
+
+	Channel\Control_TYPE Control[0..*];
+	Channel\Dat_TYPE Dat[0..*];
+	Channel\GetSet_TYPE GetSet[0..*];
+	ENUM [
+		GetSet
+,		Dat
+
+		]DataApi[0..1];
+
+	STRING DATFileName :"Ex : DAT_CPLx.h";
+	STRING DATPrefix :"Ex : DATCpl";
+
+};
+
+Channel\Intel
+{
+
+};
+
+Channel\Motorola
+{
+
+};
+
+Channel\Control
+{
+	STRING ID :"Ex :cLDBCanStart";
+	Channel\Control\Upward_TYPE Upward[0..*];
+	Channel\Control\Downward_TYPE Downward[0..*];
+	ENUM [
+		Downward
+,		Upward
+
+		]Direction;
+
+	UINT32 LDBPCSendingTimeUs[0..1] = 0;
+
+};
+
+Channel\Control\Upward
+{
+
+};
+
+Channel\Control\Downward
+{
+
+};
+
+Component
+{
+	Component\Data_TYPE Data[0..*];
+	Component\Message_TYPE Message[0..*];
+	Component\ChannelMessage_TYPE ChannelMessage[0..*];
+	Component\In_TYPE In[0..*];
+	Component\Out_TYPE Out[0..*];
+	Component\Task_TYPE Task[0..*];
+	Component\TaskPriority_TYPE TaskPriority[0..*];
+	Component\CallBack_TYPE CallBack[0..*];
+	Component\ActivateTask_TYPE ActivateTask[0..*];
+	Component\SetSignal_TYPE SetSignal[0..*];
+	ENUM [
+SetSignal
+,ActivateTask
+,CallBack
+
+		]OnControl[0..*];
+
+	Component\ProdControl_TYPE ProdControl[0..*];
+	Component\Signal_TYPE Signal[0..*];
+	Component\Npg_TYPE Npg[0..*];
+	Component\Resource_TYPE Resource[0..*];
+	Component\Graph_TYPE Graph[0..*];
+	Component\GraphGroup_TYPE GraphGroup[0..*];
+
+};
+
+Component\Data
+{
+	Component\Data\Message_TYPE Message[0..*];
+	Component\Data\AnalogInput_TYPE AnalogInput[0..*];
+	ENUM [
+		AnalogInput
+,		Message
+,		DirectInput
+,		DirectOutput
+
+		]Specialization[0..1] = Message;
+
+	Component\Data\U1_TYPE U1[0..*];
+	Component\Data\U8_TYPE U8[0..*];
+	Component\Data\S8_TYPE S8[0..*];
+	Component\Data\U16_TYPE U16[0..*];
+	Component\Data\S16_TYPE S16[0..*];
+	Component\Data\U32_TYPE U32[0..*];
+	Component\Data\S32_TYPE S32[0..*];
+	Component\Data\U8Array_TYPE U8Array[0..*];
+	Component\Data\S8Array_TYPE S8Array[0..*];
+	Component\Data\U16Array_TYPE U16Array[0..*];
+	Component\Data\S16Array_TYPE S16Array[0..*];
+	Component\Data\U32Array_TYPE U32Array[0..*];
+	Component\Data\S32Array_TYPE S32Array[0..*];
+	ENUM [
+		S32Array
+,		U32Array
+,		S16Array
+,		U16Array
+,		S8Array
+,		U8Array
+,		S32
+,		U32
+,		S16
+,		U16
+,		S8
+,		U8
+,		U1
+
+		]Type;
+
+	Component\Data\DefaultRead\Immediate_TYPE DefaultRead\Immediate[0..*];
+	Component\Data\DefaultRead\Delayed_TYPE DefaultRead\Delayed[0..*];
+	ENUM [
+		DefaultRead\Delayed
+,		DefaultRead\Immediate
+
+		]DefaultRead[0..1];
+
+	Component\Data\DefaultWrite\Immediate_TYPE DefaultWrite\Immediate[0..*];
+	Component\Data\DefaultWrite\Delayed_TYPE DefaultWrite\Delayed[0..*];
+	ENUM [
+		DefaultWrite\Delayed
+,		DefaultWrite\Immediate
+
+		]DefaultWrite[0..1];
+
+	BOOLEAN Generate[0..1] = TRUE;
+	BOOLEAN HwProtectAccess[0..1] = FALSE :"Generate Hw protect macro";
+	BOOLEAN DiagAccess[0..1] = FALSE :"Generate Diag access macros";
+	UINT32 ResetValue[0..*];
+	UINT32 DefaultValue[0..*];
+	UINT32 BytePosition[0..1];
+	UINT32[0..7] BitPosition[0..1];
+	UINT32 BitSize[0..1];
+	Component\Data\DirectInput_TYPE DirectInput[0..*];
+	Component\Data\DirectOutput_TYPE DirectOutput[0..*];
+
+};
+
+Component\Data\Message
+{
+
+};
+
+Component\Data\AnalogInput
+{
+	UINT32 TimeConstantMs[0..1];
+	UINT32 AllowedShiftPerCent[0..1];
+
+};
+
+Component\Message
+{
+	UINT32 Length;
+	Component\Data_TYPE Data[0..*];
+	Component\Message\DefaultRead\Immediate_TYPE DefaultRead\Immediate[0..*];
+	Component\Message\DefaultRead\Delayed_TYPE DefaultRead\Delayed[0..*];
+	ENUM [
+		DefaultRead\Delayed
+,		DefaultRead\Immediate
+
+		]DefaultRead[0..1];
+
+	Component\Message\DefaultWrite\Immediate_TYPE DefaultWrite\Immediate[0..*];
+	Component\Message\DefaultWrite\Delayed_TYPE DefaultWrite\Delayed[0..*];
+	ENUM [
+		DefaultWrite\Delayed
+,		DefaultWrite\Immediate
+
+		]DefaultWrite[0..1];
+
+	BOOLEAN LDBPCAutoReceive[0..1] = FALSE;
+	UINT32 LDBPCSendingTimeUs[0..1] = 0;
+	BOOLEAN LDBPCVarLenght[0..1] = FALSE;
+
+};
+
+Component\ChannelMessage
+{
+	Component\Message_TYPE Message :"Reference to a message";
+	Channel_TYPE Channel :"Reference to a single dat api provider";
+	UINT32 ID[0..1] = 0;
+	Component\ChannelMessage\Sent_TYPE Sent[0..*];
+	Component\ChannelMessage\Received_TYPE Received[0..*];
+	Component\ChannelMessage\BiDir_TYPE BiDir[0..*];
+	Component\ChannelMessage\Internal_TYPE Internal[0..*];
+	ENUM [
+		Internal
+,		BiDir
+,		Received
+,		Sent
+
+		]Type;
+
+	Component\ChannelMessage\Upward_TYPE Upward[0..*];
+	Component\ChannelMessage\Downward_TYPE Downward[0..*];
+	ENUM [
+		Downward
+,		Upward
+
+		]Direction;
+
+	UINT32 LDBPCSendingTimeUs[0..1] = 0;
+	UINT32 PeriodUs[0..1] = 0;
+	UINT32 PhaseUs[0..1] = 0;
+
+};
+
+Component\ChannelMessage\Sent
+{
+
+};
+
+Component\ChannelMessage\Received
+{
+
+};
+
+Component\ChannelMessage\BiDir
+{
+
+};
+
+Component\ChannelMessage\Internal
+{
+
+};
+
+Component\ChannelMessage\Upward
+{
+
+};
+
+Component\ChannelMessage\Downward
+{
+
+};
+
+Component\In
+{
+	Component\In\U1_TYPE U1[0..*];
+	Component\In\U8_TYPE U8[0..*];
+	Component\In\S8_TYPE S8[0..*];
+	Component\In\U16_TYPE U16[0..*];
+	Component\In\S16_TYPE S16[0..*];
+	Component\In\U32_TYPE U32[0..*];
+	Component\In\S32_TYPE S32[0..*];
+	Component\In\U8Array_TYPE U8Array[0..*];
+	Component\In\S8Array_TYPE S8Array[0..*];
+	Component\In\U16Array_TYPE U16Array[0..*];
+	Component\In\S16Array_TYPE S16Array[0..*];
+	Component\In\U32Array_TYPE U32Array[0..*];
+	Component\In\S32Array_TYPE S32Array[0..*];
+	ENUM [
+		S32Array
+,		U32Array
+,		S16Array
+,		U16Array
+,		S8Array
+,		U8Array
+,		S32
+,		U32
+,		S16
+,		U16
+,		S8
+,		U8
+,		U1
+
+		]Type;
+
+	STRING Data;
+
+};
+
+Component\In\U1
+{
+
+};
+
+Component\In\U8
+{
+
+};
+
+Component\In\S8
+{
+
+};
+
+Component\In\U16
+{
+
+};
+
+Component\In\S16
+{
+
+};
+
+Component\In\U32
+{
+
+};
+
+Component\In\S32
+{
+
+};
+
+Component\In\U8Array
+{
+	UINT32 Size;
+
+};
+
+Component\In\S8Array
+{
+	UINT32 Size;
+
+};
+
+Component\In\U16Array
+{
+	UINT32 Size;
+
+};
+
+Component\In\S16Array
+{
+	UINT32 Size;
+
+};
+
+Component\In\U32Array
+{
+	UINT32 Size;
+
+};
+
+Component\In\S32Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out
+{
+	Component\Out\U1_TYPE U1[0..*];
+	Component\Out\U8_TYPE U8[0..*];
+	Component\Out\S8_TYPE S8[0..*];
+	Component\Out\U16_TYPE U16[0..*];
+	Component\Out\S16_TYPE S16[0..*];
+	Component\Out\U32_TYPE U32[0..*];
+	Component\Out\S32_TYPE S32[0..*];
+	Component\Out\U8Array_TYPE U8Array[0..*];
+	Component\Out\S8Array_TYPE S8Array[0..*];
+	Component\Out\U16Array_TYPE U16Array[0..*];
+	Component\Out\S16Array_TYPE S16Array[0..*];
+	Component\Out\U32Array_TYPE U32Array[0..*];
+	Component\Out\S32Array_TYPE S32Array[0..*];
+	ENUM [
+		S32Array
+,		U32Array
+,		S16Array
+,		U16Array
+,		S8Array
+,		U8Array
+,		S32
+,		U32
+,		S16
+,		U16
+,		S8
+,		U8
+,		U1
+
+		]Type;
+
+	STRING Data;
+
+};
+
+Component\Out\U1
+{
+
+};
+
+Component\Out\U8
+{
+
+};
+
+Component\Out\S8
+{
+
+};
+
+Component\Out\U16
+{
+
+};
+
+Component\Out\S16
+{
+
+};
+
+Component\Out\U32
+{
+
+};
+
+Component\Out\S32
+{
+
+};
+
+Component\Out\U8Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out\S8Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out\U16Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out\S16Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out\U32Array
+{
+	UINT32 Size;
+
+};
+
+Component\Out\S32Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\U1
+{
+
+};
+
+Component\Data\U8
+{
+
+};
+
+Component\Data\S8
+{
+
+};
+
+Component\Data\U16
+{
+
+};
+
+Component\Data\S16
+{
+
+};
+
+Component\Data\U32
+{
+
+};
+
+Component\Data\S32
+{
+
+};
+
+Component\Data\U8Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\S8Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\U16Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\S16Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\U32Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\S32Array
+{
+	UINT32 Size;
+
+};
+
+Component\Data\DefaultRead\Immediate
+{
+
+};
+
+Component\Data\DefaultRead\Delayed
+{
+
+};
+
+Component\Data\DefaultWrite\Immediate
+{
+
+};
+
+Component\Data\DefaultWrite\Delayed
+{
+
+};
+
+Component\Message\DefaultRead\Immediate
+{
+
+};
+
+Component\Message\DefaultRead\Delayed
+{
+
+};
+
+Component\Message\DefaultWrite\Immediate
+{
+
+};
+
+Component\Message\DefaultWrite\Delayed
+{
+
+};
+
+Channel\Dat
+{
+
+};
+
+Channel\GetSet
+{
+
+};
+
+DirectInputManager
+{
+	UINT32 SamplingPeriodMs[0..1] = 30;
+	UINT32 DefaultFilterDelayMs[0..1] = 10;
+	UINT32 BufferLength;
+	UINT32 SleepBufferLength;
+	DirectInputManager\Fixed_TYPE Fixed[0..*];
+	DirectInputManager\Variable_TYPE Variable[0..*];
+	ENUM [
+		Variable
+,		Fixed
+
+		]Filter[0..1] = Variable;
+
+	DirectInputManager\NoWakeUp_TYPE NoWakeUp[0..*];
+	DirectInputManager\Polling_TYPE Polling[0..*];
+	DirectInputManager\Interrupt_TYPE Interrupt[0..*];
+	ENUM [
+		Interrupt
+,		Polling
+,		NoWakeUp
+
+		]WakeUp[0..1] = NoWakeUp;
+
+
+};
+
+DirectInputManager\Fixed
+{
+	UINT32[1..4] WordSize[0..1] = 1;
+
+};
+
+DirectInputManager\Variable
+{
+
+};
+
+DirectInputManager\NoWakeUp
+{
+
+};
+
+DirectInputManager\Polling
+{
+	UINT32 SamplingPeriodMs;
+
+};
+
+DirectInputManager\Interrupt
+{
+
+};
+
+Component\Data\DirectInput
+{
+	UINT32 FilterDelayMs[0..1];
+
+};
+
+DirectOutputManager
+{
+	UINT32 RefreshPeriodMs[0..1] = 100;
+	BOOLEAN UpdatebeforeSleep[0..1] = FALSE;
+	UINT32 BufferLength;
+
+};
+
+Component\Data\DirectOutput
+{
+
+};
+
+Component\Task
+{
+	UINT32 Priority[0..1];
+	STRING Fct[0..1];
+	Component\Resource_TYPE Resource[0..*];
+	Component\Npg_TYPE Npg[0..1];
+	STRING Id[0..1];
+	Component\GraphGroup_TYPE GraphGroup[0..1];
+
+};
+
+Component\TaskPriority
+{
+	UINT32 Priority[0..1];
+	Component\Npg_TYPE Npg[0..1];
+
+};
+
+Component\CallBack
+{
+	STRING Ctrl;
+	STRING Fct;
+
+};
+
+Component\ActivateTask
+{
+	STRING Ctrl;
+	Component\Task_TYPE Task;
+
+};
+
+Component\SetSignal
+{
+	STRING Ctrl;
+	Component\Signal_TYPE Signal;
+
+};
+
+Component\ProdControl
+{
+	STRING Name;
+
+};
+
+Component\Signal
+{
+
+};
+
+Component\Npg
+{
+
+};
+
+Component\Resource
+{
+
+};
+
+Component\Graph
+{
+	STRING Id[0..1];
+	Component\GraphGroup_TYPE GraphGroup[0..1];
+	UINT32 NbInstances[0..1] = 1;
+	STRING __GraphGroupName[0..1];
+
+};
+
+Component\GraphGroup
+{
+	BOOLEAN Default[0..1] = FALSE;
+	STRING Macro[0..1];
+	Component\Graph_TYPE Graph[0..*];
+
+};
+
+PerfCntConfig
+{
+	BOOLEAN CycleTimeEnabled;
+	BOOLEAN ExecTimeEnabled;
+	UINT32[0..15] TotalTimePassedPrescaler;
+	UINT32[0..255] ProcessStackSize;
+	STRING DisableInterrupts;
+	STRING EnableInterrupts;
+	STRING SuspendInterrupts;
+	STRING ResumeInterrupts;
+	BOOLEAN AutoTasksInclude;
+	PerfCntConfig\TraceObject_TYPE TraceObject[0..*];
+
+};
+
+PerfCntConfig\TraceObject
+{
+	STRING Name;
+	UINT32[0..255] Id;
+	PerfCntConfig\TraceObject\Other_TYPE Other[0..*];
+	PerfCntConfig\TraceObject\Task_TYPE Task[0..*];
+	PerfCntConfig\TraceObject\Interrupt_TYPE Interrupt[0..*];
+	ENUM [
+		Interrupt
+,		Task
+,		Other
+
+		]Type[0..1] = Other;
+
+	BOOLEAN Used;
+
+};
+
+PerfCntConfig\TraceObject\Other
+{
+
+};
+
+PerfCntConfig\TraceObject\Task
+{
+
+};
+
+PerfCntConfig\TraceObject\Interrupt
+{
+
+};
+
+};
+   /*==================  DEFINITION ==============*/ 
+
+DEFINITION Application 
+{
+AnalogInputManager _Default
+{
+	SamplingPeriodMs = 10;
+	ConverterBitSize = 10;
+	CalculationBitSize = 16;
+	NbrOfChannels = 8;
+	DefaultTimeConstantMs = 80;
+	DefaultAllowedShiftPerCent = 10;
+	ForceFastAlogorithm = TRUE;
+};
+
+Channel Ana
+{
+	LDBPCFileName = "ParamAna.CPP";
+	LDBChannelID = "cLDBChannelAna";
+	IsAddressed = FALSE;
+	FlowCI = TRUE;
+	Intel = @FormatAna0;
+	Format = Intel
+	{
+	};
+	Control = CtrlAnaStart;
+	Control = CtrlAnaStop;
+	DATFileName = "DAT_PANx.H";
+	DATPrefix = "DATPan";
+};
+
+Channel Din
+{
+	LDBPCFileName = "ParamDin.CPP";
+	LDBChannelID = "cLDBChannelDin";
+	IsAddressed = FALSE;
+	FlowCI = TRUE;
+	Intel = @FormatDin0;
+	Format = Intel
+	{
+	};
+	Control = CtrlDinWakeUp;
+	Control = CtrlDinEnterNominalMode;
+	Control = CtrlDinEnterSleepMode;
+	Control = CtrlDinEnableWakeUpInterrupt;
+	DATFileName = "DAT_PINx.H";
+	DATPrefix = "DATPin";
+};
+
+Channel Dou
+{
+	LDBPCFileName = "ParamDou.CPP";
+	LDBChannelID = "cLDBChannelDou";
+	IsAddressed = FALSE;
+	FlowPI = TRUE;
+	Intel = @FormatDou0;
+	Format = Intel
+	{
+	};
+	Control = CtrlDouEnterNominalMode;
+	Control = CtrlDouEnterSleepMode;
+	Control = CtrlDouSetDO_DATA_IMMOBILIZER;
+	Control = CtrlDouClearDO_DATA_IMMOBILIZER;
+	Control = CtrlDouSetDO_VERLOG;
+	Control = CtrlDouClearDO_VERLOG;
+	Control = CtrlDouEnableOPEN_DOOR_LED;
+	Control = CtrlDouDisableOPEN_DOOR_LED;
+	Control = CtrlDouSetVERLOG_LED;
+	Control = CtrlDouClearVERLOG_LED;
+	DATFileName = "DAT_POUx.H";
+	DATPrefix = "DATPou";
+};
+
+Channel\Control CtrlAnaStart
+{
+	ID = "cLDBAnaStart";
+	Downward = @DirectionCtrlAnaStart0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlAnaStop
+{
+	ID = "cLDBAnaStop";
+	Downward = @DirectionCtrlAnaStop0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDinWakeUp
+{
+	ID = "cLDBDinWakeUp";
+	Upward = @DirectionCtrlDinWakeUp0;
+	Direction = Upward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDinEnterNominalMode
+{
+	ID = "cLDBDinEnterNominalMode";
+	Downward = @DirectionCtrlDinEnterNominalMode0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDinEnterSleepMode
+{
+	ID = "cLDBDinEnterSleepMode";
+	Downward = @DirectionCtrlDinEnterSleepMode0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDinEnableWakeUpInterrupt
+{
+	ID = "cLDBDinEnableWakeUpInterrupt";
+	Downward = @DirectionCtrlDinEnableWakeUpInterrupt0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouEnterNominalMode
+{
+	ID = "cLDBDouEnterNominalMode";
+	Downward = @DirectionCtrlDouEnterNominalMode0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouEnterSleepMode
+{
+	ID = "cLDBDouEnterSleepMode";
+	Downward = @DirectionCtrlDouEnterSleepMode0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouSetDO_DATA_IMMOBILIZER
+{
+	ID = "cLDBControlSetDO_DATA_IMMOBILIZER";
+	Downward = @DirectionCtrlDouSetDO_DATA_IMMOBILIZER0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouClearDO_DATA_IMMOBILIZER
+{
+	ID = "cLDBControlClearDO_DATA_IMMOBILIZER";
+	Downward = @DirectionCtrlDouClearDO_DATA_IMMOBILIZER0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouSetDO_VERLOG
+{
+	ID = "cLDBControlSetDO_VERLOG";
+	Downward = @DirectionCtrlDouSetDO_VERLOG0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouClearDO_VERLOG
+{
+	ID = "cLDBControlClearDO_VERLOG";
+	Downward = @DirectionCtrlDouClearDO_VERLOG0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouEnableOPEN_DOOR_LED
+{
+	ID = "cLDBDouEnableOPEN_DOOR_LED";
+	Downward = @DirectionCtrlDouEnableOPEN_DOOR_LED0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouDisableOPEN_DOOR_LED
+{
+	ID = "cLDBDouDisableOPEN_DOOR_LED";
+	Downward = @DirectionCtrlDouDisableOPEN_DOOR_LED0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouSetVERLOG_LED
+{
+	ID = "cLDBControlSetVERLOG_LED";
+	Downward = @DirectionCtrlDouSetVERLOG_LED0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Channel\Control CtrlDouClearVERLOG_LED
+{
+	ID = "cLDBControlClearVERLOG_LED";
+	Downward = @DirectionCtrlDouClearVERLOG_LED0;
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+};
+
+Component Tos_ord
+{
+};
+
+Component Tos_seq
+{
+	CallBack = @OnControlTos_seq0;
+	OnControl = CallBack
+	{
+	Ctrl = "TOSInitialize";
+	Fct = "TOSSeqInitialize";
+	};
+};
+
+Component Tos_sig
+{
+	CallBack = @OnControlTos_sig0;
+	OnControl = CallBack
+	{
+	Ctrl = "TOSInitialize";
+	Fct = "TOSSigInitialize";
+	};
+};
+
+Component Tos_ala
+{
+	CallBack = @OnControlTos_ala0;
+	OnControl = CallBack
+	{
+	Ctrl = "TOSInitialize";
+	Fct = "TOSAlaInitialize";
+	};
+};
+
+Component Tos_tpo
+{
+	Task = TOSClock;
+	CallBack = @OnControlTos_tpo0;
+	OnControl = CallBack
+	{
+	Ctrl = "TOSInitialize";
+	Fct = "TOSTpoInitialize";
+	};
+};
+
+Component Tos
+{
+	ProdControl = @ProdControl6;
+};
+
+Component DAT_CPU
+{
+	Task = DATCpuIdleTask;
+	Task = GraphEngineTask;
+	Task = GraphEngineTask20Ms;
+	Task = GraphEngineTaskSleep;
+	Task = GraphEngineTask80Ms;
+	Task = DATCpuRefreshWatchDogTask;
+	CallBack = @OnControlDAT_CPU0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATCpuInit";
+	};
+	GraphGroup = Default;
+	GraphGroup = IdleGraphGroup;
+	GraphGroup = GraphGroup20Ms;
+	GraphGroup = GraphGroupSleep;
+	GraphGroup = GraphGroup80Ms;
+};
+
+Component DAT_EEP
+{
+	Task = DATEepTask;
+	CallBack = @OnControlDAT_EEP0;
+	CallBack = @OnControlDAT_EEP1;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATEepInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveSleepState";
+	Fct = "DATEepIsMaintainActiveSleepState";
+	};
+	ProdControl = @ProdControl21;
+};
+
+Component DAT_DEA
+{
+	CallBack = @OnControlDAT_DEA0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATDeaInitialize";
+	};
+};
+
+Component DAT_SBK
+{
+	CallBack = @OnControlDAT_SBK0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATSbkInit";
+	};
+};
+
+Component DAT_DBK
+{
+	CallBack = @OnControlDAT_DBK0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATDbkInit";
+	};
+};
+
+Component DAT_PEE
+{
+	CallBack = @OnControlDAT_PEE0;
+	CallBack = @OnControlDAT_PEE1;
+	CallBack = @OnControlDAT_PEE2;
+	CallBack = @OnControlDAT_PEE3;
+	CallBack = @OnControlDAT_PEE4;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATPeeInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainStartingStepState";
+	Fct = "DATPeeIsMaintainStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "EnterStartingStepState";
+	Fct = "DATPeeReadAllBanks";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATPeeCanRestoreBanks";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATPeeUpdateBanks";
+	};
+	Graph = EepromManager;
+	Graph = EepromNormalization;
+};
+
+Component DAT_DINp
+{
+	Data = AIRBAG_CRASH;
+	Data = DI_DATA_IMMOBILIZER;
+	Data = HAZARD_SW;
+	Data = DI_VERLOG;
+	Data = RR_AUTOSTOP_SW;
+	Data = FR_AUTOSTOP_SW;
+	Data = DI_VEHICLE_SPEED;
+	Data = DEFROSTER_SW;
+	Data = R_FLASHER_SW;
+	Data = L_FLASHER_SW;
+	Data = FR_WASHER_SW;
+	Data = SEATBELT_REMINDER_SW;
+	Data = POSITION_LIGHTS;
+	Data = HIGH_LOW_BEAM;
+	Data = RR_FOG_SW;
+	Data = RR_WASHER_SW;
+	Data = RR_WIPER_INT_SW;
+	Data = PWR_IGN;
+	Data = FR_DOORS_SW;
+	Data = DOOR_LOCK_SW;
+	Data = DI_ENGINE_RPM;
+	Data = RR_DOORS_SW;
+	Data = DOOR_UNLOCK_SW;
+	Data = FR_WIPER_INT_SW;
+};
+
+Component DAT_DIN
+{
+	Task = DATDinTask;
+	CallBack = @OnControlDAT_DIN0;
+	CallBack = @OnControlDAT_DIN1;
+	CallBack = @OnControlDAT_DIN2;
+	CallBack = @OnControlDAT_DIN3;
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATDinEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATDinLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATDinLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveSleepState";
+	Fct = "DATDinMaintainActiveSleepState";
+	};
+	ProdControl = @ProdControl56;
+};
+
+Component DAT_PIN
+{
+	CallBack = @OnControlDAT_PIN0;
+	CallBack = @OnControlDAT_PIN1;
+	CallBack = @OnControlDAT_PIN2;
+	CallBack = @OnControlDAT_PIN3;
+	CallBack = @OnControlDAT_PIN4;
+	CallBack = @OnControlDAT_PIN5;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATPinInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DATPinIsMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveSleepState";
+	Fct = "DATPinIsMaintainActiveSleepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATPinEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATPinLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATPinLeaveStartingStepState";
+	};
+	ProdControl = @ProdControl62;
+	ProdControl = @ProdControl63;
+	ProdControl = @ProdControl64;
+	ProdControl = @ProdControl65;
+	ProdControl = @ProdControl66;
+	ProdControl = @ProdControl67;
+	ProdControl = @ProdControl68;
+	ProdControl = @ProdControl69;
+	ProdControl = @ProdControl70;
+	ProdControl = @ProdControl71;
+	ProdControl = @ProdControl72;
+	ProdControl = @ProdControl73;
+	ProdControl = @ProdControl74;
+	ProdControl = @ProdControl75;
+	ProdControl = @ProdControl76;
+	ProdControl = @ProdControl77;
+	Signal = FrontWiperStopIsAllowed_LAP_FRW;
+	Signal = RearWiperStopIsAllowed_LAP_RRW;
+	Signal = FR_AUTOSTOP_SWFalling_LAP_FRW;
+	Signal = RR_AUTOSTOP_SWFalling_LAP_RRW;
+};
+
+Component DAT_DOUp
+{
+	Data = VERLOG_LED;
+	Data = OPEN_DOOR_LED;
+	Data = DEFROSTER;
+	Data = HORN_RL;
+	Data = LOCK_DOORS;
+	Data = UNLOCK_DOORS;
+	Data = BAT_LIGHT_TEMPO;
+	Data = UNLOCK_DRIVER_DOOR;
+	Data = FRONT_WIPER;
+	Data = RR_WIPER_RR_FOG_LAMP;
+	Data = DI_LEFT;
+	Data = DI_RIGHT;
+};
+
+Component DAT_DOU
+{
+	Task = DATDouTask;
+	CallBack = @OnControlDAT_DOU0;
+	CallBack = @OnControlDAT_DOU1;
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATDouEnterNominalMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATDouEnterSleepMode";
+	};
+};
+
+Component DAT_POU
+{
+	CallBack = @OnControlDAT_POU0;
+	CallBack = @OnControlDAT_POU1;
+	CallBack = @OnControlDAT_POU2;
+	CallBack = @OnControlDAT_POU3;
+	CallBack = @OnControlDAT_POU4;
+	CallBack = @OnControlDAT_POU5;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATPouInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ActivateFinalTest";
+	Fct = "DATPouActivateFinalTest";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATPouLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATPouLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "AirbagUnlock";
+	Fct = "DATPouAirbagUnlockStarted";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "CrashUnlockFinished";
+	Fct = "DATPouAirbagUnlockFinished";
+	};
+};
+
+Component DAT_PAN
+{
+	CallBack = @OnControlDAT_PAN0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATPanInit";
+	};
+};
+
+Component DAT_ANA
+{
+	Task = DATAnaTask;
+	CallBack = @OnControlDAT_ANA0;
+	CallBack = @OnControlDAT_ANA1;
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATAnaStart";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATAnaStop";
+	};
+};
+
+Component DAT_ANAp
+{
+	Data = DIAG_BAT;
+	Data = DIAG_FLASHER;
+	Data = DIAG_DRIVER_ULQ;
+	Data = AI_FR_WIPER_INT_SW;
+	Data = DIAG_DRIVER_KLAXON;
+	Data = AI_DOOR_UNLOCK_SW;
+	Data = AI_RR_DOORS_SW;
+	Data = DIAG_DRIVER_HIGH_SIDE;
+};
+
+Component DAT_CMN
+{
+	CallBack = @OnControlDAT_CMN0;
+	CallBack = @OnControlDAT_CMN1;
+	CallBack = @OnControlDAT_CMN2;
+	CallBack = @OnControlDAT_CMN3;
+	CallBack = @OnControlDAT_CMN4;
+	CallBack = @OnControlDAT_CMN5;
+	SetSignal = @OnControlDAT_CMN6;
+	SetSignal = @OnControlDAT_CMN7;
+	SetSignal = @OnControlDAT_CMN8;
+	SetSignal = @OnControlDAT_CMN9;
+	SetSignal = @OnControlDAT_CMN10;
+	SetSignal = @OnControlDAT_CMN11;
+	SetSignal = @OnControlDAT_CMN12;
+	SetSignal = @OnControlDAT_CMN13;
+	SetSignal = @OnControlDAT_CMN14;
+	SetSignal = @OnControlDAT_CMN15;
+	SetSignal = @OnControlDAT_CMN16;
+	SetSignal = @OnControlDAT_CMN17;
+	SetSignal = @OnControlDAT_CMN18;
+	SetSignal = @OnControlDAT_CMN19;
+	SetSignal = @OnControlDAT_CMN20;
+	SetSignal = @OnControlDAT_CMN21;
+	SetSignal = @OnControlDAT_CMN22;
+	SetSignal = @OnControlDAT_CMN23;
+	SetSignal = @OnControlDAT_CMN24;
+	SetSignal = @OnControlDAT_CMN25;
+	SetSignal = @OnControlDAT_CMN26;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATCmnInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATCmnLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "GetAprTrpResource";
+	Fct = "DATCmnGetAprTrpResource";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ReleaseAprTrpResource";
+	Fct = "DATCmnReleaseAprTrpResource";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "GetCarTrpResource";
+	Fct = "DATCmnGetCarTrpResource";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ReleaseCarTrpResource";
+	Fct = "DATCmnReleaseCarTrpResource";
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Changing_RR_DOORS_SW";
+	Signal = Changing_RR_DOORS_SW_LAP_ILL;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Changing_FR_DOORS_SW";
+	Signal = Changing_FR_DOORS_SW_LAP_ILL;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_HAZARD_SW";
+	Signal = Falling_HAZARD_SW_LAP_FLI;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_PWR_IGN";
+	Signal = Falling_PWR_IGN_LAP_ILL;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_PWR_IGN";
+	Signal = Falling_PWR_IGN_LAP_BUZ;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_PWR_IGN";
+	Signal = Rising_PWR_IGN_LAP_ILL;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_PWR_IGN";
+	Signal = Rising_PWR_IGN_LAP_FLI;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "FrontStopPositionDetected";
+	Signal = FrontStopPositionDetected_LAP_FRW1;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "FrontStopPositionDetected";
+	Signal = FrontStopPositionDetected_LAP_FRW2;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "RearStopPositionDetected";
+	Signal = RearStopPositionDetected_LAP_RRW1;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "RearStopPositionDetected";
+	Signal = RearStopPositionDetected_LAP_RRW2;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_PWR_IGN";
+	Signal = Rising_PWR_IGN_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_PWR_IGN";
+	Signal = Falling_PWR_IGN_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_FR_DOORS_SW";
+	Signal = Rising_FR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_FR_DOORS_SW";
+	Signal = Falling_FR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Changing_FR_DOORS_SW";
+	Signal = Changing_FR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_RR_DOORS_SW";
+	Signal = Rising_RR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Falling_RR_DOORS_SW";
+	Signal = Falling_RR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Changing_RR_DOORS_SW";
+	Signal = Changing_RR_DOORS_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_DOOR_LOCK_SW";
+	Signal = Rising_DOOR_LOCK_SW_LAP_DLK;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "Rising_DOOR_UNLOCK_SW";
+	Signal = Rising_DOOR_UNLOCK_LOCK_SW_LAP_DLK;
+	};
+	Signal = Changing_RR_DOORS_SW_LAP_ILL;
+	Signal = Falling_RR_DOORS_SW_LAP_ILL;
+	Signal = Rising_RR_DOORS_SW_LAP_ILL;
+	Signal = Changing_FR_DOORS_SW_LAP_ILL;
+	Signal = Falling_FR_DOORS_SW_LAP_ILL;
+	Signal = Rising_FR_DOORS_SW_LAP_ILL;
+	Signal = Falling_PWR_IGN_LAP_ILL;
+	Signal = Rising_PWR_IGN_LAP_ILL;
+	Signal = Falling_PWR_IGN_LAP_BUZ;
+	Signal = Rising_PWR_IGN_LAP_FLI;
+	Signal = Falling_HAZARD_SW_LAP_FLI;
+	Signal = FrontStopPositionDetected_LAP_FRW1;
+	Signal = FrontStopPositionDetected_LAP_FRW2;
+	Signal = RearStopPositionDetected_LAP_RRW1;
+	Signal = RearStopPositionDetected_LAP_RRW2;
+	Signal = Rising_PWR_IGN_LAP_DLK;
+	Signal = Falling_PWR_IGN_LAP_DLK;
+	Signal = Rising_FR_DOORS_SW_LAP_DLK;
+	Signal = Falling_FR_DOORS_SW_LAP_DLK;
+	Signal = Changing_FR_DOORS_SW_LAP_DLK;
+	Signal = Rising_RR_DOORS_SW_LAP_DLK;
+	Signal = Falling_RR_DOORS_SW_LAP_DLK;
+	Signal = Changing_RR_DOORS_SW_LAP_DLK;
+	Signal = Rising_DOOR_LOCK_SW_LAP_DLK;
+	Signal = Rising_DOOR_UNLOCK_LOCK_SW_LAP_DLK;
+	Signal = Rising_RF_UNLOCK_DRIVER_DOOR_LAP_DLK;
+};
+
+Component DAT_KWP
+{
+	Task = DATKwpTask;
+	CallBack = @OnControlDAT_KWP0;
+	CallBack = @OnControlDAT_KWP1;
+	CallBack = @OnControlDAT_KWP2;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATKwpInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATKwpLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DATKwpIsMaintainActiveState";
+	};
+	Signal = EventIntKwpWakeUp;
+	Signal = DiagnosticMessageIsReceived;
+};
+
+Component DAT_PWM
+{
+	Out = @Out140;
+	CallBack = @OnControlDAT_PWM0;
+	CallBack = @OnControlDAT_PWM1;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATPwmInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "DATPwmLeaveStartingStepState";
+	};
+};
+
+Component DAT_RF
+{
+	CallBack = @OnControlDAT_RF0;
+	CallBack = @OnControlDAT_RF1;
+	CallBack = @OnControlDAT_RF2;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATRfInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DATRfIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveSleepState";
+	Fct = "DATRfIsAnybodyMaintainActiveSleepState";
+	};
+	Graph = DATRfReceptionManagement;
+};
+
+Component DAT_BUZ
+{
+	Task = DATBuzTask;
+	CallBack = @OnControlDAT_BUZ0;
+	CallBack = @OnControlDAT_BUZ1;
+	CallBack = @OnControlDAT_BUZ2;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATBuzInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATBuzStart";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATBuzStop";
+	};
+};
+
+Component DAT_TRP
+{
+	CallBack = @OnControlDAT_TRP0;
+	CallBack = @OnControlDAT_TRP1;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATTrpInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DATTrpMaintainActiveState";
+	};
+	Graph = DATTrpAuthentication;
+	Graph = DATTrpWriteAccess;
+	Graph = DATTrpResynchronization;
+	Graph = DATTrpTfcDiag;
+};
+
+Component DAT_VLG
+{
+	CallBack = @OnControlDAT_VLG0;
+	CallBack = @OnControlDAT_VLG1;
+	CallBack = @OnControlDAT_VLG2;
+	CallBack = @OnControlDAT_VLG3;
+	CallBack = @OnControlDAT_VLG4;
+	CallBack = @OnControlDAT_VLG5;
+	CallBack = @OnControlDAT_VLG6;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATVlgInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "KeyIsAuthenticated";
+	Fct = "DATVlgKeyIsAuthenticated";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "KeyIsNotAuthenticated";
+	Fct = "DATVlgKeyIsNotAuthenticated";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StartPermanentAuthentication";
+	Fct = "DATVlgStartAuthentPermKey";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StopPermanentAuthentication";
+	Fct = "DATVlgExitFromAuthentPermKey";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Falling_PWR_IGN";
+	Fct = "DATVlgFalling_PWR_IGN";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DATVlgIsAnybodyMaintainActiveState";
+	};
+	Graph = DATVlgInput;
+	Graph = DATVlgOutputProtection;
+};
+
+Component DAT_APR
+{
+	CallBack = @OnControlDAT_APR0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATAprInit";
+	};
+};
+
+Component DAT_SPD
+{
+	CallBack = @OnControlDAT_SPD0;
+	CallBack = @OnControlDAT_SPD1;
+	CallBack = @OnControlDAT_SPD2;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATSpdInit";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATEnterActiveState";
+	Fct = "DATSpdEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "DATLeaveActiveState";
+	Fct = "DATSpdLeaveActiveState";
+	};
+	Graph = SpeedManagement;
+	Graph = RPMManagement;
+};
+
+Component DAT_ALA
+{
+	CallBack = @OnControlDAT_ALA0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATAlaInit";
+	};
+};
+
+Component DAT_RBG
+{
+	Task = DATRbgTask;
+	CallBack = @OnControlDAT_RBG0;
+	OnControl = CallBack
+	{
+	Ctrl = "DATInitialize";
+	Fct = "DATRbgInit";
+	};
+	ProdControl = @ProdControl160;
+};
+
+Component LAP_KWP
+{
+	CallBack = @OnControlLAP_KWP0;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPKwpInitialize";
+	};
+	Graph = LAPKwpTreatRequest;
+	Graph = LAPKwpTreatCommunication;
+};
+
+Component LAP_AFS
+{
+	CallBack = @OnControlLAP_AFS0;
+	CallBack = @OnControlLAP_AFS1;
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPAfsIsMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ClearFaultFlagsAndCounters";
+	Fct = "LAPAfsClearFaultFlagsAndCounters";
+	};
+	ProdControl = @ProdControl166;
+	ProdControl = @ProdControl167;
+	ProdControl = @ProdControl168;
+	ProdControl = @ProdControl169;
+	ProdControl = @ProdControl170;
+	ProdControl = @ProdControl171;
+	ProdControl = @ProdControl172;
+	ProdControl = @ProdControl173;
+	ProdControl = @ProdControl174;
+	ProdControl = @ProdControl175;
+	Graph = LAPAfsIOControlByLocalID;
+};
+
+Component LAP_TFC
+{
+	ProdControl = @ProdControl180;
+	ProdControl = @ProdControl181;
+	ProdControl = @ProdControl182;
+	ProdControl = @ProdControl183;
+	Graph = LAPTfcAutoTestIO;
+	Graph = LAPTfcGraph;
+	Graph = LAPTfcEepTest;
+};
+
+Component LAP_DLK
+{
+	CallBack = @OnControlLAP_DLK0;
+	CallBack = @OnControlLAP_DLK1;
+	CallBack = @OnControlLAP_DLK2;
+	CallBack = @OnControlLAP_DLK3;
+	CallBack = @OnControlLAP_DLK4;
+	CallBack = @OnControlLAP_DLK6;
+	CallBack = @OnControlLAP_DLK7;
+	SetSignal = @OnControlLAP_DLK5;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "DLKInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "DLKIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "DLKEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "DLKLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "KeyIsAuthenticated";
+	Fct = "DLKUpdateByVerlogOfKeyIsAuthenticated";
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "AirbagUnlock";
+	Signal = CrashIsDetectedByAirbag;
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "InputsReadAfterStartingStepState";
+	Fct = "DLKLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ProtectionLedVerlogSleepMode";
+	Fct = "DLKProtectionSleepModeCallBack";
+	};
+	ProdControl = @ProdControl191;
+	ProdControl = @ProdControl192;
+	ProdControl = @ProdControl193;
+	ProdControl = @ProdControl194;
+	ProdControl = @ProdControl195;
+	ProdControl = @ProdControl196;
+	Signal = CrashIsDetectedByAirbag;
+	Signal = CrashUnlockStarted;
+	Graph = DLKInputData;
+	Graph = DLKOutputData;
+	Graph = DLKMotorCommand;
+	Graph = DLKAirbagManagement;
+};
+
+Component LAP_ILL
+{
+	CallBack = @OnControlLAP_ILL0;
+	CallBack = @OnControlLAP_ILL1;
+	CallBack = @OnControlLAP_ILL2;
+	CallBack = @OnControlLAP_ILL3;
+	CallBack = @OnControlLAP_ILL4;
+	CallBack = @OnControlLAP_ILL5;
+	CallBack = @OnControlLAP_ILL6;
+	CallBack = @OnControlLAP_ILL7;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPIllInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "LAPIllLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPIllEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPIllLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPIllIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RKE_LOCK_REQUEST";
+	Fct = "LAPIllRKELock";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RKE_UNLOCK_REQUEST";
+	Fct = "LAPIllRKEUnlock";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "AutoRelock";
+	Fct = "LAPIllRKELock";
+	};
+	ProdControl = @ProdControl200;
+	Graph = LAPIllInternalLightsManagement;
+	Graph = LAPIllInternalLightsController;
+};
+
+Component LAP_BUZ
+{
+	CallBack = @OnControlLAP_BUZ0;
+	CallBack = @OnControlLAP_BUZ1;
+	CallBack = @OnControlLAP_BUZ2;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPBuzInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPBuzEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPBuzLeaveActiveState";
+	};
+	Graph = LAPBuzMainGraph;
+};
+
+Component LAP_FLI
+{
+	CallBack = @OnControlLAP_FLI0;
+	CallBack = @OnControlLAP_FLI1;
+	CallBack = @OnControlLAP_FLI2;
+	CallBack = @OnControlLAP_FLI3;
+	CallBack = @OnControlLAP_FLI4;
+	CallBack = @OnControlLAP_FLI5;
+	CallBack = @OnControlLAP_FLI9;
+	SetSignal = @OnControlLAP_FLI6;
+	SetSignal = @OnControlLAP_FLI7;
+	SetSignal = @OnControlLAP_FLI8;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPFliInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPFliEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPFliLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPFliIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeftFlashingForTFC";
+	Fct = "LAPFliLeftFlashingForTFC";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RightFlashingForTFC";
+	Fct = "LAPFliRightFlashingForTFC";
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "RKE_LOCK_REQUEST";
+	Signal = LAPFliEventRfLockAll;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "RKE_UNLOCK_REQUEST";
+	Signal = LAPFliEventRfUnlockAll;
+	};
+	OnControl = SetSignal
+	{
+	Ctrl = "CrashUnlockFinished";
+	Signal = LAPFliCrashUnlockFinished;
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "CrashUnlockFinished";
+	Fct = "LAPFliInputManagement";
+	};
+	Signal = LAPFliCrashUnlockFinished;
+	Signal = LAPFliEventRfLockAll;
+	Signal = LAPFliEventRfUnlockAll;
+	Graph = LAPFliInput;
+	Graph = LAPFliLampsState;
+	Graph = LAPFliProtectionManagement;
+};
+
+Component LAP_LRN
+{
+	CallBack = @OnControlLAP_LRN0;
+	CallBack = @OnControlLAP_LRN1;
+	CallBack = @OnControlLAP_LRN2;
+	CallBack = @OnControlLAP_LRN3;
+	CallBack = @OnControlLAP_LRN4;
+	CallBack = @OnControlLAP_LRN5;
+	CallBack = @OnControlLAP_LRN6;
+	CallBack = @OnControlLAP_LRN7;
+	OnControl = CallBack
+	{
+	Ctrl = "ExitFromLearningInFactoryMode";
+	Fct = "LRNExitFromLearningInFactoryMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "GiveUpLearningInAfterSaleMode";
+	Fct = "LRNGiveUpLearningInAfterSaleMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LRNEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LRNInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LRNLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StartLearningInAfterSaleMode";
+	Fct = "LRNStartLearningInAfterSaleMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StartLearningInFactoryMode";
+	Fct = "LRNStartLearningInFactoryMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "ValidateLearningInAfterSaleMode";
+	Fct = "LRNValidateLearningInAfterSaleMode";
+	};
+	ProdControl = @ProdControl213;
+	ProdControl = @ProdControl214;
+	Graph = LRNUpdateLearningAuthorization;
+	Graph = LRNManageLearningService;
+};
+
+Component LAP_CAR
+{
+	CallBack = @OnControlLAP_CAR0;
+	CallBack = @OnControlLAP_CAR1;
+	CallBack = @OnControlLAP_CAR2;
+	CallBack = @OnControlLAP_CAR3;
+	CallBack = @OnControlLAP_CAR4;
+	CallBack = @OnControlLAP_CAR5;
+	CallBack = @OnControlLAP_CAR6;
+	CallBack = @OnControlLAP_CAR7;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "CARInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "CARIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "CAREnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "CARLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "CARAuthorizedStandByMode";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StartPermanentAuthentication";
+	Fct = "CARStartAuthentPermKey";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StopPermanentAuthentication";
+	Fct = "CARExitFromAuthentPermKey";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "StartTestVirginKey";
+	Fct = "CARStartTestVirginKey";
+	};
+	ProdControl = @ProdControl217;
+	ProdControl = @ProdControl218;
+	ProdControl = @ProdControl219;
+	ProdControl = @ProdControl220;
+	Graph = CARManageImmobiliserAndCarAntiTheft;
+};
+
+Component LAP_VLD
+{
+	CallBack = @OnControlLAP_VLD0;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPVldInitialize";
+	};
+	Graph = LAPVldPatternManagement;
+};
+
+Component LAP_DFR
+{
+	CallBack = @OnControlLAP_DFR0;
+	CallBack = @OnControlLAP_DFR1;
+	CallBack = @OnControlLAP_DFR2;
+	CallBack = @OnControlLAP_DFR3;
+	CallBack = @OnControlLAP_DFR4;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPDfrInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPDfrEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPDfrLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPDfrIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "LAPDfrLeaveStartingStepState";
+	};
+	Graph = RDFRearDefoggerManagement;
+	Graph = RDFProtectionManagement;
+};
+
+Component LAP_ALA
+{
+	CallBack = @OnControlLAP_ALA0;
+	CallBack = @OnControlLAP_ALA1;
+	CallBack = @OnControlLAP_ALA2;
+	CallBack = @OnControlLAP_ALA3;
+	CallBack = @OnControlLAP_ALA4;
+	CallBack = @OnControlLAP_ALA5;
+	CallBack = @OnControlLAP_ALA6;
+	CallBack = @OnControlLAP_ALA7;
+	CallBack = @OnControlLAP_ALA8;
+	CallBack = @OnControlLAP_ALA9;
+	CallBack = @OnControlLAP_ALA10;
+	CallBack = @OnControlLAP_ALA11;
+	CallBack = @OnControlLAP_ALA12;
+	CallBack = @OnControlLAP_ALA13;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPAlaInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPAlaEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPAlaLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPAlaIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveSleepState";
+	Fct = "LAPAlaIsAnybodyMaintainActiveSleepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LeaveStartingStepState";
+	Fct = "LAPAlaLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "KeyIsAuthenticated";
+	Fct = "LAPAlaKeyIsAuthenticated";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RfUnlockAllForAlarm";
+	Fct = "LAPAlaUnlockFromTheOutside";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RfLockAllForAlarm";
+	Fct = "LAPAlaLockFromTheOutside";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "AlaDiagEnable";
+	Fct = "LAPAlaDiagEnable";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "AlaDiagDisable";
+	Fct = "LAPAlaDiagDisable";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Falling_PWR_IGN";
+	Fct = "LAPAlaFallingEdgeForPWR_IGN";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Falling_FR_DOORS_SW";
+	Fct = "LAPAlaFallingEdgeForDS";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Falling_RR_DOORS_SW";
+	Fct = "LAPAlaFallingEdgeForDS";
+	};
+	Graph = LAPAlarms;
+	Graph = AlarmAfterReset;
+};
+
+Component LAP_FRW
+{
+	CallBack = @OnControlLAP_FRW0;
+	CallBack = @OnControlLAP_FRW1;
+	CallBack = @OnControlLAP_FRW2;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPFrwInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPFrwEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPFrwLeaveActiveState";
+	};
+	Graph = LAPFrwEngineProtection;
+	Graph = LAPFrwIntermittentWipe;
+	Graph = LAPFrwWashing;
+	Graph = LAPFrwControl;
+};
+
+Component LAP_RRW
+{
+	CallBack = @OnControlLAP_RRW0;
+	CallBack = @OnControlLAP_RRW1;
+	CallBack = @OnControlLAP_RRW2;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPRrwInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPRrwEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPRrwLeaveActiveState";
+	};
+	Graph = LAPRrwEngineProtection;
+	Graph = LAPRrwIntermittentWipe;
+	Graph = LAPRrwWashing;
+	Graph = LAPRrwInitialParking;
+	Graph = LAPRrwControl;
+};
+
+Component LAP_EXL
+{
+	CallBack = @OnControlLAP_EXL0;
+	CallBack = @OnControlLAP_EXL1;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPExlEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPExlLeaveActiveState";
+	};
+	Graph = LAPExlGraph;
+};
+
+Component LAP_PAL
+{
+	CallBack = @OnControlLAP_PAL0;
+	CallBack = @OnControlLAP_PAL1;
+	CallBack = @OnControlLAP_PAL2;
+	CallBack = @OnControlLAP_PAL3;
+	CallBack = @OnControlLAP_PAL4;
+	CallBack = @OnControlLAP_PAL5;
+	CallBack = @OnControlLAP_PAL6;
+	CallBack = @OnControlLAP_PAL7;
+	CallBack = @OnControlLAP_PAL8;
+	CallBack = @OnControlLAP_PAL9;
+	OnControl = CallBack
+	{
+	Ctrl = "LAPInitialize";
+	Fct = "LAPPalInitialize";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPEnterActiveState";
+	Fct = "LAPPalEnterActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "LAPLeaveActiveState";
+	Fct = "LAPPalLeaveActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "InputsReadAfterStartingStepState";
+	Fct = "LAPPalLeaveStartingStepState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "IsAnybodyMaintainActiveState";
+	Fct = "LAPPalIsAnybodyMaintainActiveState";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "KeyIsAuthenticated";
+	Fct = "LAPPalKeyIsAuthenticated";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RfUnlockAllForAlarm";
+	Fct = "LAPPalUnlockFromTheOutside";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "RfLockAllForAlarm";
+	Fct = "LAPPalLockFromTheOutside";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Rising_FR_DOORS_SW";
+	Fct = "LAPPalRising_FR_DOORS_SW";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "Rising_RR_DOORS_SW";
+	Fct = "LAPPalRising_RR_DOORS_SW";
+	};
+	Graph = PerimeterAlarmManagement;
+};
+
+Component LAP_SUP
+{
+	TaskPriority = DATCpuIdleTask;
+	TaskPriority = DATEepTask;
+	TaskPriority = DATCpuRefreshWatchDogTask;
+	TaskPriority = GraphEngineTaskSleep;
+	TaskPriority = DATBuzTask;
+	TaskPriority = DATDouTask;
+	TaskPriority = GraphEngineTask80Ms;
+	TaskPriority = GraphEngineTask20Ms;
+	TaskPriority = GraphEngineTask;
+	TaskPriority = DATKwpTask;
+	TaskPriority = DATRbgTask;
+	TaskPriority = DATDinTask;
+	TaskPriority = DATAnaTask;
+	TaskPriority = TOSClock;
+	CallBack = @OnControlLAP_SUP0;
+	CallBack = @OnControlLAP_SUP1;
+	OnControl = CallBack
+	{
+	Ctrl = "ActiveSleepRequest";
+	Fct = "LAPSupActiveSleepRequest";
+	};
+	OnControl = CallBack
+	{
+	Ctrl = "WakeUpRequest";
+	Fct = "LAPSupWakeUpRequest";
+	};
+	ProdControl = @ProdControl265;
+	ProdControl = @ProdControl266;
+	ProdControl = @ProdControl267;
+	ProdControl = @ProdControl268;
+	ProdControl = @ProdControl269;
+	ProdControl = @ProdControl270;
+	ProdControl = @ProdControl271;
+	ProdControl = @ProdControl272;
+	ProdControl = @ProdControl273;
+	ProdControl = @ProdControl274;
+	ProdControl = @ProdControl275;
+	Signal = ActiveSleepRequested;
+	Signal = WakeUpRequested;
+	Signal = SomebodyMaintainStartingStepState;
+	Signal = SomebodyMaintainActiveSleepState;
+	Signal = SomebodyMaintainActiveState;
+	Graph = Supervisor;
+};
+
+Component\Data AIRBAG_CRASH
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeAIRBAG_CRASH0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 0;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectInput = @SpecializationAIRBAG_CRASH0;
+};
+
+Component\Data DI_DATA_IMMOBILIZER
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDI_DATA_IMMOBILIZER0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 0;
+	BitPosition = 5;
+	BitSize = 1;
+	DirectInput = @SpecializationDI_DATA_IMMOBILIZER0;
+};
+
+Component\Data HAZARD_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeHAZARD_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 1;
+	BitPosition = 4;
+	BitSize = 1;
+	DirectInput = @SpecializationHAZARD_SW0;
+};
+
+Component\Data DI_VERLOG
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDI_VERLOG0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 2;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationDI_VERLOG0;
+};
+
+Component\Data RR_AUTOSTOP_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeRR_AUTOSTOP_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 2;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectInput = @SpecializationRR_AUTOSTOP_SW0;
+};
+
+Component\Data FR_AUTOSTOP_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeFR_AUTOSTOP_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 2;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectInput = @SpecializationFR_AUTOSTOP_SW0;
+};
+
+Component\Data DI_VEHICLE_SPEED
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDI_VEHICLE_SPEED0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 2;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectInput = @SpecializationDI_VEHICLE_SPEED0;
+};
+
+Component\Data DEFROSTER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDEFROSTER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationDEFROSTER_SW0;
+};
+
+Component\Data R_FLASHER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeR_FLASHER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectInput = @SpecializationR_FLASHER_SW0;
+};
+
+Component\Data L_FLASHER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeL_FLASHER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectInput = @SpecializationL_FLASHER_SW0;
+};
+
+Component\Data FR_WASHER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeFR_WASHER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 4;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationFR_WASHER_SW0;
+};
+
+Component\Data SEATBELT_REMINDER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeSEATBELT_REMINDER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 4;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectInput = @SpecializationSEATBELT_REMINDER_SW0;
+};
+
+Component\Data POSITION_LIGHTS
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypePOSITION_LIGHTS0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 4;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectInput = @SpecializationPOSITION_LIGHTS0;
+};
+
+Component\Data HIGH_LOW_BEAM
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeHIGH_LOW_BEAM0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 5;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationHIGH_LOW_BEAM0;
+};
+
+Component\Data RR_FOG_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeRR_FOG_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 5;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectInput = @SpecializationRR_FOG_SW0;
+};
+
+Component\Data RR_WASHER_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeRR_WASHER_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 5;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectInput = @SpecializationRR_WASHER_SW0;
+};
+
+Component\Data RR_WIPER_INT_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeRR_WIPER_INT_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 5;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectInput = @SpecializationRR_WIPER_INT_SW0;
+};
+
+Component\Data PWR_IGN
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypePWR_IGN0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 6;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationPWR_IGN0;
+};
+
+Component\Data FR_DOORS_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeFR_DOORS_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 6;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectInput = @SpecializationFR_DOORS_SW0;
+};
+
+Component\Data DOOR_LOCK_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDOOR_LOCK_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 6;
+	BitPosition = 4;
+	BitSize = 1;
+	DirectInput = @SpecializationDOOR_LOCK_SW0;
+};
+
+Component\Data DI_ENGINE_RPM
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDI_ENGINE_RPM0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 7;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationDI_ENGINE_RPM0;
+};
+
+Component\Data RR_DOORS_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeRR_DOORS_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 8;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectInput = @SpecializationRR_DOORS_SW0;
+};
+
+Component\Data DOOR_UNLOCK_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeDOOR_UNLOCK_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 8;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectInput = @SpecializationDOOR_UNLOCK_SW0;
+};
+
+Component\Data FR_WIPER_INT_SW
+{
+	Specialization = DirectInput
+	{
+	};
+	U1 = @TypeFR_WIPER_INT_SW0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 8;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectInput = @SpecializationFR_WIPER_INT_SW0;
+};
+
+Component\Data VERLOG_LED
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeVERLOG_LED0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 0;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectOutput = @SpecializationVERLOG_LED0;
+};
+
+Component\Data OPEN_DOOR_LED
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeOPEN_DOOR_LED0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 0;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectOutput = @SpecializationOPEN_DOOR_LED0;
+};
+
+Component\Data DEFROSTER
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeDEFROSTER0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 1;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectOutput = @SpecializationDEFROSTER0;
+};
+
+Component\Data HORN_RL
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeHORN_RL0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 2;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectOutput = @SpecializationHORN_RL0;
+};
+
+Component\Data LOCK_DOORS
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeLOCK_DOORS0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 0;
+	BitSize = 1;
+	DirectOutput = @SpecializationLOCK_DOORS0;
+};
+
+Component\Data UNLOCK_DOORS
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeUNLOCK_DOORS0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 1;
+	BitSize = 1;
+	DirectOutput = @SpecializationUNLOCK_DOORS0;
+};
+
+Component\Data BAT_LIGHT_TEMPO
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeBAT_LIGHT_TEMPO0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 2;
+	BitSize = 1;
+	DirectOutput = @SpecializationBAT_LIGHT_TEMPO0;
+};
+
+Component\Data UNLOCK_DRIVER_DOOR
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeUNLOCK_DRIVER_DOOR0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 3;
+	BitSize = 1;
+	DirectOutput = @SpecializationUNLOCK_DRIVER_DOOR0;
+};
+
+Component\Data FRONT_WIPER
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeFRONT_WIPER0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 4;
+	BitSize = 1;
+	DirectOutput = @SpecializationFRONT_WIPER0;
+};
+
+Component\Data RR_WIPER_RR_FOG_LAMP
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeRR_WIPER_RR_FOG_LAMP0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 5;
+	BitSize = 1;
+	DirectOutput = @SpecializationRR_WIPER_RR_FOG_LAMP0;
+};
+
+Component\Data DI_LEFT
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeDI_LEFT0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 6;
+	BitSize = 1;
+	DirectOutput = @SpecializationDI_LEFT0;
+};
+
+Component\Data DI_RIGHT
+{
+	Specialization = DirectOutput
+	{
+	};
+	U1 = @TypeDI_RIGHT0;
+	Type = U1
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 3;
+	BitPosition = 7;
+	BitSize = 1;
+	DirectOutput = @SpecializationDI_RIGHT0;
+};
+
+Component\Data DIAG_BAT
+{
+	AnalogInput = @SpecializationDIAG_BAT0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeDIAG_BAT0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 766;
+	BytePosition = 14;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data DIAG_FLASHER
+{
+	AnalogInput = @SpecializationDIAG_FLASHER0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeDIAG_FLASHER0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 12;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data DIAG_DRIVER_ULQ
+{
+	AnalogInput = @SpecializationDIAG_DRIVER_ULQ0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeDIAG_DRIVER_ULQ0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 10;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data AI_FR_WIPER_INT_SW
+{
+	AnalogInput = @SpecializationAI_FR_WIPER_INT_SW0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeAI_FR_WIPER_INT_SW0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 8;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data DIAG_DRIVER_KLAXON
+{
+	AnalogInput = @SpecializationDIAG_DRIVER_KLAXON0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeDIAG_DRIVER_KLAXON0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 6;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data AI_DOOR_UNLOCK_SW
+{
+	AnalogInput = @SpecializationAI_DOOR_UNLOCK_SW0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeAI_DOOR_UNLOCK_SW0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 1023;
+	BytePosition = 4;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data AI_RR_DOORS_SW
+{
+	AnalogInput = @SpecializationAI_RR_DOORS_SW0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeAI_RR_DOORS_SW0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 1023;
+	BytePosition = 2;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Data DIAG_DRIVER_HIGH_SIDE
+{
+	AnalogInput = @SpecializationDIAG_DRIVER_HIGH_SIDE0;
+	Specialization = AnalogInput
+	{
+	TimeConstantMs = 40;
+	};
+	U16 = @TypeDIAG_DRIVER_HIGH_SIDE0;
+	Type = U16
+	{
+	};
+	Generate = TRUE;
+	HwProtectAccess = FALSE;
+	DiagAccess = FALSE;
+	ResetValue = 0;
+	BytePosition = 0;
+	BitPosition = 7;
+	BitSize = 16;
+};
+
+Component\Message AnaGeneratorMessage
+{
+	Length = 16;
+	Data = DIAG_BAT;
+	Data = DIAG_FLASHER;
+	Data = DIAG_DRIVER_ULQ;
+	Data = AI_FR_WIPER_INT_SW;
+	Data = DIAG_DRIVER_KLAXON;
+	Data = AI_DOOR_UNLOCK_SW;
+	Data = AI_RR_DOORS_SW;
+	Data = DIAG_DRIVER_HIGH_SIDE;
+};
+
+Component\Message DinGeneratorMessage
+{
+	Length = 9;
+	Data = AIRBAG_CRASH;
+	Data = DI_DATA_IMMOBILIZER;
+	Data = HAZARD_SW;
+	Data = DI_VERLOG;
+	Data = RR_AUTOSTOP_SW;
+	Data = FR_AUTOSTOP_SW;
+	Data = DI_VEHICLE_SPEED;
+	Data = DEFROSTER_SW;
+	Data = R_FLASHER_SW;
+	Data = L_FLASHER_SW;
+	Data = FR_WASHER_SW;
+	Data = SEATBELT_REMINDER_SW;
+	Data = POSITION_LIGHTS;
+	Data = HIGH_LOW_BEAM;
+	Data = RR_FOG_SW;
+	Data = RR_WASHER_SW;
+	Data = RR_WIPER_INT_SW;
+	Data = PWR_IGN;
+	Data = FR_DOORS_SW;
+	Data = DOOR_LOCK_SW;
+	Data = DI_ENGINE_RPM;
+	Data = RR_DOORS_SW;
+	Data = DOOR_UNLOCK_SW;
+	Data = FR_WIPER_INT_SW;
+};
+
+Component\Message DouGeneratorMessage
+{
+	Length = 4;
+	Data = VERLOG_LED;
+	Data = OPEN_DOOR_LED;
+	Data = DEFROSTER;
+	Data = HORN_RL;
+	Data = LOCK_DOORS;
+	Data = UNLOCK_DOORS;
+	Data = BAT_LIGHT_TEMPO;
+	Data = UNLOCK_DRIVER_DOOR;
+	Data = FRONT_WIPER;
+	Data = RR_WIPER_RR_FOG_LAMP;
+	Data = DI_LEFT;
+	Data = DI_RIGHT;
+};
+
+Component\ChannelMessage AnaGeneratorChannelMessage
+{
+	Message = AnaGeneratorMessage;
+	Channel = Ana;
+	ID = 0;
+	Type = Received
+	{
+	};
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+	PeriodUs = 0;
+	PhaseUs = 0;
+};
+
+Component\ChannelMessage DinGeneratorChannelMessage
+{
+	Message = DinGeneratorMessage;
+	Channel = Din;
+	ID = 0;
+	Type = Received
+	{
+	};
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+	PeriodUs = 0;
+	PhaseUs = 0;
+};
+
+Component\ChannelMessage DouGeneratorChannelMessage
+{
+	Message = DouGeneratorMessage;
+	Channel = Dou;
+	ID = 0;
+	Type = Sent
+	{
+	};
+	Direction = Downward
+	{
+	};
+	LDBPCSendingTimeUs = 0;
+	PeriodUs = 0;
+	PhaseUs = 0;
+};
+
+Component\Out @Out140
+{
+	U1 = @Type@Out1400;
+	Type = U1
+	{
+	};
+	Data = "PWM_ROOMLAMP_DO";
+};
+
+DirectInputManager _Default
+{
+	SamplingPeriodMs = 5;
+	DefaultFilterDelayMs = 25;
+	BufferLength = 9;
+	SleepBufferLength = 9;
+	Fixed = @Filter_Default0;
+	Filter = Fixed
+	{
+	WordSize = 1;
+	};
+	Polling = @WakeUp_Default0;
+	WakeUp = Polling
+	{
+	SamplingPeriodMs = 40;
+	};
+};
+
+DirectOutputManager _Default
+{
+	RefreshPeriodMs = 10;
+	UpdatebeforeSleep = TRUE;
+	BufferLength = 4;
+};
+
+Component\Task TOSClock
+{
+	Priority = 500;
+	Fct = "TOSClockTask";
+	Id = "cTOSTaskIdTOSClock";
+};
+
+Component\Task DATCpuIdleTask
+{
+	Priority = 0;
+	Fct = "DATCpuIdleTask";
+};
+
+Component\Task GraphEngineTask
+{
+	Priority = 64;
+	Fct = "GraphEngineTask";
+	GraphGroup = Default;
+};
+
+Component\Task GraphEngineTask20Ms
+{
+	Priority = 62;
+	Fct = "GraphEngineTask20Ms";
+	GraphGroup = GraphGroup20Ms;
+};
+
+Component\Task GraphEngineTaskSleep
+{
+	Priority = 30;
+	Fct = "GraphEngineTaskSleep";
+	GraphGroup = GraphGroupSleep;
+};
+
+Component\Task GraphEngineTask80Ms
+{
+	Priority = 60;
+	Fct = "GraphEngineTask80Ms";
+	GraphGroup = GraphGroup80Ms;
+};
+
+Component\Task DATCpuRefreshWatchDogTask
+{
+	Priority = 20;
+	Fct = "DATCpuRefreshWatchDogTask";
+};
+
+Component\Task DATEepTask
+{
+	Priority = 10;
+	Fct = "DATEepTask";
+};
+
+Component\Task DATDinTask
+{
+	Priority = 90;
+	Fct = "DATDinReadTask";
+	Id = "cTOSTaskID_ReadLogical";
+};
+
+Component\Task DATDouTask
+{
+	Priority = 50;
+	Fct = "DATDouRefreshOutputTask";
+	Id = "cTOSTaskID_WriteLogical";
+};
+
+Component\Task DATAnaTask
+{
+	Priority = 100;
+	Fct = "DATAnaTask";
+	Id = "cTOSTaskID_TacheANA";
+};
+
+Component\Task DATKwpTask
+{
+	Priority = 70;
+	Fct = "DATKwpTaskControl";
+	Id = "cTOSTaskID_ControlKwp";
+};
+
+Component\Task DATBuzTask
+{
+	Priority = 40;
+	Fct = "DATBuzTask";
+};
+
+Component\Task DATRbgTask
+{
+	Priority = 80;
+	Fct = "DATRbgAirbagCrashDetection";
+	Id = "cTOSTaskIdDATRbgTask";
+};
+
+Component\TaskPriority DATCpuIdleTask
+{
+	Priority = 0;
+};
+
+Component\TaskPriority DATEepTask
+{
+	Priority = 10;
+};
+
+Component\TaskPriority DATCpuRefreshWatchDogTask
+{
+	Priority = 20;
+};
+
+Component\TaskPriority GraphEngineTaskSleep
+{
+	Priority = 30;
+};
+
+Component\TaskPriority DATBuzTask
+{
+	Priority = 40;
+};
+
+Component\TaskPriority DATDouTask
+{
+	Priority = 50;
+};
+
+Component\TaskPriority GraphEngineTask80Ms
+{
+	Priority = 60;
+};
+
+Component\TaskPriority GraphEngineTask20Ms
+{
+	Priority = 62;
+};
+
+Component\TaskPriority GraphEngineTask
+{
+	Priority = 64;
+};
+
+Component\TaskPriority DATKwpTask
+{
+	Priority = 70;
+};
+
+Component\TaskPriority DATRbgTask
+{
+	Priority = 80;
+};
+
+Component\TaskPriority DATDinTask
+{
+	Priority = 90;
+};
+
+Component\TaskPriority DATAnaTask
+{
+	Priority = 100;
+};
+
+Component\TaskPriority TOSClock
+{
+	Priority = 500;
+};
+
+Component\ProdControl @ProdControl6
+{
+	Name = "TOSInitialize";
+};
+
+Component\ProdControl @ProdControl21
+{
+	Name = "ActiveSleepRequest";
+};
+
+Component\ProdControl @ProdControl56
+{
+	Name = "ActiveSleepRequest";
+};
+
+Component\ProdControl @ProdControl62
+{
+	Name = "WakeUpRequest";
+};
+
+Component\ProdControl @ProdControl63
+{
+	Name = "Changing_RR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl64
+{
+	Name = "Changing_FR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl65
+{
+	Name = "Falling_HAZARD_SW";
+};
+
+Component\ProdControl @ProdControl66
+{
+	Name = "Falling_PWR_IGN";
+};
+
+Component\ProdControl @ProdControl67
+{
+	Name = "Rising_PWR_IGN";
+};
+
+Component\ProdControl @ProdControl68
+{
+	Name = "FrontStopPositionDetected";
+};
+
+Component\ProdControl @ProdControl69
+{
+	Name = "RearStopPositionDetected";
+};
+
+Component\ProdControl @ProdControl70
+{
+	Name = "Rising_DOOR_LOCK_SW";
+};
+
+Component\ProdControl @ProdControl71
+{
+	Name = "Rising_DOOR_UNLOCK_SW";
+};
+
+Component\ProdControl @ProdControl72
+{
+	Name = "Falling_FR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl73
+{
+	Name = "Rising_FR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl74
+{
+	Name = "Falling_RR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl75
+{
+	Name = "Rising_RR_DOORS_SW";
+};
+
+Component\ProdControl @ProdControl76
+{
+	Name = "InputsReadAfterStartingStepState";
+};
+
+Component\ProdControl @ProdControl77
+{
+	Name = "ProtectionLedVerlogSleepMode";
+};
+
+Component\ProdControl @ProdControl160
+{
+	Name = "AirbagUnlock";
+};
+
+Component\ProdControl @ProdControl166
+{
+	Name = "StartLearningInFactoryMode";
+};
+
+Component\ProdControl @ProdControl167
+{
+	Name = "ExitFromLearningInFactoryMode";
+};
+
+Component\ProdControl @ProdControl168
+{
+	Name = "StartLearningInAfterSaleMode";
+};
+
+Component\ProdControl @ProdControl169
+{
+	Name = "ValidateLearningInAfterSaleMode";
+};
+
+Component\ProdControl @ProdControl170
+{
+	Name = "GiveUpLearningInAfterSaleMode";
+};
+
+Component\ProdControl @ProdControl171
+{
+	Name = "StartPermanentAuthentication";
+};
+
+Component\ProdControl @ProdControl172
+{
+	Name = "StopPermanentAuthentication";
+};
+
+Component\ProdControl @ProdControl173
+{
+	Name = "StartTestVirginKey";
+};
+
+Component\ProdControl @ProdControl174
+{
+	Name = "AlaDiagEnable";
+};
+
+Component\ProdControl @ProdControl175
+{
+	Name = "AlaDiagDisable";
+};
+
+Component\ProdControl @ProdControl180
+{
+	Name = "RightFlashingForTFC";
+};
+
+Component\ProdControl @ProdControl181
+{
+	Name = "LeftFlashingForTFC";
+};
+
+Component\ProdControl @ProdControl182
+{
+	Name = "ActivateFinalTest";
+};
+
+Component\ProdControl @ProdControl183
+{
+	Name = "ClearFaultFlagsAndCounters";
+};
+
+Component\ProdControl @ProdControl191
+{
+	Name = "RKE_LOCK_REQUEST";
+};
+
+Component\ProdControl @ProdControl192
+{
+	Name = "RKE_UNLOCK_REQUEST";
+};
+
+Component\ProdControl @ProdControl193
+{
+	Name = "RfLockAllForAlarm";
+};
+
+Component\ProdControl @ProdControl194
+{
+	Name = "RfUnlockAllForAlarm";
+};
+
+Component\ProdControl @ProdControl195
+{
+	Name = "AutoRelock";
+};
+
+Component\ProdControl @ProdControl196
+{
+	Name = "CrashUnlockFinished";
+};
+
+Component\ProdControl @ProdControl200
+{
+	Name = "WakeUpRequest";
+};
+
+Component\ProdControl @ProdControl213
+{
+	Name = "GetAprTrpResource";
+};
+
+Component\ProdControl @ProdControl214
+{
+	Name = "ReleaseAprTrpResource";
+};
+
+Component\ProdControl @ProdControl217
+{
+	Name = "GetCarTrpResource";
+};
+
+Component\ProdControl @ProdControl218
+{
+	Name = "KeyIsAuthenticated";
+};
+
+Component\ProdControl @ProdControl219
+{
+	Name = "KeyIsNotAuthenticated";
+};
+
+Component\ProdControl @ProdControl220
+{
+	Name = "ReleaseCarTrpResource";
+};
+
+Component\ProdControl @ProdControl265
+{
+	Name = "DATInitialize";
+};
+
+Component\ProdControl @ProdControl266
+{
+	Name = "LAPInitialize";
+};
+
+Component\ProdControl @ProdControl267
+{
+	Name = "EnterStartingStepState";
+};
+
+Component\ProdControl @ProdControl268
+{
+	Name = "LeaveStartingStepState";
+};
+
+Component\ProdControl @ProdControl269
+{
+	Name = "DATEnterActiveState";
+};
+
+Component\ProdControl @ProdControl270
+{
+	Name = "LAPEnterActiveState";
+};
+
+Component\ProdControl @ProdControl271
+{
+	Name = "LAPLeaveActiveState";
+};
+
+Component\ProdControl @ProdControl272
+{
+	Name = "DATLeaveActiveState";
+};
+
+Component\ProdControl @ProdControl273
+{
+	Name = "IsAnybodyMaintainStartingStepState";
+};
+
+Component\ProdControl @ProdControl274
+{
+	Name = "IsAnybodyMaintainActiveSleepState";
+};
+
+Component\ProdControl @ProdControl275
+{
+	Name = "IsAnybodyMaintainActiveState";
+};
+
+Component\Signal FrontWiperStopIsAllowed_LAP_FRW
+{
+};
+
+Component\Signal RearWiperStopIsAllowed_LAP_RRW
+{
+};
+
+Component\Signal FR_AUTOSTOP_SWFalling_LAP_FRW
+{
+};
+
+Component\Signal RR_AUTOSTOP_SWFalling_LAP_RRW
+{
+};
+
+Component\Signal Changing_RR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Falling_RR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Rising_RR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Changing_FR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Falling_FR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Rising_FR_DOORS_SW_LAP_ILL
+{
+};
+
+Component\Signal Falling_PWR_IGN_LAP_ILL
+{
+};
+
+Component\Signal Rising_PWR_IGN_LAP_ILL
+{
+};
+
+Component\Signal Falling_PWR_IGN_LAP_BUZ
+{
+};
+
+Component\Signal Rising_PWR_IGN_LAP_FLI
+{
+};
+
+Component\Signal Falling_HAZARD_SW_LAP_FLI
+{
+};
+
+Component\Signal FrontStopPositionDetected_LAP_FRW1
+{
+};
+
+Component\Signal FrontStopPositionDetected_LAP_FRW2
+{
+};
+
+Component\Signal RearStopPositionDetected_LAP_RRW1
+{
+};
+
+Component\Signal RearStopPositionDetected_LAP_RRW2
+{
+};
+
+Component\Signal Rising_PWR_IGN_LAP_DLK
+{
+};
+
+Component\Signal Falling_PWR_IGN_LAP_DLK
+{
+};
+
+Component\Signal Rising_FR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Falling_FR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Changing_FR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Rising_RR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Falling_RR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Changing_RR_DOORS_SW_LAP_DLK
+{
+};
+
+Component\Signal Rising_DOOR_LOCK_SW_LAP_DLK
+{
+};
+
+Component\Signal Rising_DOOR_UNLOCK_LOCK_SW_LAP_DLK
+{
+};
+
+Component\Signal Rising_RF_UNLOCK_DRIVER_DOOR_LAP_DLK
+{
+};
+
+Component\Signal EventIntKwpWakeUp
+{
+};
+
+Component\Signal DiagnosticMessageIsReceived
+{
+};
+
+Component\Signal CrashIsDetectedByAirbag
+{
+};
+
+Component\Signal CrashUnlockStarted
+{
+};
+
+Component\Signal LAPFliCrashUnlockFinished
+{
+};
+
+Component\Signal LAPFliEventRfLockAll
+{
+};
+
+Component\Signal LAPFliEventRfUnlockAll
+{
+};
+
+Component\Signal ActiveSleepRequested
+{
+};
+
+Component\Signal WakeUpRequested
+{
+};
+
+Component\Signal SomebodyMaintainStartingStepState
+{
+};
+
+Component\Signal SomebodyMaintainActiveSleepState
+{
+};
+
+Component\Signal SomebodyMaintainActiveState
+{
+};
+
+Component\Graph EepromManager
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph EepromNormalization
+{
+	GraphGroup = GraphGroup80Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup80Ms";
+};
+
+Component\Graph DATRfReceptionManagement
+{
+	GraphGroup = GraphGroupSleep;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroupSleep";
+};
+
+Component\Graph DATTrpAuthentication
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph DATTrpWriteAccess
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph DATTrpResynchronization
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph DATTrpTfcDiag
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph DATVlgInput
+{
+	GraphGroup = GraphGroup80Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup80Ms";
+};
+
+Component\Graph DATVlgOutputProtection
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph SpeedManagement
+{
+	GraphGroup = GraphGroup80Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup80Ms";
+};
+
+Component\Graph RPMManagement
+{
+	GraphGroup = GraphGroup80Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup80Ms";
+};
+
+Component\Graph LAPKwpTreatRequest
+{
+	Id = "cTOSSeqKWPTreatRequest";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPKwpTreatCommunication
+{
+	Id = "cTOSSeqKWPTreatCommunication";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPAfsIOControlByLocalID
+{
+	Id = "cTOSSeqLAPAfsIOControlByLocalID";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPTfcAutoTestIO
+{
+	Id = "cTOSSeqLAPTfcAutoTestIO";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPTfcGraph
+{
+	Id = "cTOSSeqLAPTfcGraph";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPTfcEepTest
+{
+	Id = "cTOSSeqLAPTfcEepTest";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph DLKInputData
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph DLKOutputData
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph DLKMotorCommand
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph DLKAirbagManagement
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPIllInternalLightsManagement
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph LAPIllInternalLightsController
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph LAPBuzMainGraph
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPFliInput
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph LAPFliLampsState
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph LAPFliProtectionManagement
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LRNUpdateLearningAuthorization
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph LRNManageLearningService
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph CARManageImmobiliserAndCarAntiTheft
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPVldPatternManagement
+{
+	GraphGroup = GraphGroupSleep;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroupSleep";
+};
+
+Component\Graph RDFRearDefoggerManagement
+{
+	Id = "cTOSSeqGraphIdRDFRearDefoggerManagement";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph RDFProtectionManagement
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPAlarms
+{
+	Id = "cTOSSeqGraphIdLAPAlarms";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph AlarmAfterReset
+{
+	Id = "cTOSSeqGraphIdAlarmAfterReset";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPFrwEngineProtection
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPFrwIntermittentWipe
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPFrwWashing
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPFrwControl
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPRrwEngineProtection
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPRrwIntermittentWipe
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPRrwWashing
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPRrwInitialParking
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPRrwControl
+{
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph LAPExlGraph
+{
+	GraphGroup = GraphGroup20Ms;
+	NbInstances = 1;
+	__GraphGroupName = "GraphGroup20Ms";
+};
+
+Component\Graph PerimeterAlarmManagement
+{
+	Id = "cTOSSeqGraphIdPerimeterAlarmManagement";
+	GraphGroup = Default;
+	NbInstances = 1;
+	__GraphGroupName = "Default";
+};
+
+Component\Graph Supervisor
+{
+	GraphGroup = IdleGraphGroup;
+	NbInstances = 1;
+	__GraphGroupName = "IdleGraphGroup";
+};
+
+Component\GraphGroup Default
+{
+	Default = TRUE;
+};
+
+Component\GraphGroup IdleGraphGroup
+{
+};
+
+Component\GraphGroup GraphGroup20Ms
+{
+};
+
+Component\GraphGroup GraphGroupSleep
+{
+};
+
+Component\GraphGroup GraphGroup80Ms
+{
+};
+
+};

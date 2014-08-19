@@ -1,0 +1,665 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:53 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SPD.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_SPD.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_SPD.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SPD.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_SPD.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_SPD.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SPD.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LDB_SPD
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Oct 14 2009 17:20:30  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SPD/LDB_SPD.c-arc  $
+     16          // $Revision:   1.2  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SPD/LDB_SPD.c-arc  $
+     19          // 
+     20          //    Rev 1.2   Oct 14 2009 17:20:30   adzhelp
+     21          // Cm005225, Cm004744, Cm003262: Code review corrections
+     22          // 
+     23          //    Rev 1.1   Sep 25 2009 09:13:34   adzhelp
+     24          // Cm005225, Cm004744, Cm003262: Move functions to banked area.
+     25          // 
+     26          //    Rev 1.0   Apr 09 2009 10:20:20   adzhelp
+     27          // Initial revision.
+     28          //******************************************************************************
+     29          #endif
+     30          
+     31          //------------------------------------------------------------------------------
+     32          // Body Identification
+     33          //------------------------------------------------------------------------------
+     34          #define ldb_spd   "ldb_spd"
+     35          
+     36          //------------------------------------------------------------------------------
+     37          // Included files to resolve specific definitions in this file
+     38          //------------------------------------------------------------------------------
+     39          #include "ldb_int.h"
+
+   \                                 In  segment SADDR_A, at 0xff0e
+   \   union <unnamed> volatile __saddr _A_P14
+   \                     _A_P14:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff1f
+   \   unsigned char const volatile __saddr __no_bit_access TM51
+   \                     TM51:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff41
+   \   union <unnamed> volatile __sfr _A_CR51
+   \                     _A_CR51:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff43
+   \   union <unnamed> volatile __sfr _A_TMC51
+   \                     _A_TMC51:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff48
+   \   union <unnamed> volatile __sfr _A_EGP
+   \                     _A_EGP:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff49
+   \   union <unnamed> volatile __sfr _A_EGN
+   \                     _A_EGN:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff8c
+   \   union <unnamed> volatile __sfr _A_TCL51
+   \                     _A_TCL51:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe2
+   \   union <unnamed> volatile __sfr _A_IF1
+   \                     _A_IF1:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     40          #include "ldb_reg.h"
+     41          #include "ldb_spd.h"
+     42          
+     43          //------------------------------------------------------------------------------
+     44          // Local constants
+     45          //------------------------------------------------------------------------------
+     46          // Registers initializers
+     47          #define cRegisterTCL51Init  (U8)0x00U // TI51 pin falling edge
+     48          #define cRegisterTMC51Init  (U8)0x00U // Counter stopped, output disabled
+     49          
+     50          #define cMaxCounterValue    (U8)0xFFU
+     51          
+     52          // External interrupt for engine RPM measurement
+     53          #define cExtInterruptId     INTP6
+     54          #define cExtInterruptNum    6
+     55          // Threshold number of signal transitions on ENGINE_RPM input
+     56          #define cThresholdNumberEngineRunning   6U // corresponds to 6 periods
+     57                                                     // when f >= 6.7Hz (T <= 149 ms)
+     58                                                     // and reading period is 960 ms
+     59          
+     60          //------------------------------------------------------------------------------
+     61          // Local macros
+     62          //------------------------------------------------------------------------------
+     63          // Vehicle Speed
+     64          #define mConfigureVehicleSpeedCounter() \
+     65              /* Timer Clock Selection */ \
+     66              mLDBRegWrite8BitRegister(TCL51, cRegisterTCL51Init); \
+     67              /* Timer Mode Control */ \
+     68              mLDBRegWrite8BitRegister(TMC51, cRegisterTMC51Init); \
+     69              /* Compare register */ \
+     70              mLDBRegWrite8BitRegister(CR51, cMaxCounterValue)
+     71          
+     72          #define mStartVehicleSpeedCounter() \
+     73              mClearVehicleSpeedCounterFlag(); \
+     74              mLDBRegWrite1BitInRegister(TMC51, 7, 1)
+     75          #define mStopVehicleSpeedCounter()      mLDBRegWrite1BitInRegister(TMC51, 7, 0)
+     76          #define mGetVehicleSpeedCounter()       mLDBRegRead8BitRegister(TM51)
+     77          #define mIsVehicleSpeedCounterOverrun() (mLDBIntGetIsrRequestFlag(INTTM51) != 0)
+     78          #define mClearVehicleSpeedCounterFlag() mLDBIntClearIsrRequestFlag(INTTM51)
+     79          
+     80          // Engine RPM
+     81          #define mConfigureEngineRpmDetection()
+     82          
+     83          #define mStartEngineRpmDetection() \
+     84          { \
+     85              /* Enable external interrupt edge detection: both edges */ \
+     86              mLDBRegWrite1BitInRegister(EGP, cExtInterruptNum, 1); \
+     87              mLDBRegWrite1BitInRegister(EGN, cExtInterruptNum, 1); \
+     88              mRestartEngineRpmDetection(); \
+     89          }
+     90          
+     91          #define mRestartEngineRpmDetection() \
+     92          { \
+     93              u8RpmSignalRisingCounter = 0; \
+     94              u8RpmSignalFallingCounter = 0; \
+     95              mLDBIntClearIsrRequestFlag(cExtInterruptId); \
+     96              mLDBIntEnableIsr(cExtInterruptId); \
+     97          }
+     98          
+     99          #define mStopEngineRpmDeteciton() \
+    100          { \
+    101              mLDBIntDisableIsr(cExtInterruptId); \
+    102              mLDBRegWrite1BitInRegister(EGP, cExtInterruptNum, 0); \
+    103              mLDBRegWrite1BitInRegister(EGN, cExtInterruptNum, 0); \
+    104          }
+    105          
+    106          #define mIsEngineRunning() \
+    107              ((u8RpmSignalFallingCounter >= (U8)(cThresholdNumberEngineRunning + 1U)) || \
+    108               (u8RpmSignalRisingCounter >= (U8)(cThresholdNumberEngineRunning + 1U)))
+    109          
+    110          //------------------------------------------------------------------------------
+    111          // Local types
+    112          //------------------------------------------------------------------------------
+    113          
+    114          // This is an example:
+    115          // typedef Expression   tTypeName;
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Local data
+    119          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    120          static U8 u8RpmSignalFallingCounter;
+   \                     u8RpmSignalFallingCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    121          static U8 u8RpmSignalRisingCounter;
+   \                     u8RpmSignalRisingCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    122          
+    123          //------------------------------------------------------------------------------
+    124          // Constant local data
+    125          //------------------------------------------------------------------------------
+    126          
+    127          // This is an example:
+    128          // static const tType  cConstantName;
+    129          
+    130          //------------------------------------------------------------------------------
+    131          // Exported data
+    132          //------------------------------------------------------------------------------
+    133          
+    134          // This is an example:
+    135          // Reduce to minimum the usage of extern data members!!!
+    136          // tType   LAYCmpVariableName;  //LAY: 3 characters to identify the layer
+    137          // tType*  pLAYCmpVariableName; //Cmp: 3-4 characters to identify the component
+    138          // U8      u8LAYCmpVariableName;
+    139          // U16*    pu16LAYCmpVariableName;
+    140          
+    141          //------------------------------------------------------------------------------
+    142          // Constant exported data
+    143          //------------------------------------------------------------------------------
+    144          
+    145          // This is an example:
+    146          // Reduce to minimum the usage of extern constant data members!!!
+    147          // extern const tType  cLAYCmpConstantName;
+    148          // extern const U32    cu32LAYCmpConstantName;
+    149          
+    150          //------------------------------------------------------------------------------
+    151          // Local function prototypes
+    152          //------------------------------------------------------------------------------
+    153          
+    154          // This is an example:
+    155          // static tType CmpFunctionName( tTypeArgument1 ArgumentName1, ... );
+    156          
+    157          //==============================================================================
+    158          //=========================== LOCAL FUNCTIONS ==================================
+    159          //==============================================================================
+    160          
+    161          //==============================================================================
+    162          // DESCRIPTION:         < short description of the function >
+    163          //
+    164          // PARAMETERS:          < type,usage and constraints for all parameters >
+    165          //
+    166          // RETURN VALUE:        < type and usage >
+    167          //
+    168          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+    169          //==============================================================================
+    170          // This is an example:
+    171          // static tType CmpFunctionName( tTypeArgument1 ArgumentName1, ... )
+    172          // {
+    173          //      ... body
+    174          // }
+    175          
+    176          //==============================================================================
+    177          //=========================== EXPORTED FUNCTIONS ===============================
+    178          //==============================================================================
+    179          
+    180          //==============================================================================
+    181          // DESCRIPTION:         Initialization of SPD channel
+    182          //
+    183          // PARAMETERS:          None
+    184          //
+    185          // RETURN VALUE:        None
+    186          //
+    187          // DESIGN INFORMATION:  Refer to DCD
+    188          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    189          void LDBSpdInit(void)
+   \                     LDBSpdInit:
+    190          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    191              mConfigureVehicleSpeedCounter();
+   \   0000   138C00         MOV       0xFF8C,#0
+   \   0003   134300         MOV       0xFF43,#0
+   \   0006   1341FF         MOV       0xFF41,#255
+    192              mConfigureEngineRpmDetection();
+    193          }
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   \   000A                  REQUIRE _A_CR51
+   \   000A                  REQUIRE _A_TMC51
+   \   000A                  REQUIRE _A_TCL51
+    194          
+    195          //==============================================================================
+    196          // DESCRIPTION:         LDB receive with address of SPD channel
+    197          //
+    198          // PARAMETERS:          const tAddress Address - address of parameter to read:
+    199          //                          either speed of engine state
+    200          //                      tMsg* const pMsg - pointer to data message  
+    201          //
+    202          // RETURN VALUE:        None
+    203          //
+    204          // DESIGN INFORMATION:  Refer to DCD
+    205          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    206          MEM_TYPE void LDBSpdReceiveWithAddr(const tAddress Address, tMsg* const pMsg)
+   \                     LDBSpdReceiveWithAddr:
+    207          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   D4             MOVW      DE,AX
+    208              if (pMsg != NULL)
+   \   0001   C2             MOVW      AX,BC
+   \   0002   6168           OR        A,X
+   \   0004   BD03           BNZ       $+5
+   \   0006   9B....         BR        N:??LDBIntIsrINTP6_5
+    209              {
+    210                  mLIBassert(pMsg->Lng == cLDBSpdMessageLength);
+   \   0009   63             MOV       A,B
+   \   000A   D6             MOVW      HL,AX
+   \   000B   AE02           MOV       A,[HL+0x02]
+   \   000D   70             MOV       X,A
+   \   000E   AE03           MOV       A,[HL+0x03]
+   \   0010   EA0200         CMPW      AX,#2
+   \   0013   AD03           BZ        ??LDBIntIsrINTP6_6
+   \   0015   9A....         CALL      LIBAssertionFailed
+    211                  if (Address == cLDBSpdAddrVehicleSpeed)
+   \                     ??LDBIntIsrINTP6_6:
+   \   0018   C4             MOVW      AX,DE
+   \   0019   EA0100         CMPW      AX,#1
+   \   001C   BD26           BNZ       ??LDBIntIsrINTP6_7
+    212                  {
+    213                      // called on period 720 ms
+    214                      if (mIsVehicleSpeedCounterOverrun())
+   \   001E   3137E20C       BF        0xFFE2.3, ??LDBIntIsrINTP6_8
+    215                      {
+    216                          pMsg->pBuffer[cLDBSpdVehicleSpeedIndex] = cMaxCounterValue;
+   \   0022   C2             MOVW      AX,BC
+   \   0023   D6             MOVW      HL,AX
+   \   0024   87             MOV       A,[HL]
+   \   0025   70             MOV       X,A
+   \   0026   AE01           MOV       A,[HL+0x01]
+   \   0028   D6             MOVW      HL,AX
+   \   0029   A1FF           MOV       A,#255
+   \   002B   97             MOV       [HL],A
+   \   002C   FA0F           BR        ??LDBIntIsrINTP6_9
+    217                      }
+    218                      else
+    219                      {
+    220                          pMsg->pBuffer[cLDBSpdVehicleSpeedIndex] = mGetVehicleSpeedCounter();
+   \                     ??LDBIntIsrINTP6_8:
+   \   002E   F01F           MOV       A,S:0xFF1F
+   \   0030   74             MOV       E,A
+   \   0031   C2             MOVW      AX,BC
+   \   0032   D6             MOVW      HL,AX
+   \   0033   87             MOV       A,[HL]
+   \   0034   70             MOV       X,A
+   \   0035   AE01           MOV       A,[HL+0x01]
+   \   0037   D6             MOVW      HL,AX
+   \   0038   64             MOV       A,E
+   \   0039   97             MOV       [HL],A
+    221                          mStopVehicleSpeedCounter();
+   \   003A   717B43         CLR1      0xFF43.7
+    222                      }
+    223                      mStartVehicleSpeedCounter();
+   \                     ??LDBIntIsrINTP6_9:
+   \   003D   713BE2         CLR1      0xFFE2.3
+   \   0040   717A43         SET1      0xFF43.7
+   \   0043   AF             RET       
+    224                  }
+    225                  else if (Address == cLDBSpdAddrEngineRpm)
+   \                     ??LDBIntIsrINTP6_7:
+   \   0044   EA0200         CMPW      AX,#2
+   \   0047   BD50           BNZ       ??LDBIntIsrINTP6_5
+    226                  {
+    227                      // called on period 960 ms
+    228                      mLDBIntDisableIsr(cExtInterruptId); // protect shared counters from interrupt access
+   \   0049   7B1E           DI
+   \   004B   6A..           SET1      S:LDBIntGroup1+1.6
+   \   004D   C8..00         CMP       S:LDBIntLevel,#0
+   \   0050   BD03           BNZ       ??LDBIntIsrINTP6_10
+   \   0052   716AE6         SET1      0xFFE6.6
+   \                     ??LDBIntIsrINTP6_10:
+   \   0055   C8..02         CMP       S:LDBIntLevel,#2
+   \   0058   AD02           BZ        ??LDBIntIsrINTP6_11
+   \   005A   7A1E           EI
+    229                      pMsg->pBuffer[cLDBSpdEngineRpmIndex] = 
+    230                          (mIsEngineRunning() ? cLDBSpdEngineRunning : cLDBSpdEngineNotRunning);
+   \                     ??LDBIntIsrINTP6_11:
+   \   005C   8E....         MOV       A,u8RpmSignalFallingCounter
+   \   005F   4D07           CMP       A,#7
+   \   0061   9D07           BNC       ??LDBIntIsrINTP6_12
+   \   0063   8E....         MOV       A,u8RpmSignalRisingCounter
+   \   0066   4D07           CMP       A,#7
+   \   0068   8D04           BC        ??LDBIntIsrINTP6_13
+   \                     ??LDBIntIsrINTP6_12:
+   \   006A   A401           MOV       E,#1
+   \   006C   FA02           BR        ??LDBIntIsrINTP6_14
+   \                     ??LDBIntIsrINTP6_13:
+   \   006E   A400           MOV       E,#0
+   \                     ??LDBIntIsrINTP6_14:
+   \   0070   C2             MOVW      AX,BC
+   \   0071   D6             MOVW      HL,AX
+   \   0072   87             MOV       A,[HL]
+   \   0073   70             MOV       X,A
+   \   0074   AE01           MOV       A,[HL+0x01]
+   \   0076   D6             MOVW      HL,AX
+   \   0077   64             MOV       A,E
+   \   0078   86             INCW      HL
+   \   0079   97             MOV       [HL],A
+    231                      mRestartEngineRpmDetection();
+   \   007A   A100           MOV       A,#0
+   \   007C   9E....         MOV       u8RpmSignalRisingCounter,A
+   \   007F   9E....         MOV       u8RpmSignalFallingCounter,A
+   \   0082   716BE2         CLR1      0xFFE2.6
+   \   0085   7B1E           DI
+   \   0087   6B..           CLR1      S:LDBIntGroup1+1.6
+   \   0089   C8..00         CMP       S:LDBIntLevel,#0
+   \   008C   BD03           BNZ       ??LDBIntIsrINTP6_15
+   \   008E   716BE6         CLR1      0xFFE6.6
+   \                     ??LDBIntIsrINTP6_15:
+   \   0091   C8..02         CMP       S:LDBIntLevel,#2
+   \   0094   AD06           BZ        ??LDBIntIsrINTP6_16
+   \   0096   7A1E           EI
+   \   0098   AF             RET       
+    232                  }
+    233                  else
+    234                  {
+    235                      mLIBassert(cFalse);
+   \                     ??LDBIntIsrINTP6_5:
+   \   0099   9A....         CALL      LIBAssertionFailed
+    236                  }
+    237              }
+    238              else
+    239              {
+    240                  mLIBassert(cFalse);
+    241              }
+    242          }
+   \                     ??LDBIntIsrINTP6_16:
+   \   009C   AF             RET       
+   \   009D                  REQUIRE ?CL78K_V4_6_L00
+   \   009D                  REQUIRE TM51
+   \   009D                  REQUIRE _A_TMC51
+   \   009D                  REQUIRE _A_IF1
+   \   009D                  REQUIRE _A_MK1
+    243          
+    244          //==============================================================================
+    245          // DESCRIPTION:         LDB control of SPD channel
+    246          //
+    247          // PARAMETERS:          const tCtrl Ctrl - Control type
+    248          //
+    249          // RETURN VALUE:        None
+    250          //
+    251          // DESIGN INFORMATION:  Refer to DCD
+    252          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    253          MEM_TYPE void LDBSpdControl(const tCtrl Ctrl)
+   \                     LDBSpdControl:
+    254          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    255              switch (Ctrl)
+   \   0000   4D01           CMP       A,#1
+   \   0002   AD06           BZ        ??LDBIntIsrINTP6_17
+   \   0004   4D02           CMP       A,#2
+   \   0006   AD2D           BZ        ??LDBIntIsrINTP6_18
+   \   0008   FA48           BR        ??LDBIntIsrINTP6_19
+    256              {
+    257              case cLDBSpdControlStart:
+    258                  mStartVehicleSpeedCounter();
+   \                     ??LDBIntIsrINTP6_17:
+   \   000A   A100           MOV       A,#0
+   \   000C   713BE2         CLR1      0xFFE2.3
+   \   000F   717A43         SET1      0xFF43.7
+    259                  mStartEngineRpmDetection();
+   \   0012   716A48         SET1      0xFF48.6
+   \   0015   716A49         SET1      0xFF49.6
+   \   0018   9E....         MOV       u8RpmSignalRisingCounter,A
+   \   001B   9E....         MOV       u8RpmSignalFallingCounter,A
+   \   001E   716BE2         CLR1      0xFFE2.6
+   \   0021   7B1E           DI
+   \   0023   6B..           CLR1      S:LDBIntGroup1+1.6
+   \   0025   C8..00         CMP       S:LDBIntLevel,#0
+   \   0028   BD03           BNZ       ??LDBIntIsrINTP6_20
+   \   002A   716BE6         CLR1      0xFFE6.6
+   \                     ??LDBIntIsrINTP6_20:
+   \   002D   C8..02         CMP       S:LDBIntLevel,#2
+   \   0030   AD23           BZ        ??LDBIntIsrINTP6_21
+   \   0032   7A1E           EI
+   \   0034   AF             RET       
+    260                  break;
+    261              case cLDBSpdControlStop:
+    262                  mStopVehicleSpeedCounter();
+   \                     ??LDBIntIsrINTP6_18:
+   \   0035   717B43         CLR1      0xFF43.7
+    263                  mStopEngineRpmDeteciton();
+   \   0038   7B1E           DI
+   \   003A   6A..           SET1      S:LDBIntGroup1+1.6
+   \   003C   C8..00         CMP       S:LDBIntLevel,#0
+   \   003F   BD03           BNZ       ??LDBIntIsrINTP6_22
+   \   0041   716AE6         SET1      0xFFE6.6
+   \                     ??LDBIntIsrINTP6_22:
+   \   0044   C8..02         CMP       S:LDBIntLevel,#2
+   \   0047   AD02           BZ        ??LDBIntIsrINTP6_23
+   \   0049   7A1E           EI
+   \                     ??LDBIntIsrINTP6_23:
+   \   004B   716B48         CLR1      0xFF48.6
+   \   004E   716B49         CLR1      0xFF49.6
+   \   0051   AF             RET       
+    264                  break;
+    265              default:
+    266                  mLIBassert(cFalse);
+   \                     ??LDBIntIsrINTP6_19:
+   \   0052   9A....         CALL      LIBAssertionFailed
+    267              }
+    268          }
+   \                     ??LDBIntIsrINTP6_21:
+   \   0055   AF             RET       
+   \   0056                  REQUIRE ?CL78K_V4_6_L00
+   \   0056                  REQUIRE _A_TMC51
+   \   0056                  REQUIRE _A_EGP
+   \   0056                  REQUIRE _A_EGN
+   \   0056                  REQUIRE _A_IF1
+   \   0056                  REQUIRE _A_MK1
+    269          
+    270          //==============================================================================
+    271          // DESCRIPTION:         External interrupt service routine
+    272          //
+    273          // PARAMETERS:          N/A
+    274          //
+    275          // RETURN VALUE:        N/A
+    276          //
+    277          // DESIGN INFORMATION:  Refer to DCD
+    278          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    279          mLDBIntDeclareIsr(cExtInterruptId)
+   \                     LDBIntIsrINTP6:
+    280          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001                  ; Total Auto size: 0
+    281              mLDBIntEnterIsr(cExtInterruptId);
+   \   0001   11..01         MOV       S:LDBIntLevel,#1
+   \   0004   F4E5           MOV       A,0xFFE5
+   \   0006   6D1E           OR        A,#30
+   \   0008   F6E5           MOV       0xFFE5,A
+   \   000A   F4E6           MOV       A,0xFFE6
+   \   000C   6D46           OR        A,#70
+   \   000E   F6E6           MOV       0xFFE6,A
+   \   0010   7A1E           EI
+    282          
+    283              if (mLDBHarRead(cLDBHarEngineRpmInput) == 0)
+   \   0012   8C0E09         BT        S:0xFF0E.0, ??LDBIntIsrINTP6_0
+    284              {
+    285                  u8RpmSignalFallingCounter++;
+   \   0015   8E....         MOV       A,u8RpmSignalFallingCounter
+   \   0018   41             INC       A
+   \   0019   9E....         MOV       u8RpmSignalFallingCounter,A
+   \   001C   FA07           BR        ??LDBIntIsrINTP6_1
+    286              }
+    287              else
+    288              {
+    289                  u8RpmSignalRisingCounter++;
+   \                     ??LDBIntIsrINTP6_0:
+   \   001E   8E....         MOV       A,u8RpmSignalRisingCounter
+   \   0021   41             INC       A
+   \   0022   9E....         MOV       u8RpmSignalRisingCounter,A
+    290              }
+    291          
+    292              if ((u8RpmSignalFallingCounter >= (U8)(cThresholdNumberEngineRunning + 1U)) ||
+    293                  (u8RpmSignalRisingCounter >= (U8)(cThresholdNumberEngineRunning + 1U))   )
+   \                     ??LDBIntIsrINTP6_1:
+   \   0025   8E....         MOV       A,u8RpmSignalFallingCounter
+   \   0028   4D07           CMP       A,#7
+   \   002A   9D07           BNC       ??LDBIntIsrINTP6_2
+   \   002C   8E....         MOV       A,u8RpmSignalRisingCounter
+   \   002F   4D07           CMP       A,#7
+   \   0031   8D13           BC        ??LDBIntIsrINTP6_3
+    294              {
+    295                  // external interrupt protection: engine is running
+    296                  mLDBIntDisableIsr(cExtInterruptId);
+   \                     ??LDBIntIsrINTP6_2:
+   \   0033   7B1E           DI
+   \   0035   6A..           SET1      S:LDBIntGroup1+1.6
+   \   0037   C8..00         CMP       S:LDBIntLevel,#0
+   \   003A   BD03           BNZ       ??LDBIntIsrINTP6_4
+   \   003C   716AE6         SET1      0xFFE6.6
+   \                     ??LDBIntIsrINTP6_4:
+   \   003F   C8..02         CMP       S:LDBIntLevel,#2
+   \   0042   AD02           BZ        ??LDBIntIsrINTP6_3
+   \   0044   7A1E           EI
+    297              }
+    298              mLDBIntLeaveIsr(cExtInterruptId);
+   \                     ??LDBIntIsrINTP6_3:
+   \   0046   7B1E           DI
+   \   0048   11..00         MOV       S:LDBIntLevel,#0
+   \   004B   F0..           MOV       A,S:LDBIntGroup1
+   \   004D   70             MOV       X,A
+   \   004E   F4E5           MOV       A,0xFFE5
+   \   0050   6158           AND       A,X
+   \   0052   F6E5           MOV       0xFFE5,A
+   \   0054   F0..           MOV       A,S:LDBIntGroup1+1
+   \   0056   70             MOV       X,A
+   \   0057   F4E6           MOV       A,0xFFE6
+   \   0059   6158           AND       A,X
+   \   005B   F6E6           MOV       0xFFE6,A
+    299          }
+   \   005D   B0             POP       AX
+   \   005E   8F             RETI      
+   \   005F                  REQUIRE ?CL78K_V4_6_L00
+   \   005F                  REQUIRE _A_P14
+   \   005F                  REQUIRE _A_MK0
+   \   005F                  REQUIRE _A_MK1
+
+   \                                 In  segment INTVEC, offset 0x30, root
+   \                     `??LDBIntIsrINTP6??INTVEC 48`:
+   \   0030   ....           DW LDBIntIsrINTP6
+
+   Segment part sizes:
+
+     Function/Label              Bytes
+     --------------              -----
+     _A_P14                         1
+     TM51                           1
+     _A_CR51                        1
+     _A_TMC51                       1
+     _A_EGP                         1
+     _A_EGN                         1
+     _A_TCL51                       1
+     _A_IF1                         2
+     _A_MK0                         2
+     _A_MK1                         2
+     u8RpmSignalFallingCounter      1
+     u8RpmSignalRisingCounter       1
+     LDBSpdInit                    10
+     LDBSpdReceiveWithAddr        157
+     LDBSpdControl                 86
+     LDBIntIsrINTP6                95
+     ??LDBIntIsrINTP6??INTVEC 48    2
+
+ 
+ 243 bytes in segment BCODE
+ 105 bytes in segment CODE
+   2 bytes in segment INTVEC
+  11 bytes in segment NEAR_A
+   2 bytes in segment NEAR_Z
+   2 bytes in segment SADDR_A
+ 
+ 348 bytes of CODE memory (+  2 bytes shared)
+   2 bytes of DATA memory (+ 13 bytes shared)
+
+Errors: none
+Warnings: none

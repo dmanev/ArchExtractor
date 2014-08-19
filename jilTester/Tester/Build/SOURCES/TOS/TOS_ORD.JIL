@@ -1,0 +1,34 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      STK
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    TOS_ORD
+//               JIL definitions
+// -----------------------------------------------------------------------------
+// $Date:   04 Feb 2009 17:03:06  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ORD.JIL-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_ORD.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:03:06   adzhelp
+// Initial revision.
+*/
+//******************************************************************************
+#ifndef I_TOS_ORD_JIL
+#define I_TOS_ORD_JIL
+
+
+Component Tos_ord 
+{
+    
+};
+
+
+#endif /* I_TOS_ORD_JIL */

@@ -1,0 +1,33 @@
+format 74
+
+artifactcanvas 129775 artifact_ref 135151 // BaseFileParser
+  xyz 172 34 2000
+end
+artifactcanvas 130415 artifact_ref 148847 // StkJilFileParser
+  xyz 282 283 2000
+end
+artifactcanvas 130927 artifact_ref 155503 // StkFileParser
+  xyz 181 154 2000
+end
+artifactcanvas 131311 artifact_ref 184175 // BasePortCriteria
+  xyz 683 89 2000
+end
+artifactcanvas 132719 artifact_ref 210671 // StkPortCriteria
+  xyz 815 257 2000
+end
+artifactcanvas 132975 artifact_ref 223727 // StkCHeaderFileParser
+  xyz 95 287 2005
+end
+simplerelationcanvas 131055 simplerelation_ref 162031
+  from ref 130415 z 2001 to ref 130927
+end
+simplerelationcanvas 131183 simplerelation_ref 162159
+  from ref 130927 z 2001 to ref 129775
+end
+simplerelationcanvas 132847 simplerelation_ref 215535
+  from ref 132719 z 2001 to ref 131311
+end
+simplerelationcanvas 133103 simplerelation_ref 222063
+  from ref 132975 z 2006 to ref 130927
+end
+end

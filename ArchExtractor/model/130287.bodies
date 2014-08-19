@@ -1,0 +1,5 @@
+class IPort
+!!!166255.python!!!	getInterface(in self : ) : IPortInterface
+        pass
+!!!166383.python!!!	setInterface(in self : , in inpIf : IPortInterface)
+        pass

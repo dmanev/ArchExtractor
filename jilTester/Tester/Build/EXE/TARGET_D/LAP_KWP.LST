@@ -1,0 +1,1866 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:27 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_KWP.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_KWP.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_KWP.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_KWP.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_KWP.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_KWP.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_KWP.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_KWP
+     13          // -----------------------------------------------------------------------------
+     14          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_KWP/LAP_KWP.C-arc  $
+     15          // 
+     16          //    Rev 1.11   Mar 25 2010 14:28:44   adzhelp
+     17          // Cm007976: Code review corrections - comment removed
+     18          // 
+     19          //    Rev 1.10   Oct 27 2009 15:33:14   adzhelp
+     20          // Cm006382: Removal of implementation of start reprogramming session
+     21          // 
+     22          //    Rev 1.9   Oct 13 2009 18:21:30   akodzhh
+     23          // Cm005756: Comments added - Component Test results updated.
+     24          // 
+     25          //    Rev 1.8   Sep 21 2009 15:42:32   akodzhh
+     26          // Cm005756: P2 and TIdle timeouts adjusted.
+     27          // 
+     28          //    Rev 1.7   Sep 17 2009 10:20:36   adzhelp
+     29          // Cm003277: Implementation of start reprogramming session - jump to bootloader
+     30          // 
+     31          //    Rev 1.6   Sep 15 2009 09:47:46   akodzhh
+     32          // Cm006204: SDS positive response length changed to be 1 byte.
+     33          // 
+     34          //    Rev 1.5   Sep 14 2009 15:33:48   akodzhh
+     35          // Cm006204: SDS positive response length changed to be 1 byte. CR 1.5 issues fixed.
+     36          // 
+     37          //    Rev 1.4   Apr 29 2009 14:20:16   adzhelp
+     38          // Cm003128: Functions moved to banked memory area
+     39          // 
+     40          //    Rev 1.3   Apr 27 2009 14:11:00   akodzhh
+     41          // Cm003128: LAP_KWP Component test and QAC.
+     42          // 
+     43          //    Rev 1.2   Apr 22 2009 15:27:10   akodzhh
+     44          // Cm003128: StartCom positive response is always send CLR#69. SDS response 2 bytes(not 1). SDS: do not exit current session if the same is requested.
+     45          // 
+     46          //    Rev 1.1   20 Mar 2009 18:09:48   akodzhh
+     47          // Cm003128 - last session restore after Read immo conf.
+     48          // 
+     49          //    Rev 1.0   Jan 14 2009 16:24:04   akodzhh
+     50          // Initial revision.
+     51          // 
+     52          //******************************************************************************
+     53          #endif
+     54          
+     55          
+     56          //--------------------------------------------------------------------------
+     57          //  Body Identification
+     58          //--------------------------------------------------------------------------
+     59          #define lap_kwp  "lap_kwp"
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Included files to resolve specific definitions in this file
+     63          //------------------------------------------------------------------------------
+     64          #include "lib.h"
+     65          #include "dat.h"
+     66          #include "tos.h"
+     67          #include "lap_kwp.h"
+     68          #include "lap_kwpp.h"
+     69          #include "lap_kwp.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPKwpTreatRequest[4]
+   \                     LAPKwpTreatRequest:
+   \   0000   ........       DW LAPKwpNewRequestIsReceived, LAPKwpAnalyseRequest
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW TOSSeqTrueEval, LAPKwpExecuteCurrentSessionService
+   \   000A   FF02           DB 255, 2
+   \   000C   ........       DW LAPKwpServiceIsFinishedOrTimeOutP2IsFinished, LAPKwpSendResponse
+   \   0010   0300           DB 3, 0
+   \   0012   ........       DW TOSSeqTrueEval, LAPKwpExecuteCurrentSessionService
+   \   0016   FF02           DB 255, 2
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPKwpTreatCommunication[4]
+   \                     LAPKwpTreatCommunication:
+   \   0000   ........       DW LAPKwpIsWakeUpReceived, LAPKwpStartTimeOutInit
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPKwpNewRequestIsReceived, LAPKwpStartCom
+   \   000A   0302           DB 3, 2
+   \   000C   ........       DW LAPKwpComTimeOutIsElapsedOrStopComReceived, LAPKwpTreatStopCom
+   \   0010   FF00           DB 255, 0
+   \   0012   ........       DW LAPKwpTimeOutInitElapsed, LAPKwpReturnInWakeUpDetection
+   \   0016   FF00           DB 255, 0
+     70          
+     71          //------------------------------------------------------------------------------
+     72          // Local constants
+     73          //------------------------------------------------------------------------------
+     74          // Cm005756: increase accuracy for the timeouts measured through graph group default
+     75          #define cTidle                    (mTOSConvMsEnTickHorloge(300UL) - (tTOSTimer)1U)
+     76          #define cCommunicationTimeOut     (mTOSConvMsEnTickHorloge(5000UL))
+     77          // Cm005756: increase accuracy for the timeouts measured through graph group default
+     78          #define cP2TimeOut                (mTOSConvMsEnTickHorloge(240UL) - (tTOSTimer)1U)
+     79          
+     80          #define cRequestField         0
+     81          // SIDPR: SID+$40
+     82          #define cPositiveRespAdd     (U8)0x40
+     83          
+     84          // lgth of frame
+     85          #define cTesterPresentRequestLgth    (U8)0x01
+     86          #define cStartSessionRequestLgth     (U8)0x02
+     87          
+     88          #define cStartComRequestLgth         (U8)0x01
+     89          #define cStopComRequestLgth          (U8)0x01
+     90          
+     91          #define cStartComRespLgth   (U8)3
+     92          #define cStartComPR     (U8)0xC1
+     93          #define cStartComKB1    (U8)0xD0
+     94          #define cStartComKB2    (U8)0x8F
+     95          #define cKB1Offset  1
+     96          #define cKB2Offset  2
+     97          
+     98          // negative response
+     99          #define cNRSIDOffset 1
+    100          #define cNRCOffset   2
+    101          
+    102          #define cDefaultSessionID      cLAPAfsIdAFSSession
+    103          
+    104          //------------------------------------------------------------------------------
+    105          // Local macros
+    106          //------------------------------------------------------------------------------
+    107          
+    108          //------------------------------------------------------------------------------
+    109          // Local types
+    110          //------------------------------------------------------------------------------
+    111          
+    112          //------------------------------------------------------------------------------
+    113          // Local data
+    114          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    115          static tTOSTempo  CommunicationTimeOut;
+   \                     CommunicationTimeOut:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    116          static tTOSTempo  TimerP2;
+   \                     TimerP2:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    117          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    118          static U8     u8IndexRequestedService;
+   \                     u8IndexRequestedService:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    119          static BOOL   bComIsStopped;
+   \                     bComIsStopped:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    120          static BOOL   bStartComIsValid;
+   \                     bStartComIsValid:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    121          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    122          static const tLAPKwpParamOfSession*   pActiveSession;
+   \                     pActiveSession:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    123          static U8     u8LastSessionID;
+   \                     u8LastSessionID:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    124          static BOOL   bHaveToRestoreLastSession;
+   \                     bHaveToRestoreLastSession:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    125          static BOOL   bNoAnswer;
+   \                     bNoAnswer:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    126          //------------------------------------------------------------------------------
+    127          // Constant local data
+    128          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 2
+    129          static const tLAPKwpParamOfSession TabSession[cLAPKwpNbrOfSessionSupported] = 
+   \                     TabSession:
+   \   0000   08C0           DB 8, 192
+   \   0002   ....           DW TabIdentifierServiceSupportedInAfsSession
+   \   0004   ....           DW TabServiceSupportedInAfsSession
+   \   0006   ........       DD LAPAfsCloseSession, LAPAfsInitSession
+   \          ........
+   \   000E   08B0           DB 8, 176
+   \   0010   ....           DW TabIdentifierServiceSupportedInAfsSession
+   \   0012   ....           DW TabServiceSupportedInAfsSession
+   \   0014   ........       DD LAPAfsCloseSession, LAPAfsInitSession
+   \          ........
+   \   001C   08A0           DB 8, 160
+   \   001E   ....           DW TabIdentifierServiceSupportedInAfsSession
+   \   0020   ....           DW TabServiceSupportedInAfsSession
+   \   0022   ........       DD LAPAfsCloseSession, LAPAfsInitSession
+   \          ........
+   \   002A   03FB           DB 3, 251
+   \   002C   ....           DW TabIdentifierServiceSupportedInDvpSession
+   \   002E   ....           DW TabServiceSupportedInDvpSession
+   \   0030   ........       DD LAPDvpCloseSession, LAPDvpInitSession
+   \          ........
+   \   0038   04FA           DB 4, 250
+   \   003A   ....           DW TabIdentifierServiceSupportedInTfcSession
+   \   003C   ....           DW TabServiceSupportedInTfcSession
+   \   003E   ........       DD LAPTfcCloseSession, LAPTfcInitSession
+   \          ........
+    130                                                                    LAPKwpInitSessiontables();
+    131          
+    132          //------------------------------------------------------------------------------
+    133          // Exported data
+    134          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    135          U8  u8LAPKwpRequestStatus;
+   \                     u8LAPKwpRequestStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    136          
+    137          //------------------------------------------------------------------------------
+    138          // Constant exported data
+    139          //------------------------------------------------------------------------------
+    140          
+    141          //------------------------------------------------------------------------------
+    142          // Local function prototypes
+    143          //------------------------------------------------------------------------------
+    144          static MEM_TYPE BOOL  ServiceKnownByECUSession(const U8 u8ServiceIDP);
+    145          static MEM_TYPE void  TreatStartDiagnosticSession(void);
+    146          static MEM_TYPE void  TreatStopCommunication(void);
+    147          static MEM_TYPE void  TreatTesterPresentService(void);
+    148          static MEM_TYPE void  RestoreLastSession(void);
+    149          static MEM_TYPE void  TreatStartCommunication(void);
+    150          
+    151          #ifdef X90_PROJECT
+    152          static MEM_TYPE void LAPKwpAnalyseRequest_Static(void);
+    153          static MEM_TYPE void LAPKwpStartCom_Static(void);
+    154          static MEM_TYPE void LAPKwpTreatStopCom_Static(void);
+    155          static MEM_TYPE void LAPKwpSendResponse_Static(void);
+    156          static MEM_TYPE void LAPKwpExecuteCurrentSessionService_Static(void);
+    157          static MEM_TYPE void LAPKwpInitialize_Static(void);
+    158          #endif
+    159          
+    160          
+    161          //==============================================================================
+    162          //=========================== LOCAL FUNCTIONS ==================================
+    163          //==============================================================================
+    164          
+    165          //==============================================================================
+    166          // DESCRIPTION:         ServiceKnownByECUSession
+    167          //
+    168          // PARAMETERS:          U8
+    169          //
+    170          // RETURN VALUE:        BOOL
+    171          //
+    172          // DESIGN INFORMATION:  refer to Detailed Design Document
+    173          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    174          static MEM_TYPE BOOL ServiceKnownByECUSession(const U8 u8ServiceIDP)
+   \                     ServiceKnownByECUSession:
+    175          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    176              BOOL bResultL;
+    177              U8   u8IndexL;
+    178          
+    179              bResultL = cFalse;
+   \   0002   A400           MOV       E,#0
+    180              if(pActiveSession != NULL)
+   \   0004   02....         MOVW      AX,pActiveSession
+   \   0007   6168           OR        A,X
+   \   0009   AD2C           BZ        ??LAPKwpRerstoreLastSession_0
+    181              {
+    182                  for (u8IndexL=0 ; (u8IndexL<pActiveSession->NbOfSupportedService) ; u8IndexL++)
+   \   000B   A300           MOV       B,#0
+   \   000D   8E....         MOV       A,pActiveSession+1
+   \   0010   D6             MOVW      HL,AX
+   \   0011   87             MOV       A,[HL]
+   \   0012   4D00           CMP       A,#0
+   \   0014   AD24           BZ        ??LAPKwpRerstoreLastSession_1
+    183                  {
+    184                      if (u8ServiceIDP ==  (pActiveSession->pTabIdentifierOfSupportedService)[u8IndexL])
+   \                     ??ServiceKnownByECUSession_0:
+   \   0016   AE02           MOV       A,[HL+0x02]
+   \   0018   70             MOV       X,A
+   \   0019   AE03           MOV       A,[HL+0x03]
+   \   001B   D6             MOVW      HL,AX
+   \   001C   AB             MOV       A,[HL+B]
+   \   001D   70             MOV       X,A
+   \   001E   62             MOV       A,C
+   \   001F   6148           CMP       A,X
+   \   0021   BD06           BNZ       ??LAPKwpRerstoreLastSession_2
+    185                      {
+    186                          bResultL = cTrue;
+   \   0023   63             MOV       A,B
+   \   0024   A401           MOV       E,#1
+    187                          u8IndexRequestedService = u8IndexL;
+   \   0026   9E....         MOV       u8IndexRequestedService,A
+    188                      }
+    189                  }
+   \                     ??LAPKwpRerstoreLastSession_2:
+   \   0029   43             INC       B
+   \   002A   02....         MOVW      AX,pActiveSession
+   \   002D   D6             MOVW      HL,AX
+   \   002E   87             MOV       A,[HL]
+   \   002F   70             MOV       X,A
+   \   0030   63             MOV       A,B
+   \   0031   6148           CMP       A,X
+   \   0033   9D05           BNC       ??LAPKwpRerstoreLastSession_1
+   \   0035   FADF           BR        ??ServiceKnownByECUSession_0
+    190              }
+    191              else
+    192              {
+    193                  mLIBassert(cFalse); //CCOV: akodzhh: can't be tested because of assert
+   \                     ??LAPKwpRerstoreLastSession_0:
+   \   0037   9A....         CALL      LIBAssertionFailed
+    194              } 
+    195              
+    196              return(bResultL);
+   \                     ??LAPKwpRerstoreLastSession_1:
+   \   003A   64             MOV       A,E
+   \   003B   B2             POP       BC
+   \   003C   AF             RET       
+   \   003D                  REQUIRE ?CL78K_V4_6_L00
+    197          }
+    198          
+    199          //==============================================================================
+    200          // DESCRIPTION:         TreatStartDiagnosticSession
+    201          //
+    202          // PARAMETERS:          none
+    203          //
+    204          // RETURN VALUE:        none
+    205          //
+    206          // DESIGN INFORMATION:  refer to Detailed Design Document
+    207          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    208          static MEM_TYPE void TreatStartDiagnosticSession(void)
+   \                     TreatStartDiagnosticSession:
+    209          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    210              U8    u8IndexL;
+    211              BOOL  bInvalidRequestL;
+    212          
+    213              bInvalidRequestL = cTrue;
+   \   0002   A201           MOV       C,#1
+    214              if (mDATRead(U8Bit,DATKwpRxFrameLgth,Default)== cStartSessionRequestLgth)
+   \   0004   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0007   4D02           CMP       A,#2
+   \   0009   AD03           BZ        $+5
+   \   000B   9B....         BR        N:??LAPKwpRerstoreLastSession_3
+    215              {
+    216                  for (u8IndexL=0; (u8IndexL<cLAPKwpNbrOfSessionSupported)&&(bInvalidRequestL == cTrue); u8IndexL++)
+   \   000E   10....         MOVW      AX,#TabSession+1
+   \   0011   A300           MOV       B,#0
+   \   0013   B6             POP       HL
+   \   0014   B1             PUSH      AX
+    217                  {
+    218                      if (TabSession[u8IndexL].SessionIdentifier == mDATReadTable(U8Bit,DATKwpRxBuffer,cRequestField+1,Default))
+   \                     ??TreatStartDiagnosticSession_0:
+   \   0015   891C           MOVW      AX,SP
+   \   0017   D6             MOVW      HL,AX
+   \   0018   87             MOV       A,[HL]
+   \   0019   70             MOV       X,A
+   \   001A   AE01           MOV       A,[HL+0x01]
+   \   001C   D6             MOVW      HL,AX
+   \   001D   87             MOV       A,[HL]
+   \   001E   48....         CMP       A,DATKwpRxBuffer+4
+   \   0021   BD57           BNZ       ??LAPKwpRerstoreLastSession_4
+    219                      {
+    220                          mLIBassert(pActiveSession != NULL);
+   \   0023   02....         MOVW      AX,pActiveSession
+   \   0026   6168           OR        A,X
+   \   0028   BD03           BNZ       ??LAPKwpRerstoreLastSession_5
+   \   002A   9A....         CALL      LIBAssertionFailed
+    221                          //QACJ 0506: akodzhh: pointer value is correct
+    222                          u8LastSessionID = pActiveSession->SessionIdentifier;
+   \                     ??LAPKwpRerstoreLastSession_5:
+   \   002D   02....         MOVW      AX,pActiveSession
+   \   0030   D6             MOVW      HL,AX
+   \   0031   AE01           MOV       A,[HL+0x01]
+   \   0033   9E....         MOV       u8LastSessionID,A
+    223                          
+    224                          // if session requested is not activated already
+    225                          if( TabSession[u8IndexL].SessionIdentifier != u8LastSessionID ) // prsFS_DIAG-674
+   \   0036   891C           MOVW      AX,SP
+   \   0038   D6             MOVW      HL,AX
+   \   0039   87             MOV       A,[HL]
+   \   003A   70             MOV       X,A
+   \   003B   AE01           MOV       A,[HL+0x01]
+   \   003D   D6             MOVW      HL,AX
+   \   003E   87             MOV       A,[HL]
+   \   003F   48....         CMP       A,u8LastSessionID
+   \   0042   AD34           BZ        ??LAPKwpRerstoreLastSession_6
+    226                          {
+    227                              bHaveToRestoreLastSession = cFalse;
+   \   0044   A100           MOV       A,#0
+   \   0046   9E....         MOV       bHaveToRestoreLastSession,A
+    228                              //close Active Session 
+    229                              //QACJ 0506: akodzhh: pointer value is correct 
+    230                              (*pActiveSession->CloseActiveSession)();    // prsFS_DIAG-673
+   \   0049   02....         MOVW      AX,pActiveSession
+   \   004C   D6             MOVW      HL,AX
+   \   004D   AE08           MOV       A,[HL+0x08]
+   \   004F   72             MOV       C,A
+   \   0050   AE06           MOV       A,[HL+0x06]
+   \   0052   70             MOV       X,A
+   \   0053   AE07           MOV       A,[HL+0x07]
+   \   0055   D6             MOVW      HL,AX
+   \   0056   62             MOV       A,C
+   \   0057   74             MOV       E,A
+   \   0058   ..             CALLT     [__T_?FAR_CALL_L07]
+    231                          
+    232                              // start new Session
+    233                              (*TabSession[u8IndexL].OpenActiveSession)();
+   \   0059   891C           MOVW      AX,SP
+   \   005B   D6             MOVW      HL,AX
+   \   005C   87             MOV       A,[HL]
+   \   005D   70             MOV       X,A
+   \   005E   AE01           MOV       A,[HL+0x01]
+   \   0060   D6             MOVW      HL,AX
+   \   0061   AE0B           MOV       A,[HL+0x0B]
+   \   0063   72             MOV       C,A
+   \   0064   AE09           MOV       A,[HL+0x09]
+   \   0066   70             MOV       X,A
+   \   0067   AE0A           MOV       A,[HL+0x0A]
+   \   0069   D6             MOVW      HL,AX
+   \   006A   62             MOV       A,C
+   \   006B   74             MOV       E,A
+   \   006C   ..             CALLT     [__T_?FAR_CALL_L07]
+    234                              pActiveSession = &TabSession[u8IndexL];
+   \   006D   891C           MOVW      AX,SP
+   \   006F   D6             MOVW      HL,AX
+   \   0070   87             MOV       A,[HL]
+   \   0071   70             MOV       X,A
+   \   0072   AE01           MOV       A,[HL+0x01]
+   \   0074   90             DECW      AX
+   \   0075   03....         MOVW      pActiveSession,AX
+    235                          }
+    236                          
+    237                          bInvalidRequestL = cFalse;
+   \                     ??LAPKwpRerstoreLastSession_6:
+   \   0078   A200           MOV       C,#0
+    238                      }
+    239                  }
+   \                     ??LAPKwpRerstoreLastSession_4:
+   \   007A   43             INC       B
+   \   007B   891C           MOVW      AX,SP
+   \   007D   D6             MOVW      HL,AX
+   \   007E   87             MOV       A,[HL]
+   \   007F   70             MOV       X,A
+   \   0080   AE01           MOV       A,[HL+0x01]
+   \   0082   CA0E00         ADDW      AX,#14
+   \   0085   B6             POP       HL
+   \   0086   B1             PUSH      AX
+   \   0087   63             MOV       A,B
+   \   0088   4D05           CMP       A,#5
+   \   008A   9D04           BNC       ??LAPKwpRerstoreLastSession_7
+   \   008C   62             MOV       A,C
+   \   008D   51             DEC       A
+   \   008E   AD85           BZ        ??TreatStartDiagnosticSession_0
+    240              }
+    241          
+    242              if(bInvalidRequestL != cFalse)
+   \                     ??LAPKwpRerstoreLastSession_7:
+   \   0090   62             MOV       A,C
+   \   0091   4D00           CMP       A,#0
+   \   0093   AD17           BZ        ??LAPKwpRerstoreLastSession_8
+    243              {
+    244                  LAPKwpPrepareNegativeResponse(cLAPKwpInvalidFormat);
+   \                     ??LAPKwpRerstoreLastSession_3:
+   \   0095   A17F           MOV       A,#127
+   \   0097   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   009A   97             MOV       [HL],A
+   \   009B   8E....         MOV       A,DATKwpRxBuffer+3
+   \   009E   9E....         MOV       DATKwpTxBuffer+4,A
+   \   00A1   A112           MOV       A,#18
+   \   00A3   16....         MOVW      HL,#DATKwpTxBuffer+5
+   \   00A6   97             MOV       [HL],A
+   \   00A7   100300         MOVW      AX,#3
+   \   00AA   FA0B           BR        ??LAPKwpRerstoreLastSession_9
+    245              }
+    246              else
+    247              {   // Cm006204: SDS positive response length to be 1 byte.
+    248                  LAPKwpPreparePositiveResponse(1);
+   \                     ??LAPKwpRerstoreLastSession_8:
+   \   00AC   A140           MOV       A,#64
+   \   00AE   08....         ADD       A,DATKwpRxBuffer+3
+   \   00B1   9E....         MOV       DATKwpTxBuffer+3,A
+   \   00B4   100100         MOVW      AX,#1
+   \                     ??LAPKwpRerstoreLastSession_9:
+   \   00B7   03....         MOVW      DATKwpTxMsg+2,AX
+    249              }
+    250          }
+   \   00BA   B0             POP       AX
+   \   00BB   B2             POP       BC
+   \   00BC   AF             RET       
+   \   00BD                  REQUIRE ?CL78K_V4_6_L00
+    251          //==============================================================================
+    252          // DESCRIPTION:         TreatStopCommunication
+    253          //
+    254          // PARAMETERS:          none
+    255          //
+    256          // RETURN VALUE:        none
+    257          //
+    258          // DESIGN INFORMATION:  refer to Detailed Design Document
+    259          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    260          static MEM_TYPE void TreatStopCommunication(void)
+   \                     TreatStopCommunication:
+    261          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    262            
+    263              if (mDATRead(U8Bit,DATKwpRxFrameLgth,Default)== cStopComRequestLgth)
+   \   0000   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0003   51             DEC       A
+   \   0004   BD14           BNZ       ??LAPKwpRerstoreLastSession_10
+    264              {
+    265                  LAPKwpPreparePositiveResponse(1);
+   \   0006   A140           MOV       A,#64
+   \   0008   08....         ADD       A,DATKwpRxBuffer+3
+   \   000B   9E....         MOV       DATKwpTxBuffer+3,A
+   \   000E   100100         MOVW      AX,#1
+   \   0011   03....         MOVW      DATKwpTxMsg+2,AX
+    266                  bComIsStopped = cTrue;
+   \   0014   A101           MOV       A,#1
+   \   0016   9E....         MOV       bComIsStopped,A
+   \   0019   AF             RET       
+    267              }
+    268              else
+    269              {
+    270                  LAPKwpPrepareNegativeResponse(cLAPKwpInvalidFormat);
+   \                     ??LAPKwpRerstoreLastSession_10:
+   \   001A   A17F           MOV       A,#127
+   \   001C   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   001F   97             MOV       [HL],A
+   \   0020   8E....         MOV       A,DATKwpRxBuffer+3
+   \   0023   9E....         MOV       DATKwpTxBuffer+4,A
+   \   0026   A112           MOV       A,#18
+   \   0028   16....         MOVW      HL,#DATKwpTxBuffer+5
+   \   002B                  REQUIRE ?CL78K_V4_6_L00
+   \   002B                  REQUIRE ?Subroutine0
+   \   002B                  ; // Fall through to label ?Subroutine0
+    271              }
+    272          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   97             MOV       [HL],A
+   \   0001   100300         MOVW      AX,#3
+   \   0004   03....         MOVW      DATKwpTxMsg+2,AX
+   \   0007   AF             RET       
+   \   0008                  REQUIRE ?CL78K_V4_6_L00
+    273          
+    274          //==============================================================================
+    275          // DESCRIPTION:         TreatTesterPresentService
+    276          //
+    277          // PARAMETERS:          none
+    278          //
+    279          // RETURN VALUE:        none
+    280          //
+    281          // DESIGN INFORMATION:  refer to Detailed Design Document
+    282          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    283          static MEM_TYPE void TreatTesterPresentService(void)
+   \                     TreatTesterPresentService:
+    284          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    285              if( (mDATRead(U8Bit,DATKwpRxFrameLgth,Default)== cTesterPresentRequestLgth))
+   \   0000   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0003   51             DEC       A
+   \   0004   BD0D           BNZ       ??LAPKwpRerstoreLastSession_11
+    286              {
+    287                  LAPKwpPreparePositiveResponse(1);
+   \   0006   A140           MOV       A,#64
+   \   0008   08....         ADD       A,DATKwpRxBuffer+3
+   \   000B   9E....         MOV       DATKwpTxBuffer+3,A
+   \   000E   100100         MOVW      AX,#1
+   \   0011   FA15           BR        ??LAPKwpRerstoreLastSession_12
+    288              }
+    289              else
+    290              {
+    291                  LAPKwpPrepareNegativeResponse(cLAPKwpInvalidFormat);
+   \                     ??LAPKwpRerstoreLastSession_11:
+   \   0013   A17F           MOV       A,#127
+   \   0015   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   0018   97             MOV       [HL],A
+   \   0019   8E....         MOV       A,DATKwpRxBuffer+3
+   \   001C   9E....         MOV       DATKwpTxBuffer+4,A
+   \   001F   A112           MOV       A,#18
+   \   0021   16....         MOVW      HL,#DATKwpTxBuffer+5
+   \   0024   97             MOV       [HL],A
+   \   0025   100300         MOVW      AX,#3
+   \                     ??LAPKwpRerstoreLastSession_12:
+   \   0028   03....         MOVW      DATKwpTxMsg+2,AX
+    292              }
+    293          }
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+    294          
+    295          //==============================================================================
+    296          // DESCRIPTION:         RestoreLastSession
+    297          //
+    298          // PARAMETERS:          none
+    299          //
+    300          // RETURN VALUE:        none
+    301          //
+    302          // DESIGN INFORMATION:  refer to Detailed Design Document
+    303          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    304          static MEM_TYPE void RestoreLastSession(void)
+   \                     RestoreLastSession:
+    305          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    306              U8 u8IndexL;
+    307          
+    308              //CCOV: akodzhh: can't be tested, because of global LAP_KWP Component Test desing.    
+    309              if(  (u8LastSessionID == cLAPAfsIdDvpCustomerSession)
+    310                 ||(u8LastSessionID == cLAPDvpIdDVPSession))
+   \   0001   8E....         MOV       A,u8LastSessionID
+   \   0004   4DA0           CMP       A,#160
+   \   0006   AD04           BZ        ??LAPKwpRerstoreLastSession_13
+   \   0008   4DFB           CMP       A,#251
+   \   000A   BD05           BNZ       ??LAPKwpRerstoreLastSession_14
+    311              {
+    312                  u8LastSessionID = cDefaultSessionID; 
+   \                     ??LAPKwpRerstoreLastSession_13:
+   \   000C   A1C0           MOV       A,#192
+   \   000E   9E....         MOV       u8LastSessionID,A
+    313              }
+    314          
+    315              //CCOV: akodzhh: Defensive check, can't be covered, u8IndexL is always less then cLAPKwpNbrOfSessionSupported. 
+    316              for (u8IndexL=0; bHaveToRestoreLastSession && (u8IndexL < cLAPKwpNbrOfSessionSupported); u8IndexL++)
+   \                     ??LAPKwpRerstoreLastSession_14:
+   \   0011   A300           MOV       B,#0
+   \   0013   FA43           BR        ??LAPKwpRerstoreLastSession_15
+    317              {
+    318                  //CCOV: akodzhh: can't be tested, because of global LAP_KWP Component Test desing.
+    319                  if (TabSession[u8IndexL].SessionIdentifier == u8LastSessionID)
+   \                     ??RestoreLastSession_0:
+   \   0015   A00E           MOV       X,#14
+   \   0017   3188           MULU      X
+   \   0019   CA....         ADDW      AX,#TabSession+1
+   \   001C   D6             MOVW      HL,AX
+   \   001D   87             MOV       A,[HL]
+   \   001E   48....         CMP       A,u8LastSessionID
+   \   0021   BD34           BNZ       ??LAPKwpRerstoreLastSession_16
+    320                  {
+    321                      //close Active Session
+    322                      //QACJ 0506: akodzhh: pointer value is correct 
+    323                      (*pActiveSession->CloseActiveSession)();
+   \   0023   02....         MOVW      AX,pActiveSession
+   \   0026   D6             MOVW      HL,AX
+   \   0027   AE08           MOV       A,[HL+0x08]
+   \   0029   72             MOV       C,A
+   \   002A   AE06           MOV       A,[HL+0x06]
+   \   002C   70             MOV       X,A
+   \   002D   AE07           MOV       A,[HL+0x07]
+   \   002F   D6             MOVW      HL,AX
+   \   0030   62             MOV       A,C
+   \   0031   74             MOV       E,A
+   \   0032   ..             CALLT     [__T_?FAR_CALL_L07]
+    324                      
+    325                      // start last session
+    326                      (*TabSession[u8IndexL].OpenActiveSession)();
+   \   0033   63             MOV       A,B
+   \   0034   A00E           MOV       X,#14
+   \   0036   3188           MULU      X
+   \   0038   CA....         ADDW      AX,#TabSession+10
+   \   003B   D6             MOVW      HL,AX
+   \   003C   AE02           MOV       A,[HL+0x02]
+   \   003E   72             MOV       C,A
+   \   003F   87             MOV       A,[HL]
+   \   0040   70             MOV       X,A
+   \   0041   AE01           MOV       A,[HL+0x01]
+   \   0043   D6             MOVW      HL,AX
+   \   0044   62             MOV       A,C
+   \   0045   74             MOV       E,A
+   \   0046   ..             CALLT     [__T_?FAR_CALL_L07]
+    327                      pActiveSession = &TabSession[u8IndexL];
+   \   0047   63             MOV       A,B
+   \   0048   A00E           MOV       X,#14
+   \   004A   3188           MULU      X
+   \   004C   CA....         ADDW      AX,#TabSession
+   \   004F   03....         MOVW      pActiveSession,AX
+    328          
+    329                      bHaveToRestoreLastSession = cFalse;
+   \   0052   A100           MOV       A,#0
+   \   0054   9E....         MOV       bHaveToRestoreLastSession,A
+    330                  }
+    331              }
+   \                     ??LAPKwpRerstoreLastSession_16:
+   \   0057   43             INC       B
+   \                     ??LAPKwpRerstoreLastSession_15:
+   \   0058   8E....         MOV       A,bHaveToRestoreLastSession
+   \   005B   4D00           CMP       A,#0
+   \   005D   AD05           BZ        ??LAPKwpRerstoreLastSession_17
+   \   005F   63             MOV       A,B
+   \   0060   4D05           CMP       A,#5
+   \   0062   8DB1           BC        ??RestoreLastSession_0
+    332          
+    333          }
+   \                     ??LAPKwpRerstoreLastSession_17:
+   \   0064   B2             POP       BC
+   \   0065   AF             RET       
+   \   0066                  REQUIRE ?CL78K_V4_6_L00
+    334          
+    335          //==============================================================================
+    336          // DESCRIPTION:         TreatStartCommunication
+    337          //
+    338          // PARAMETERS:          none
+    339          //
+    340          // RETURN VALUE:        none
+    341          //
+    342          // DESIGN INFORMATION:  refer to Detailed Design Document
+    343          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    344          static MEM_TYPE void  TreatStartCommunication(void)
+   \                     TreatStartCommunication:
+    345          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    346              if(mDATRead(U8Bit,DATKwpRxFrameLgth,Default)==cStartComRequestLgth)
+   \   0000   8E....         MOV       A,DATKwpRxFrameLgth
+   \   0003   51             DEC       A
+   \   0004   BD10           BNZ       ??LAPKwpRerstoreLastSession_18
+    347              {
+    348                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField,           cStartComPR, Default);
+   \   0006   A1C1           MOV       A,#193
+   \   0008   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   000B   97             MOV       [HL],A
+    349                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField+cKB1Offset,cStartComKB1,Default);
+   \   000C   A1D0           MOV       A,#208
+   \   000E   86             INCW      HL
+   \   000F   97             MOV       [HL],A
+    350                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField+cKB2Offset,cStartComKB2,Default);
+   \   0010   A18F           MOV       A,#143
+   \   0012   86             INCW      HL
+   \   0013   9B....         BR        N:?Subroutine0
+    351                  mDATWrite(U8Bit, DATKwpTxFrameLgth,cStartComRespLgth,Default);
+    352              }
+    353              else
+    354              {
+    355                  bNoAnswer = cTrue;
+   \                     ??LAPKwpRerstoreLastSession_18:
+   \   0016   A101           MOV       A,#1
+   \   0018   9E....         MOV       bNoAnswer,A
+    356              }
+    357          }
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    358          
+    359          //==============================================================================
+    360          //=========================== EXPORTED FUNCTIONS ===============================
+    361          //==============================================================================
+    362          //==============================================================================
+    363          // DESCRIPTION:         LAPKwpAnalyseRequest
+    364          //
+    365          // PARAMETERS:          none
+    366          //
+    367          // RETURN VALUE:        none
+    368          //
+    369          // DESIGN INFORMATION:  refer to Detailed Design Document
+    370          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    371          void LAPKwpAnalyseRequest(void)
+   \                     LAPKwpAnalyseRequest:
+    372          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    373          #ifdef X90_PROJECT
+    374              LAPKwpAnalyseRequest_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpAnalyseRequest_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpAnalyseRequest_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    375          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    376          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    377          static MEM_TYPE void LAPKwpAnalyseRequest_Static(void)
+   \                     LAPKwpAnalyseRequest_Static:
+    378          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CommunicationTimeOut
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    379          #endif
+    380              U8   u8RequestedServiceL;
+    381              BOOL bServiceKnownByECUSession;
+    382            
+    383              // reset of the time out communication
+    384              TOSStartTempo(&CommunicationTimeOut);
+   \   0004   ..             CALLT     [__T_TOSStartTimer]
+    385              if( (mDATRead(U8Bit,TargetID,Default)== cDATKwpECUId) 
+    386                ||(mDATRead(U8Bit,TargetID,Default)== cDATKwpBroadcastID))
+   \   0005   8E....         MOV       A,DATKwpRxBuffer+1
+   \   0008   4D26           CMP       A,#38
+   \   000A   AD04           BZ        ??LAPKwpRerstoreLastSession_19
+   \   000C   4DFF           CMP       A,#255
+   \   000E   BD57           BNZ       ??LAPKwpRerstoreLastSession_20
+    387              {
+    388                  TOSStartTempo(&TimerP2);
+   \                     ??LAPKwpRerstoreLastSession_19:
+   \   0010   10....         MOVW      AX,#TimerP2
+   \   0013   ..             CALLT     [__T_TOSStartTimer]
+    389          
+    390                  u8RequestedServiceL = mDATReadTable(U8Bit,DATKwpRxBuffer,cRequestField,Default);
+   \   0014   8E....         MOV       A,DATKwpRxBuffer+3
+   \   0017   72             MOV       C,A
+    391          
+    392                  if ( u8RequestedServiceL == cLAPKwpIdStartCommunication)
+   \   0018   4D81           CMP       A,#129
+   \   001A   BD08           BNZ       ??LAPKwpRerstoreLastSession_21
+    393                  {
+    394                      // CLR #96 - send response
+    395                      // Communication is started, prepare response only  
+    396                      TreatStartCommunication();
+   \   001C   16....         MOVW      HL,#LWRD(TreatStartCommunication)
+   \   001F   A4..           MOV       E,#BYTE3(TreatStartCommunication)
+   \                     ??LAPKwpAnalyseRequest_Static_0:
+   \   0021   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0022   FA43           BR        ??LAPKwpRerstoreLastSession_20
+    397                  }
+    398                  else if ( u8RequestedServiceL == cLAPKwpIdStartDiagnosticSession)
+   \                     ??LAPKwpRerstoreLastSession_21:
+   \   0024   4D10           CMP       A,#16
+   \   0026   BD07           BNZ       ??LAPKwpRerstoreLastSession_22
+    399                  {
+    400                      TreatStartDiagnosticSession();
+   \   0028   16....         MOVW      HL,#LWRD(TreatStartDiagnosticSession)
+   \   002B   A4..           MOV       E,#BYTE3(TreatStartDiagnosticSession)
+   \   002D   FAF2           BR        ??LAPKwpAnalyseRequest_Static_0
+    401                  }
+    402                  else if ( u8RequestedServiceL == cLAPKwpIdStopCommunication)
+   \                     ??LAPKwpRerstoreLastSession_22:
+   \   002F   4D82           CMP       A,#130
+   \   0031   BD07           BNZ       ??LAPKwpRerstoreLastSession_23
+    403                  {
+    404                      TreatStopCommunication();
+   \   0033   16....         MOVW      HL,#LWRD(TreatStopCommunication)
+   \   0036   A4..           MOV       E,#BYTE3(TreatStopCommunication)
+   \   0038   FAE7           BR        ??LAPKwpAnalyseRequest_Static_0
+    405                  }
+    406                  else if ( u8RequestedServiceL == cLAPKwpIdTesterPresent)
+   \                     ??LAPKwpRerstoreLastSession_23:
+   \   003A   4D3E           CMP       A,#62
+   \   003C   BD07           BNZ       ??LAPKwpRerstoreLastSession_24
+    407                  {
+    408                      TreatTesterPresentService();
+   \   003E   16....         MOVW      HL,#LWRD(TreatTesterPresentService)
+   \   0041   A4..           MOV       E,#BYTE3(TreatTesterPresentService)
+   \   0043   FADC           BR        ??LAPKwpAnalyseRequest_Static_0
+    409                  }
+    410                  else 
+    411                  {
+    412                      bServiceKnownByECUSession = ServiceKnownByECUSession(u8RequestedServiceL);
+    413                      if ( bServiceKnownByECUSession != cFalse)
+   \                     ??LAPKwpRerstoreLastSession_24:
+   \   0045   16....         MOVW      HL,#LWRD(ServiceKnownByECUSession)
+   \   0048   A4..           MOV       E,#BYTE3(ServiceKnownByECUSession)
+   \   004A   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   004B   4D00           CMP       A,#0
+   \   004D   AD13           BZ        ??LAPKwpRerstoreLastSession_25
+    414                      {
+    415                          if ( (mDATRead(U8Bit,TargetID,Default)!= cDATKwpBroadcastID)
+    416                             ||(u8RequestedServiceL == cLAPKwpIdClearDiagnosticInformation))
+   \   004F   8E....         MOV       A,DATKwpRxBuffer+1
+   \   0052   4DFF           CMP       A,#255
+   \   0054   BD05           BNZ       ??LAPKwpRerstoreLastSession_26
+   \   0056   62             MOV       A,C
+   \   0057   4D14           CMP       A,#20
+   \   0059   BD0C           BNZ       ??LAPKwpRerstoreLastSession_20
+    417                          {
+    418                              u8LAPKwpRequestStatus = cLAPKwpNewServiceIsRequested;
+   \                     ??LAPKwpRerstoreLastSession_26:
+   \   005B   A101           MOV       A,#1
+   \   005D   9E....         MOV       u8LAPKwpRequestStatus,A
+   \   0060   FA05           BR        ??LAPKwpRerstoreLastSession_20
+    419                          }
+    420                      }
+    421                      else
+    422                      {
+    423                          // the service is unknown
+    424                          LAPKwpPrepareNegativeResponse(cLAPKwpServiceNotSupported);
+   \                     ??LAPKwpRerstoreLastSession_25:
+   \   0062   A111           MOV       A,#17
+   \   0064   9A....         CALL      LAPKwpPrepareNegativeResponse
+    425                      }
+    426                  }
+    427              }
+    428          }
+   \                     ??LAPKwpRerstoreLastSession_20:
+   \   0067   B2             POP       BC
+   \   0068   AF             RET       
+   \   0069                  REQUIRE ?CL78K_V4_6_L00
+    429          //==============================================================================
+    430          // DESCRIPTION:         LAPKwpExecuteCurrentSessionService
+    431          //
+    432          // PARAMETERS:          none
+    433          //
+    434          // RETURN VALUE:        none
+    435          //
+    436          // DESIGN INFORMATION:  refer to Detailed Design Document
+    437          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    438          void LAPKwpExecuteCurrentSessionService(void)
+   \                     LAPKwpExecuteCurrentSessionService:
+    439          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    440          #ifdef X90_PROJECT
+    441              LAPKwpExecuteCurrentSessionService_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpExecuteCurrentSessionService_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpExecuteCurrentSessionService_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    442          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    443          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    444          static MEM_TYPE void LAPKwpExecuteCurrentSessionService_Static(void)
+   \                     LAPKwpExecuteCurrentSessionService_Static:
+    445          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    446          #endif
+    447          
+    448              if(LAPKwpIsServiceFinished() == cFalse) 
+   \   0001   8E....         MOV       A,u8LAPKwpRequestStatus
+   \   0004   4D03           CMP       A,#3
+   \   0006   AD24           BZ        ??LAPKwpRerstoreLastSession_27
+    449              {
+    450                  //QACJ 0506: akodzhh: pointer value is correct
+    451                  (*(pActiveSession->pTabFunctionOfSupportedService[u8IndexRequestedService]))();
+   \   0008   8E....         MOV       A,u8IndexRequestedService
+   \   000B   A004           MOV       X,#4
+   \   000D   3188           MULU      X
+   \   000F   D4             MOVW      DE,AX
+   \   0010   02....         MOVW      AX,pActiveSession
+   \   0013   D6             MOVW      HL,AX
+   \   0014   AE04           MOV       A,[HL+0x04]
+   \   0016   70             MOV       X,A
+   \   0017   AE05           MOV       A,[HL+0x05]
+   \   0019   E4             XCHW      AX,DE
+   \   001A   30             XCH       A,X
+   \   001B   610C           ADD       A,E
+   \   001D   30             XCH       A,X
+   \   001E   612D           ADDC      A,D
+   \   0020   D6             MOVW      HL,AX
+   \   0021   AE02           MOV       A,[HL+0x02]
+   \   0023   72             MOV       C,A
+   \   0024   87             MOV       A,[HL]
+   \   0025   70             MOV       X,A
+   \   0026   AE01           MOV       A,[HL+0x01]
+   \   0028   D6             MOVW      HL,AX
+   \   0029   62             MOV       A,C
+   \   002A   74             MOV       E,A
+   \   002B   ..             CALLT     [__T_?FAR_CALL_L07]
+    452              }
+    453          }
+   \                     ??LAPKwpRerstoreLastSession_27:
+   \   002C   B2             POP       BC
+   \   002D   AF             RET       
+   \   002E                  REQUIRE ?CL78K_V4_6_L00
+    454          //==============================================================================
+    455          // DESCRIPTION:         LAPKwpNewRequestIsReceived
+    456          //
+    457          // PARAMETERS:          none
+    458          //
+    459          // RETURN VALUE:        BOOL
+    460          //
+    461          // DESIGN INFORMATION:  refer to Detailed Design Document
+    462          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    463          BOOL LAPKwpNewRequestIsReceived(void)
+   \                     LAPKwpNewRequestIsReceived:
+    464          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    465              return TOSReadSignal(cTOSSignalDiagnosticMessageIsReceived);
+   \   0000   101F00         MOVW      AX,#31
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    466          }
+    467          //==============================================================================
+    468          // DESCRIPTION:         LAPKwpSendResponse
+    469          //
+    470          // PARAMETERS:          none
+    471          //
+    472          // RETURN VALUE:        none
+    473          //
+    474          // DESIGN INFORMATION:  refer to Detailed Design Document
+    475          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    476          void LAPKwpSendResponse(void)
+   \                     LAPKwpSendResponse:
+    477          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    478          #ifdef X90_PROJECT
+    479              LAPKwpSendResponse_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpSendResponse_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpSendResponse_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    480          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    481          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    482          static MEM_TYPE void LAPKwpSendResponse_Static(void)
+   \                     LAPKwpSendResponse_Static:
+    483          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#TimerP2
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    484          #endif
+    485              BOOL bTempoElapsedL;
+    486          
+    487              bTempoElapsedL = TOSIsTempoElapsed(&TimerP2, cP2TimeOut);
+    488              if( (bTempoElapsedL == cFalse) && 
+    489                  (mDATRead(U8Bit,TargetID,Default) == cDATKwpECUId)&& 
+    490                  (bNoAnswer != cTrue))
+   \   0004   121700         MOVW      BC,#23
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD21           BNZ       ??LAPKwpRerstoreLastSession_28
+   \   000C   8E....         MOV       A,DATKwpRxBuffer+1
+   \   000F   4D26           CMP       A,#38
+   \   0011   BD1A           BNZ       ??LAPKwpRerstoreLastSession_28
+   \   0013   8E....         MOV       A,bNoAnswer
+   \   0016   51             DEC       A
+   \   0017   AD14           BZ        ??LAPKwpRerstoreLastSession_28
+    491              {
+    492                  mDATControl(Kwp,SendFrame);
+   \   0019   100001         MOVW      AX,#256
+   \   001C   9A....         CALL      TOSActivateTask
+    493                  if(bHaveToRestoreLastSession == cTrue) // confidential service finished
+   \   001F   8E....         MOV       A,bHaveToRestoreLastSession
+   \   0022   51             DEC       A
+   \   0023   BD10           BNZ       ??LAPKwpRerstoreLastSession_29
+    494                  {
+    495                      RestoreLastSession();
+   \   0025   16....         MOVW      HL,#LWRD(RestoreLastSession)
+   \   0028   A4..           MOV       E,#BYTE3(RestoreLastSession)
+   \   002A   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   002B   FA08           BR        ??LAPKwpRerstoreLastSession_29
+    496                  }
+    497              }
+    498              else
+    499              {
+    500                  mDATControl(Kwp,NoAnswer);
+   \                     ??LAPKwpRerstoreLastSession_28:
+   \   002D   9A....         CALL      DATKwpReturnInRxMode
+    501                  bNoAnswer = cFalse; // clear flag
+   \   0030   A100           MOV       A,#0
+   \   0032   9E....         MOV       bNoAnswer,A
+    502              }
+    503              TOSStopTempo(&TimerP2);
+   \                     ??LAPKwpRerstoreLastSession_29:
+   \   0035   10....         MOVW      AX,#TimerP2
+   \   0038   ..             CALLT     [__T_TOSStopTimer]
+    504          }
+   \   0039   B2             POP       BC
+   \   003A   AF             RET       
+   \   003B                  REQUIRE ?CL78K_V4_6_L00
+    505          //==============================================================================
+    506          // DESCRIPTION:         LAPKwpServiceIsFinishedOrTimeOutP2IsFinished
+    507          //
+    508          // PARAMETERS:          none
+    509          //
+    510          // RETURN VALUE:        BOOL
+    511          //
+    512          // DESIGN INFORMATION:  refer to Detailed Design Document
+    513          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    514          BOOL LAPKwpServiceIsFinishedOrTimeOutP2IsFinished(void)
+   \                     LAPKwpServiceIsFinishedOrTimeOutP2IsFinished:
+    515          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#TimerP2
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    516              BOOL bTempoElapsedL;
+    517          
+    518              bTempoElapsedL = TOSIsTempoElapsed(&TimerP2, cP2TimeOut);
+    519              return ((bTempoElapsedL) || (LAPKwpIsServiceFinished()));
+   \   0004   121700         MOVW      BC,#23
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD07           BNZ       ??LAPKwpRerstoreLastSession_37
+   \   000C   8E....         MOV       A,u8LAPKwpRequestStatus
+   \   000F   4D03           CMP       A,#3
+   \   0011   BD04           BNZ       ??LAPKwpRerstoreLastSession_38
+   \                     ??LAPKwpRerstoreLastSession_37:
+   \   0013   A101           MOV       A,#1
+   \   0015   FA02           BR        ??LAPKwpRerstoreLastSession_39
+   \                     ??LAPKwpRerstoreLastSession_38:
+   \   0017   A100           MOV       A,#0
+   \                     ??LAPKwpRerstoreLastSession_39:
+   \   0019   B2             POP       BC
+   \   001A   AF             RET       
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+    520          }
+    521          //==============================================================================
+    522          // DESCRIPTION:         LAPKwpComTimeOutIsElapsedOrStopComReceived
+    523          //
+    524          // PARAMETERS:          none
+    525          //
+    526          // RETURN VALUE:        BOOL
+    527          //
+    528          // DESIGN INFORMATION:  refer to Detailed Design Document
+    529          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    530          BOOL LAPKwpComTimeOutIsElapsedOrStopComReceived(void)
+   \                     LAPKwpComTimeOutIsElapsedOrStopComReceived:
+    531          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CommunicationTimeOut
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    532              BOOL bTempoElapsedL;
+    533          
+    534              bTempoElapsedL = TOSIsTempoElapsed(&CommunicationTimeOut, cCommunicationTimeOut);
+    535              return ((bTempoElapsedL) || (bComIsStopped != cFalse));
+   \   0004   12F401         MOVW      BC,#500
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   4D00           CMP       A,#0
+   \   000A   BD07           BNZ       ??LAPKwpRerstoreLastSession_40
+   \   000C   8E....         MOV       A,bComIsStopped
+   \   000F   4D00           CMP       A,#0
+   \   0011   AD04           BZ        ??LAPKwpRerstoreLastSession_41
+   \                     ??LAPKwpRerstoreLastSession_40:
+   \   0013   A101           MOV       A,#1
+   \   0015   FA02           BR        ??LAPKwpRerstoreLastSession_42
+   \                     ??LAPKwpRerstoreLastSession_41:
+   \   0017   A100           MOV       A,#0
+   \                     ??LAPKwpRerstoreLastSession_42:
+   \   0019   B2             POP       BC
+   \   001A   AF             RET       
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+    536          }
+    537          //==============================================================================
+    538          // DESCRIPTION:         LAPKwpIsWakeUpReceived
+    539          //
+    540          // PARAMETERS:          none
+    541          //
+    542          // RETURN VALUE:        BOOL
+    543          //
+    544          // DESIGN INFORMATION:  refer to Detailed Design Document
+    545          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    546          BOOL LAPKwpIsWakeUpReceived(void)
+   \                     LAPKwpIsWakeUpReceived:
+    547          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    548              return (TOSReadSignal(cTOSSignalEventIntKwpWakeUp));
+   \   0000   101E00         MOVW      AX,#30
+   \   0003   ..             CALLT     [__T_TOSReadSignal]
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    549          }
+    550          //==============================================================================
+    551          // DESCRIPTION:         LAPKwpStartCom
+    552          //
+    553          // PARAMETERS:          none
+    554          //
+    555          // RETURN VALUE:        none
+    556          //
+    557          // DESIGN INFORMATION:  refer to Detailed Design Document
+    558          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    559          void LAPKwpStartCom(void)
+   \                     LAPKwpStartCom:
+    560          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    561          #ifdef X90_PROJECT
+    562              LAPKwpStartCom_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpStartCom_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpStartCom_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    563          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    564          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    565          static MEM_TYPE void LAPKwpStartCom_Static(void)
+   \                     LAPKwpStartCom_Static:
+    566          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    567          #endif
+    568              TOSStopTempo(&CommunicationTimeOut);
+   \   0000   10....         MOVW      AX,#CommunicationTimeOut
+   \   0003   ..             CALLT     [__T_TOSStopTimer]
+    569          
+    570              if( (mDATReadTable(U8Bit,DATKwpRxBuffer,cRequestField,Default)==cLAPKwpIdStartCommunication) &&
+    571                  (mDATRead(U8Bit,DATKwpRxFrameLgth,Default)==cStartComRequestLgth) &&
+    572                  (mDATRead(U8Bit,TargetID,Default) == cDATKwpECUId))
+   \   0004   8E....         MOV       A,DATKwpRxBuffer+3
+   \   0007   4D81           CMP       A,#129
+   \   0009   BD49           BNZ       ??LAPKwpRerstoreLastSession_30
+   \   000B   8E....         MOV       A,DATKwpRxFrameLgth
+   \   000E   51             DEC       A
+   \   000F   BD43           BNZ       ??LAPKwpRerstoreLastSession_30
+   \   0011   8E....         MOV       A,DATKwpRxBuffer+1
+   \   0014   4D26           CMP       A,#38
+   \   0016   BD3C           BNZ       ??LAPKwpRerstoreLastSession_30
+    573              {
+    574                  bStartComIsValid = cTrue;
+   \   0018   A101           MOV       A,#1
+   \   001A   9E....         MOV       bStartComIsValid,A
+    575          
+    576                  // Init local variable
+    577                  LAPKwpSetServiceIsFinished();
+   \   001D   A103           MOV       A,#3
+   \   001F   9E....         MOV       u8LAPKwpRequestStatus,A
+    578          
+    579                  // After a SartCom, the active session is the defaut session
+    580                  pActiveSession = &TabSession[0];
+   \   0022   10....         MOVW      AX,#TabSession
+   \   0025   03....         MOVW      pActiveSession,AX
+    581                  //QACJ 0506: akodzhh: pointer value is correct
+    582                  (*pActiveSession->OpenActiveSession)();
+   \   0028   16....         MOVW      HL,#LWRD(LAPAfsInitSession)
+   \   002B   A4..           MOV       E,#BYTE3(LAPAfsInitSession)
+   \   002D   ..             CALLT     [__T_?FAR_CALL_L07]
+    583                  bComIsStopped = cFalse;
+   \   002E   A100           MOV       A,#0
+   \   0030   9E....         MOV       bComIsStopped,A
+    584          
+    585                  // Send StartCom response
+    586                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField,           cStartComPR, Default);
+   \   0033   A1C1           MOV       A,#193
+   \   0035   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   0038   97             MOV       [HL],A
+    587                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField+cKB1Offset,cStartComKB1,Default);
+   \   0039   A1D0           MOV       A,#208
+   \   003B   86             INCW      HL
+   \   003C   97             MOV       [HL],A
+    588                  mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField+cKB2Offset,cStartComKB2,Default);
+   \   003D   A18F           MOV       A,#143
+   \   003F   86             INCW      HL
+   \   0040   97             MOV       [HL],A
+    589                  mDATWrite(U8Bit, DATKwpTxFrameLgth,cStartComRespLgth,Default);
+   \   0041   100300         MOVW      AX,#3
+   \   0044   03....         MOVW      DATKwpTxMsg+2,AX
+    590                  mDATControl(Kwp,SendFrame);
+   \   0047   100001         MOVW      AX,#256
+   \   004A   9A....         CALL      TOSActivateTask
+    591          
+    592                  // Activate graph
+    593                  TOSSeqActiverGraphe(cTOSSeqKWPTreatRequest);
+   \   004D   A103           MOV       A,#3
+   \   004F   ..             CALLT     [__T_TOSSeqActivateGraph]
+    594          
+    595                  // start com time out
+    596                  TOSStartTempo(&CommunicationTimeOut);
+   \   0050   10....         MOVW      AX,#CommunicationTimeOut
+   \   0053   ..             CALLT     [__T_TOSStartTimer]
+    597              }
+    598          
+    599          }
+   \                     ??LAPKwpRerstoreLastSession_30:
+   \   0054   AF             RET       
+   \   0055                  REQUIRE ?CL78K_V4_6_L00
+    600          //==============================================================================
+    601          // DESCRIPTION:         LAPKwpStartTimeOutInit
+    602          //
+    603          // PARAMETERS:          none
+    604          //
+    605          // RETURN VALUE:        none
+    606          //
+    607          // DESIGN INFORMATION:  refer to Detailed Design Document
+    608          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    609          void LAPKwpStartTimeOutInit(void)
+   \                     LAPKwpStartTimeOutInit:
+    610          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    611              TOSStartTempo(&CommunicationTimeOut);
+   \   0000   10....         MOVW      AX,#CommunicationTimeOut
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+    612          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    613          //==============================================================================
+    614          // DESCRIPTION:         LAPKwpTimeOutInitElapsed
+    615          //
+    616          // PARAMETERS:          none
+    617          //
+    618          // RETURN VALUE:        BOOL
+    619          //
+    620          // DESIGN INFORMATION:  refer to Detailed Design Document
+    621          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    622          BOOL LAPKwpTimeOutInitElapsed(void)
+   \                     LAPKwpTimeOutInitElapsed:
+    623          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CommunicationTimeOut
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    624              return TOSIsTempoElapsed(&CommunicationTimeOut, cTidle);
+   \   0004   121D00         MOVW      BC,#29
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    625          }
+    626          //==============================================================================
+    627          // DESCRIPTION:         LAPKwpTreatStopCom
+    628          //
+    629          // PARAMETERS:          none
+    630          //
+    631          // RETURN VALUE:        none
+    632          //
+    633          // DESIGN INFORMATION:  refer to Detailed Design Document
+    634          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    635          void LAPKwpTreatStopCom(void)
+   \                     LAPKwpTreatStopCom:
+    636          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    637          #ifdef X90_PROJECT
+    638              LAPKwpTreatStopCom_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpTreatStopCom_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpTreatStopCom_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    639          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    640          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    641          static MEM_TYPE void LAPKwpTreatStopCom_Static(void)
+   \                     LAPKwpTreatStopCom_Static:
+    642          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    643          #endif
+    644              if( bStartComIsValid == cTrue)
+   \   0001   8E....         MOV       A,bStartComIsValid
+   \   0004   51             DEC       A
+   \   0005   BD48           BNZ       ??LAPKwpRerstoreLastSession_31
+    645              {
+    646                  TOSStopTempo(&CommunicationTimeOut);
+   \   0007   10....         MOVW      AX,#CommunicationTimeOut
+   \   000A   ..             CALLT     [__T_TOSStopTimer]
+    647          
+    648                  //close Active Session
+    649                  //QACJ 0506: akodzhh: pointer value is correct
+    650                  (*pActiveSession->CloseActiveSession)();
+   \   000B   02....         MOVW      AX,pActiveSession
+   \   000E   D6             MOVW      HL,AX
+   \   000F   AE08           MOV       A,[HL+0x08]
+   \   0011   72             MOV       C,A
+   \   0012   AE06           MOV       A,[HL+0x06]
+   \   0014   70             MOV       X,A
+   \   0015   AE07           MOV       A,[HL+0x07]
+   \   0017   D6             MOVW      HL,AX
+   \   0018   62             MOV       A,C
+   \   0019   74             MOV       E,A
+   \   001A   ..             CALLT     [__T_?FAR_CALL_L07]
+    651          
+    652                  // deactivate graph
+    653                  TOSSeqDesactiverGraphe(cTOSSeqKWPTreatRequest);
+   \   001B   A103           MOV       A,#3
+   \   001D   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    654          
+    655                  if(bComIsStopped != cFalse)
+   \   001E   8E....         MOV       A,bComIsStopped
+   \   0021   4D00           CMP       A,#0
+   \   0023   AD14           BZ        ??LAPKwpRerstoreLastSession_32
+    656                  {
+    657                      if(mDATRead(U8Bit,TargetID,Default)!= cDATKwpBroadcastID)
+   \   0025   8E....         MOV       A,DATKwpRxBuffer+1
+   \   0028   4DFF           CMP       A,#255
+   \   002A   AD08           BZ        ??LAPKwpRerstoreLastSession_33
+    658                      {
+    659                          // Send the stopcom response
+    660                          mDATControl(Kwp,SendFrame);
+   \   002C   100001         MOVW      AX,#256
+   \   002F   9A....         CALL      TOSActivateTask
+   \   0032   FA14           BR        ??LAPKwpRerstoreLastSession_34
+    661                      }
+    662                      else
+    663                      {
+    664                          // Return in reception mode
+    665                          mDATControl(Kwp,NoAnswer);
+   \                     ??LAPKwpRerstoreLastSession_33:
+   \   0034   9A....         CALL      DATKwpReturnInRxMode
+   \   0037   FA0F           BR        ??LAPKwpRerstoreLastSession_34
+    666                      }
+    667                  }
+    668                  else // Communication time out
+    669                  {
+    670                      // communication timeout : no request actualy in treatment
+    671                      mLIBassert(LAPKwpIsServiceFinished() != cFalse);
+   \                     ??LAPKwpRerstoreLastSession_32:
+   \   0039   8E....         MOV       A,u8LAPKwpRequestStatus
+   \   003C   4D03           CMP       A,#3
+   \   003E   AD03           BZ        ??LAPKwpRerstoreLastSession_35
+   \   0040   9A....         CALL      LIBAssertionFailed
+    672                      bComIsStopped = cTrue;
+   \                     ??LAPKwpRerstoreLastSession_35:
+   \   0043   A101           MOV       A,#1
+   \   0045   9E....         MOV       bComIsStopped,A
+    673                  }
+    674                  bStartComIsValid = cFalse;
+   \                     ??LAPKwpRerstoreLastSession_34:
+   \   0048   A100           MOV       A,#0
+   \   004A   9E....         MOV       bStartComIsValid,A
+   \   004D   FA03           BR        ??LAPKwpRerstoreLastSession_36
+    675          
+    676              }
+    677              else
+    678              {
+    679                  //Bad StartCom
+    680                  mDATControl(Kwp,NoAnswer);
+   \                     ??LAPKwpRerstoreLastSession_31:
+   \   004F   9A....         CALL      DATKwpReturnInRxMode
+    681              }
+    682          
+    683              // Authorize KWP WakeUp
+    684              mDATControl(Kwp,WaitForWakeUp);
+   \                     ??LAPKwpRerstoreLastSession_36:
+   \   0052   9A....         CALL      DATKwpActivateWakeUpDetection
+    685          
+    686          }
+   \   0055   B2             POP       BC
+   \   0056   AF             RET       
+   \   0057                  REQUIRE ?CL78K_V4_6_L00
+    687          //==============================================================================
+    688          // DESCRIPTION:         LAPKwpPrepareNegativeResponse
+    689          //
+    690          // PARAMETERS:          U8
+    691          //
+    692          // RETURN VALUE:        none
+    693          //
+    694          // DESIGN INFORMATION:  refer to Detailed Design Document
+    695          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    696          void LAPKwpPrepareNegativeResponse(const U8  u8NRCodeP)
+   \                     LAPKwpPrepareNegativeResponse:
+    697          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   70             MOV       X,A
+    698              U8 u8TempByteL;
+    699          
+    700              u8TempByteL = mDATReadTable(U8Bit,DATKwpRxBuffer,cRequestField, Default);
+    701              mDATWriteTable(U8Bit,DATKwpTxBuffer,0,cLAPKwpIdNegativeResponse,Default);
+   \   0001   A17F           MOV       A,#127
+   \   0003   16....         MOVW      HL,#DATKwpTxBuffer+3
+   \   0006   97             MOV       [HL],A
+    702              mDATWriteTable(U8Bit,DATKwpTxBuffer,cNRSIDOffset,u8TempByteL,Default);
+   \   0007   8E....         MOV       A,DATKwpRxBuffer+3
+   \   000A   9E....         MOV       DATKwpTxBuffer+4,A
+    703              mDATWriteTable(U8Bit,DATKwpTxBuffer,cNRCOffset,  u8NRCodeP,  Default);
+   \   000D   60             MOV       A,X
+   \   000E   9E....         MOV       DATKwpTxBuffer+5,A
+    704              mDATWrite(U8Bit, DATKwpTxFrameLgth,cLAPKwpNRLength,Default);
+   \   0011   100300         MOVW      AX,#3
+   \   0014   03....         MOVW      DATKwpTxMsg+2,AX
+    705          
+    706          }
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+    707          //==============================================================================
+    708          // DESCRIPTION:         LAPKwpPreparePositiveResponse
+    709          //
+    710          // PARAMETERS:          U8
+    711          //
+    712          // RETURN VALUE:        none
+    713          //
+    714          // DESIGN INFORMATION:  refer to Detailed Design Document
+    715          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    716          void LAPKwpPreparePositiveResponse(const U8  u8LengthP)
+   \                     LAPKwpPreparePositiveResponse:
+    717          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   \   0000   70             MOV       X,A
+    718              U8 u8TempByteL;
+    719              u8TempByteL = mDATReadTable(U8Bit,DATKwpRxBuffer,cRequestField, Default);
+    720              mDATWriteTable(U8Bit,DATKwpTxBuffer,cRequestField,(u8TempByteL+cPositiveRespAdd),Default);
+   \   0001   A140           MOV       A,#64
+   \   0003   08....         ADD       A,DATKwpRxBuffer+3
+   \   0006   9E....         MOV       DATKwpTxBuffer+3,A
+    721              mDATWrite(U8Bit, DATKwpTxFrameLgth,u8LengthP,Default);
+   \   0009   A100           MOV       A,#0
+   \   000B   03....         MOVW      DATKwpTxMsg+2,AX
+    722          }
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+    723          //==============================================================================
+    724          // DESCRIPTION:         LAPKwpReturnInWakeUpDetection
+    725          //
+    726          // PARAMETERS:          none
+    727          //
+    728          // RETURN VALUE:        none
+    729          //
+    730          // DESIGN INFORMATION:  refer to Detailed Design Document
+    731          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    732          void LAPKwpReturnInWakeUpDetection(void)
+   \                     LAPKwpReturnInWakeUpDetection:
+    733          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    734              mDATControl(Kwp,WaitForWakeUp);
+   \   0000   9B....         BR        N:DATKwpActivateWakeUpDetection
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    735          }
+    736          //==============================================================================
+    737          // DESCRIPTION:         LAPKwpInitialize
+    738          //
+    739          // PARAMETERS:          none
+    740          //
+    741          // RETURN VALUE:        none
+    742          //
+    743          // DESIGN INFORMATION:  refer to Detailed Design Document
+    744          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    745          void LAPKwpInitialize(void)
+   \                     LAPKwpInitialize:
+    746          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    747          #ifdef X90_PROJECT
+    748              LAPKwpInitialize_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPKwpInitialize_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPKwpInitialize_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    749          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    750          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    751          static MEM_TYPE void LAPKwpInitialize_Static(void)
+   \                     LAPKwpInitialize_Static:
+    752          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    753          #endif
+    754          
+    755              TOSSeqActiverGraphe(cTOSSeqKWPTreatCommunication);
+   \   0000   A104           MOV       A,#4
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    756              bComIsStopped = cTrue;
+   \   0003   A101           MOV       A,#1
+   \   0005   9E....         MOV       bComIsStopped,A
+    757              bStartComIsValid = cFalse;
+   \   0008   A100           MOV       A,#0
+   \   000A   9E....         MOV       bStartComIsValid,A
+    758              bNoAnswer = cFalse; 
+   \   000D   9E....         MOV       bNoAnswer,A
+    759          }
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+    760          
+    761          //==============================================================================
+    762          // DESCRIPTION:         LAPKwpGetActiveSessionID
+    763          //
+    764          // PARAMETERS:          none
+    765          //
+    766          // RETURN VALUE:        U8
+    767          //
+    768          // DESIGN INFORMATION:  refer to Detailed Design Document
+    769          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    770          U8 LAPKwpGetActiveSessionID(void)
+   \                     LAPKwpGetActiveSessionID:
+    771          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    772              U8 u8SessionIdentifierL;
+    773          
+    774              if(pActiveSession != NULL)
+   \   0000   02....         MOVW      AX,pActiveSession
+   \   0003   6168           OR        A,X
+   \   0005   AD07           BZ        ??LAPKwpRerstoreLastSession_43
+    775              {
+    776                  u8SessionIdentifierL = pActiveSession->SessionIdentifier;
+   \   0007   8E....         MOV       A,pActiveSession+1
+   \   000A   D6             MOVW      HL,AX
+   \   000B   AE01           MOV       A,[HL+0x01]
+   \   000D   AF             RET       
+    777              }
+    778              else    //CCOV: akodzhh: for QAC - can't be tested
+    779              {
+    780                  mLIBassert(cFalse);
+   \                     ??LAPKwpRerstoreLastSession_43:
+   \   000E   9A....         CALL      LIBAssertionFailed
+    781                  u8SessionIdentifierL = cDefaultSessionID;
+   \   0011   A1C0           MOV       A,#192
+    782              }
+    783              return u8SessionIdentifierL;
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+    784              
+    785          }
+    786          
+    787          //==============================================================================
+    788          // DESCRIPTION:         LAPKwpRerstoreLastSession
+    789          //
+    790          // PARAMETERS:          none
+    791          //
+    792          // RETURN VALUE:        U8
+    793          //
+    794          // DESIGN INFORMATION:  refer to Detailed Design Document
+    795          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    796          void LAPKwpRerstoreLastSession(void)
+   \                     LAPKwpRerstoreLastSession:
+    797          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    798              bHaveToRestoreLastSession = cTrue;
+   \   0000   A101           MOV       A,#1
+   \   0002   9E....         MOV       bHaveToRestoreLastSession,A
+    799          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSReadSignal:
+   \   0000   ....           DW       TOSReadSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     LAPKwpTreatRequest               24
+     LAPKwpTreatCommunication         24
+     CommunicationTimeOut              2
+     TimerP2                           2
+     u8IndexRequestedService           1
+     bComIsStopped                     1
+     bStartComIsValid                  1
+     pActiveSession                    2
+     u8LastSessionID                   1
+     bHaveToRestoreLastSession         1
+     bNoAnswer                         1
+     TabSession                       70
+     u8LAPKwpRequestStatus             1
+     ServiceKnownByECUSession         61
+     TreatStartDiagnosticSession     189
+     TreatStopCommunication           43
+     ?Subroutine0                      8
+     TreatTesterPresentService        44
+     RestoreLastSession              102
+     TreatStartCommunication          28
+     LAPKwpAnalyseRequest              9
+     LAPKwpAnalyseRequest_Static     105
+     LAPKwpExecuteCurrentSessionService
+                                       9
+     LAPKwpExecuteCurrentSessionService_Static
+                                      46
+     LAPKwpNewRequestIsReceived        5
+     LAPKwpSendResponse                9
+     LAPKwpSendResponse_Static        59
+     LAPKwpServiceIsFinishedOrTimeOutP2IsFinished
+                                      27
+     LAPKwpComTimeOutIsElapsedOrStopComReceived
+                                      27
+     LAPKwpIsWakeUpReceived            5
+     LAPKwpStartCom                    9
+     LAPKwpStartCom_Static            85
+     LAPKwpStartTimeOutInit            5
+     LAPKwpTimeOutInitElapsed         10
+     LAPKwpTreatStopCom                9
+     LAPKwpTreatStopCom_Static        87
+     LAPKwpPrepareNegativeResponse    24
+     LAPKwpPreparePositiveResponse    15
+     LAPKwpReturnInWakeUpDetection     3
+     LAPKwpInitialize                  9
+     LAPKwpInitialize_Static          17
+     LAPKwpGetActiveSessionID         20
+     LAPKwpRerstoreLastSession         6
+     __T_?FAR_CALL_L07                 2
+     __T_TOSStartTimer                 2
+     __T_?FAR_FAST_CALL_L07            2
+     __T_TOSReadSignal                 2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSStopTimer                  2
+     __T_TOSSeqActivateGraph           2
+     __T_TOSSeqDeactivateGraph         2
+
+ 
+ 874 bytes in segment BCODE
+  16 bytes in segment CLTVEC
+ 201 bytes in segment CODE
+ 118 bytes in segment CONST
+  13 bytes in segment NEAR_Z
+ 
+ 1 075 bytes of CODE  memory (+ 16 bytes shared)
+   118 bytes of CONST memory
+    13 bytes of DATA  memory
+
+Errors: none
+Warnings: none

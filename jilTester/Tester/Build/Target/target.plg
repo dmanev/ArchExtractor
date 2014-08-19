@@ -1,0 +1,987 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: target - Win32 Target Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Temp\RSP4124.bat" with contents
+[
+@echo off
+cd ..\sources
+ANALYSE.BAT ..\SOURCES\LAP\lap_sup.jil
+]
+Creating command line "C:\Temp\RSP4124.bat"
+Creating temporary file "C:\Temp\RSP4125.bat" with contents
+[
+@echo off
+asm.bat .\LDB\ldb_sup.s26 ldb_supa .\..\EXE\TARGET_D
+]
+Creating command line "C:\Temp\RSP4125.bat"
+Creating temporary file "C:\Temp\RSP4126.tmp" with contents
+[
+/nologo /Zp1 /MLd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "CIBLEEMUL" /FR"..\EXE\TARGET_D/" /Fp"..\EXE\TARGET_D/target.pch" /YX /Fo"..\EXE\TARGET_D/" /Fd"..\EXE\TARGET_D/" /FD /GZ /c 
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LIB\LIB.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LIB\LIB_RND.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_ala.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_ord.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_seq.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_sig.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_tpo.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\TOS\Tos_jil.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\Ldb_tim.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_TIMP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\Ldb_sup.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_swi.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_eep.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_INT.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_INTP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_har.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_IOC.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_SPI.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_DIN.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_DOU.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_ANA.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_KWP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_BUZ.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_SPD.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_ALA.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_RF.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\ldb_trp.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_PWM.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\TARGET\LDB\LDB_SLD.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_CPU.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_EEP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_PEE.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_DBK.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_SBK.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_DEA.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_ANA.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_PAN.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_DIN.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_PIN.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_DOU.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_POU.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_CMN.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_KWP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_PWM.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_BUZ.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_SPD.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_ALA.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_RBG.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\Dat_RF.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\dat_apr.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_TRP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\DAT\DAT_VLG.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\lap_sup.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_KWP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_AFS.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_DVP.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_TFC.C"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_ILL.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_BUZ.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_FLI.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_DFR.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_ALA.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_FRW.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_DLK.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_CAR.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_LRN.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_VLD.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_RRW.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_EXL.c"
+"D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\SOURCES\LAP\LAP_PAL.c"
+]
+Creating command line "cl.exe @C:\Temp\RSP4126.tmp" 
+Performing Custom Build Step on ..\SOURCES\LAP\lap_sup.jil
+SCC2 Analysis...
+
+database successfully dumped
+
+Result files successfully generated , 0 warning(s)
+
+Result files successfully generated , 0 warning(s)
+Assemble .\LDB\ldb_sup.s26
+Compilation ldb_supa
+
+    IAR Assembler V4.61A/W32 for 78K0 and 78K0S
+    Copyright 1992-2008 IAR Systems AB.
+
+Errors:   0
+Warnings: 0
+Bytes: 23
+
+Errors:   0
+Warnings: 0
+Bytes: 11
+
+Errors:   0
+Warnings: 0
+Bytes: 11
+
+Errors:   0
+Warnings: 0
+Bytes: 23
+
+Errors:   0
+Warnings: 0
+Bytes: 14
+
+Errors:   0
+Warnings: 0
+Bytes: 14
+
+Errors:   0
+Warnings: 0
+Bytes: 16
+
+Errors:   0
+Warnings: 0
+Bytes: 4
+
+Errors:   0
+Warnings: 0
+Bytes: 4
+
+Modules:   8
+Total errors:   0
+Total warnings: 0
+Creating temporary file "C:\Temp\RSP4127.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:no /pdb:"..\EXE\TARGET_D/target_d.pdb" /map:"..\EXE\TARGET_D/target_d.map" /debug /machine:I386 /out:"..\EXE\target_d" /CIBLE:r26 /MODEEMUL 
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LIB.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LIB_RND.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_ala.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_ord.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_seq.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_sig.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_tpo.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Tos_jil.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Ldb_tim.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_TIMP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Ldb_sup.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\ldb_swi.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\ldb_eep.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_INT.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_INTP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\ldb_har.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_IOC.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_SPI.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_DIN.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_DOU.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_ANA.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_KWP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_BUZ.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_SPD.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_ALA.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_RF.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\ldb_trp.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_PWM.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LDB_SLD.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_CPU.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_EEP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_PEE.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_DBK.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_SBK.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_DEA.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_ANA.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_PAN.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_DIN.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_PIN.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_DOU.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_POU.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_CMN.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_KWP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_PWM.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_BUZ.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_SPD.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_ALA.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_RBG.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\Dat_RF.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\dat_apr.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_TRP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\DAT_VLG.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\lap_sup.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_KWP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_AFS.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_DVP.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_TFC.OBJ
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_ILL.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_BUZ.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_FLI.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_DFR.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_ALA.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_FRW.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_DLK.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_CAR.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_LRN.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_VLD.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_RRW.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_EXL.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\LAP_PAL.obj
+\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\Build\EXE\TARGET_D\ldb_supa.obj
+]
+Creating command line "link.exe @C:\Temp\RSP4127.tmp"
+<h3>Output Window</h3>
+Compiling...
+Compiling LIB.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 2 bytes of CODE memory
+
+Errors: none
+Warnings: none
+Compiling LIB_RND.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 62 bytes of CODE memory (+ 2 bytes shared)
+  4 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_ALA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 339 bytes of CODE memory (+ 2 bytes shared)
+  18 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_ORD.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 278 bytes of CODE memory
+   6 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_SEQ.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 461 bytes of CODE memory
+  95 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_SIG.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 127 bytes of CODE memory (+ 2 bytes shared)
+   6 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_TPO.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 329 bytes of CODE memory
+   7 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling TOS_JIL.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 616 bytes of CODE  memory (+ 2 bytes shared)
+ 240 bytes of CONST memory
+
+Errors: none
+Warnings: none
+Compiling LDB_TIM.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 151 bytes of CODE memory (+ 2 bytes shared)
+   3 bytes of DATA memory (+ 8 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_TIMP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 118 bytes of CODE memory
+   0 bytes of DATA memory (+ 6 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_SUP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 528 bytes of CODE  memory (+  2 bytes shared)
+   5 bytes of CONST memory
+   6 bytes of DATA  memory (+ 10 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_SWI.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 195 bytes of CODE memory (+ 2 bytes shared)
+   0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_EEP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 562 bytes of CODE memory
+   3 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_INT.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 22 bytes of CODE memory
+  3 bytes of DATA memory (+ 4 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_INTP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 245 bytes of CODE memory (+ 48 bytes shared)
+   2 bytes of DATA memory (+  4 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_HAR.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 23 bytes of CODE memory
+  0 bytes of DATA memory (+ 1 byte shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_IOC.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 byte of CODE memory
+
+Errors: none
+Warnings: none
+Compiling LDB_SPI.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 92 bytes of CODE memory (+ 2 bytes shared)
+  0 bytes of DATA memory (+ 2 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_DIN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 310 bytes of CODE  memory (+  2 bytes shared)
+   1 byte  of CONST memory
+   4 bytes of DATA  memory (+ 11 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_DOU.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 483 bytes of CODE  memory (+  4 bytes shared)
+    57 bytes of CONST memory
+     6 bytes of DATA  memory (+ 21 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_ANA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 281 bytes of CODE  memory (+ 2 bytes shared)
+   9 bytes of CONST memory
+   3 bytes of DATA  memory (+ 8 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_KWP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 402 bytes of CODE memory (+  4 bytes shared)
+    81 bytes of DATA memory (+ 15 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_BUZ.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 318 bytes of CODE memory (+ 4 bytes shared)
+   5 bytes of DATA memory (+ 5 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_SPD.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 348 bytes of CODE memory (+  2 bytes shared)
+   2 bytes of DATA memory (+ 13 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_ALA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 662 bytes of CODE memory (+  6 bytes shared)
+   9 bytes of DATA memory (+ 16 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_RF.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 995 bytes of CODE  memory
+     2 bytes of CONST memory
+    29 bytes of DATA  memory (+ 25 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_TRP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 2 591 bytes of CODE memory (+  4 bytes shared)
+    37 bytes of DATA memory (+ 26 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_PWM.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 377 bytes of CODE memory
+   3 bytes of DATA memory (+ 9 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling LDB_SLD.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 613 bytes of CODE  memory (+  4 bytes shared)
+  60 bytes of CONST memory
+   0 bytes of DATA  memory (+ 35 bytes shared)
+
+Errors: none
+Warnings: none
+Compiling DAT_CPU.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 609 bytes of CODE memory
+  23 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_EEP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 868 bytes of CODE  memory (+ 12 bytes shared)
+    50 bytes of CONST memory
+   104 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_PEE.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 121 bytes of CODE  memory (+ 10 bytes shared)
+   229 bytes of CONST memory
+    29 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_DBK.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 424 bytes of CODE  memory (+ 2 bytes shared)
+    20 bytes of CONST memory
+   228 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_SBK.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 662 bytes of CODE  memory (+ 2 bytes shared)
+  20 bytes of CONST memory
+  67 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_DEA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 362 bytes of CODE memory (+ 4 bytes shared)
+  25 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_ANA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 359 bytes of CODE  memory (+ 8 bytes shared)
+  12 bytes of CONST memory
+  36 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_PAN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 588 bytes of CODE  memory (+ 8 bytes shared)
+  16 bytes of CONST memory
+  15 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_DIN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 225 bytes of CODE memory (+ 10 bytes shared)
+    81 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_PIN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 118 bytes of CODE  memory (+ 14 bytes shared)
+    10 bytes of CONST memory
+    14 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_DOU.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 148 bytes of CODE memory (+ 2 bytes shared)
+  13 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_POU.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 449 bytes of CODE  memory (+ 8 bytes shared)
+   4 bytes of CONST memory
+  29 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_CMN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 188 bytes of CODE  memory
+   6 bytes of CONST memory
+  78 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_KWP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 703 bytes of CODE memory (+ 12 bytes shared)
+ 149 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_PWM.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 500 bytes of CODE  memory (+ 8 bytes shared)
+   4 bytes of CONST memory
+  10 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_BUZ.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 930 bytes of CODE  memory (+ 10 bytes shared)
+   104 bytes of CONST memory
+   202 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_SPD.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 174 bytes of CODE  memory (+ 10 bytes shared)
+  12 bytes of CONST memory
+  14 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_ALA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 101 bytes of CODE memory (+ 2 bytes shared)
+  10 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_RBG.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 458 bytes of CODE memory (+ 4 bytes shared)
+  16 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_RF.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 3 045 bytes of CODE  memory (+ 20 bytes shared)
+    45 bytes of CONST memory
+    55 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_APR.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 405 bytes of CODE memory (+ 4 bytes shared)
+  42 bytes of DATA memory
+
+Errors: none
+Warnings: none
+Compiling DAT_TRP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 4 599 bytes of CODE  memory (+ 14 bytes shared)
+   216 bytes of CONST memory
+    93 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling DAT_VLG.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 846 bytes of CODE  memory (+ 12 bytes shared)
+  24 bytes of CONST memory
+  15 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_SUP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 181 bytes of CODE  memory (+ 12 bytes shared)
+  72 bytes of CONST memory
+   3 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_KWP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 075 bytes of CODE  memory (+ 16 bytes shared)
+   118 bytes of CONST memory
+    13 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_AFS.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 7 122 bytes of CODE  memory (+ 22 bytes shared)
+   283 bytes of CONST memory
+     6 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_DVP.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 330 bytes of CODE  memory (+ 6 bytes shared)
+    15 bytes of CONST memory
+     5 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_TFC.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 5 303 bytes of CODE  memory (+ 26 bytes shared)
+   174 bytes of CONST memory
+   105 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_ILL.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 057 bytes of CODE  memory (+ 22 bytes shared)
+    42 bytes of CONST memory
+    18 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_BUZ.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 420 bytes of CODE  memory (+ 16 bytes shared)
+   6 bytes of CONST memory
+   7 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_FLI.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 2 814 bytes of CODE  memory (+ 20 bytes shared)
+    60 bytes of CONST memory
+    51 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_DFR.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 160 bytes of CODE  memory (+ 16 bytes shared)
+    19 bytes of CONST memory
+    14 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_ALA.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 792 bytes of CODE  memory (+ 18 bytes shared)
+ 169 bytes of CONST memory
+  13 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_FRW.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 088 bytes of CODE  memory (+ 22 bytes shared)
+   138 bytes of CONST memory
+    18 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_DLK.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 3 489 bytes of CODE  memory (+ 22 bytes shared)
+    72 bytes of CONST memory
+    57 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_CAR.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 894 bytes of CODE  memory (+ 22 bytes shared)
+ 258 bytes of CONST memory
+   6 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_LRN.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 7 311 bytes of CODE  memory (+ 28 bytes shared)
+   630 bytes of CONST memory
+   113 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_VLD.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 309 bytes of CODE  memory (+ 4 bytes shared)
+  18 bytes of CONST memory
+   3 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_RRW.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 1 375 bytes of CODE  memory (+ 22 bytes shared)
+   156 bytes of CONST memory
+    19 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_EXL.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 126 bytes of CODE  memory (+ 6 bytes shared)
+   6 bytes of CONST memory
+   1 byte  of DATA  memory
+
+Errors: none
+Warnings: none
+Compiling LAP_PAL.C
+
+   IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S
+   Copyright 1992-2008 IAR Systems AB.
+
+ 877 bytes of CODE  memory (+ 16 bytes shared)
+  72 bytes of CONST memory
+  12 bytes of DATA  memory
+
+Errors: none
+Warnings: none
+Linking...
+
+     IAR Universal Linker V4.61C/386
+     Copyright 1987-2008 IAR Systems. All rights reserved.
+Warning[w33]: Using "-r" overrides format options. Generating debugging output for C-SPY
+12345678 = 1E6A2C48
+2000 = 4
+
+ 84 366 bytes of CODE  memory (+             9 274 range fill )
+  2 818 bytes of DATA  memory (+ 98 absolute )
+  4 594 bytes of CONST memory (+                17 range fill )
+
+Errors: none
+Warnings: 1
+
+
+
+
+<h3>Results</h3>
+target_d - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

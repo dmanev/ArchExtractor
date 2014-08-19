@@ -1,0 +1,226 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date:   Oct 30 2009 10:42:30  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/ILL/LAP_ILL.jil-arc  $
+// $Revision:   1.6  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/ILL/LAP_ILL.jil-arc  $
+// 
+//    Rev 1.6   Oct 30 2009 10:42:30   amarinm1
+// Cm006587: New callback for AutoRelock was added.
+// 
+//    Rev 1.5   Oct 01 2009 15:18:22   amarinm1
+// Cm006282: Integration modifications.
+// 
+//    Rev 1.4   Oct 01 2009 11:39:06   amarinm1
+// Cm006282: Starting the power relay is now done in LeaveStartingStepState too.
+// 
+//    Rev 1.3   Mar 30 2009 17:47:40   amarinm1
+// Cm004676: Both graphs were assigned to GraphGroup20Ms. Also some useless code was removed.
+*/
+//******************************************************************************
+#include "Lib_stk.h"
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_LAP_ILL_JIL
+#define I_LAP_ILL_JIL (1)
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_ILL 
+{
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+    Graph LAPIllInternalLightsManagement
+    {
+        GraphGroup = GraphGroup20Ms;
+    };
+
+    Graph LAPIllInternalLightsController
+    {
+        GraphGroup = GraphGroup20Ms;
+    };
+
+//------------------------------------------------------------------------------
+//    GraphGroup GraphGroupName                // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+    ProdControl { Name = "WakeUpRequest"; };
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = CallBackActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//
+//    OnControl = CallBackSetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+ 
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPInitialize";
+        Fct = "LAPIllInitialize";
+    };
+    
+    OnControl = CallBack
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct = "LAPIllLeaveStartingStepState";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPEnterActiveState";
+        Fct = "LAPIllEnterActiveState";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "LAPLeaveActiveState";
+        Fct = "LAPIllLeaveActiveState";
+    };
+
+    OnControl = CallBack 
+    {
+        Ctrl = "IsAnybodyMaintainActiveState";
+        Fct = "LAPIllIsAnybodyMaintainActiveState";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "RKE_LOCK_REQUEST";
+        Fct = "LAPIllRKELock";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "RKE_UNLOCK_REQUEST";
+        Fct = "LAPIllRKEUnlock";
+    };
+
+    OnControl = CallBack  
+    {
+        Ctrl = "AutoRelock";
+        Fct = "LAPIllRKELock";
+    };
+
+
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U32, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+
+};
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_LAP_ILL_JIL */
+
+

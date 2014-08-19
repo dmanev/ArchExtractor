@@ -1,0 +1,5 @@
+class StkU1
+!!!173807.python!!!	__init__(inout self : )
+        self.Name = 'U1'
+        self.lowerLimit = 0
+        self.upperLimit = 255

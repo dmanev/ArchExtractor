@@ -1,0 +1,89 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    DAT_PAN
+// -----------------------------------------------------------------------------
+// $Date:   Nov 20 2009 15:48:38  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PAN/DAT_PAN.H-arc  $
+// $Revision:   1.3  $
+// -----------------------------------------------------------------------------
+/* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PAN/DAT_PAN.H-arc  $
+ * 
+ *    Rev 1.0   20 Nov 2008 15:12:10   ailievb
+ * Initial revision.
+*/ 
+//******************************************************************************
+
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_PAN_JIL 
+#define I_DAT_PAN_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_PAN 
+{
+    
+
+
+
+
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATPanInit";
+    };
+
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+#endif
+/* I_DAT_PAN_JIL */ /*cLIBStkScc2_Used*/

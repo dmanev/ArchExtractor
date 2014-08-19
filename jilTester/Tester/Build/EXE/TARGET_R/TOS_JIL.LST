@@ -1,0 +1,607 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:06 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_JIL.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\TOS_JIL.LST -o                           #
+#                    ..\EXE\TARGET_R\TOS_JIL.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_JIL.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\TOS_JIL.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\TOS_JIL.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\TOS_JIL.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      STK
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    TOS_JIL
+     12          //               
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Sep 17 2009 10:27:10  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_JIL.C-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_JIL.C-arc  $
+     19          // 
+     20          //    Rev 1.1   Sep 17 2009 10:27:10   adzhelp
+     21          // Cm003277: Functions defined as CALLT_TYPE
+     22          // 
+     23          //    Rev 1.0   04 Feb 2009 17:03:06   adzhelp
+     24          // Initial revision.
+     25          */
+     26          //******************************************************************************
+     27          
+     28          //------------------------------------------------------------------------------
+     29          // Body Identification
+     30          //------------------------------------------------------------------------------
+     31          #define TOS_JIL "TOS_JIL"
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Included files to resolve specific definitions in this file
+     35          //------------------------------------------------------------------------------
+     36          #include "tos.h"
+     37          #include "lib.h"
+     38          #include "jili.h"
+     39          
+     40          //------------------------------------------------------------------------------
+     41          // Local constants
+     42          //------------------------------------------------------------------------------
+     43          
+     44          //------------------------------------------------------------------------------
+     45          // Local macros
+     46          //------------------------------------------------------------------------------
+     47          
+     48          //------------------------------------------------------------------------------
+     49          // Local types
+     50          //------------------------------------------------------------------------------
+     51          
+     52          //------------------------------------------------------------------------------
+     53          // Local data
+     54          //------------------------------------------------------------------------------
+     55          
+     56          //------------------------------------------------------------------------------
+     57          // Constant local data
+     58          //------------------------------------------------------------------------------
+     59          
+     60          //------------------------------------------------------------------------------
+     61          // Exported data
+     62          //------------------------------------------------------------------------------
+     63          
+     64          //------------------------------------------------------------------------------
+     65          // Constant exported data
+     66          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 2
+     67          const tTOSTask              TOSTaskList[cTOSNbTask]             = mTOSTaskList;
+   \                     TOSTaskList:
+   \   0000   ........       DW DATCpuIdleTask, DATEepTask, DATCpuRefreshWatchDogTask
+   \          ....    
+   \   0006   ........       DW GraphEngineTaskSleep, DATBuzTask, DATDouRefreshOutputTask
+   \          ....    
+   \   000C   ........       DW GraphEngineTask80Ms, GraphEngineTask20Ms, GraphEngineTask
+   \          ....    
+   \   0012   ........       DW DATKwpTaskControl, DATRbgAirbagCrashDetection, DATDinReadTask
+   \          ....    
+   \   0018   ........       DW DATAnaTask, TOSClockTask
+
+   \                                 In  segment CONST, align 2
+     68          const tTOSSeqGraphListType  TOSSeqGraphList                     = mTOSGraphList;
+   \                     TOSSeqGraphList:
+   \   0000   ........       DW EepromManager, DATTrpAuthentication, DATVlgOutputProtection
+   \          ....    
+   \   0006   ........       DW LAPKwpTreatRequest, LAPKwpTreatCommunication
+   \   000A   ........       DW LAPAfsIOControlByLocalID, LAPTfcAutoTestIO, LAPTfcGraph
+   \          ....    
+   \   0010   ........       DW LAPTfcEepTest, DLKInputData, DLKOutputData, DLKMotorCommand
+   \          ........
+   \   0018   ........       DW DLKAirbagManagement, LAPBuzMainGraph, LAPFliProtectionManagement
+   \          ....    
+   \   001E   ........       DW CARManageImmobiliserAndCarAntiTheft, RDFRearDefoggerManagement
+   \   0022   ........       DW RDFProtectionManagement, LAPAlarms, AlarmAfterReset
+   \          ....    
+   \   0028   ........       DW LAPFrwEngineProtection, LAPFrwIntermittentWipe, LAPFrwWashing
+   \          ....    
+   \   002E   ........       DW LAPFrwControl, LAPRrwEngineProtection, LAPRrwIntermittentWipe
+   \          ....    
+   \   0034   ........       DW LAPRrwWashing, LAPRrwInitialParking, LAPRrwControl
+   \          ....    
+   \   003A   ........       DW PerimeterAlarmManagement, DATTrpWriteAccess, DATTrpResynchronization
+   \          ....    
+   \   0040   ........       DW DATTrpTfcDiag, LAPIllInternalLightsManagement
+   \   0044   ........       DW LAPIllInternalLightsController, LAPFliInput, LAPFliLampsState
+   \          ....    
+   \   004A   ........       DW LRNUpdateLearningAuthorization, LRNManageLearningService
+   \   004E   ........       DW LAPExlGraph, EepromNormalization, DATVlgInput, SpeedManagement
+   \          ........
+   \   0056   ........       DW RPMManagement, DATRfReceptionManagement, LAPVldPatternManagement
+   \          ....    
+   \   005C   ....           DW Supervisor
+     69          
+     70          #ifdef TOS_PREEMPTIVE
+     71          const tTOSPriorityLevel   TOSForbiddenPreemptLevelList[cTOSNbTask] = mTOSForbiddenPreemptLevelList;
+     72          #endif
+     73          
+     74          //------------------------------------------------------------------------------
+     75          // Local function prototypes
+     76          //------------------------------------------------------------------------------
+     77          
+     78          
+     79          //==============================================================================
+     80          //=========================== LOCAL FUNCTIONS ==================================
+     81          //==============================================================================
+     82          
+     83          //==============================================================================
+     84          //=========================== EXPORTED FUNCTIONS ===============================
+     85          //==============================================================================
+     86          
+     87          //==============================================================================
+     88          // DESCRIPTION:         See component header file
+     89          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     90          CALLT_TYPE void TOSSendControl(const U8 u8ControlId )
+   \                     TOSSendControl:
+     91          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+     92              mSignalControl( u8ControlId );
+   \   0000   16....         MOVW      HL,#`?<Jumptable for TOSSendControl>_0`
+   \   0003   9B....         BR        ?C_SSWITCH_L10
+   \                     ??TOSSendControl_0:
+   \   0006   9A....         CALL      TOSSeqInitialize
+   \   0009   9A....         CALL      TOSSigInitialize
+   \   000C   9A....         CALL      TOSAlaInitialize
+   \   000F   9B....         BR        N:TOSTpoInitialize
+   \                     ??TOSSendControl_1:
+   \   0012   9B....         BR        N:LAPSupActiveSleepRequest
+   \                     ??TOSSendControl_2:
+   \   0015   9B....         BR        N:LAPSupWakeUpRequest
+   \                     ??TOSSendControl_3:
+   \   0018   100400         MOVW      AX,#4
+   \   001B   ..             CALLT     [__T_TOSWriteSignal]
+   \   001C   101A00         MOVW      AX,#26
+   \   001F   ..             CALLT     [__T_TOSWriteSignal]
+   \   0020   AF             RET       
+   \                     ??TOSSendControl_4:
+   \   0021   100700         MOVW      AX,#7
+   \   0024   ..             CALLT     [__T_TOSWriteSignal]
+   \   0025   101700         MOVW      AX,#23
+   \   0028   ..             CALLT     [__T_TOSWriteSignal]
+   \   0029   AF             RET       
+   \                     ??TOSSendControl_5:
+   \   002A   100E00         MOVW      AX,#14
+   \   002D   ..             CALLT     [__T_TOSWriteSignal]
+   \   002E   AF             RET       
+   \                     ??TOSSendControl_6:
+   \   002F   100A00         MOVW      AX,#10
+   \   0032   ..             CALLT     [__T_TOSWriteSignal]
+   \   0033   100C00         MOVW      AX,#12
+   \   0036   ..             CALLT     [__T_TOSWriteSignal]
+   \   0037   101400         MOVW      AX,#20
+   \   003A   ..             CALLT     [__T_TOSWriteSignal]
+   \   003B   9A....         CALL      DATVlgFalling_PWR_IGN
+   \   003E   9B....         BR        N:LAPAlaFallingEdgeForPWR_IGN
+   \                     ??TOSSendControl_7:
+   \   0041   100B00         MOVW      AX,#11
+   \   0044   ..             CALLT     [__T_TOSWriteSignal]
+   \   0045   100D00         MOVW      AX,#13
+   \   0048   ..             CALLT     [__T_TOSWriteSignal]
+   \   0049   101300         MOVW      AX,#19
+   \   004C   ..             CALLT     [__T_TOSWriteSignal]
+   \   004D   AF             RET       
+   \                     ??TOSSendControl_8:
+   \   004E   100F00         MOVW      AX,#15
+   \   0051   ..             CALLT     [__T_TOSWriteSignal]
+   \   0052   101000         MOVW      AX,#16
+   \   0055   ..             CALLT     [__T_TOSWriteSignal]
+   \   0056   AF             RET       
+   \                     ??TOSSendControl_9:
+   \   0057   101100         MOVW      AX,#17
+   \   005A   ..             CALLT     [__T_TOSWriteSignal]
+   \   005B   101200         MOVW      AX,#18
+   \   005E   ..             CALLT     [__T_TOSWriteSignal]
+   \   005F   AF             RET       
+   \                     ??TOSSendControl_10:
+   \   0060   101B00         MOVW      AX,#27
+   \   0063   ..             CALLT     [__T_TOSWriteSignal]
+   \   0064   AF             RET       
+   \                     ??TOSSendControl_11:
+   \   0065   101C00         MOVW      AX,#28
+   \   0068   ..             CALLT     [__T_TOSWriteSignal]
+   \   0069   AF             RET       
+   \                     ??TOSSendControl_12:
+   \   006A   101600         MOVW      AX,#22
+   \   006D   ..             CALLT     [__T_TOSWriteSignal]
+   \   006E   9B....         BR        N:LAPAlaFallingEdgeForDS
+   \                     ??TOSSendControl_13:
+   \   0071   101500         MOVW      AX,#21
+   \   0074   ..             CALLT     [__T_TOSWriteSignal]
+   \   0075   9B....         BR        N:LAPPalRising_FR_DOORS_SW
+   \                     ??TOSSendControl_14:
+   \   0078   101900         MOVW      AX,#25
+   \   007B   ..             CALLT     [__T_TOSWriteSignal]
+   \   007C   9B....         BR        N:LAPAlaFallingEdgeForDS
+   \                     ??TOSSendControl_15:
+   \   007F   101800         MOVW      AX,#24
+   \   0082   ..             CALLT     [__T_TOSWriteSignal]
+   \   0083   9B....         BR        N:LAPPalRising_RR_DOORS_SW
+   \                     ??TOSSendControl_16:
+   \   0086   9A....         CALL      DLKLeaveStartingStepState
+   \   0089   9B....         BR        N:LAPPalLeaveStartingStepState
+   \                     ??TOSSendControl_17:
+   \   008C   9B....         BR        N:DLKProtectionSleepModeCallBack
+   \                     ??TOSSendControl_18:
+   \   008F   9A....         CALL      DATPouAirbagUnlockStarted
+   \   0092   102000         MOVW      AX,#32
+   \   0095   ..             CALLT     [__T_TOSWriteSignal]
+   \   0096   AF             RET       
+   \                     ??TOSSendControl_19:
+   \   0097   9B....         BR        N:LRNStartLearningInFactoryMode
+   \                     ??TOSSendControl_20:
+   \   009A   9B....         BR        N:LRNExitFromLearningInFactoryMode
+   \                     ??TOSSendControl_21:
+   \   009D   9B....         BR        N:LRNStartLearningInAfterSaleMode
+   \                     ??TOSSendControl_22:
+   \   00A0   9B....         BR        N:LRNValidateLearningInAfterSaleMode
+   \                     ??TOSSendControl_23:
+   \   00A3   9B....         BR        N:LRNGiveUpLearningInAfterSaleMode
+   \                     ??TOSSendControl_24:
+   \   00A6   9A....         CALL      DATVlgStartAuthentPermKey
+   \   00A9   9B....         BR        N:CARStartAuthentPermKey
+   \                     ??TOSSendControl_25:
+   \   00AC   9A....         CALL      DATVlgExitFromAuthentPermKey
+   \   00AF   9B....         BR        N:CARExitFromAuthentPermKey
+   \                     ??TOSSendControl_26:
+   \   00B2   9B....         BR        N:CARStartTestVirginKey
+   \                     ??TOSSendControl_27:
+   \   00B5   9B....         BR        N:LAPAlaDiagEnable
+   \                     ??TOSSendControl_28:
+   \   00B8   9B....         BR        N:LAPAlaDiagDisable
+   \                     ??TOSSendControl_29:
+   \   00BB   9B....         BR        N:LAPFliRightFlashingForTFC
+   \                     ??TOSSendControl_30:
+   \   00BE   9B....         BR        N:LAPFliLeftFlashingForTFC
+   \                     ??TOSSendControl_31:
+   \   00C1   9B....         BR        N:DATPouActivateFinalTest
+   \                     ??TOSSendControl_32:
+   \   00C4   9B....         BR        N:LAPAfsClearFaultFlagsAndCounters
+   \                     ??TOSSendControl_33:
+   \   00C7   9A....         CALL      LAPIllRKELock
+   \   00CA   102300         MOVW      AX,#35
+   \   00CD   ..             CALLT     [__T_TOSWriteSignal]
+   \   00CE   AF             RET       
+   \                     ??TOSSendControl_34:
+   \   00CF   9A....         CALL      LAPIllRKEUnlock
+   \   00D2   102400         MOVW      AX,#36
+   \   00D5   ..             CALLT     [__T_TOSWriteSignal]
+   \   00D6   AF             RET       
+   \                     ??TOSSendControl_35:
+   \   00D7   9A....         CALL      LAPAlaLockFromTheOutside
+   \   00DA   9B....         BR        N:LAPPalLockFromTheOutside
+   \                     ??TOSSendControl_36:
+   \   00DD   9A....         CALL      LAPAlaUnlockFromTheOutside
+   \   00E0   9B....         BR        N:LAPPalUnlockFromTheOutside
+   \                     ??TOSSendControl_37:
+   \   00E3   9B....         BR        N:LAPIllRKELock
+   \                     ??TOSSendControl_38:
+   \   00E6   9A....         CALL      DATPouAirbagUnlockFinished
+   \   00E9   102200         MOVW      AX,#34
+   \   00EC   ..             CALLT     [__T_TOSWriteSignal]
+   \   00ED   9B....         BR        N:LAPFliInputManagement
+   \                     ??TOSSendControl_39:
+   \   00F0   9B....         BR        N:DATCmnGetAprTrpResource
+   \                     ??TOSSendControl_40:
+   \   00F3   9B....         BR        N:DATCmnReleaseAprTrpResource
+   \                     ??TOSSendControl_41:
+   \   00F6   9B....         BR        N:DATCmnGetCarTrpResource
+   \                     ??TOSSendControl_42:
+   \   00F9   9A....         CALL      DATVlgKeyIsAuthenticated
+   \   00FC   9A....         CALL      DLKUpdateByVerlogOfKeyIsAuthenticated
+   \   00FF   9A....         CALL      LAPAlaKeyIsAuthenticated
+   \   0102   9B....         BR        N:LAPPalKeyIsAuthenticated
+   \                     ??TOSSendControl_43:
+   \   0105   9B....         BR        N:DATVlgKeyIsNotAuthenticated
+   \                     ??TOSSendControl_44:
+   \   0108   9B....         BR        N:DATCmnReleaseCarTrpResource
+   \                     ??TOSSendControl_45:
+   \   010B   9A....         CALL      DATCpuInit
+   \   010E   9A....         CALL      DATEepInit
+   \   0111   9A....         CALL      DATDeaInitialize
+   \   0114   9A....         CALL      DATSbkInit
+   \   0117   9A....         CALL      DATDbkInit
+   \   011A   9A....         CALL      DATPeeInit
+   \   011D   9A....         CALL      DATPinInit
+   \   0120   9A....         CALL      DATPouInit
+   \   0123   9A....         CALL      DATPanInit
+   \   0126   9A....         CALL      DATCmnInitialize
+   \   0129   9A....         CALL      DATKwpInit
+   \   012C   9A....         CALL      DATPwmInit
+   \   012F   9A....         CALL      DATRfInit
+   \   0132   9A....         CALL      DATBuzInit
+   \   0135   9A....         CALL      DATTrpInit
+   \   0138   9A....         CALL      DATVlgInit
+   \   013B   9A....         CALL      DATAprInit
+   \   013E   9A....         CALL      DATSpdInit
+   \   0141   9A....         CALL      DATAlaInit
+   \   0144   9B....         BR        N:DATRbgInit
+   \                     ??TOSSendControl_46:
+   \   0147   9A....         CALL      LAPKwpInitialize
+   \   014A   9A....         CALL      DLKInitialize
+   \   014D   9A....         CALL      LAPIllInitialize
+   \   0150   9A....         CALL      LAPBuzInitialize
+   \   0153   9A....         CALL      LAPFliInitialize
+   \   0156   9A....         CALL      LRNInitialize
+   \   0159   9A....         CALL      CARInitialize
+   \   015C   9A....         CALL      LAPVldInitialize
+   \   015F   9A....         CALL      LAPDfrInitialize
+   \   0162   9A....         CALL      LAPAlaInitialize
+   \   0165   9A....         CALL      LAPFrwInitialize
+   \   0168   9A....         CALL      LAPRrwInitialize
+   \   016B   9B....         BR        N:LAPPalInitialize
+   \                     ??TOSSendControl_47:
+   \   016E   9B....         BR        N:DATPeeReadAllBanks
+   \                     ??TOSSendControl_48:
+   \   0171   9A....         CALL      DATPeeCanRestoreBanks
+   \   0174   9A....         CALL      DATDinLeaveStartingStepState
+   \   0177   9A....         CALL      DATPinLeaveStartingStepState
+   \   017A   9A....         CALL      DATPouLeaveStartingStepState
+   \   017D   9A....         CALL      DATCmnLeaveStartingStepState
+   \   0180   9A....         CALL      DATKwpLeaveStartingStepState
+   \   0183   9A....         CALL      DATPwmLeaveStartingStepState
+   \   0186   9A....         CALL      LAPIllLeaveStartingStepState
+   \   0189   9A....         CALL      CARAuthorizedStandByMode
+   \   018C   9A....         CALL      LAPDfrLeaveStartingStepState
+   \   018F   9B....         BR        N:LAPAlaLeaveStartingStepState
+   \                     ??TOSSendControl_49:
+   \   0192   9A....         CALL      DATDinEnterActiveState
+   \   0195   9A....         CALL      DATPinEnterActiveState
+   \   0198   9A....         CALL      DATDouEnterNominalMode
+   \   019B   9A....         CALL      DATAnaStart
+   \   019E   9A....         CALL      DATBuzStart
+   \   01A1   9B....         BR        N:DATSpdEnterActiveState
+   \                     ??TOSSendControl_50:
+   \   01A4   9A....         CALL      DLKEnterActiveState
+   \   01A7   9A....         CALL      LAPIllEnterActiveState
+   \   01AA   9A....         CALL      LAPBuzEnterActiveState
+   \   01AD   9A....         CALL      LAPFliEnterActiveState
+   \   01B0   9A....         CALL      LRNEnterActiveState
+   \   01B3   9A....         CALL      CAREnterActiveState
+   \   01B6   9A....         CALL      LAPDfrEnterActiveState
+   \   01B9   9A....         CALL      LAPAlaEnterActiveState
+   \   01BC   9A....         CALL      LAPFrwEnterActiveState
+   \   01BF   9A....         CALL      LAPRrwEnterActiveState
+   \   01C2   9A....         CALL      LAPExlEnterActiveState
+   \   01C5   9B....         BR        N:LAPPalEnterActiveState
+   \                     ??TOSSendControl_51:
+   \   01C8   9A....         CALL      DLKLeaveActiveState
+   \   01CB   9A....         CALL      LAPIllLeaveActiveState
+   \   01CE   9A....         CALL      LAPBuzLeaveActiveState
+   \   01D1   9A....         CALL      LAPFliLeaveActiveState
+   \   01D4   9A....         CALL      LRNLeaveActiveState
+   \   01D7   9A....         CALL      CARLeaveActiveState
+   \   01DA   9A....         CALL      LAPDfrLeaveActiveState
+   \   01DD   9A....         CALL      LAPAlaLeaveActiveState
+   \   01E0   9A....         CALL      LAPFrwLeaveActiveState
+   \   01E3   9A....         CALL      LAPRrwLeaveActiveState
+   \   01E6   9A....         CALL      LAPExlLeaveActiveState
+   \   01E9   9B....         BR        N:LAPPalLeaveActiveState
+   \                     ??TOSSendControl_52:
+   \   01EC   9A....         CALL      DATPeeUpdateBanks
+   \   01EF   9A....         CALL      DATDinLeaveActiveState
+   \   01F2   9A....         CALL      DATPinLeaveActiveState
+   \   01F5   9A....         CALL      DATDouEnterSleepMode
+   \   01F8   9A....         CALL      DATPouLeaveActiveState
+   \   01FB   9A....         CALL      DATAnaStop
+   \   01FE   9A....         CALL      DATBuzStop
+   \   0201   9B....         BR        N:DATSpdLeaveActiveState
+   \                     ??TOSSendControl_53:
+   \   0204   9B....         BR        N:DATPeeIsMaintainStartingStepState
+   \                     ??TOSSendControl_54:
+   \   0207   9A....         CALL      DATEepIsMaintainActiveSleepState
+   \   020A   9A....         CALL      DATDinMaintainActiveSleepState
+   \   020D   9A....         CALL      DATPinIsMaintainActiveSleepState
+   \   0210   9A....         CALL      DATRfIsAnybodyMaintainActiveSleepState
+   \   0213   9B....         BR        N:LAPAlaIsAnybodyMaintainActiveSleepState
+   \                     ??TOSSendControl_55:
+   \   0216   9A....         CALL      DATPinIsMaintainActiveState
+   \   0219   9A....         CALL      DATKwpIsMaintainActiveState
+   \   021C   9A....         CALL      DATRfIsAnybodyMaintainActiveState
+   \   021F   9A....         CALL      DATTrpMaintainActiveState
+   \   0222   9A....         CALL      DATVlgIsAnybodyMaintainActiveState
+   \   0225   9A....         CALL      LAPAfsIsMaintainActiveState
+   \   0228   9A....         CALL      DLKIsAnybodyMaintainActiveState
+   \   022B   9A....         CALL      LAPIllIsAnybodyMaintainActiveState
+   \   022E   9A....         CALL      LAPFliIsAnybodyMaintainActiveState
+   \   0231   9A....         CALL      CARIsAnybodyMaintainActiveState
+   \   0234   9A....         CALL      LAPDfrIsAnybodyMaintainActiveState
+   \   0237   9A....         CALL      LAPAlaIsAnybodyMaintainActiveState
+   \   023A   9A....         CALL      LAPPalIsAnybodyMaintainActiveState
+     93          }
+   \                     ??TOSSendControl_56:
+   \   023D   AF             RET       
+   \   023E                  REQUIRE ?CL78K_V4_6_L00
+     94          
+     95          //==============================================================================
+     96          // DESCRIPTION:         Graph task declared by JIL
+     97          //
+     98          // PARAMETERS:          None
+     99          //
+    100          // RETURN VALUE:        None
+    101          //
+    102          // DESIGN INFORMATION:  Refer to Detailed Design Document
+    103          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    104          mTOSGraphTaskList
+   \                     GraphEngineTask:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+   \   0003   A31D           MOV       B,#29
+   \   0005   9A....         CALL      TOSSeqMotor
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \   __non_banked void GraphEngineTask20Ms(void)
+   \                     GraphEngineTask20Ms:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A11E           MOV       A,#30
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+   \   0003   A327           MOV       B,#39
+   \   0005   9A....         CALL      TOSSeqMotor
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \   __non_banked void GraphEngineTaskSleep(void)
+   \                     GraphEngineTaskSleep:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A12C           MOV       A,#44
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+   \   0003   A32D           MOV       B,#45
+   \   0005   9A....         CALL      TOSSeqMotor
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \   __non_banked void GraphEngineTask80Ms(void)
+   \                     GraphEngineTask80Ms:
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A128           MOV       A,#40
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+   \   0003   A32B           MOV       B,#43
+   \   0005   9A....         CALL      TOSSeqMotor
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment SWITCH, align 1
+   \                     `?<Jumptable for TOSSendControl>_0`:
+   \   0000   0000           DW        0
+   \   0002   3800           DW        56
+   \   0004   ....           DW        ??TOSSendControl_56
+   \   0006   ....           DW        ??TOSSendControl_0
+   \   0008   ....           DW        ??TOSSendControl_1
+   \   000A   ....           DW        ??TOSSendControl_2
+   \   000C   ....           DW        ??TOSSendControl_3
+   \   000E   ....           DW        ??TOSSendControl_4
+   \   0010   ....           DW        ??TOSSendControl_5
+   \   0012   ....           DW        ??TOSSendControl_6
+   \   0014   ....           DW        ??TOSSendControl_7
+   \   0016   ....           DW        ??TOSSendControl_8
+   \   0018   ....           DW        ??TOSSendControl_9
+   \   001A   ....           DW        ??TOSSendControl_10
+   \   001C   ....           DW        ??TOSSendControl_11
+   \   001E   ....           DW        ??TOSSendControl_12
+   \   0020   ....           DW        ??TOSSendControl_13
+   \   0022   ....           DW        ??TOSSendControl_14
+   \   0024   ....           DW        ??TOSSendControl_15
+   \   0026   ....           DW        ??TOSSendControl_16
+   \   0028   ....           DW        ??TOSSendControl_17
+   \   002A   ....           DW        ??TOSSendControl_18
+   \   002C   ....           DW        ??TOSSendControl_19
+   \   002E   ....           DW        ??TOSSendControl_20
+   \   0030   ....           DW        ??TOSSendControl_21
+   \   0032   ....           DW        ??TOSSendControl_22
+   \   0034   ....           DW        ??TOSSendControl_23
+   \   0036   ....           DW        ??TOSSendControl_24
+   \   0038   ....           DW        ??TOSSendControl_25
+   \   003A   ....           DW        ??TOSSendControl_26
+   \   003C   ....           DW        ??TOSSendControl_27
+   \   003E   ....           DW        ??TOSSendControl_28
+   \   0040   ....           DW        ??TOSSendControl_29
+   \   0042   ....           DW        ??TOSSendControl_30
+   \   0044   ....           DW        ??TOSSendControl_31
+   \   0046   ....           DW        ??TOSSendControl_32
+   \   0048   ....           DW        ??TOSSendControl_33
+   \   004A   ....           DW        ??TOSSendControl_34
+   \   004C   ....           DW        ??TOSSendControl_35
+   \   004E   ....           DW        ??TOSSendControl_36
+   \   0050   ....           DW        ??TOSSendControl_37
+   \   0052   ....           DW        ??TOSSendControl_38
+   \   0054   ....           DW        ??TOSSendControl_39
+   \   0056   ....           DW        ??TOSSendControl_40
+   \   0058   ....           DW        ??TOSSendControl_41
+   \   005A   ....           DW        ??TOSSendControl_42
+   \   005C   ....           DW        ??TOSSendControl_43
+   \   005E   ....           DW        ??TOSSendControl_44
+   \   0060   ....           DW        ??TOSSendControl_45
+   \   0062   ....           DW        ??TOSSendControl_46
+   \   0064   ....           DW        ??TOSSendControl_47
+   \   0066   ....           DW        ??TOSSendControl_48
+   \   0068   ....           DW        ??TOSSendControl_49
+   \   006A   ....           DW        ??TOSSendControl_50
+   \   006C   ....           DW        ??TOSSendControl_51
+   \   006E   ....           DW        ??TOSSendControl_52
+   \   0070   ....           DW        ??TOSSendControl_53
+   \   0072   ....           DW        ??TOSSendControl_54
+   \   0074   ....           DW        ??TOSSendControl_55
+    105          
+
+   Segment part sizes:
+
+     Function/Label                    Bytes
+     --------------                    -----
+     TOSTaskList                         28
+     TOSSeqGraphList                     94
+     TOSSendControl                     574
+     GraphEngineTask                     10
+     GraphEngineTask20Ms                 10
+     GraphEngineTaskSleep                10
+     GraphEngineTask80Ms                 10
+     __T_TOSWriteSignal                   2
+     ?<Jumptable for TOSSendControl>_0  118
+
+ 
+   2 bytes in segment CLTVEC
+ 614 bytes in segment CODE
+ 122 bytes in segment CONST
+ 118 bytes in segment SWITCH
+ 
+ 614 bytes of CODE  memory (+ 2 bytes shared)
+ 240 bytes of CONST memory
+
+Errors: none
+Warnings: none

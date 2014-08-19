@@ -1,0 +1,175 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_PIN
+// -----------------------------------------------------------------------------
+// $Date:   Feb 24 2010 15:55:14  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PIN/DAT_PIN.JIL-arc  $
+// $Revision:   1.8  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PIN/DAT_PIN.JIL-arc  $
+// 
+//    Rev 1.8   Feb 24 2010 15:55:14   adzhelp
+// Cm007212:  HWP: SC detection of Verlog LED in sleep mode
+// 
+//    Rev 1.7   Oct 06 2009 11:00:10   adzhelp
+// Cm006155: Enter in active sleep mode when requested from LDB_DIN
+// 
+//    Rev 1.6   Sep 24 2009 10:13:00   adzhelp
+// Cm003262: EFX90_SW2_FP04 : Implementation of the Rear Wipers functionality
+// 
+//    Rev 1.5   Jul 24 2009 09:07:48   adzhelp
+// Cm005136: Produce control after inputs are read after starting step
+// 
+//    Rev 1.4   Apr 27 2009 16:56:12   adzhelp
+// Cm003264: Implementation of doorlock
+// 
+//    Rev 1.3   Apr 22 2009 09:38:12   adzhelp
+// Cm003261: Callback connected to leave starting step state.
+// Signals/controls for FrontStopPosition declared
+// 
+//    Rev 1.2   Mar 31 2009 15:24:46   adzhelp
+// Cm003276: Controls produces for changing of inputs declared
+// 
+//    Rev 1.1   Mar 20 2009 17:30:14   adzhelp
+// Cm003619: Parameterization according to HSI
+//
+//    Rev 1.0   10 Nov 2008 10:21:12   ailievb
+// Initial revision.
+//******************************************************************************
+
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_PIN_JIL 
+#define I_DAT_PIN_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_PIN 
+{
+    
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATPinInit";
+    };
+// This control is used for STK test configuration only
+// It permit to maintain the application awake Tige_Droite = 1 after 
+// a wake up by DIN
+
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainActiveState";
+        Fct = "DATPinIsMaintainActiveState";
+    };
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainActiveSleepState";
+        Fct = "DATPinIsMaintainActiveSleepState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "DATEnterActiveState";
+        Fct = "DATPinEnterActiveState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "DATLeaveActiveState";
+        Fct = "DATPinLeaveActiveState";
+    };
+    
+    OnControl = CallBack
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct = "DATPinLeaveStartingStepState";
+    };
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+    Signal FrontWiperStopIsAllowed_LAP_FRW;
+    Signal  RearWiperStopIsAllowed_LAP_RRW;
+    Signal FR_AUTOSTOP_SWFalling_LAP_FRW;
+    Signal RR_AUTOSTOP_SWFalling_LAP_RRW;
+
+ /*--------------------------------------------------------------------------
+  Declaration of Control produced
+
+  Prod Control { Name = "ControlName";} 
+
+  --------------------------------------------------------------------------*/
+    ProdControl {Name="WakeUpRequest";};
+
+    ProdControl {Name="Changing_RR_DOORS_SW";};
+    ProdControl {Name="Changing_FR_DOORS_SW";};
+    ProdControl {Name="Falling_HAZARD_SW";};
+    ProdControl {Name="Falling_PWR_IGN";};
+    ProdControl {Name="Rising_PWR_IGN";};
+    ProdControl {Name="FrontStopPositionDetected";};
+    ProdControl {Name="RearStopPositionDetected";};
+    ProdControl {Name="Rising_DOOR_LOCK_SW";};
+    ProdControl {Name="Rising_DOOR_UNLOCK_SW";};
+    ProdControl {Name="Falling_FR_DOORS_SW";};
+    ProdControl {Name="Rising_FR_DOORS_SW";};
+    ProdControl {Name="Falling_RR_DOORS_SW";};
+    ProdControl {Name="Rising_RR_DOORS_SW";};
+
+    ProdControl {Name="InputsReadAfterStartingStepState";};
+
+    ProdControl {Name="ProtectionLedVerlogSleepMode";};    
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_PIN_JIL */ /*cLIBStkScc2_Used*/

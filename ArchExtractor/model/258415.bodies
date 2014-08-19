@@ -1,0 +1,35 @@
+class StkPortInterfaceFactory
+!!!252399.python!!!	getStkControlIf(in self : , in inpNameIf : string) : StkControlIf
+        outIPortInterface = self.getAbstractPortInterface('Ctrl_'+inpNameIf+'_If', 
+                                                          PortInterface.ClientServerInterface.ClientServerInterface)
+        if(len(outIPortInterface.getItsOperationList()) == 0):
+            ctrlOp = PortInterface.Operation.Operation()
+            ctrlOp.setName('Envoke')
+            outIPortInterface.itsOperationList = [ctrlOp]
+
+        return outIPortInterface        
+!!!252527.python!!!	getStkTOSSignalIf(in self : , in inpNameIf : string, in inpDataTypeFactory : DataTypeFactory) : StkTOSSignalIf
+        outIPortInterface = self.getAbstractPortInterface('TOSSig_'+inpNameIf+'_If', 
+                                                          PortInterface.ClientServerInterface.ClientServerInterface)
+        if(len(outIPortInterface.getItsOperationList()) == 0):
+            setOp = PortInterface.Operation.Operation()
+            setOp.setName('Set')
+            getOp = PortInterface.Operation.Operation()
+            getOp.setName('Get')
+            getOp.itsDataType = inpDataTypeFactory.getStkU1();
+            outIPortInterface.itsOperationList = [setOp, getOp]
+
+        return outIPortInterface
+!!!252655.python!!!	getStkDATControlIf(in self : , in inpNameIf : string, in inpDataTypeFactory : DataTypeFactory) : StkDATControlIf
+        outIPortInterface = self.getAbstractPortInterface('DATCtrl_'+inpNameIf+'_If', 
+                                                          PortInterface.ClientServerInterface.ClientServerInterface)
+        if(len(outIPortInterface.getItsOperationList()) == 0):            
+            ctrlOp = PortInterface.Operation.Operation()
+            ctrlOp.setName('Envoke')
+            param = PortInterface.ParamData.ParamData()
+            param.itsDataType = inpDataTypeFactory.getStkU8()
+            param.setName('SubControlSelector')
+            ctrlOp.setItsParamList([param])
+            outIPortInterface.itsOperationList = [ctrlOp]
+
+        return outIPortInterface

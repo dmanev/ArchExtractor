@@ -1,0 +1,1029 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:18 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_CPU.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_CPU.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_CPU.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_CPU.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_CPU.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_CPU.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_CPU.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_CPU
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Apr 27 2009 16:22:44  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CPU/DAT_CPU.C-arc  $
+     15          // $Revision:   1.4  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CPU/DAT_CPU.C-arc  $
+     18          // 
+     19          //    Rev 1.4   Apr 27 2009 16:22:44   adzhelp
+     20          // Cm003619: Alarm management for GraphGroupSleep added
+     21          // 
+     22          //    Rev 1.3   Apr 13 2009 15:27:08   adzhelp
+     23          // Cm003619: Alarm management for GraphGroup80Ms added
+     24          // 
+     25          //    Rev 1.2   Mar 30 2009 13:48:00   adzhelp
+     26          // Cm004676: Alarm management for GraphGroup20Ms added
+     27          // 
+     28          //    Rev 1.1   Mar 12 2009 09:12:50   adzhelp
+     29          // Cm003619: Graph engine period set to 10 ms
+     30          //
+     31          //    Rev 1.0   04 Feb 2009 17:02:12   ailievb
+     32          // Initial revision.
+     33          //******************************************************************************
+     34          
+     35          //------------------------------------------------------------------------------
+     36          // Body Identification
+     37          //------------------------------------------------------------------------------
+     38          #define DAT_CPU   "DAT_CPU"
+     39          
+     40          
+     41          //------------------------------------------------------------------------------
+     42          // Included files to resolve specific definitions in this file
+     43          //
+     44          // #include <system_file_name.h>
+     45          // #include "project_file_name.h"
+     46          //------------------------------------------------------------------------------
+     47          #include "lib.h"
+     48          #include "tos.h"
+     49          #include "dat.h"
+     50          #include "DAT_CPU.h"
+     51          #include "DAT_CPUp.h"
+     52          
+     53          
+     54          //------------------------------------------------------------------------------
+     55          // Local constants
+     56          //
+     57          // #define cConstantName   ((tType) ConstantValue)
+     58          //------------------------------------------------------------------------------
+     59          #define cGraphEnginePeriodMs            ((U32)10UL)
+     60          #define cGraphEngine20MsPeriodMs        ((U32)20UL)
+     61          #define cGraphEngineSleepPeriodMs       ((U32)20UL)
+     62          #define cGraphEngine80MsPeriodMs        ((U32)80UL)
+     63          
+     64          #define cMultiplyOf4Mask        3 // for the two less signifficant bits
+     65          #define cMultiplyOf2Mask        1 // for the less signifficant bit
+     66          
+     67          // The watch-dog allow to check if the software is blocked in a loop.
+     68          // According to the priority of the task, there is to value of timeout :
+     69          // if the task priority is greater than watchdog task the timeout is
+     70          // - cRefreshWatchDogPeriodMs
+     71          // if the task priority is lower than watchdog task the timeout is
+     72          // - cWatchDogIdleTaskTimeoutMs
+     73          #define cRefreshWatchDogPeriodMs    ((U32)80UL)
+     74          #define cWatchDogIdleTaskTimeoutMs  ((U32)1000UL)
+     75          
+     76          #define cWatchDogCounterMaxValue mDiv(cWatchDogIdleTaskTimeoutMs,cRefreshWatchDogPeriodMs)
+     77          
+     78          //------------------------------------------------------------------------------
+     79          // Local constants
+     80          //
+     81          // #define cConstantName   ((tType) ConstantValue)
+     82          //------------------------------------------------------------------------------
+     83          
+     84          //------------------------------------------------------------------------------
+     85          // Local macros
+     86          //
+     87          // #define mMacroName   (MacroDefinition)
+     88          //------------------------------------------------------------------------------
+     89          
+     90          //------------------------------------------------------------------------------
+     91          // Local types
+     92          //
+     93          // typedef Expression    tTypeName;
+     94          //------------------------------------------------------------------------------
+     95          
+     96          //------------------------------------------------------------------------------
+     97          // Data prefix
+     98          //
+     99          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    100          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    101          //
+    102          // -----------------------------------------------------------------------------
+    103          // Local data
+    104          //
+    105          // static  tType   u8VariableName;  
+    106          // static  tType*  pu8VariableName; 
+    107          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    108          static tTOSAlarm GraphEngineAlarm;
+   \                     GraphEngineAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    109          static tTOSAlarm GraphEngine20MsAlarm;
+   \                     GraphEngine20MsAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    110          static tTOSAlarm GraphEngineSleepAlarm;
+   \                     GraphEngineSleepAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    111          static tTOSAlarm GraphEngine80MsAlarm;
+   \                     GraphEngine80MsAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    112          static tTOSAlarm RefreshWatchDogAlarm;
+   \                     RefreshWatchDogAlarm:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    113          static BOOL  IsIdleGraphGroupEnable;
+   \                     IsIdleGraphGroupEnable:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    114          static U8    WatchDogCounter;
+   \                     WatchDogCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    115          
+    116          #ifdef COMPILATION_NATIVE
+    117          // for Windows unit test
+    118          tDATCpuStackWatermarkValue DATCpuWinSimStack[cDATCpuWinSimStackSize];
+    119          BOOL bDATCpuWinSimReset = cFalse;
+    120          BOOL  bDATCpuFirstWatermarkAssert;
+    121          tDATCpuStackWatermarkValue *cDATCpuWatermarkResetAddress = &DATCpuWinSimStack[0];
+    122          U8 *pDATCpuInStack = (U8 *)&DATCpuWinSimStack[cDATCpuWinSimStackSize-1];
+    123          #else
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    124          static BOOL  bDATCpuFirstWatermarkAssert;
+   \                     bDATCpuFirstWatermarkAssert:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    125          #endif
+    126          
+    127          #ifndef DISABLE_IDLE_MEASURE
+    128          U32 u32DATCpuUnUsedStackSize;
+    129          #endif
+    130          
+    131          //------------------------------------------------------------------------------
+    132          // Constant local data
+    133          //
+    134          // static const tType  VariableName;
+    135          //------------------------------------------------------------------------------
+    136          
+    137          //------------------------------------------------------------------------------
+    138          // Exported data
+    139          //
+    140          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    141          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    142          //------------------------------------------------------------------------------
+    143          
+    144          //------------------------------------------------------------------------------
+    145          // Constant exported data
+    146          //
+    147          //             (LAY: 3 characters to identify the layer)
+    148          //             (Cmp: 3 characters to identify this component)
+    149          // 
+    150          // const tType   LAYCmpVariableName;
+    151          //------------------------------------------------------------------------------
+    152          
+    153          //------------------------------------------------------------------------------
+    154          // Local function prototypes
+    155          // 
+    156          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    157          //------------------------------------------------------------------------------
+    158          static void DATCpuCheckStackWatermarks(void);
+    159          static void DATCpuSetStackWatermarks(void);
+    160          
+    161          
+    162          //==============================================================================
+    163          //=========================== LOCAL FUNCTIONS ==================================
+    164          //==============================================================================
+    165          
+    166          //==============================================================================
+    167          // DESCRIPTION : DATCpuCheckStackWatermarks()
+    168          //
+    169          // PARAMETERS (Type,Name,Min,Max) :   none
+    170          //
+    171          // RETURN VALUE :   none
+    172          //
+    173          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    174          //==============================================================================
+    175          static void DATCpuCheckStackWatermarks(void)
+    176          {
+    177              tDATCpuStackWatermarkValue *pWatermark;
+    178              
+    179              if (cDATCpuWatermarkAssertAddress != cDATCpuWatermarkDisable)
+    180              {
+    181                  pWatermark = (tDATCpuStackWatermarkValue *)cDATCpuWatermarkAssertAddress;
+    182                  if (*pWatermark != cDATCpuWatermarkAssertValue)
+    183                  {
+    184                      if (bDATCpuFirstWatermarkAssert != cFalse)
+    185                      {
+    186                          bDATCpuFirstWatermarkAssert = cFalse;
+    187          #ifndef COMPILATION_NATIVE
+    188                          mLIBassert(cFalse);
+    189          #endif
+    190                      }
+    191                  }
+    192              }
+    193              if (cDATCpuWatermarkResetAddress != cDATCpuWatermarkDisable)
+    194              {
+    195                  pWatermark = (tDATCpuStackWatermarkValue *)cDATCpuWatermarkResetAddress;
+    196                  if (*pWatermark != cDATCpuWatermarkResetValue)
+    197                  {
+    198          #ifdef COMPILATION_NATIVE
+    199                      bDATCpuWinSimReset = cTrue;
+    200          #else
+    201                      mLIBassert(cFalse);
+    202                      LDBReset();
+    203          #endif
+    204                  }
+    205              }
+    206          }
+    207          
+    208          
+    209          //==============================================================================
+    210          // DESCRIPTION : DATCpuSetStackWatermarks
+    211          //
+    212          // PARAMETERS (Type,Name,Min,Max) :   none
+    213          //
+    214          // RETURN VALUE :   none
+    215          //
+    216          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    217          //==============================================================================
+    218          static void DATCpuSetStackWatermarks(void)
+    219          {
+    220              tDATCpuStackWatermarkValue *pWatermark;
+    221              
+    222              if (cDATCpuWatermarkAssertAddress != cDATCpuWatermarkDisable)
+    223              {
+    224                  pWatermark = (tDATCpuStackWatermarkValue *)cDATCpuWatermarkAssertAddress;
+    225                  *pWatermark = cDATCpuWatermarkAssertValue;
+    226              }
+    227              if (cDATCpuWatermarkResetAddress != cDATCpuWatermarkDisable)
+    228              {
+    229                  pWatermark = (tDATCpuStackWatermarkValue *)cDATCpuWatermarkResetAddress;
+    230                  *pWatermark = cDATCpuWatermarkResetValue;
+    231              }
+    232          }
+    233          
+    234          
+    235          //==============================================================================
+    236          // DESCRIPTION : DATCpuSetStackContents
+    237          //
+    238          // PARAMETERS (Type,Name,Min,Max) :   none
+    239          //
+    240          // RETURN VALUE :   none
+    241          //
+    242          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    243          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    244          static void DATCpuSetStackContents(void)
+   \                     DATCpuSetStackContents:
+    245          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    246              if (cDATCpuWatermarkResetAddress != cDATCpuWatermarkDisable)
+    247              {
+    248          		U8 *pu8start, *pu8stop;
+    249          #ifndef COMPILATION_NATIVE
+    250                  U8 u8InStack;
+    251                  U8 *pu8InStack = &u8InStack;
+    252          #else
+    253                  U8 *pu8InStack = pDATCpuInStack;
+    254          #endif
+    255          		// WARNING: memset() should not be used directly because it (as any function) pushes its arguments and return address in the stack and they could get overwritten!
+    256                  if ((U8 *)cDATCpuWatermarkResetAddress > pu8InStack)
+   \   0002   891C           MOVW      AX,SP
+   \   0004   D6             MOVW      HL,AX
+   \   0005   EAA8FB         CMPW      AX,#64424
+   \   0008   9D06           BNC       ??DATCpuGetUnUsedStackSize_0
+    257                  {
+    258                      // upward growing stack
+    259          			pu8start = pu8InStack;
+   \   000A   D4             MOVW      DE,AX
+    260          			pu8stop = (U8 *)cDATCpuWatermarkResetAddress;
+   \   000B   16A8FB         MOVW      HL,#64424
+   \   000E   FA09           BR        ??DATCpuGetUnUsedStackSize_1
+    261          		}
+    262                  else
+    263                  {
+    264                      // downward growing stack
+    265          			pu8start = (U8 *)cDATCpuWatermarkResetAddress;
+   \                     ??DATCpuGetUnUsedStackSize_0:
+   \   0010   14A8FB         MOVW      DE,#64424
+    266          			pu8stop = pu8InStack;
+   \   0013   FA04           BR        ??DATCpuGetUnUsedStackSize_1
+    267                  }
+    268          		while (pu8start <= pu8stop)
+    269          		{
+    270          				*pu8start = cDATCpuStackContentsValue;
+   \                     ??DATCpuSetStackContents_0:
+   \   0015   A169           MOV       A,#105
+   \   0017   95             MOV       [DE],A
+    271          				pu8start++;
+   \   0018   84             INCW      DE
+    272          		}
+   \                     ??DATCpuGetUnUsedStackSize_1:
+   \   0019   C6             MOVW      AX,HL
+   \   001A   30             XCH       A,X
+   \   001B   611C           SUB       A,E
+   \   001D   60             MOV       A,X
+   \   001E   613D           SUBC      A,D
+   \   0020   9DF3           BNC       ??DATCpuSetStackContents_0
+    273              }
+    274          }
+   \   0022   B0             POP       AX
+   \   0023   B4             POP       DE
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+    275          
+    276          //==============================================================================
+    277          //=========================== EXPORTED FUNCTIONS ===============================
+    278          //==============================================================================
+    279          
+    280          //==============================================================================
+    281          // DESCRIPTION : DATCpuIdleTask: Idle task
+    282          //
+    283          // PARAMETERS (Type,Name,Min,Max) :   none
+    284          //
+    285          // RETURN VALUE :   none
+    286          //
+    287          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    288          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    289          void DATCpuIdleTask(void)
+   \                     DATCpuIdleTask:
+    290          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    291              if( IsIdleGraphGroupEnable != cFalse )
+   \   0001   8E....         MOV       A,IsIdleGraphGroupEnable
+   \   0004   4D00           CMP       A,#0
+   \   0006   AD08           BZ        ??DATCpuGetUnUsedStackSize_2
+    292              {
+    293                  mTOSSeqMotorIdleGraphGroup();
+   \   0008   A12E           MOV       A,#46
+   \   000A   73             MOV       B,A
+   \   000B   9A....         CALL      TOSSeqMotor
+   \   000E   FA03           BR        ??DATCpuGetUnUsedStackSize_3
+    294              }
+    295          #ifndef DAT_CPU_ENABLE_HALT
+    296              else
+    297              {
+    298                  LDBWaitForCallBack();
+   \                     ??DATCpuGetUnUsedStackSize_2:
+   \   0010   9A....         CALL      LDBWaitForCallBack
+    299              }
+    300          #endif
+    301              
+    302              WatchDogCounter = cWatchDogCounterMaxValue;
+   \                     ??DATCpuGetUnUsedStackSize_3:
+   \   0013   A10D           MOV       A,#13
+   \   0015   9E....         MOV       WatchDogCounter,A
+    303              
+    304              DATCpuCheckStackWatermarks();
+   \   0018   16E8FB         MOVW      HL,#64488
+   \   001B   AE02           MOV       A,[HL+0x02]
+   \   001D   72             MOV       C,A
+   \   001E   AE03           MOV       A,[HL+0x03]
+   \   0020   73             MOV       B,A
+   \   0021   87             MOV       A,[HL]
+   \   0022   70             MOV       X,A
+   \   0023   AE01           MOV       A,[HL+0x01]
+   \   0025   B5             PUSH      DE
+   \   0026   D4             MOVW      DE,AX
+   \   0027   64             MOV       A,E
+   \   0028   1DD0           SUB       A,#47824
+   \   002A   70             MOV       X,A
+   \   002B   65             MOV       A,D
+   \   002C   3DBA           SUBC      A,#186
+   \   002E   6160           OR        X,A
+   \   0030   62             MOV       A,C
+   \   0031   3DAD           SUBC      A,#173
+   \   0033   6160           OR        X,A
+   \   0035   63             MOV       A,B
+   \   0036   3D0B           SUBC      A,#11
+   \   0038   6160           OR        X,A
+   \   003A   B4             POP       DE
+   \   003B   AD0C           BZ        ??DATCpuGetUnUsedStackSize_4
+   \   003D   8E....         MOV       A,bDATCpuFirstWatermarkAssert
+   \   0040   4D00           CMP       A,#0
+   \   0042   AD05           BZ        ??DATCpuGetUnUsedStackSize_4
+   \   0044   A100           MOV       A,#0
+   \   0046   9E....         MOV       bDATCpuFirstWatermarkAssert,A
+   \                     ??DATCpuGetUnUsedStackSize_4:
+   \   0049   A6A8           MOV       L,#168
+   \   004B   AE02           MOV       A,[HL+0x02]
+   \   004D   72             MOV       C,A
+   \   004E   AE03           MOV       A,[HL+0x03]
+   \   0050   73             MOV       B,A
+   \   0051   87             MOV       A,[HL]
+   \   0052   70             MOV       X,A
+   \   0053   AE01           MOV       A,[HL+0x01]
+   \   0055   B5             PUSH      DE
+   \   0056   D4             MOVW      DE,AX
+   \   0057   64             MOV       A,E
+   \   0058   1DD0           SUB       A,#47824
+   \   005A   70             MOV       X,A
+   \   005B   65             MOV       A,D
+   \   005C   3DBA           SUBC      A,#186
+   \   005E   6160           OR        X,A
+   \   0060   62             MOV       A,C
+   \   0061   3DAD           SUBC      A,#173
+   \   0063   6160           OR        X,A
+   \   0065   63             MOV       A,B
+   \   0066   3D0B           SUBC      A,#11
+   \   0068   6160           OR        X,A
+   \   006A   B4             POP       DE
+   \   006B   AD03           BZ        ??DATCpuGetUnUsedStackSize_5
+   \   006D   9A....         CALL      LDBReset
+    305              
+    306          #ifndef DISABLE_IDLE_MEASURE    
+    307              if (mDATCpuGetUnUsedStackSizeEnabled())
+    308              {
+    309                  u32DATCpuUnUsedStackSize = DATCpuGetUnUsedStackSize();
+    310              }
+    311          #endif
+    312          #ifdef DAT_CPU_ENABLE_HALT
+    313              TOSHalt();
+    314          #endif
+    315          }
+   \                     ??DATCpuGetUnUsedStackSize_5:
+   \   0070   B2             POP       BC
+   \   0071   AF             RET       
+   \   0072                  REQUIRE ?CL78K_V4_6_L00
+    316          
+    317          
+    318          //==============================================================================
+    319          // DESCRIPTION : DATCpuInit : Initialization of the component
+    320          //
+    321          // PARAMETERS (Type,Name,Min,Max) :   none
+    322          //
+    323          // RETURN VALUE :   none
+    324          //
+    325          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    326          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    327          void DATCpuInit(void)
+   \                     DATCpuInit:
+    328          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100200         MOVW      AX,#2
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    329              RefreshWatchDogAlarm.TaskID = cTOSTaskIdDATCpuRefreshWatchDogTask;
+   \   0004   03....         MOVW      RefreshWatchDogAlarm,AX
+    330              GraphEngineSleepAlarm.TaskID = cTOSTaskIdGraphEngineTaskSleep;
+   \   0007   A004           MOV       X,#4
+   \   0009   03....         MOVW      GraphEngineSleepAlarm,AX
+    331              TOSSetRelAlarm( &RefreshWatchDogAlarm,0, mTOSConvMsInAlarmTick(cRefreshWatchDogPeriodMs) );
+   \   000C   10....         MOVW      AX,#RefreshWatchDogAlarm
+   \   000F   A310           MOV       B,#16
+   \   0011   9A....         CALL      TOSSetRelAlarm_Interne
+    332              TOSSetRelAlarm( &GraphEngineSleepAlarm,0, mTOSConvMsInAlarmTick(cGraphEngineSleepPeriodMs) );
+   \   0014   10....         MOVW      AX,#GraphEngineSleepAlarm
+   \   0017   A304           MOV       B,#4
+   \   0019   9A....         CALL      TOSSetRelAlarm_Interne
+    333          
+    334              IsIdleGraphGroupEnable = cFalse;
+   \   001C   A100           MOV       A,#0
+   \   001E   9E....         MOV       IsIdleGraphGroupEnable,A
+    335              WatchDogCounter = cWatchDogCounterMaxValue;
+   \   0021   A10D           MOV       A,#13
+   \   0023   9E....         MOV       WatchDogCounter,A
+    336              
+    337              bDATCpuFirstWatermarkAssert = cTrue;
+   \   0026   A101           MOV       A,#1
+   \   0028   9E....         MOV       bDATCpuFirstWatermarkAssert,A
+    338          
+    339          #ifndef DISABLE_IDLE_MEASURE    
+    340              u32DATCpuUnUsedStackSize = 0;
+    341          #endif
+    342              
+    343              if (sizeof(tDATCpuStackWatermarkValue) == 4)
+    344              {
+    345                  // warn that for accessing 32 bits (4 bytes) in many MCUs the address must be a multiply of 4!
+    346                  mLIBassert(((U32)cDATCpuWatermarkAssertAddress & cMultiplyOf4Mask) == 0);
+    347                  mLIBassert(((U32)cDATCpuWatermarkResetAddress & cMultiplyOf4Mask) == 0);
+    348              }
+    349              if (sizeof(tDATCpuStackWatermarkValue) == 2)
+    350              {
+    351                  // warn that for accessing 16 bits (2 bytes) in many MCUs the address must be a multiply of 2!
+    352                  mLIBassert(((U32)cDATCpuWatermarkAssertAddress & cMultiplyOf2Mask) == 0);
+    353                  mLIBassert(((U32)cDATCpuWatermarkResetAddress & cMultiplyOf2Mask) == 0);
+    354              }
+    355              
+    356              if (mDATCpuGetUnUsedStackSizeEnabled())
+    357              {
+    358                  DATCpuSetStackContents();
+   \   002B   9A....         CALL      DATCpuSetStackContents
+    359              }
+    360              
+    361              DATCpuSetStackWatermarks();
+   \   002E   10D0BA         MOVW      AX,#47824
+   \   0031   16E8FB         MOVW      HL,#64488
+   \   0034   12AD0B         MOVW      BC,#2989
+   \   0037   BE01           MOV       [HL+0x01],A
+   \   0039   60             MOV       A,X
+   \   003A   97             MOV       [HL],A
+   \   003B   C2             MOVW      AX,BC
+   \   003C   BE03           MOV       [HL+0x03],A
+   \   003E   60             MOV       A,X
+   \   003F   BE02           MOV       [HL+0x02],A
+   \   0041   10D0BA         MOVW      AX,#47824
+   \   0044   A6A8           MOV       L,#168
+   \   0046   BE01           MOV       [HL+0x01],A
+   \   0048   60             MOV       A,X
+   \   0049   97             MOV       [HL],A
+   \   004A   C2             MOVW      AX,BC
+   \   004B   BE03           MOV       [HL+0x03],A
+   \   004D   60             MOV       A,X
+   \   004E   BE02           MOV       [HL+0x02],A
+    362          }
+   \   0050   B2             POP       BC
+   \   0051   AF             RET       
+   \   0052                  REQUIRE ?CL78K_V4_6_L00
+    363          
+    364          
+    365          //==============================================================================
+    366          // DESCRIPTION : DATCpuLeaveSleep : leave the sleep mode
+    367          //
+    368          // PARAMETERS (Type,Name,Min,Max) :   none
+    369          //
+    370          // RETURN VALUE :   none
+    371          //
+    372          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    373          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    374          void DATCpuLeaveSleep(void)
+   \                     DATCpuLeaveSleep:
+    375          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   108000         MOVW      AX,#128
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    376              GraphEngineAlarm.TaskID = cTOSTaskIdGraphEngineTask;
+   \   0004   03....         MOVW      GraphEngineAlarm,AX
+    377              GraphEngine20MsAlarm.TaskID = cTOSTaskIdGraphEngineTask20Ms;
+   \   0007   A040           MOV       X,#64
+   \   0009   03....         MOVW      GraphEngine20MsAlarm,AX
+    378              GraphEngine80MsAlarm.TaskID = cTOSTaskIdGraphEngineTask80Ms;
+   \   000C   A020           MOV       X,#32
+   \   000E   03....         MOVW      GraphEngine80MsAlarm,AX
+    379              TOSSetRelAlarm( &GraphEngineAlarm,0, mTOSConvMsInAlarmTick(cGraphEnginePeriodMs) );
+   \   0011   10....         MOVW      AX,#GraphEngineAlarm
+   \   0014   A302           MOV       B,#2
+   \   0016   9A....         CALL      TOSSetRelAlarm_Interne
+    380              TOSSetRelAlarm( &GraphEngine20MsAlarm,0, mTOSConvMsInAlarmTick(cGraphEngine20MsPeriodMs) );
+   \   0019   10....         MOVW      AX,#GraphEngine20MsAlarm
+   \   001C   A304           MOV       B,#4
+   \   001E   9A....         CALL      TOSSetRelAlarm_Interne
+    381              TOSSetRelAlarm( &GraphEngine80MsAlarm,0, mTOSConvMsInAlarmTick(cGraphEngine80MsPeriodMs) );
+   \   0021   10....         MOVW      AX,#GraphEngine80MsAlarm
+   \   0024   A310           MOV       B,#16
+   \   0026   9A....         CALL      TOSSetRelAlarm_Interne
+    382              IsIdleGraphGroupEnable = cTrue;
+   \   0029   A101           MOV       A,#1
+   \   002B   9E....         MOV       IsIdleGraphGroupEnable,A
+    383          
+    384              #ifdef USE_DISABLE_TOSTIMER
+    385              TOSDisableTimer();
+   \   002E   9A....         CALL      TOSDisableTimer
+    386              TOSStopAlarm();
+   \   0031   9A....         CALL      TOSStopAlarm
+    387              #endif
+    388          
+    389              LDBLeaveSleepMode();
+   \   0034   9A....         CALL      LDBLeaveSleepMode
+    390          
+    391              #ifdef USE_DISABLE_TOSTIMER
+    392              TOSStartAlarm();
+   \   0037   9A....         CALL      TOSStartAlarm
+    393              TOSEnableTimer(1); //Min Multiplicator Value = 1
+   \   003A   A101           MOV       A,#1
+   \   003C   9A....         CALL      TOSEnableTimer
+    394              #endif
+    395          }
+   \   003F   B2             POP       BC
+   \   0040   AF             RET       
+   \   0041                  REQUIRE ?CL78K_V4_6_L00
+    396          
+    397          
+    398          //==============================================================================
+    399          // DESCRIPTION : DATCpuEnterSleep : entreing into the sleep mode
+    400          //
+    401          // PARAMETERS (Type,Name,Min,Max) :   none
+    402          //
+    403          // RETURN VALUE :   none
+    404          //
+    405          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    406          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    407          void DATCpuEnterSleep(void)
+   \                     DATCpuEnterSleep:
+    408          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    409              TOSCancelAlarm( &GraphEngineAlarm );
+   \   0000   10....         MOVW      AX,#GraphEngineAlarm
+   \   0003   9A....         CALL      TOSCancelAlarm
+    410              TOSCancelAlarm( &GraphEngine20MsAlarm );
+   \   0006   10....         MOVW      AX,#GraphEngine20MsAlarm
+   \   0009   9A....         CALL      TOSCancelAlarm
+    411              TOSCancelAlarm( &GraphEngine80MsAlarm );
+   \   000C   10....         MOVW      AX,#GraphEngine80MsAlarm
+   \   000F   9A....         CALL      TOSCancelAlarm
+    412              IsIdleGraphGroupEnable = cFalse;
+   \   0012   A100           MOV       A,#0
+   \   0014   9E....         MOV       IsIdleGraphGroupEnable,A
+    413          
+    414              #ifdef USE_DISABLE_TOSTIMER
+    415              TOSDisableTimer();
+   \   0017   9A....         CALL      TOSDisableTimer
+    416              TOSStopAlarm();
+   \   001A   9A....         CALL      TOSStopAlarm
+    417              #endif
+    418          
+    419              LDBEnterSleepMode();
+   \   001D   9A....         CALL      LDBEnterSleepMode
+    420          
+    421              #ifdef USE_DISABLE_TOSTIMER
+    422              TOSStartSlowestAlarms((tTOSTickAlarm)(cLDBSleepTick / cLDBTick));
+   \   0020   A108           MOV       A,#8
+   \   0022   9A....         CALL      TOSStartSlowestAlarms
+    423              TOSEnableTimer((tTOSTickAlarm)(cLDBSleepTick / cLDBTick));
+   \   0025   A108           MOV       A,#8
+   \   0027   9B....         BR        N:TOSEnableTimer
+   \   002A                  REQUIRE ?CL78K_V4_6_L00
+    424              #endif
+    425          }
+    426          
+    427          
+    428          //==============================================================================
+    429          // DESCRIPTION : DATCpuRefreshWatchDogTask : periodical task is create in order
+    430          // to refresh watchdog
+    431          //
+    432          // PARAMETERS (Type,Name,Min,Max) :   none
+    433          //
+    434          // RETURN VALUE :   none
+    435          //
+    436          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    437          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    438          void DATCpuRefreshWatchDogTask(void)
+   \                     DATCpuRefreshWatchDogTask:
+    439          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    440              // A periodical task is create in order to refresh watchdog.
+    441              
+    442              // This way of processing allows to:
+    443              // - Insure that TOS time base correctly work
+    444              // - Insure that tasks with higher priority than this task running.
+    445              // - Get an unique mechanism in wake-up and sleep modes.
+    446              
+    447              // This way of processing does not allows to:
+    448              // - Insure that tasks with lower priority than this task running.
+    449              //   For example, if the graph engine run in idle task, this solution
+    450              //   is not adjusted. In this case use a graph updating watchdog when
+    451              //   a temporisation elapse.
+    452              
+    453              if( WatchDogCounter != 0)
+   \   0000   8E....         MOV       A,WatchDogCounter
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD07           BZ        ??DATCpuGetUnUsedStackSize_6
+    454              {
+    455                  // This counter allows to check that tasks of lower priority than
+    456                  // Watch dog tasks are also running.
+    457                  WatchDogCounter--;
+   \   0007   51             DEC       A
+   \   0008   9E....         MOV       WatchDogCounter,A
+    458              
+    459                  LDBRefreshWatchDog();
+   \   000B   9A....         CALL      LDBRefreshWatchDog
+    460              }
+    461          }
+   \                     ??DATCpuGetUnUsedStackSize_6:
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+    462          
+    463          
+    464          //==============================================================================
+    465          // DESCRIPTION : DATCpuGetUnUsedStackSize : get the unused stack size
+    466          //
+    467          // PARAMETERS (Type,Name,Min,Max) :   U32 : unused stack size
+    468          //
+    469          // RETURN VALUE :   none
+    470          //
+    471          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    472          // in bytes, if returned value = 0 then the measure is not performed (enabled),
+    473          //to enable it just define meaningful cDATCpuWatermarkResetAddress
+    474          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    475          U32 DATCpuGetUnUsedStackSize(void)
+   \                     DATCpuGetUnUsedStackSize:
+    476          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 4
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+    477              U32 u32Size = 0;
+   \   0003   891C           MOVW      AX,SP
+   \   0005   D6             MOVW      HL,AX
+   \   0006   A100           MOV       A,#0
+   \   0008   BE01           MOV       [HL+0x01],A
+   \   000A   97             MOV       [HL],A
+   \   000B   BE03           MOV       [HL+0x03],A
+   \   000D   BE02           MOV       [HL+0x02],A
+    478              
+    479              if (mDATCpuGetUnUsedStackSizeEnabled())
+    480              {
+    481          #ifndef COMPILATION_NATIVE
+    482                  U8 *pu8InStack = (U8 *)&u32Size;
+    483          #else
+    484                  U8 *pu8InStack = pDATCpuInStack;
+    485          #endif
+    486                  U8 *pu8StackFrom = (U8 *)cDATCpuWatermarkResetAddress;
+    487                  // always start the scan from stack end to current stack pointer!
+    488                  if ((U8 *)cDATCpuWatermarkResetAddress > pu8InStack)
+   \   000F   891C           MOVW      AX,SP
+   \   0011   EAA8FB         CMPW      AX,#64424
+   \   0014   9D6D           BNC       ??DATCpuGetUnUsedStackSize_7
+    489                  {
+    490                      // upward growing stack
+    491                      pu8StackFrom--; // skip reset watermark
+   \   0016   14A7FB         MOVW      DE,#64423
+   \   0019   FA2C           BR        ??DATCpuGetUnUsedStackSize_8
+    492                      while (   (pu8StackFrom > pu8InStack) && ((*pu8StackFrom == cDATCpuStackContentsValue)
+    493                             || (pu8StackFrom == (U8 *)((U8 *)cDATCpuWatermarkAssertAddress+sizeof(tDATCpuStackWatermarkValue)-1))))
+   \                     ??DATCpuGetUnUsedStackSize_9:
+   \   001B   EAEBFB         CMPW      AX,#64491
+   \   001E   AD03           BZ        $+5
+   \   0020   9B....         BR        N:??DATCpuGetUnUsedStackSize_10
+    494                      {
+    495                          if (pu8StackFrom == (U8 *)((U8 *)cDATCpuWatermarkAssertAddress+sizeof(tDATCpuStackWatermarkValue)-1))
+    496                          {
+    497                              // take into account assert watermark
+    498                              pu8StackFrom -= sizeof(tDATCpuStackWatermarkValue);
+   \                     ??DATCpuGetUnUsedStackSize_11:
+   \   0023   100400         MOVW      AX,#4
+   \   0026   14E7FB         MOVW      DE,#64487
+    499                              u32Size += sizeof(tDATCpuStackWatermarkValue);
+   \   0029   73             MOV       B,A
+   \   002A   D6             MOVW      HL,AX
+   \   002B   891C           MOVW      AX,SP
+   \   002D   E6             XCHW      AX,HL
+   \   002E   30             XCH       A,X
+   \   002F   07             XCH       A,[HL]
+   \   0030   0F             ADD       A,[HL]
+   \   0031   97             MOV       [HL],A
+   \   0032   60             MOV       A,X
+   \   0033   DE01           XCH       A,[HL+0x01]
+   \   0035   2901           ADDC      A,[HL+0x01]
+   \   0037   BE01           MOV       [HL+0x01],A
+   \   0039   63             MOV       A,B
+   \   003A   DE02           XCH       A,[HL+0x02]
+   \   003C   2902           ADDC      A,[HL+0x02]
+   \   003E   BE02           MOV       [HL+0x02],A
+   \   0040   60             MOV       A,X
+   \   0041   DE03           XCH       A,[HL+0x03]
+   \   0043   2903           ADDC      A,[HL+0x03]
+   \   0045   BE03           MOV       [HL+0x03],A
+    500                          }
+   \                     ??DATCpuGetUnUsedStackSize_8:
+   \   0047   891C           MOVW      AX,SP
+   \   0049   30             XCH       A,X
+   \   004A   611C           SUB       A,E
+   \   004C   60             MOV       A,X
+   \   004D   613D           SUBC      A,D
+   \   004F   8D03           BC        $+5
+   \   0051   9B....         BR        N:??DATCpuGetUnUsedStackSize_10
+   \   0054   85             MOV       A,[DE]
+   \   0055   4D69           CMP       A,#105
+   \   0057   C4             MOVW      AX,DE
+   \   0058   BDC1           BNZ       ??DATCpuGetUnUsedStackSize_9
+   \   005A   EAEBFB         CMPW      AX,#64491
+   \   005D   ADC4           BZ        ??DATCpuGetUnUsedStackSize_11
+    501                          else
+    502                          {
+    503                              u32Size++;
+   \   005F   100100         MOVW      AX,#1
+   \   0062   73             MOV       B,A
+   \   0063   D6             MOVW      HL,AX
+   \   0064   891C           MOVW      AX,SP
+   \   0066   E6             XCHW      AX,HL
+   \   0067   30             XCH       A,X
+   \   0068   07             XCH       A,[HL]
+   \   0069   0F             ADD       A,[HL]
+   \   006A   97             MOV       [HL],A
+   \   006B   60             MOV       A,X
+   \   006C   DE01           XCH       A,[HL+0x01]
+   \   006E   2901           ADDC      A,[HL+0x01]
+   \   0070   BE01           MOV       [HL+0x01],A
+   \   0072   63             MOV       A,B
+   \   0073   DE02           XCH       A,[HL+0x02]
+   \   0075   2902           ADDC      A,[HL+0x02]
+   \   0077   BE02           MOV       [HL+0x02],A
+   \   0079   60             MOV       A,X
+   \   007A   DE03           XCH       A,[HL+0x03]
+   \   007C   2903           ADDC      A,[HL+0x03]
+   \   007E   BE03           MOV       [HL+0x03],A
+    504                              pu8StackFrom--;
+   \   0080   94             DECW      DE
+   \   0081   FAC4           BR        ??DATCpuGetUnUsedStackSize_8
+    505                          }
+    506                      }
+    507                  }
+    508                  else
+    509                  {
+    510                      // downward growing stack
+    511                      pu8StackFrom += sizeof(tDATCpuStackWatermarkValue); // skip reset watermark
+   \                     ??DATCpuGetUnUsedStackSize_7:
+   \   0083   14ACFB         MOVW      DE,#64428
+   \   0086   FA29           BR        ??DATCpuGetUnUsedStackSize_12
+    512                      while ((pu8StackFrom < pu8InStack) && ((*pu8StackFrom == cDATCpuStackContentsValue) || (pu8StackFrom == (U8 *)cDATCpuWatermarkAssertAddress)))
+   \                     ??DATCpuGetUnUsedStackSize_13:
+   \   0088   EAE8FB         CMPW      AX,#64488
+   \   008B   BD5C           BNZ       ??DATCpuGetUnUsedStackSize_10
+    513                      {
+    514                          if (pu8StackFrom == (U8 *)cDATCpuWatermarkAssertAddress)
+    515                          {
+    516                              // take into account assert watermark
+    517                              pu8StackFrom += sizeof(tDATCpuStackWatermarkValue);
+   \                     ??DATCpuGetUnUsedStackSize_14:
+   \   008D   100400         MOVW      AX,#4
+   \   0090   14ECFB         MOVW      DE,#64492
+    518                              u32Size += sizeof(tDATCpuStackWatermarkValue);
+   \   0093   73             MOV       B,A
+   \   0094   D6             MOVW      HL,AX
+   \   0095   891C           MOVW      AX,SP
+   \   0097   E6             XCHW      AX,HL
+   \   0098   30             XCH       A,X
+   \   0099   07             XCH       A,[HL]
+   \   009A   0F             ADD       A,[HL]
+   \   009B   97             MOV       [HL],A
+   \   009C   60             MOV       A,X
+   \   009D   DE01           XCH       A,[HL+0x01]
+   \   009F   2901           ADDC      A,[HL+0x01]
+   \   00A1   BE01           MOV       [HL+0x01],A
+   \   00A3   63             MOV       A,B
+   \   00A4   DE02           XCH       A,[HL+0x02]
+   \   00A6   2902           ADDC      A,[HL+0x02]
+   \   00A8   BE02           MOV       [HL+0x02],A
+   \   00AA   60             MOV       A,X
+   \   00AB   DE03           XCH       A,[HL+0x03]
+   \   00AD   2903           ADDC      A,[HL+0x03]
+   \   00AF   BE03           MOV       [HL+0x03],A
+    519                          }
+   \                     ??DATCpuGetUnUsedStackSize_12:
+   \   00B1   C4             MOVW      AX,DE
+   \   00B2   30             XCH       A,X
+   \   00B3   611E           SUB       A,L
+   \   00B5   60             MOV       A,X
+   \   00B6   613F           SUBC      A,H
+   \   00B8   9D2F           BNC       ??DATCpuGetUnUsedStackSize_10
+   \   00BA   85             MOV       A,[DE]
+   \   00BB   4D69           CMP       A,#105
+   \   00BD   C4             MOVW      AX,DE
+   \   00BE   BDC8           BNZ       ??DATCpuGetUnUsedStackSize_13
+   \   00C0   EAE8FB         CMPW      AX,#64488
+   \   00C3   ADC8           BZ        ??DATCpuGetUnUsedStackSize_14
+    520                          else
+    521                          {
+    522                              u32Size++;
+   \   00C5   100100         MOVW      AX,#1
+   \   00C8   73             MOV       B,A
+   \   00C9   D6             MOVW      HL,AX
+   \   00CA   891C           MOVW      AX,SP
+   \   00CC   E6             XCHW      AX,HL
+   \   00CD   30             XCH       A,X
+   \   00CE   07             XCH       A,[HL]
+   \   00CF   0F             ADD       A,[HL]
+   \   00D0   97             MOV       [HL],A
+   \   00D1   60             MOV       A,X
+   \   00D2   DE01           XCH       A,[HL+0x01]
+   \   00D4   2901           ADDC      A,[HL+0x01]
+   \   00D6   BE01           MOV       [HL+0x01],A
+   \   00D8   63             MOV       A,B
+   \   00D9   DE02           XCH       A,[HL+0x02]
+   \   00DB   2902           ADDC      A,[HL+0x02]
+   \   00DD   BE02           MOV       [HL+0x02],A
+   \   00DF   60             MOV       A,X
+   \   00E0   DE03           XCH       A,[HL+0x03]
+   \   00E2   2903           ADDC      A,[HL+0x03]
+   \   00E4   BE03           MOV       [HL+0x03],A
+    523                              pu8StackFrom++;
+   \   00E6   84             INCW      DE
+   \   00E7   FAC8           BR        ??DATCpuGetUnUsedStackSize_12
+    524                          }
+    525                      }
+    526                  }
+    527              }
+    528              else
+    529              {
+    530                  // functionality not enabled, cDATCpuWatermarkResetAddress must be defined
+    531                  // according to actual stack location
+    532          #ifndef COMPILATION_NATIVE
+    533                  mLIBassert(cFalse);
+    534          #endif
+    535              }
+    536          
+    537              return u32Size;
+   \                     ??DATCpuGetUnUsedStackSize_10:
+   \   00E9   AE02           MOV       A,[HL+0x02]
+   \   00EB   72             MOV       C,A
+   \   00EC   AE03           MOV       A,[HL+0x03]
+   \   00EE   73             MOV       B,A
+   \   00EF   87             MOV       A,[HL]
+   \   00F0   70             MOV       X,A
+   \   00F1   AE01           MOV       A,[HL+0x01]
+   \   00F3   B4             POP       DE
+   \   00F4   B4             POP       DE
+   \   00F5   B4             POP       DE
+   \   00F6   AF             RET       
+   \   00F7                  REQUIRE ?CL78K_V4_6_L00
+    538          }
+
+   Segment part sizes:
+
+     Function/Label              Bytes
+     --------------              -----
+     GraphEngineAlarm               4
+     GraphEngine20MsAlarm           4
+     GraphEngineSleepAlarm          4
+     GraphEngine80MsAlarm           4
+     RefreshWatchDogAlarm           4
+     IsIdleGraphGroupEnable         1
+     WatchDogCounter                1
+     bDATCpuFirstWatermarkAssert    1
+     DATCpuSetStackContents        37
+     DATCpuIdleTask               114
+     DATCpuInit                    82
+     DATCpuLeaveSleep              65
+     DATCpuEnterSleep              42
+     DATCpuRefreshWatchDogTask     15
+     DATCpuGetUnUsedStackSize     247
+
+ 
+ 602 bytes in segment CODE
+  23 bytes in segment NEAR_Z
+ 
+ 602 bytes of CODE memory
+  23 bytes of DATA memory
+
+Errors: none
+Warnings: none

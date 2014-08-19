@@ -1,0 +1,378 @@
+format 74
+"StkPortInterfaces" // EA_Model::System::Specific::STK::StkPortInterfaces
+  revision 10
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Specific/STK/StkPortInterfaces/"
+  python_package "StkPortInterfaces"
+  classview 180975 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 261999 "StkPortInterfaceFactory class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 207983 "StkControlIf class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 214895 "StkTOSSignalIf class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 241775 "StkDATControlIf class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 258415 "StkPortInterfaceFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 275695 // <generalisation>
+	relation 275311 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 275695 // <generalisation>
+	  b parent class_ref 258287 // PortInterfaceFactory
+      end
+
+      classrelation 275823 // <dependency>
+	relation 275439 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 275823 // <dependency>
+	  b parent class_ref 204911 // StkControlIf
+      end
+
+      classrelation 275951 // <dependency>
+	relation 275567 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 275951 // <dependency>
+	  b parent class_ref 211695 // StkTOSSignalIf
+      end
+
+      classrelation 276079 // <dependency>
+	relation 275695 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 276079 // <dependency>
+	  b parent class_ref 238063 // StkDATControlIf
+      end
+
+      operation 252399 "getStkControlIf"
+	preserve_cpp_body_indent public return_type class_ref 204911 // StkControlIf
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 252527 "getStkTOSSignalIf"
+	preserve_cpp_body_indent public return_type class_ref 211695 // StkTOSSignalIf
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpDataTypeFactory" type class_ref 285423 // DataTypeFactory
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 252655 "getStkDATControlIf"
+	preserve_cpp_body_indent public return_type class_ref 238063 // StkDATControlIf
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpDataTypeFactory" type class_ref 285423 // DataTypeFactory
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 317551 // <dependency>
+	relation 317039 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 317551 // <dependency>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+    end
+
+    class 204911 "StkControlIf"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 211695 // <generalisation>
+	relation 211439 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 211695 // <generalisation>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      classrelation 211823 // <dependency>
+	relation 211567 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 211823 // <dependency>
+	  b parent class_ref 164207 // Operation
+      end
+
+      operation 204527 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+    end
+
+    class 211695 "StkTOSSignalIf"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 219247 // <generalisation>
+	relation 218991 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 219247 // <generalisation>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      classrelation 219375 // <dependency>
+	relation 219119 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 219375 // <dependency>
+	  b parent class_ref 164207 // Operation
+      end
+
+      operation 211183 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      classrelation 219503 // <dependency>
+	relation 219247 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 219503 // <dependency>
+	  b parent class_ref 177775 // StkU1
+      end
+    end
+
+    class 238063 "StkDATControlIf"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 251631 // <generalisation>
+	relation 251247 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 251631 // <generalisation>
+	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      classrelation 251759 // <dependency>
+	relation 251375 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251759 // <dependency>
+	  b parent class_ref 164207 // Operation
+      end
+
+      classrelation 251887 // <dependency>
+	relation 251503 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 251887 // <dependency>
+	  b parent class_ref 171119 // ParamData
+      end
+
+      operation 231791 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param inout name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      classrelation 252015 // <dependency>
+	relation 251631 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 252015 // <dependency>
+	  b parent class_ref 177903 // StkU8
+      end
+    end
+  end
+
+  deploymentview 155119 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 208111 "deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A4
+    end
+
+    artifact 197231 "StkControlIf"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 204911 // StkControlIf
+      end
+      simplerelation 195823
+	-_->
+	  on artifact_ref 162799 // ClientServerInterface
+      end
+    end
+
+    artifact 203887 "StkTOSSignalIf"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 211695 // StkTOSSignalIf
+      end
+    end
+
+    artifact 230383 "StkDATControlIf"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 238063 // StkDATControlIf
+      end
+    end
+
+    artifact 250735 "StkPortInterfaceFactory"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 258415 // StkPortInterfaceFactory
+      end
+    end
+  end
+end

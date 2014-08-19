@@ -1,0 +1,357 @@
+format 74
+"Components" // EA_Model::System::Base::SwComponent::Components
+  revision 10
+  modified_by 111 "mitko"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  python_dir "Base/SwComponent/Components/"
+  python_package "Components"
+  classview 174191 "Class view"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default show_msg_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 160751 "Component class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    classdiagram 269167 "ComponentFactory class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    class 129647 "IComponent"
+      abstract visibility public stereotype "interface"
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 165999 "getFileList"
+	preserve_cpp_body_indent public explicit_return_type "string"
+	nparams 1
+	  param in name "self" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 204015 "addPort"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpIPort" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+
+    class 128239 "BaseComponent"
+      visibility public 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 128751 // <realization>
+	relation 128751 -_-|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 128751 // <realization>
+	  b parent class_ref 129647 // IComponent
+      end
+
+      classrelation 131567 // itsIPortMap (<directional composition>)
+	relation 131439 *-->
+	  stereotype "map"
+	  a role_name "itsIPortMap" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 131567 // itsIPortMap (<directional composition>)
+	  b parent class_ref 130287 // IPort
+	get_oper operation_ref 300783 // get_itsIPortMap
+      end
+
+      operation 164975 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" explicit_type ""
+	  param in name "inpName" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      attribute 141423 "fileList"
+	private explicit_type "string"
+	multiplicity "*"
+	init_value "list()"
+	stereotype "list"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl "${comment}${self}${name} = ${value}
+"
+	idl_decl ""
+	get_oper operation_ref 260463 // get_fileList
+	set_oper operation_ref 260591 // set_fileList
+      end
+
+      operation 204143 "addPort"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpIPort" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      classrelation 277871 // <generalisation>
+	relation 277359 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 277871 // <generalisation>
+	  b parent class_ref 258799 // PackageableElement
+      end
+
+      operation 260463 "get_fileList"
+	stereotype "list"
+	force_body_gen const cpp_inline public explicit_return_type "string"
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.fileList
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_attribute attribute_ref 141423 // fileList
+      end
+
+      operation 260591 "set_fileList"
+	stereotype "list"
+	force_body_gen public explicit_return_type "void"
+	nparams 1
+	  param in name "value" explicit_type "string"
+	
+	cpp_name_spec "set_${name}"
+	
+	java_name_spec "set${Name}"
+	
+	php_name_spec "set${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
+${docstring}self.fileList = ${p0}
+"
+	python_name_spec "set${Name}"
+	
+	idl_name_spec "set_${name}"
+	set_of_attribute attribute_ref 141423 // fileList
+      end
+
+      operation 260719 "addFileList"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" explicit_type ""
+	  param in name "inpFileList" explicit_type ""
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 300783 "get_itsIPortMap"
+	stereotype "map"
+	force_body_gen const cpp_inline public return_type class_ref 130287 // IPort
+	nparams 0
+	
+	cpp_name_spec "get_${name}"
+	final 
+	java_name_spec "get${Name}"
+	php_final 
+	php_name_spec "get${Name}"
+	python_def "${@}${static}${abstract}def ${name}${(}self${)}:
+${docstring}return self.itsIPortMap
+"
+	python_name_spec "get${Name}"
+	
+	idl_name_spec "get_${name}"
+	get_of_relation classrelation_ref 131567 // itsIPortMap (<directional composition>)
+      end
+    end
+
+    class 265455 "ComponentFactory"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 285679 // <dependency>
+	relation 285167 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 285679 // <dependency>
+	  b parent class_ref 128239 // BaseComponent
+      end
+
+      classrelation 285551 // itsIComponentMap (<directional aggregation>)
+	relation 285039 o-->
+	  stereotype "map"
+	  a role_name "itsIComponentMap" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 285551 // itsIComponentMap (<directional aggregation>)
+	  b parent class_ref 129647 // IComponent
+      end
+
+      operation 260207 "getBaseComponent"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameCmp" explicit_type "string"
+	  param out name "outIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 261231 "findComponent"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" explicit_type ""
+	  param in name "inpNameCmp" explicit_type "string"
+	  param out name "outIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
+    end
+  end
+
+  deploymentview 148463 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 180975 "deply diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A4
+    end
+
+    artifact 135407 "IComponent"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 129647 // IComponent
+      end
+    end
+
+    artifact 134767 "BaseComponent"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 128239 // BaseComponent
+      end
+      simplerelation 134895
+	-_->
+	  on artifact_ref 135407 // IComponent
+      end
+    end
+
+    artifact 257775 "ComponentFactory"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 265455 // ComponentFactory
+      end
+    end
+  end
+end

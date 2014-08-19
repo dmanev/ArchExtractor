@@ -1,0 +1,496 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:45 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TIM.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_TIM.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_TIM.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_TIM.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_TIM.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_TIM.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_TIM.C
+      1          /*============================================================================
+      2            Project ......................... Common
+      3            Component ....................... ldb_tim
+      4            File revision.................... :  
+      5            Last modification date .......... 
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19            - Role :
+     20            
+     21            -------------------------------------------------------------------------
+     22            ldb_tim.c file review : 
+     23          
+     24          
+     25            ==========================================================================*/
+     26          
+     27          /*--------------------------------------------------------------------------
+     28            Body Identification
+     29            --------------------------------------------------------------------------*/
+     30          #define ldb_tim   "ldb_tim"
+     31          
+     32          /*-------------------------------------------------------------------------
+     33            Included files
+     34          
+     35            #include <system_file_name.h>
+     36            #include "project_file_name.h"
+     37            --------------------------------------------------------------------------*/
+     38          
+     39          #include "lib.h"
+     40          #include "ldb.h"
+     41          #include "ldb_ioc.h"
+
+   \                                 In  segment SADDR_A, at 0xff18
+   \   unsigned char volatile __saddr __no_bit_access CMP00
+   \                     CMP00:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff69
+   \   union <unnamed> volatile __sfr _A_TMHMD0
+   \                     _A_TMHMD0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     42          #include "ldb_int.h"
+     43          #include "ldb_har.h"
+     44          #include "ldb_tim.h"
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+   \   BOOL __near bLDBTimEnabled_LDBKwpCallBackTimer
+   \                     bLDBTimEnabled_LDBKwpCallBackTimer:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     45          #ifdef cLIBStkTosPerfCnt_Used
+     46          #ifdef TOS_PERF_CNT_ENABLE
+     47           #include "TOS_PerfCnt.h"
+     48          #endif
+     49          #endif
+     50          
+     51          /*--------------------------------------------------------------------------
+     52            Local constants
+     53          
+     54            #define cConstantName   ((tType) ConstantValue)
+     55            --------------------------------------------------------------------------*/
+     56          
+     57          /*--------------------------------------------------------------------------
+     58            Local macros
+     59          
+     60            #define mMacroName   (MacroDefinition)
+     61            --------------------------------------------------------------------------*/
+     62          
+     63          /*--------------------------------------------------------------------------
+     64            Local types
+     65          
+     66            struct  sStructureName { ... };
+     67            union   uUnionName { ... };
+     68            enum    eEnumerationName { ... };
+     69            typedef Expression tTypeName;
+     70            --------------------------------------------------------------------------*/
+     71          /*--------------------------------------------------------------------------
+     72            Local data
+     73          
+     74            static  tType   VariableName;
+     75            static  tType*  pVariableName; 
+     76            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     77          static U8    TimerTosPeriod;
+   \                     TimerTosPeriod:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     78          static U8    TimerTosCounter;
+   \                     TimerTosCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     79          
+     80          /*--------------------------------------------------------------------------
+     81            Constant local data
+     82          
+     83            static const tType  VariableName;
+     84            --------------------------------------------------------------------------*/
+     85          
+     86          
+     87          /*--------------------------------------------------------------------------
+     88            Exported data
+     89          
+     90            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     91            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     92            --------------------------------------------------------------------------*/
+     93          
+     94          
+     95          /*--------------------------------------------------------------------------
+     96            Constant exported data
+     97           
+     98            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+     99            --------------------------------------------------------------------------*/
+    100          
+    101          
+    102          /*--------------------------------------------------------------------------
+    103            Local function prototypes
+    104            
+    105            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    106            --------------------------------------------------------------------------*/
+    107          
+    108          
+    109          /*============================================================================
+    110            =========================== LOCAL FUNCTIONS ================================
+    111            ==========================================================================*/
+    112          
+    113          /*============================================================================
+    114            DESCRIPTION :
+    115            
+    116            PARAMETERS (Type,Name,Min,Max) :   none
+    117          
+    118            RETURN VALUE :   none
+    119           
+    120            DESIGN INFORMATION :   refer to Detailed Design Document
+    121            ==========================================================================*/
+    122          //static type FunctionName(...)
+    123          
+    124          /*============================================================================
+    125            =========================== EXPORTED FUNCTIONS =============================
+    126            ==========================================================================*/
+    127          /*============================================================================
+    128            DESCRIPTION         : Initialize timer
+    129            
+    130            PARAMETERS          : None
+    131            (Type,Name,Min,Max) 
+    132          
+    133            RETURN VALUE        : None
+    134           
+    135            DESIGN INFORMATION  : Refer to Detailed Design Document
+    136          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    137          void LDBTimInit(void)
+   \                     LDBTimInit:
+    138          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    139             // Initialize timer
+    140             mLDBIocSetTimerModeIntervalTimer(cLDBHarRealTimeTimer);
+   \   0000   713B69         CLR1      0xFF69.3
+   \   0003   712B69         CLR1      0xFF69.2
+    141             //    mLDBHarSpecificInitRealTimeTimer();
+    142             LDBTimStart();
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+   \   0006                  REQUIRE LDBTimStart
+   \   0006                  REQUIRE _A_TMHMD0
+   \   0006                  ; // Fall through to label LDBTimStart
+    143              #ifdef TOS_PERF_CNT_ENABLE
+    144              LDBTimpInit();
+    145              #endif
+    146          }
+    147          
+    148          /*============================================================================
+    149            DESCRIPTION         : Start ldb_tim component
+    150            
+    151            PARAMETERS          : None
+    152            (Type,Name,Min,Max) 
+    153          
+    154            RETURN VALUE        : Always 0 for OSEK compatibility
+    155           
+    156            DESIGN INFORMATION  : Refer to Detailed Design Document
+    157            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    158          void LDBTimStart(void)
+   \                     LDBTimStart:
+    159          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    160          //    Verify that LDBTick is upper a multiple of cLDBHarTickInNsRealTimeTimer
+    161          //    mLIBassert( ((cLDBTick / cLDBHarTickInNsRealTimeTimer) *cLDBHarTickInNsRealTimeTimer)
+    162          //                == cLDBTick);
+    163          
+    164              mLIBassert((cLDBTick/cLDBHarTickInNsRealTimeTimer) < (1UL << mLDBIocGetType(cLDBHarRealTimeTimer)))
+    165          
+    166              mLDBIocWriteTrigger(cLDBHarRealTimeTrigger, ((cLDBTick / cLDBHarTickInNsRealTimeTimer)-1));
+   \   0000   111826         MOV       S:0xFF18,#38
+    167              mLDBIntClearIsrRequestFlag(cLDBHarInterruptRealTimeIt);
+   \   0003   714BE1         CLR1      0xFFE1.4
+    168              mLDBIntEnableIsr(cLDBHarInterruptRealTimeIt);
+   \   0006   7B1E           DI
+   \   0008   4B..           CLR1      S:LDBIntGroup1.4
+   \   000A   C8..00         CMP       S:LDBIntLevel,#0
+   \   000D   BD03           BNZ       ??LDBIntIsrINTTMH0_0
+   \   000F   714BE5         CLR1      0xFFE5.4
+   \                     ??LDBIntIsrINTTMH0_0:
+   \   0012   C8..02         CMP       S:LDBIntLevel,#2
+   \   0015   AD02           BZ        ??LDBIntIsrINTTMH0_1
+   \   0017   7A1E           EI
+    169              mLDBIocStartTimer(cLDBHarRealTimeTimer);
+   \                     ??LDBIntIsrINTTMH0_1:
+   \   0019   717A69         SET1      0xFF69.7
+    170          
+    171          }
+   \   001C   AF             RET       
+   \   001D                  REQUIRE ?CL78K_V4_6_L00
+   \   001D                  REQUIRE _A_TMHMD0
+   \   001D                  REQUIRE _A_IF0
+   \   001D                  REQUIRE _A_MK0
+   \   001D                  REQUIRE CMP00
+    172          
+    173          /*============================================================================
+    174            DESCRIPTION         : Stop ldb_tim component
+    175            
+    176            PARAMETERS          : None
+    177            (Type,Name,Min,Max) 
+    178          
+    179            RETURN VALUE        : Always 0 for OSEK compatibility
+    180           
+    181            DESIGN INFORMATION  : Refer to Detailed Design Document
+    182            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    183          void LDBTimStop(void)
+   \                     LDBTimStop:
+    184          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    185              mLDBIocStopTimer(cLDBHarRealTimeTimer);
+   \   0000   717B69         CLR1      0xFF69.7
+    186              mLDBIntDisableIsr(cLDBHarInterruptRealTimeIt);
+   \   0003   7B1E           DI
+   \   0005   4A..           SET1      S:LDBIntGroup1.4
+   \   0007   C8..00         CMP       S:LDBIntLevel,#0
+   \   000A   BD03           BNZ       ??LDBIntIsrINTTMH0_2
+   \   000C   714AE5         SET1      0xFFE5.4
+   \                     ??LDBIntIsrINTTMH0_2:
+   \   000F   C8..02         CMP       S:LDBIntLevel,#2
+   \   0012   AD02           BZ        ??LDBIntIsrINTTMH0_3
+   \   0014   7A1E           EI
+    187          }
+   \                     ??LDBIntIsrINTTMH0_3:
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+   \   0017                  REQUIRE _A_TMHMD0
+   \   0017                  REQUIRE _A_MK0
+    188          
+    189          /*============================================================================
+    190            DESCRIPTION         : Start Tempo TimeOutRef
+    191            
+    192            PARAMETERS          : tTimerRef TimeOutRef : timout reference number (0 to cLDBTimNbOfExternalTimeOut-1)
+    193                                  tDelay Duree         : duration in cLDBTick 
+    194                                  tpFunc pFunc         : function called a the time out expiration 
+    195                                  BOOL Periodique  : Automatic Reload of the timeout(cTrue or cFalse) 
+    196          
+    197            RETURN VALUE        : None
+    198           
+    199            DESIGN INFORMATION  : Refer to Detailed Design Document
+    200            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    201          void LDBTimStartTimer( tTimerRef TimeOutRef, tDelay Duree)
+   \                     LDBTimStartTimer:
+    202          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    203             // Save period if periodic
+    204             TimerTosPeriod = Duree -1;
+   \   0000   53             DEC       B
+   \   0001   63             MOV       A,B
+   \   0002   9E....         MOV       TimerTosPeriod,A
+    205             // Initialize count
+    206             TimerTosCounter = TimerTosPeriod;  // +1 for ensure that tempo is upper that duree
+   \   0005   9E....         MOV       TimerTosCounter,A
+    207          }
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    208          
+    209          /*============================================================================
+    210            DESCRIPTION         : Stop Tempo TimeOutRef
+    211            
+    212            PARAMETERS          : tTimerRef TimeOutRef : timout reference number (0 to cLDBTimNbOfExternalTimeOut-1)
+    213            RETURN VALUE        : Always 0 for OSEK compatibility
+    214           
+    215            DESIGN INFORMATION  : Refer to Detailed Design Document
+    216            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    217          tDelay LDBTimStopTimer( tTimerRef TimeOutRef )
+   \                     LDBTimStopTimer:
+    218          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    219             return(TimerTosCounter);
+   \   0000   8E....         MOV       A,TimerTosCounter
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    220          }
+    221          
+    222          /*============================================================================
+    223            DESCRIPTION         : Real time interrupt
+    224            
+    225            PARAMETERS          : None
+    226            (Type,Name,Min,Max) :
+    227          
+    228            RETURN VALUE        : None
+    229           
+    230            DESIGN INFORMATION  : Refer to Detailed Design Document
+    231          ============================================================================*/
+    232          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    233          mLDBIntDeclareIsr(cLDBHarInterruptRealTimeIt)
+   \                     LDBIntIsrINTTMH0:
+    234          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B1             PUSH      AX
+   \   0001   B7             PUSH      HL
+   \   0002                  ; Total Auto size: 0
+    235             tTimerRef TimeOutRef;
+    236             
+    237             mLDBIntEnterIsr(cLDBHarInterruptRealTimeIt)
+   \   0002   11..01         MOV       S:LDBIntLevel,#1
+   \   0005   F4E5           MOV       A,0xFFE5
+   \   0007   6D1E           OR        A,#30
+   \   0009   F6E5           MOV       0xFFE5,A
+   \   000B   F4E6           MOV       A,0xFFE6
+   \   000D   6D46           OR        A,#70
+   \   000F   F6E6           MOV       0xFFE6,A
+   \   0011   7A1E           EI
+    238                
+    239             // IT clearing
+    240             mLDBIntClearIsrRequestFlag(cLDBHarInterruptRealTimeIt);
+   \   0013   714BE1         CLR1      0xFFE1.4
+    241             mLaunchItSequencedTimeOut();
+   \   0016   8E....         MOV       A,bLDBTimEnabled_LDBKwpCallBackTimer
+   \   0019   4D00           CMP       A,#0
+   \   001B   AD03           BZ        ??LDBIntIsrINTTMH0_4
+   \   001D   9A....         CALL      LDBKwpCallBackTimer
+    242          
+    243             // Calculate Tempos
+    244             if (TimerTosCounter == 0)
+   \                     ??LDBIntIsrINTTMH0_4:
+   \   0020   8E....         MOV       A,TimerTosCounter
+   \   0023   4D00           CMP       A,#0
+   \   0025   BD0B           BNZ       ??LDBIntIsrINTTMH0_5
+    245             {
+    246                TimerTosCounter = TimerTosPeriod;
+   \   0027   8E....         MOV       A,TimerTosPeriod
+   \   002A   9E....         MOV       TimerTosCounter,A
+    247                mLauchTosSequencedTimeOut();
+   \   002D   9A....         CALL      TOSAlaCallBackTimer
+   \   0030   FA04           BR        ??LDBIntIsrINTTMH0_6
+    248             }
+    249             else
+    250             {
+    251                TimerTosCounter--;
+   \                     ??LDBIntIsrINTTMH0_5:
+   \   0032   51             DEC       A
+   \   0033   9E....         MOV       TimerTosCounter,A
+    252             }
+    253             // Call callback
+    254             mLDBIntLeaveIsr(cLDBHarInterruptRealTimeIt)
+   \                     ??LDBIntIsrINTTMH0_6:
+   \   0036   7B1E           DI
+   \   0038   11..00         MOV       S:LDBIntLevel,#0
+   \   003B   F0..           MOV       A,S:LDBIntGroup1
+   \   003D   70             MOV       X,A
+   \   003E   F4E5           MOV       A,0xFFE5
+   \   0040   6158           AND       A,X
+   \   0042   F6E5           MOV       0xFFE5,A
+   \   0044   F0..           MOV       A,S:LDBIntGroup1+1
+   \   0046   70             MOV       X,A
+   \   0047   F4E6           MOV       A,0xFFE6
+   \   0049   6158           AND       A,X
+   \   004B   F6E6           MOV       0xFFE6,A
+    255          }
+   \   004D   B6             POP       HL
+   \   004E   B0             POP       AX
+   \   004F   8F             RETI      
+   \   0050                  REQUIRE ?CL78K_V4_6_L00
+   \   0050                  REQUIRE _A_IF0
+   \   0050                  REQUIRE _A_MK0
+   \   0050                  REQUIRE _A_MK1
+
+   \                                 In  segment INTVEC, offset 0x1c, root
+   \                     `??LDBIntIsrINTTMH0??INTVEC 28`:
+   \   001C   ....           DW LDBIntIsrINTTMH0
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     CMP00                             1
+     _A_TMHMD0                         1
+     _A_IF0                            2
+     _A_MK0                            2
+     _A_MK1                            2
+     bLDBTimEnabled_LDBKwpCallBackTimer
+                                       1
+     TimerTosPeriod                    1
+     TimerTosCounter                   1
+     LDBTimInit                        6
+     LDBTimStart                      29
+     LDBTimStop                       23
+     LDBTimStartTimer                  9
+     LDBTimStopTimer                   4
+     LDBIntIsrINTTMH0                 80
+     ??LDBIntIsrINTTMH0??INTVEC 28     2
+
+ 
+ 151 bytes in segment CODE
+   2 bytes in segment INTVEC
+   7 bytes in segment NEAR_A
+   3 bytes in segment NEAR_Z
+   1 byte  in segment SADDR_A
+ 
+ 151 bytes of CODE memory (+ 2 bytes shared)
+   3 bytes of DATA memory (+ 8 bytes shared)
+
+Errors: none
+Warnings: none

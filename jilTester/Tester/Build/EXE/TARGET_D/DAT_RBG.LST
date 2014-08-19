@@ -1,0 +1,763 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:15 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_RBG.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_RBG.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_RBG.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_RBG.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_RBG.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_RBG.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_RBG.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      RSA_X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:   DAT_RBG
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 09 2010 11:10:08  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_RBG/DAT_RBG.c-arc  $
+     16          // $Revision:   1.11  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_RBG/DAT_RBG.c-arc  $
+     19          // 
+     20          //    Rev 1.11   Mar 09 2010 11:10:08   adzhelp
+     21          // Cm006631: Code review corrections
+     22          // 
+     23          //    Rev 1.10   Mar 02 2010 16:20:14   adzhelp
+     24          // Cm006631: Decrementing of fault counter performed after 2 s has elapsed AND diag pulse is received
+     25          // 
+     26          //    Rev 1.9   Jan 21 2010 15:05:48   adzhelp
+     27          // Cm007074: Clearing of fault made on start-up
+     28          //
+     29          //    Rev 1.8   Dec 15 2009 11:56:06   amanevd
+     30          // Cm005566: EEP_DefAirbag is never cleared inside the component
+     31          //
+     32          //    Rev 1.7   Oct 02 2009 10:57:12   aangovt
+     33          // Cm005603: Corrections according to code review 1.5
+     34          // 
+     35          //    Rev 1.6   May 08 2009 16:33:17   aangovt
+     36          // Cm004984: Airbag diag pattern is the same with pointed in PRS and patern is not inverted. 
+     37          // 
+     38          //    Rev 1.5   May 08 2009 14:31:53   aangovt
+     39          // Cm004984: Airbag diag pattern is inverted.  
+     40          // 
+     41          //    Rev 1.4   Apr 25 2009 08:26:02   adzhelp 
+     42          // Cm003264: Functions moved to banked memory area
+     43          // 
+     44          //    Rev 1.3   Apr 22 2009 10:28:57   adzhelp 
+     45          // Cm003264: Macros for accessing fault flags updated  
+     46          // 
+     47          //    Rev 1.2   Apr 21 2009 19:09:51   ailievb 
+     48          // Cm003264 Implementation of the Doorlock functionality (Without SDO part)
+     49          // Added DATRbgStart and DATRbgStop functiona to stop adn start RBG from DLK component.  
+     50          // 
+     51          //    Rev 1.1   Apr 15 2009 09:58:47   aangovt
+     52          // Cm003264 - New template is added  
+     53          // 
+     54          //    Rev 1.0   Mar 26 2009 10:24:09   aangovt
+     55          // Initial revision. 
+     56          //******************************************************************************
+     57          #endif
+     58          
+     59          //------------------------------------------------------------------------------
+     60          // Body Identification
+     61          //------------------------------------------------------------------------------
+     62          #define dat_rbg  "dat_rbg"
+     63          
+     64          //------------------------------------------------------------------------------
+     65          // Included files to resolve specific definitions in this file
+     66          //
+     67          // #include <system_file_name.h>
+     68          // #include "project_file_name.h"
+     69          //------------------------------------------------------------------------------
+     70          //#include "deftypes.h"
+     71          #include "lib.h"
+     72          #include "ldb.h"
+     73          #include "tos.h"
+     74          #include "dat.h"
+     75          #include "DAT_RBG.h"
+     76          
+     77          
+     78          //------------------------------------------------------------------------------
+     79          // Local constants
+     80          //
+     81          // #define cConstantName   ((tType) ConstantValue)
+     82          //------------------------------------------------------------------------------
+     83          #define cRbgTaskPeriodMs                              ((U8)(  5)) //5ms
+     84          #define cMaxNbDefaults                                ((U8)( 30)) //60secs
+     85          #define cMinNbPulsesDuringResetTime                   ((U8)(  2))
+     86          
+     87          
+     88          #define cLowLevelOnSerialLine                         ((BOOL)(0))
+     89           
+     90          #define cResetTime                ((U16)(10000/cRbgTaskPeriodMs)) //10sec->2000samples
+     91          #define cMaxTimeWithoutDiagPulse  ((U16) (2000/cRbgTaskPeriodMs)) //2sec -> 400samples
+     92          #define cMaxCrashPulseTime        ((U16)  (150/cRbgTaskPeriodMs)) //150ms
+     93          #define cMinCrashPulseTime        ((U16)   (70/cRbgTaskPeriodMs)) //70ms
+     94          #define cMinDiagnosticPulseTime   ((U16)   (30/cRbgTaskPeriodMs)) //33ms rounded to 30ms
+     95          #define cMaxDiagnosticPulseTime   ((U16)   (40/cRbgTaskPeriodMs)) //39ms rounded to 40ms
+     96          
+     97          //------------------------------------------------------------------------------
+     98          // Local macros
+     99          //
+    100          // #define mMacroName   (MacroDefinition)
+    101          //------------------------------------------------------------------------------
+    102          #define mSetFlagAirbagMalfunctionIsDetected()                             \
+    103              mDATWrite(U1Bit, DefAirbag, cTrue, Default);                          \
+    104              /*//QACJ 3412: aangovt: No unrecognized code */                       \
+    105              /*//QACJ 3443: aangovt: No recursion */                               \
+    106              mDATWrite(U1Bit, EEP_DefAirbag, cTrue, Immediate)
+    107          
+    108          #define mResetFlagAirbagMalfunctionIsDetected()                           \
+    109              /*//QACJ 3443: aangovt: No recursion */                               \
+    110              mDATWrite(U1Bit, DefAirbag, cFalse, Default)
+    111          
+    112          
+    113          #define mSetFlagPermanentLowStateDetected()                               \
+    114              (bPermanentLowStateDetected = cTrue)
+    115          #define mResetFlagPermanentLowStateDetected()                             \
+    116              (bPermanentLowStateDetected = cFalse)
+    117          #define mFlagPermanentLowStateNotDetected                                 \
+    118              (bPermanentLowStateDetected == cFalse)
+    119          
+    120          //------------------------------------------------------------------------------
+    121          // Local types
+    122          //
+    123          // typedef Expression    tTypeName;
+    124          //------------------------------------------------------------------------------
+    125          
+    126          //------------------------------------------------------------------------------
+    127          // Data prefix
+    128          //
+    129          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    130          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    131          //
+    132          // -----------------------------------------------------------------------------
+    133          // Local data
+    134          //
+    135          // static  tType   u8VariableName;  
+    136          // static  tType*  pu8VariableName;  
+    137          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    138          static  U8 u8AMCounter;  // Airbag Malfunction counter
+   \                     u8AMCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    139          static U16 u16NbLowLevelSamples;
+   \                     u16NbLowLevelSamples:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    140          static U16 u16NbHighLevelSamples;
+   \                     u16NbHighLevelSamples:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    141          static U8 u8NbPulseDetectedByResetAirbag;
+   \                     u8NbPulseDetectedByResetAirbag:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    142          static U8 u8NbPulseDetectedByAirbag;
+   \                     u8NbPulseDetectedByAirbag:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    143          static U16 u16ResetTimer;
+   \                     u16ResetTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    144          static U16 u16DecrementAMCounterTimer;
+   \                     u16DecrementAMCounterTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    145          static tTOSAlarm AlarmDATRbgTask;
+   \                     AlarmDATRbgTask:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    146          static BOOL bPermanentLowStateDetected;
+   \                     bPermanentLowStateDetected:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    147          
+    148          //------------------------------------------------------------------------------
+    149          // Constant local data
+    150          //
+    151          // static const tType  VariableName;
+    152          //------------------------------------------------------------------------------
+    153          
+    154          //------------------------------------------------------------------------------
+    155          // Exported data
+    156          //
+    157          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    158          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    159          //------------------------------------------------------------------------------
+    160          
+    161          //------------------------------------------------------------------------------
+    162          // Constant exported data
+    163          //
+    164          //             (LAY: 3 characters to identify the layer)
+    165          //             (Cmp: 3 characters to identify this component)
+    166          // 
+    167          // const tType   LAYCmpVariableName;
+    168          //------------------------------------------------------------------------------
+    169          
+    170          //------------------------------------------------------------------------------
+    171          // Local function prototypes
+    172          // 
+    173          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    174          //------------------------------------------------------------------------------
+    175          
+    176          //==============================================================================
+    177          //=========================== LOCAL FUNCTIONS ==================================
+    178          //==============================================================================
+    179          
+    180          // [LOCAL_FUNCTIONS_END]
+    181          
+    182          
+    183          //==============================================================================
+    184          //=========================== EXPORTED FUNCTIONS ===============================
+    185          //==============================================================================
+    186          
+    187          //==============================================================================
+    188          // DESCRIPTION : 
+    189          //
+    190          // PARAMETERS (Type,Name,Min,Max) :   none
+    191          //
+    192          // RETURN VALUE :   none
+    193          //
+    194          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    195          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    196          void DATRbgInit(void)
+   \                     DATRbgInit:
+    197          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    198              u8NbPulseDetectedByResetAirbag = 0;
+   \   0000   A100           MOV       A,#0
+   \   0002   9E....         MOV       u8NbPulseDetectedByResetAirbag,A
+    199              u8NbPulseDetectedByAirbag = 0;
+   \   0005   9E....         MOV       u8NbPulseDetectedByAirbag,A
+    200              bPermanentLowStateDetected   = cFalse;
+   \   0008   9E....         MOV       bPermanentLowStateDetected,A
+    201              u16ResetTimer                   = cResetTime;
+   \   000B   10D007         MOVW      AX,#2000
+   \   000E   03....         MOVW      u16ResetTimer,AX
+    202              u16NbLowLevelSamples            = 0;
+   \   0011   100000         MOVW      AX,#0
+   \   0014   03....         MOVW      u16NbLowLevelSamples,AX
+    203              u16NbHighLevelSamples           = 0;
+   \   0017   03....         MOVW      u16NbHighLevelSamples,AX
+    204              u8AMCounter                  = 0;
+   \   001A   9E....         MOV       u8AMCounter,A
+    205              u16DecrementAMCounterTimer = 0;
+   \   001D   03....         MOVW      u16DecrementAMCounterTimer,AX
+    206          }
+   \   0020   AF             RET       
+   \   0021                  REQUIRE ?CL78K_V4_6_L00
+    207          
+    208          //==============================================================================
+    209          // DESCRIPTION         : DATRbgStart
+    210          //
+    211          // PARAMETERS          : None
+    212          //
+    213          // RETURN VALUE        : None
+    214          //
+    215          // DESIGN INFORMATION  : Refer to Detailed Design Document
+    216          //
+    217          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    218          MEM_TYPE void DATRbgStart(void)
+   \                     DATRbgStart:
+    219          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+    220              DATRbgInit();
+   \   0003   9E....         MOV       u8NbPulseDetectedByResetAirbag,A
+   \   0006   9E....         MOV       u8NbPulseDetectedByAirbag,A
+   \   0009   9E....         MOV       bPermanentLowStateDetected,A
+   \   000C   10D007         MOVW      AX,#2000
+   \   000F   03....         MOVW      u16ResetTimer,AX
+   \   0012   100000         MOVW      AX,#0
+   \   0015   03....         MOVW      u16NbLowLevelSamples,AX
+   \   0018   03....         MOVW      u16NbHighLevelSamples,AX
+   \   001B   9E....         MOV       u8AMCounter,A
+   \   001E   03....         MOVW      u16DecrementAMCounterTimer,AX
+    221              mResetFlagAirbagMalfunctionIsDetected();
+   \   0021   16....         MOVW      HL,#DATCmnData+17
+   \   0024   97             MOV       [HL],A
+    222              //Launch RbgTask
+    223              AlarmDATRbgTask.TaskID = cTOSTaskIdDATRbgTask;
+   \   0025   A102           MOV       A,#2
+   \   0027   03....         MOVW      AlarmDATRbgTask,AX
+    224              AlarmDATRbgTask.Period = mTOSConvMsInAlarmTick(cRbgTaskPeriodMs);
+   \   002A   A101           MOV       A,#1
+   \   002C   9E....         MOV       AlarmDATRbgTask+2,A
+    225              TOSSetRelAlarm (&AlarmDATRbgTask, 0, mTOSConvMsInAlarmTick (cRbgTaskPeriodMs)); 
+   \   002F   10....         MOVW      AX,#AlarmDATRbgTask
+   \   0032   A301           MOV       B,#1
+   \   0034   9A....         CALL      TOSSetRelAlarm_Interne
+    226          }
+   \   0037   B2             POP       BC
+   \   0038   AF             RET       
+   \   0039                  REQUIRE ?CL78K_V4_6_L00
+    227          
+    228          //==============================================================================
+    229          // DESCRIPTION         : DATRbgStop
+    230          //
+    231          // PARAMETERS          : None
+    232          //
+    233          // RETURN VALUE        : None
+    234          //
+    235          // DESIGN INFORMATION  : Refer to Detailed Design Document
+    236          //
+    237          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    238          MEM_TYPE void DATRbgStop(void)
+   \                     DATRbgStop:
+    239          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    240              // init outputs that should not be positioned without Ignition and motor running
+    241              // (won't be read anyway by LAP)
+    242              // Stop RbgTask
+    243              TOSCancelAlarm(&AlarmDATRbgTask);
+   \   0000   10....         MOVW      AX,#AlarmDATRbgTask
+   \   0003   9B....         BR        N:TOSCancelAlarm
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    244          }
+    245          
+    246          //==============================================================================
+    247          // DESCRIPTION : 
+    248          //
+    249          // PARAMETERS (Type,Name,Min,Max) :   none
+    250          //
+    251          // RETURN VALUE :   none
+    252          //
+    253          // DESIGN INFORMATION ::  prsFS_DLK-426,:  prsFS_DLK-427, prsFS_DLK-428, prsFS_DLK-429,prsFS_DLK-430, prsFS_DLK-436, prsFS_DLK-438, prsFS_DLK-510
+    254          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    255          void DATRbgAirbagCrashDetection(void)
+   \                     DATRbgAirbagCrashDetection:
+    256          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    257          #ifdef X90_PROJECT
+    258              static MEM_TYPE void DATRbgAirbagCrashDetection_Static(void);
+    259              DATRbgAirbagCrashDetection_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATRbgAirbagCrashDetection_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATRbgAirbagCrashDetection_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    260          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    261          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    262          static MEM_TYPE void DATRbgAirbagCrashDetection_Static(void)
+   \                     DATRbgAirbagCrashDetection_Static:
+    263          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    264          #endif
+    265              // Update counter reset mode
+    266              if(u16ResetTimer > 0)
+   \   0000   02....         MOVW      AX,u16ResetTimer
+   \   0003   6168           OR        A,X
+   \   0005   AD07           BZ        ??DATRbgAirbagCrashDetection_Static_0
+    267              {
+    268                  u16ResetTimer--;
+   \   0007   8E....         MOV       A,u16ResetTimer+1
+   \   000A   90             DECW      AX
+   \   000B   03....         MOVW      u16ResetTimer,AX
+    269              }
+    270              else 
+    271              {} //reset mode is over -> nothing to do
+    272          
+    273              // Management of clearing of defect
+    274              if ((u8AMCounter>0) && (u16DecrementAMCounterTimer > 0))
+   \                     ??DATRbgAirbagCrashDetection_Static_0:
+   \   000E   8E....         MOV       A,u8AMCounter
+   \   0011   4D00           CMP       A,#0
+   \   0013   AD2B           BZ        ??DATRbgAirbagCrashDetection_Static_1
+   \   0015   02....         MOVW      AX,u16DecrementAMCounterTimer
+   \   0018   6168           OR        A,X
+   \   001A   AD24           BZ        ??DATRbgAirbagCrashDetection_Static_1
+    275              {
+    276                  u16DecrementAMCounterTimer--;
+    277          
+    278                  if (u16DecrementAMCounterTimer == 0)
+   \   001C   8E....         MOV       A,u16DecrementAMCounterTimer+1
+   \   001F   90             DECW      AX
+   \   0020   03....         MOVW      u16DecrementAMCounterTimer,AX
+   \   0023   6168           OR        A,X
+   \   0025   BD19           BNZ       ??DATRbgAirbagCrashDetection_Static_1
+    279                  {
+    280                      // timer 2 s is elapsed            
+    281                      u16DecrementAMCounterTimer = cMaxTimeWithoutDiagPulse;// reload timer
+   \   0027   109001         MOVW      AX,#400
+   \   002A   03....         MOVW      u16DecrementAMCounterTimer,AX
+    282          
+    283                      if (u8NbPulseDetectedByAirbag > 0)
+   \   002D   8E....         MOV       A,u8NbPulseDetectedByAirbag
+   \   0030   4D00           CMP       A,#0
+   \   0032   AD0C           BZ        ??DATRbgAirbagCrashDetection_Static_1
+    284                      {
+    285                          u8AMCounter--; //decrease default counter when a pulse is detected and 2 s has elapsed
+   \   0034   8E....         MOV       A,u8AMCounter
+   \   0037   51             DEC       A
+   \   0038   9E....         MOV       u8AMCounter,A
+    286                          u8NbPulseDetectedByAirbag = 0;
+   \   003B   A100           MOV       A,#0
+   \   003D   9E....         MOV       u8NbPulseDetectedByAirbag,A
+    287                      }
+    288                      else
+    289                      {}// do nothing
+    290                  }
+    291              }
+    292          
+    293              if ((mDATRead(U1Bit,AIRBAG_CRASH, Immediate)) == cLowLevelOnSerialLine)
+   \                     ??DATRbgAirbagCrashDetection_Static_1:
+   \   0040   9C..4F         BT        S:DATDinInputBuffers+9.1, ??DATRbgAirbagCrashDetection_Static_2
+    294              {
+    295                  u16NbLowLevelSamples++;
+   \   0043   02....         MOVW      AX,u16NbLowLevelSamples
+   \   0046   80             INCW      AX
+   \   0047   03....         MOVW      u16NbLowLevelSamples,AX
+    296          
+    297                  // If during 2 seconds no diagnostic pulse is detected, the "Airbag Malfunction" Counter is increased.
+    298                  if ( (u16NbLowLevelSamples >= cMaxCrashPulseTime)
+    299                  && ((U16)(u16NbLowLevelSamples + u16NbHighLevelSamples) >= cMaxTimeWithoutDiagPulse)
+    300                  && (u16ResetTimer == 0))
+   \   004A   EA1E00         CMPW      AX,#30
+   \   004D   9D03           BNC       $+5
+   \   004F   9B....         BR        N:??DATRbgAirbagCrashDetection_Static_3
+   \   0052   30             XCH       A,X
+   \   0053   08....         ADD       A,u16NbHighLevelSamples
+   \   0056   30             XCH       A,X
+   \   0057   28....         ADDC      A,u16NbHighLevelSamples+1
+   \   005A   EA9001         CMPW      AX,#400
+   \   005D   9D03           BNC       $+5
+   \   005F   9B....         BR        N:??DATRbgAirbagCrashDetection_Static_3
+   \   0062   02....         MOVW      AX,u16ResetTimer
+   \   0065   6168           OR        A,X
+   \   0067   AD03           BZ        $+5
+   \   0069   9B....         BR        N:??DATRbgAirbagCrashDetection_Static_3
+    301                  {
+    302                      if (u8AMCounter < cMaxNbDefaults)
+   \   006C   8E....         MOV       A,u8AMCounter
+   \   006F   4D1E           CMP       A,#30
+   \   0071   9D04           BNC       ??DATRbgAirbagCrashDetection_Static_4
+    303                      {
+    304                          u8AMCounter++;
+   \   0073   41             INC       A
+   \   0074   9E....         MOV       u8AMCounter,A
+    305                      }
+    306                      else
+    307                      {}
+    308                    
+    309                      u16NbLowLevelSamples  = 0; //reset counters 
+   \                     ??DATRbgAirbagCrashDetection_Static_4:
+   \   0077   100000         MOVW      AX,#0
+   \   007A   03....         MOVW      u16NbLowLevelSamples,AX
+    310                      u16NbHighLevelSamples = 0; 
+   \   007D   03....         MOVW      u16NbHighLevelSamples,AX
+    311                      mSetFlagPermanentLowStateDetected();
+   \   0080   A101           MOV       A,#1
+   \   0082   9E....         MOV       bPermanentLowStateDetected,A
+    312          
+    313                      // prepare timer for defect clearing
+    314                      u16DecrementAMCounterTimer = cMaxTimeWithoutDiagPulse;// reload timer for clearing of fault
+   \   0085   A090           MOV       X,#144
+   \   0087   03....         MOVW      u16DecrementAMCounterTimer,AX
+    315                      u8NbPulseDetectedByAirbag = 0;
+   \   008A   A100           MOV       A,#0
+   \   008C   9E....         MOV       u8NbPulseDetectedByAirbag,A
+   \   008F   9B....         BR        N:??DATRbgAirbagCrashDetection_Static_3
+    316                  }
+    317                  else
+    318                  {
+    319                      // do nothing
+    320                  }
+    321              }
+    322              else
+    323              {
+    324                  u16NbHighLevelSamples++;
+   \                     ??DATRbgAirbagCrashDetection_Static_2:
+   \   0092   02....         MOVW      AX,u16NbHighLevelSamples
+   \   0095   80             INCW      AX
+   \   0096   03....         MOVW      u16NbHighLevelSamples,AX
+    325          
+    326              //pulse measuring between 33 and 39ms -> diagnostic pulse detected
+    327                  if( (u16NbLowLevelSamples >= cMinDiagnosticPulseTime) 
+    328                  && (u16NbLowLevelSamples <= cMaxDiagnosticPulseTime)
+    329                  && (mFlagPermanentLowStateNotDetected)  )
+   \   0099   02....         MOVW      AX,u16NbLowLevelSamples
+   \   009C   EA0600         CMPW      AX,#6
+   \   009F   8D26           BC        ??DATRbgAirbagCrashDetection_Static_5
+   \   00A1   EA0900         CMPW      AX,#9
+   \   00A4   9D21           BNC       ??DATRbgAirbagCrashDetection_Static_5
+   \   00A6   8E....         MOV       A,bPermanentLowStateDetected
+   \   00A9   4D00           CMP       A,#0
+   \   00AB   BD1A           BNZ       ??DATRbgAirbagCrashDetection_Static_5
+    330                  {
+    331                      // Pulse is detected 
+    332                      u8NbPulseDetectedByAirbag++;
+   \   00AD   8E....         MOV       A,u8NbPulseDetectedByAirbag
+   \   00B0   41             INC       A
+   \   00B1   9E....         MOV       u8NbPulseDetectedByAirbag,A
+    333          
+    334                      if(u8NbPulseDetectedByResetAirbag < cMinNbPulsesDuringResetTime)//in reset mode
+   \   00B4   8E....         MOV       A,u8NbPulseDetectedByResetAirbag
+   \   00B7   4D02           CMP       A,#2
+   \   00B9   9D04           BNC       ??DATRbgAirbagCrashDetection_Static_6
+    335                      {
+    336                          u8NbPulseDetectedByResetAirbag++;
+   \   00BB   41             INC       A
+   \   00BC   9E....         MOV       u8NbPulseDetectedByResetAirbag,A
+    337                      }
+    338                      else
+    339                      {} // do nothing
+    340          
+    341                      u16NbHighLevelSamples = 0; 
+   \                     ??DATRbgAirbagCrashDetection_Static_6:
+   \   00BF   100000         MOVW      AX,#0
+   \   00C2   03....         MOVW      u16NbHighLevelSamples,AX
+   \   00C5   FA52           BR        ??DATRbgAirbagCrashDetection_Static_7
+    342                 
+    343                  }
+    344                  else if((u16NbLowLevelSamples >= cMinCrashPulseTime) 
+    345                  && (u16NbLowLevelSamples <= cMaxCrashPulseTime)
+    346                  && (mFlagPermanentLowStateNotDetected))
+   \                     ??DATRbgAirbagCrashDetection_Static_5:
+   \   00C7   8E....         MOV       A,u16NbLowLevelSamples+1
+   \   00CA   EA0E00         CMPW      AX,#14
+   \   00CD   8D11           BC        ??DATRbgAirbagCrashDetection_Static_8
+   \   00CF   EA1F00         CMPW      AX,#31
+   \   00D2   9D0C           BNC       ??DATRbgAirbagCrashDetection_Static_8
+   \   00D4   8E....         MOV       A,bPermanentLowStateDetected
+   \   00D7   4D00           CMP       A,#0
+   \   00D9   BD05           BNZ       ??DATRbgAirbagCrashDetection_Static_8
+    347                  {
+    348                      // A crash should be authorized only if APC is on and the key was recognized
+    349                      // These conditions don't need to be verified because the component is 
+    350                      // started/stopped by LAP depending on Ignition state and key authentication
+    351                      TOSSendControl(cTOSControlAirbagUnlock);
+   \   00DB   A112           MOV       A,#18
+   \   00DD   ..             CALLT     [__T_TOSSendControl]
+   \   00DE   FA0E           BR        ??DATRbgAirbagCrashDetection_Static_9
+    352                  }
+    353                  else //pulse smaller than 33ms or between 40 & 70ms or bigger than 150ms
+    354                  {
+    355                      u16NbHighLevelSamples = u16NbLowLevelSamples + u16NbHighLevelSamples;
+   \                     ??DATRbgAirbagCrashDetection_Static_8:
+   \   00E0   8E....         MOV       A,u16NbLowLevelSamples+1
+   \   00E3   30             XCH       A,X
+   \   00E4   08....         ADD       A,u16NbHighLevelSamples
+   \   00E7   30             XCH       A,X
+   \   00E8   28....         ADDC      A,u16NbHighLevelSamples+1
+   \   00EB   03....         MOVW      u16NbHighLevelSamples,AX
+    356                  }
+    357          
+    358                  
+    359                  if(  (u16NbHighLevelSamples >= cMaxTimeWithoutDiagPulse) //2secs
+    360                  && (u16ResetTimer == 0)                              ) //&& not after reset
+   \                     ??DATRbgAirbagCrashDetection_Static_9:
+   \   00EE   02....         MOVW      AX,u16NbHighLevelSamples
+   \   00F1   EA9001         CMPW      AX,#400
+   \   00F4   8D23           BC        ??DATRbgAirbagCrashDetection_Static_7
+   \   00F6   02....         MOVW      AX,u16ResetTimer
+   \   00F9   6168           OR        A,X
+   \   00FB   BD1C           BNZ       ??DATRbgAirbagCrashDetection_Static_7
+    361                  { //increase default counter
+    362                      if(u8AMCounter < cMaxNbDefaults) 
+   \   00FD   8E....         MOV       A,u8AMCounter
+   \   0100   4D1E           CMP       A,#30
+   \   0102   9D04           BNC       ??DATRbgAirbagCrashDetection_Static_10
+    363                      {
+    364                          u8AMCounter++;
+   \   0104   41             INC       A
+   \   0105   9E....         MOV       u8AMCounter,A
+    365                      }
+    366                      else
+    367                      {} //don't increase if the value is already over its max
+    368                      u16NbHighLevelSamples    = 0;
+   \                     ??DATRbgAirbagCrashDetection_Static_10:
+   \   0108   100000         MOVW      AX,#0
+   \   010B   03....         MOVW      u16NbHighLevelSamples,AX
+    369          
+    370                      // prepare timer for defect clearing
+    371                      u16DecrementAMCounterTimer = cMaxTimeWithoutDiagPulse;// reload timer for clearing of fault
+   \   010E   109001         MOVW      AX,#400
+   \   0111   03....         MOVW      u16DecrementAMCounterTimer,AX
+    372                      u8NbPulseDetectedByAirbag = 0;
+   \   0114   A100           MOV       A,#0
+   \   0116   9E....         MOV       u8NbPulseDetectedByAirbag,A
+    373                  }
+    374          
+    375          
+    376                  u16NbLowLevelSamples      = 0; //reset flag & counter
+   \                     ??DATRbgAirbagCrashDetection_Static_7:
+   \   0119   100000         MOVW      AX,#0
+   \   011C   03....         MOVW      u16NbLowLevelSamples,AX
+    377                  mResetFlagPermanentLowStateDetected();
+   \   011F   9E....         MOV       bPermanentLowStateDetected,A
+    378              }
+    379          
+    380              //prsFS_DLK-429
+    381              if(  (u8NbPulseDetectedByResetAirbag < cMinNbPulsesDuringResetTime)
+    382              && (u16ResetTimer == 0)  )
+   \                     ??DATRbgAirbagCrashDetection_Static_3:
+   \   0122   8E....         MOV       A,u8NbPulseDetectedByResetAirbag
+   \   0125   4D02           CMP       A,#2
+   \   0127   9D13           BNC       ??DATRbgAirbagCrashDetection_Static_11
+   \   0129   02....         MOVW      AX,u16ResetTimer
+   \   012C   6168           OR        A,X
+   \   012E   BD0C           BNZ       ??DATRbgAirbagCrashDetection_Static_11
+    383              {
+    384                  u8AMCounter = cMaxNbDefaults;
+   \   0130   A11E           MOV       A,#30
+   \   0132   9E....         MOV       u8AMCounter,A
+    385                  u8NbPulseDetectedByResetAirbag = cMinNbPulsesDuringResetTime;
+   \   0135   A102           MOV       A,#2
+   \   0137   9E....         MOV       u8NbPulseDetectedByResetAirbag,A
+   \   013A   FA07           BR        ??DATRbgAirbagCrashDetection_Static_12
+    386              }
+    387              else
+    388              {} //nothing to do
+    389          
+    390              // prsFS_DLK-430 - So when the "Airbag Malfunction" Counter reaches the maximum
+    391              //cMaxNbDefaults = 30 -> 60secs without diagnostic pulse
+    392              if(u8AMCounter == cMaxNbDefaults) //no need >= because already limited above
+   \                     ??DATRbgAirbagCrashDetection_Static_11:
+   \   013C   8E....         MOV       A,u8AMCounter
+   \   013F   4D1E           CMP       A,#30
+   \   0141   BD13           BNZ       ??DATRbgAirbagCrashDetection_Static_13
+    393              {
+    394                  mSetFlagAirbagMalfunctionIsDetected();
+   \                     ??DATRbgAirbagCrashDetection_Static_12:
+   \   0143   A101           MOV       A,#1
+   \   0145   16....         MOVW      HL,#DATCmnData+17
+   \   0148   97             MOV       [HL],A
+   \   0149   16....         MOVW      HL,#DATDbkMirrors+19
+   \   014C   31A611         BT        [HL].2, ??DATRbgAirbagCrashDetection_Static_14
+   \   014F   A100           MOV       A,#0
+   \   0151   71A2           SET1      [HL].2
+   \   0153   9B....         BR        N:DATDbkStartUpdate
+    395              }
+    396              else if(u8AMCounter == 0) 
+   \                     ??DATRbgAirbagCrashDetection_Static_13:
+   \   0156   4D00           CMP       A,#0
+   \   0158   BD06           BNZ       ??DATRbgAirbagCrashDetection_Static_14
+    397              {
+    398                  mResetFlagAirbagMalfunctionIsDetected();
+   \   015A   A100           MOV       A,#0
+   \   015C   16....         MOVW      HL,#DATCmnData+17
+   \   015F   97             MOV       [HL],A
+    399              }
+    400              else
+    401              {
+    402                  //maintain last value
+    403              }
+    404          }
+   \                     ??DATRbgAirbagCrashDetection_Static_14:
+   \   0160   AF             RET       
+   \   0161                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+    405          /* [EXPORTED_FUNCTIONS_END] */
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     u8AMCounter                       1
+     u16NbLowLevelSamples              2
+     u16NbHighLevelSamples             2
+     u8NbPulseDetectedByResetAirbag    1
+     u8NbPulseDetectedByAirbag         1
+     u16ResetTimer                     2
+     u16DecrementAMCounterTimer        2
+     AlarmDATRbgTask                   4
+     bPermanentLowStateDetected        1
+     DATRbgInit                       33
+     DATRbgStart                      57
+     DATRbgStop                        6
+     DATRbgAirbagCrashDetection        9
+     DATRbgAirbagCrashDetection_Static
+                                     353
+     __T_?FAR_CALL_L07                 2
+     __T_TOSSendControl                2
+
+ 
+ 416 bytes in segment BCODE
+   4 bytes in segment CLTVEC
+  42 bytes in segment CODE
+  16 bytes in segment NEAR_Z
+ 
+ 458 bytes of CODE memory (+ 4 bytes shared)
+  16 bytes of DATA memory
+
+Errors: none
+Warnings: none

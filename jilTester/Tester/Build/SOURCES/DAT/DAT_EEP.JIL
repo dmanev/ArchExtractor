@@ -1,0 +1,119 @@
+/****************************************************************************
+  Project ......................... STANDARD
+  Component ....................... DAT_EEP
+  File revision.................... 
+  Last modification date .......... 
+  -------------------------------------------------------------------------
+  Copyright ... This software is JCI property. Duplication or
+                disclosure is prohibited without JCI written permission
+  ------------------------------------------------------------------------- 
+    
+  - This file defines the interaction of components with TOS services and
+    other component
+
+	See NT 02 0994 for language utilisation
+
+  -------------------------------------------------------------------------
+  dat_eep.jil file review :
+  
+
+*****************************************************************************/
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_EEP_JIL 
+#define I_DAT_EEP_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_EEP 
+{
+    
+/*--------------------------------------------------------------------------
+  Declaration of Task 
+
+  Task TaskName
+  {
+    Id          = "IdName";              --> this field is optional
+    Fct         = "FonctionName";        --> this field is optional
+    GraphGroup  =  GraphGroupReference;  --> this field is optional
+    Resource    =  ResourceReference;   --> this field is optional
+    Npg         =  NpgReference;         --> this field is optional
+    Priority    =  Priority;             --> this field is optional
+
+  };
+  --------------------------------------------------------------------------*/
+    Task DATEepTask 
+    {
+    };
+
+
+  
+/*--------------------------------------------------------------------------
+  Declaration of Control produced
+
+  Prod Control { Name = "ControlName";} 
+
+  --------------------------------------------------------------------------*/
+    ProdControl {Name="ActiveSleepRequest";};
+// Init component
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATEepInit";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainActiveSleepState";
+        Fct = "DATEepIsMaintainActiveSleepState";
+    };
+
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_EEP_JIL */ /*cLIBStkScc2_Used*/

@@ -1,0 +1,10 @@
+class AEPackage
+!!!268783.python!!!	__init__(inout self : , in inpName : )
+        self.setName(inpName)
+!!!268911.python!!!	addElement(in self : , in inpElement : PackageableElement)
+        if(isinstance(inpElement, Infrastructure.PackageableElement.PackageableElement)):
+            if(inpElement.getName() not in self.itsElementMap.keys()):
+                self.itsElementMap[inpElement.getName()] = inpElement
+                inpElement.setItsParentPackage(self)
+!!!277359.python!!!	getElementList(in self : )
+        return self.itsElementMap.values()

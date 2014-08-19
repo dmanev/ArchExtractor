@@ -1,0 +1,558 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:14 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_SPD.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_SPD.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_SPD.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_SPD.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_SPD.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_SPD.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_SPD.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    DAT_SPD
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Nov 02 2009 09:52:06  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_SPD/DAT_SPD.c-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_SPD/DAT_SPD.c-arc  $
+     19          // 
+     20          //    Rev 1.1   Nov 02 2009 09:52:06   adzhelp
+     21          // Cm006278: Code review updates and addition of 'available' flags
+     22          // 
+     23          //    Rev 1.0   Apr 10 2009 15:32:44   aangovt
+     24          // Initial revision.
+     25          //******************************************************************************
+     26          #endif
+     27          
+     28          
+     29          
+     30          //------------------------------------------------------------------------------
+     31          // Body Identification
+     32          //------------------------------------------------------------------------------
+     33          #define dat_spd  "dat_spd"
+     34          
+     35          //------------------------------------------------------------------------------
+     36          // Included files to resolve specific definitions in this file
+     37          //
+     38          // #include <system_file_name.h>
+     39          // #include "project_file_name.h"
+     40          //------------------------------------------------------------------------------
+     41          #include "deftypes.h"
+     42          #include "lib.h"
+     43          #include "tos.h"
+     44          #include "DAT_SPD.h"
+     45          #include "DAT_SPD.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near SpeedManagement[1]
+   \                     SpeedManagement:
+   \   0000   ........       DW DATSpdIsSpeedTimeoutIsElapsed, DATSpdReseiveSPDState
+   \   0004   FF00           DB 255, 0
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near RPMManagement[1]
+   \                     RPMManagement:
+   \   0000   ........       DW DATSpdIsRPMTimeoutIsElapsed, DATSpdReceiveRPMState
+   \   0004   FF00           DB 255, 0
+     46          
+     47          //------------------------------------------------------------------------------
+     48          // Local constants
+     49          //
+     50          // #define cConstantName   ((tType) ConstantValue)
+     51          //------------------------------------------------------------------------------
+     52          // reduced with one tick to improve accuracy:
+     53          #define  cSpeedPeriod      (mTOSConvMsInTimerTick((U32)720UL) - (tTOSTimer)1U)
+     54          #define  cRPMPeriod        (mTOSConvMsInTimerTick((U32)960UL) - (tTOSTimer)1U)
+     55          
+     56          
+     57          //------------------------------------------------------------------------------
+     58          // Local macros
+     59          //
+     60          // #define mMacroName   (MacroDefinition)
+     61          //------------------------------------------------------------------------------
+     62          
+     63          //------------------------------------------------------------------------------
+     64          // Local types
+     65          //
+     66          // typedef Expression    tTypeName;
+     67          //------------------------------------------------------------------------------
+     68          
+     69          //------------------------------------------------------------------------------
+     70          // Data prefix
+     71          //
+     72          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+     73          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+     74          //
+     75          // -----------------------------------------------------------------------------
+     76          // Local data
+     77          //
+     78          // static  tType   u8VariableName;  
+     79          // static  tType*  pu8VariableName; 
+     80          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     81          static tTOSTimer  RPMTimer;
+   \                     RPMTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     82          static tTOSTimer  SpeedTimer;
+   \                     SpeedTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+     83          
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     84          static tMsg DATSpdMsg;
+   \                     DATSpdMsg:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     85          static U8 Buffer[cLDBSpdMessageLength];
+   \                     Buffer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+     86          
+     87          //------------------------------------------------------------------------------
+     88          // Constant local data
+     89          //
+     90          // static const tType  VariableName;
+     91          //------------------------------------------------------------------------------
+     92          
+     93          //------------------------------------------------------------------------------
+     94          // Exported data
+     95          //
+     96          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+     97          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+     98          //------------------------------------------------------------------------------
+     99          
+    100          //------------------------------------------------------------------------------
+    101          // Constant exported data
+    102          //
+    103          //             (LAY: 3 characters to identify the layer)
+    104          //             (Cmp: 3 characters to identify this component)
+    105          // 
+    106          // const tType   LAYCmpVariableName;
+    107          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    108          BOOL bDATSpdENGINE_RPM;
+   \                     bDATSpdENGINE_RPM:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    109          U8 u8DATSpdVEHICLE_SPEED;
+   \                     u8DATSpdVEHICLE_SPEED:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    110          BOOL bDATSpdENGINE_RPMAvailable;
+   \                     bDATSpdENGINE_RPMAvailable:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    111          BOOL bDATSpdVEHICLE_SPEEDAvailable;
+   \                     bDATSpdVEHICLE_SPEEDAvailable:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    112          
+    113          
+    114          //------------------------------------------------------------------------------
+    115          // Local function prototypes
+    116          // 
+    117          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    118          //------------------------------------------------------------------------------
+    119          #ifdef X90_PROJECT
+    120          static MEM_TYPE void DATSpdEnterActiveState_Static();
+    121          #endif
+    122          
+    123          //==============================================================================
+    124          //=========================== LOCAL FUNCTIONS ==================================
+    125          //==============================================================================
+    126          
+    127          /* [LOCAL_FUNCTIONS_END] */
+    128          
+    129          
+    130          //****************************************************************************
+    131          //*...........................................................................*
+    132          //*........................... EXPORTED FUNCTIONS.............................*
+    133          //*...........................................................................*
+    134          //****************************************************************************/
+    135          
+    136          //==============================================================================
+    137          // DESCRIPTION : 
+    138          //
+    139          // PARAMETERS (Type,Name,Min,Max) :   none
+    140          //
+    141          // RETURN VALUE :   none 
+    142          //
+    143          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    144          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    145          BOOL DATSpdIsRPMTimeoutIsElapsed(void)
+   \                     DATSpdIsRPMTimeoutIsElapsed:
+    146          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#RPMTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    147              BOOL bTimerElapsedL = TOSIsTimerElapsed(&RPMTimer,cRPMPeriod);
+    148              bTimerElapsedL = bTimerElapsedL;
+    149              return bTimerElapsedL;
+   \   0004   125F00         MOVW      BC,#95
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    150          }
+    151          //==============================================================================
+    152          // DESCRIPTION : 
+    153          //
+    154          // PARAMETERS (Type,Name,Min,Max) :   none
+    155          //
+    156          // RETURN VALUE :   none 
+    157          //
+    158          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    159          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    160          BOOL DATSpdIsSpeedTimeoutIsElapsed(void)
+   \                     DATSpdIsSpeedTimeoutIsElapsed:
+    161          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#SpeedTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    162              BOOL bTimerElapsedL = TOSIsTimerElapsed(&SpeedTimer,cSpeedPeriod );
+    163              bTimerElapsedL = bTimerElapsedL;
+    164              return bTimerElapsedL;
+   \   0004   124700         MOVW      BC,#71
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    165          }
+    166          //==============================================================================
+    167          // DESCRIPTION : 
+    168          //
+    169          // PARAMETERS (Type,Name,Min,Max) :   none
+    170          //
+    171          // RETURN VALUE :   none
+    172          //
+    173          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    174          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    175          void DATSpdReceiveRPMState(void)
+   \                     DATSpdReceiveRPMState:
+    176          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100200         MOVW      AX,#2
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    177              // Called periodically on 960 ms
+    178              LDBReceiveWithAddr(cLDBChannelSpd, cLDBSpdAddrEngineRpm,  &DATSpdMsg );
+   \   0005   12....         MOVW      BC,#DATSpdMsg
+   \   0008   16....         MOVW      HL,#LWRD(LDBSpdReceiveWithAddr)
+   \   000B   A4..           MOV       E,#BYTE3(LDBSpdReceiveWithAddr)
+   \   000D   ..             CALLT     [__T_?FAR_CALL_L07]
+    179              bDATSpdENGINE_RPM = (DATSpdMsg.pBuffer[cLDBSpdEngineRpmIndex] == cLDBSpdEngineRunning);
+   \   000E   02....         MOVW      AX,DATSpdMsg
+   \   0011   D6             MOVW      HL,AX
+   \   0012   AE01           MOV       A,[HL+0x01]
+   \   0014   51             DEC       A
+   \   0015   BD04           BNZ       ??DATSpdLeaveActiveState_0
+   \   0017   A101           MOV       A,#1
+   \   0019   FA02           BR        ??DATSpdLeaveActiveState_1
+   \                     ??DATSpdLeaveActiveState_0:
+   \   001B   A100           MOV       A,#0
+   \                     ??DATSpdLeaveActiveState_1:
+   \   001D   9E....         MOV       bDATSpdENGINE_RPM,A
+    180              bDATSpdENGINE_RPMAvailable = cTrue;
+   \   0020   A101           MOV       A,#1
+   \   0022   9E....         MOV       bDATSpdENGINE_RPMAvailable,A
+    181              TOSStartTimer(&RPMTimer);
+   \   0025   10....         MOVW      AX,#RPMTimer
+   \   0028   ..             CALLT     [__T_TOSStartTimer]
+    182          }
+   \   0029   B4             POP       DE
+   \   002A   B2             POP       BC
+   \   002B   AF             RET       
+   \   002C                  REQUIRE ?CL78K_V4_6_L00
+    183          //==============================================================================
+    184          // DESCRIPTION : 
+    185          //
+    186          // PARAMETERS (Type,Name,Min,Max) :   none
+    187          //
+    188          // RETURN VALUE :   none
+    189          //
+    190          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    191          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    192          void DATSpdReseiveSPDState(void)
+   \                     DATSpdReseiveSPDState:
+    193          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100100         MOVW      AX,#1
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    194              // Called periodically on 720 ms
+    195              LDBReceiveWithAddr(cLDBChannelSpd, cLDBSpdAddrVehicleSpeed, &DATSpdMsg);
+   \   0005   12....         MOVW      BC,#DATSpdMsg
+   \   0008   16....         MOVW      HL,#LWRD(LDBSpdReceiveWithAddr)
+   \   000B   A4..           MOV       E,#BYTE3(LDBSpdReceiveWithAddr)
+   \   000D   ..             CALLT     [__T_?FAR_CALL_L07]
+    196              u8DATSpdVEHICLE_SPEED  = DATSpdMsg.pBuffer[cLDBSpdVehicleSpeedIndex];
+   \   000E   02....         MOVW      AX,DATSpdMsg
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   9E....         MOV       u8DATSpdVEHICLE_SPEED,A
+    197              bDATSpdVEHICLE_SPEEDAvailable = cTrue;
+   \   0016   A101           MOV       A,#1
+   \   0018   9E....         MOV       bDATSpdVEHICLE_SPEEDAvailable,A
+    198              TOSStartTimer(&SpeedTimer);
+   \   001B   10....         MOVW      AX,#SpeedTimer
+   \   001E   ..             CALLT     [__T_TOSStartTimer]
+    199          }
+   \   001F   B4             POP       DE
+   \   0020   B2             POP       BC
+   \   0021   AF             RET       
+   \   0022                  REQUIRE ?CL78K_V4_6_L00
+    200          
+    201          //==============================================================================
+    202          // DESCRIPTION : 
+    203          //
+    204          // PARAMETERS (Type,Name,Min,Max) :   none
+    205          //
+    206          // RETURN VALUE :   none
+    207          //
+    208          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    209          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    210          void DATSpdInit(void)
+   \                     DATSpdInit:
+    211          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    212              DATSpdMsg.Lng = cLDBSpdMessageLength;
+   \   0000   100200         MOVW      AX,#2
+   \   0003   03....         MOVW      DATSpdMsg+2,AX
+    213              DATSpdMsg.pBuffer = Buffer;
+   \   0006   10....         MOVW      AX,#Buffer
+   \   0009   03....         MOVW      DATSpdMsg,AX
+    214          }
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    215          
+    216          
+    217           
+    218          //==============================================================================
+    219          // DESCRIPTION : 
+    220          //
+    221          // PARAMETERS (Type,Name,Min,Max) :   none
+    222          //
+    223          // RETURN VALUE :   none
+    224          //
+    225          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    226          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    227          void DATSpdEnterActiveState(void)
+   \                     DATSpdEnterActiveState:
+    228          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    229          #ifdef X90_PROJECT
+    230              DATSpdEnterActiveState_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATSpdEnterActiveState_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATSpdEnterActiveState_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    231          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    232          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    233          static MEM_TYPE void DATSpdEnterActiveState_Static()
+   \                     DATSpdEnterActiveState_Static:
+    234          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    235          #endif
+    236              TOSSeqActivateGraph(cTOSSeqGraphIdSpeedManagement);
+   \   0000   A12A           MOV       A,#42
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    237              TOSSeqActivateGraph(cTOSSeqGraphIdRPMManagement);
+   \   0003   A12B           MOV       A,#43
+   \   0005   ..             CALLT     [__T_TOSSeqActivateGraph]
+    238              LDBControl(cLDBChannelSpd, cLDBSpdControlStart);
+   \   0006   A101           MOV       A,#1
+   \   0008   16....         MOVW      HL,#LWRD(LDBSpdControl)
+   \   000B   A4..           MOV       E,#BYTE3(LDBSpdControl)
+   \   000D   ..             CALLT     [__T_?FAR_CALL_L07]
+    239              TOSStartTimer(&RPMTimer); 
+   \   000E   10....         MOVW      AX,#RPMTimer
+   \   0011   ..             CALLT     [__T_TOSStartTimer]
+    240              TOSStartTimer(&SpeedTimer);
+   \   0012   10....         MOVW      AX,#SpeedTimer
+   \   0015   ..             CALLT     [__T_TOSStartTimer]
+    241              bDATSpdENGINE_RPMAvailable = cFalse;
+   \   0016   A100           MOV       A,#0
+   \   0018   9E....         MOV       bDATSpdENGINE_RPMAvailable,A
+    242              bDATSpdVEHICLE_SPEEDAvailable = cFalse;
+   \   001B   9E....         MOV       bDATSpdVEHICLE_SPEEDAvailable,A
+    243              bDATSpdENGINE_RPM = cFalse;
+   \   001E   9E....         MOV       bDATSpdENGINE_RPM,A
+    244              u8DATSpdVEHICLE_SPEED = 0;
+   \   0021   9E....         MOV       u8DATSpdVEHICLE_SPEED,A
+    245          }
+   \   0024   AF             RET       
+   \   0025                  REQUIRE ?CL78K_V4_6_L00
+    246          
+    247          //==============================================================================
+    248          // DESCRIPTION : 
+    249          //
+    250          // PARAMETERS (Type,Name,Min,Max) :   none
+    251          //
+    252          // RETURN VALUE :   none
+    253          //
+    254          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    255          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    256          void DATSpdLeaveActiveState(void)
+   \                     DATSpdLeaveActiveState:
+    257          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A12A           MOV       A,#42
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    258              TOSSeqDeactivateGraph(cTOSSeqGraphIdSpeedManagement);
+   \   0003   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    259              TOSSeqDeactivateGraph(cTOSSeqGraphIdRPMManagement);
+   \   0004   A12B           MOV       A,#43
+   \   0006   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    260              LDBControl(cLDBChannelSpd, cLDBSpdControlStop);
+   \   0007   A102           MOV       A,#2
+   \   0009   16....         MOVW      HL,#LWRD(LDBSpdControl)
+   \   000C   A4..           MOV       E,#BYTE3(LDBSpdControl)
+   \   000E   ..             CALLT     [__T_?FAR_CALL_L07]
+    261          }
+   \   000F   B4             POP       DE
+   \   0010   AF             RET       
+   \   0011                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+    262          /* [EXPORTED_FUNCTIONS_END] */
+
+   Segment part sizes:
+
+     Function/Label                Bytes
+     --------------                -----
+     SpeedManagement                  6
+     RPMManagement                    6
+     RPMTimer                         2
+     SpeedTimer                       2
+     DATSpdMsg                        4
+     Buffer                           2
+     bDATSpdENGINE_RPM                1
+     u8DATSpdVEHICLE_SPEED            1
+     bDATSpdENGINE_RPMAvailable       1
+     bDATSpdVEHICLE_SPEEDAvailable    1
+     DATSpdIsRPMTimeoutIsElapsed     10
+     DATSpdIsSpeedTimeoutIsElapsed   10
+     DATSpdReceiveRPMState           44
+     DATSpdReseiveSPDState           34
+     DATSpdInit                      13
+     DATSpdEnterActiveState           9
+     DATSpdEnterActiveState_Static   37
+     DATSpdLeaveActiveState          17
+     __T_TOSIsTimerElapsed            2
+     __T_?FAR_CALL_L07                2
+     __T_TOSStartTimer                2
+     __T_TOSSeqActivateGraph          2
+     __T_TOSSeqDeactivateGraph        2
+
+ 
+  37 bytes in segment BCODE
+  10 bytes in segment CLTVEC
+ 137 bytes in segment CODE
+  12 bytes in segment CONST
+  14 bytes in segment NEAR_Z
+ 
+ 174 bytes of CODE  memory (+ 10 bytes shared)
+  12 bytes of CONST memory
+  14 bytes of DATA  memory
+
+Errors: none
+Warnings: none

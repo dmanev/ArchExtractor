@@ -1,0 +1,3 @@
+class StkDATControlIf
+!!!231791.python!!!	__init__(inout self : )
+        self.setName('DATCtrl')

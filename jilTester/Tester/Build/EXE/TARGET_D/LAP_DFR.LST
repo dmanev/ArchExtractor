@@ -1,0 +1,1682 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:43 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_DFR.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_DFR.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_DFR.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_DFR.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_DFR.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_DFR.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_DFR.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_DFR
+     13          // -----------------------------------------------------------------------------
+     14          // $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/DFR/LAP_DFR.c-arc  $
+     15          // 
+     16          //    Rev 1.23   Apr 13 2010 12:18:50   adzhelp
+     17          // Cm008191: Defroster cannot be active when ignition is off
+     18          // 
+     19          //    Rev 1.22   Mar 11 2010 17:51:02   amanevd
+     20          // Cm006814: Code review fixes - no binary code impact
+     21          // 
+     22          //    Rev 1.21   Mar 02 2010 10:41:36   adzhelp
+     23          // Cm006814: TPS_TEMPO_DEG normalized
+     24          // 
+     25          //    Rev 1.20   Feb 11 2010 17:31:32   adzhelp
+     26          // Cm006567: False activation on falling ignition corrected
+     27          // 
+     28          //    Rev 1.19   Feb 10 2010 16:46:48   amanevd
+     29          // Cm007075: Volatile Faults and Deprotection cleared at IGN ON
+     30          // 
+     31          //    Rev 1.18   Feb 05 2010 15:21:28   adzhelp
+     32          // Cm006567: Defroster activation/deactivation on switch input rising edge.
+     33          // 
+     34          //    Rev 1.17   Feb 05 2010 11:21:16   adzhelp
+     35          // Cm005590: Implementation of activation delay 1 s
+     36          // 
+     37          //    Rev 1.16   Jan 07 2010 15:25:50   amanevd
+     38          // Cm005566: Horn fault is detected and memorized at the same time
+     39          // 
+     40          //    Rev 1.15   Dec 15 2009 10:49:46   amanevd
+     41          // Cm005566: Include PWR_IGN==1 condition in DEFROSTER SC detection
+     42          // 
+     43          //    Rev 1.14   Dec 14 2009 11:02:16   amanevd
+     44          // Cm005566: Full Hardware Protection
+     45          // 
+     46          //    Rev 1.13   Nov 04 2009 16:26:50   adzhelp
+     47          // Cm005566: Implementation of HW Protection
+     48          // 
+     49          //    Rev 1.12   Nov 02 2009 09:49:18   adzhelp
+     50          // Cm006278: Integration test corrections
+     51          // 
+     52          //    Rev 1.11   Oct 01 2009 13:53:18   aangovt
+     53          // Cm006278: Defroster behavior after reset
+     54          // 
+     55          //    Rev 1.10   Apr 29 2009 14:08:52   adzhelp
+     56          // Cm003270: Functions moved to banked memory area
+     57          // 
+     58          //    Rev 1.9   Apr 07 2009 17:02:38   aangovt
+     59          // Cm003270: Changes after QAC analysis
+     60          // 
+     61          //    Rev 1.8   Apr 07 2009 11:56:56   adzhelp
+     62          // Cm003270: Integration test corrections
+     63          //
+     64          //******************************************************************************
+     65          #endif
+     66          
+     67          //------------------------------------------------------------------------------
+     68          // Body Identification
+     69          //------------------------------------------------------------------------------
+     70          #define LAP_DFR  "LAP_DFR"
+     71          
+     72          //------------------------------------------------------------------------------
+     73          // Included files to resolve specific definitions in this file
+     74          //
+     75          // #include <system_file_name.h>
+     76          // #include "project_file_name.h"
+     77          //------------------------------------------------------------------------------
+     78          #include "dat.h"
+     79          #include "deftypes.h"
+     80          #include "lib.h"
+     81          #include "tos.h"
+     82          #include "LAP_DFR.h"
+     83          #include "LAP_DFR.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near RDFRearDefoggerManagement[2]
+   \                     RDFRearDefoggerManagement:
+   \   0000   ........       DW LAPDfrCommandOn, LAPDfrOn
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW LAPDfrCommandOff, LAPDfrOff
+   \   000A   FF00           DB 255, 0
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near RDFProtectionManagement[1]
+   \                     RDFProtectionManagement:
+   \   0000   ........       DW TOSSeqTrueEval, LAPDfrProtectionTask
+   \   0004   FF00           DB 255, 0
+     84          
+     85          //------------------------------------------------------------------------------
+     86          // Local constants
+     87          //
+     88          // #define cConstantName   ((tType) ConstantValue)
+     89          //------------------------------------------------------------------------------
+     90          #define cInhibit              (0)
+     91          #define cAuthorize            (1)
+     92          #define cDefrostTimeout       (50000UL)  //50 s
+     93          #define cActivationDelay      (1000UL)   //1 s
+     94          
+     95          // HW Protection
+     96          #define cFaultCountWarnThreshold    ((U8) 2U)
+     97          #define cFaultCountProtectThreshold ((U8) 4U)
+     98          
+     99          #define cMaxU8                      ((U8) 0xFFU)
+    100          
+    101          #define cDefrostTimeoutInTimerTick    (mTOSConvMsInTimerTick((U32)cDefrostTimeout))
+    102          #define cActivationDelayInTimerTick   (mTOSConvMsInTimerTick((U32)cActivationDelay))
+    103          
+    104          //------------------------------------------------------------------------------
+    105          // Local macros
+    106          //
+    107          // #define mMacroName   (MacroDefinition)
+    108          //------------------------------------------------------------------------------
+    109          #define mIsButtonRaisingEdge() \
+    110              (   (bPreviousButtonState == cFalse) \
+    111              /*//QACJ 3443: adzhelp: Standard STK macro used */\
+    112               && (mDATRead(U1Bit, DEFROSTER_SW_FILTERED, Default) != cFalse) )
+    113          #define mRefreshButtonState() \
+    114              /*//QACJ 3443: adzhelp: Standard STK macro used */\
+    115              (bPreviousButtonState = mDATRead(U1Bit, DEFROSTER_SW_FILTERED, Default))
+    116          
+    117          //------------------------------------------------------------------------------
+    118          // Local types
+    119          //
+    120          // typedef Expression    tTypeName;
+    121          //------------------------------------------------------------------------------
+    122          
+    123          //------------------------------------------------------------------------------
+    124          // Data prefix
+    125          //
+    126          // unsigned int {u8,u16,u32} / signed int {s8,s16,s32} 
+    127          // register size unsigned int {r} / float {f32,f64}  / s for struct 
+    128          //
+    129          // -----------------------------------------------------------------------------
+    130          // Local data
+    131          //
+    132          // static  tType   u8VariableName;  
+    133          // static  tType*  pu8VariableName; 
+    134          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    135          static tTOSTimer    TempoDefrostTimeout; 
+   \                     TempoDefrostTimeout:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    136          static tTOSTimer    ActivationTimer;
+   \                     ActivationTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    137          static BOOL     bActivationDelayElapsed = cFalse;
+   \                     bActivationDelayElapsed:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    138          static BOOL     bReadyToSleep = cTrue;
+   \                     bReadyToSleep:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bReadyToSleep>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    139          static BOOL     bPreviousButtonState = cFalse;
+   \                     bPreviousButtonState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    140          static U8       u8DFRStepTimeoutCounter = 0;
+   \                     u8DFRStepTimeoutCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    141          static BOOL     bActivateAfterReset = cFalse;
+   \                     bActivateAfterReset:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    142          static BOOL     bPwrIgnAfterReset = cFalse;
+   \                     bPwrIgnAfterReset:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    143          
+    144          // HW Protection
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    145          static BOOL     bPWR_IGNOld;
+   \                     bPWR_IGNOld:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    146          static BOOL     bDefrosterStopped;
+   \                     bDefrosterStopped:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    147          static U8       u8DfrFaultCounter;
+   \                     u8DfrFaultCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    148          static U8       u8HrnFaultCounter;
+   \                     u8HrnFaultCounter:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    149          
+    150          //------------------------------------------------------------------------------
+    151          // Constant local data
+    152          //
+    153          // static const tType  VariableName;
+    154          //------------------------------------------------------------------------------
+    155          
+    156          //------------------------------------------------------------------------------
+    157          // Exported data
+    158          //
+    159          // tType   u8LAYCmpVariableName; (LAY: 3 characters to identify the layer)
+    160          // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
+    161          //------------------------------------------------------------------------------
+    162          
+    163          //------------------------------------------------------------------------------
+    164          // Constant exported data
+    165          //
+    166          //             (LAY: 3 characters to identify the layer)
+    167          //             (Cmp: 3 characters to identify this component)
+    168          // 
+    169          // const tType   LAYCmpVariableName;
+    170          //------------------------------------------------------------------------------
+    171          
+    172          //------------------------------------------------------------------------------
+    173          // Local function prototypes
+    174          // 
+    175          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    176          //------------------------------------------------------------------------------
+    177          #ifdef X90_PROJECT
+    178          static MEM_TYPE BOOL LAPDfrCommandOff_Static(void);
+    179          static MEM_TYPE BOOL LAPDfrCommandOn_Static(void);
+    180          static MEM_TYPE void LAPDfrProtectionTask_Static(void);
+    181          #endif
+    182          
+    183          //==============================================================================
+    184          //=========================== LOCAL FUNCTIONS ==================================
+    185          //==============================================================================
+    186          
+    187          //==============================================================================
+    188          // DESCRIPTION : 
+    189          //
+    190          // PARAMETERS (Type,Name,Min,Max) :   none
+    191          //
+    192          // RETURN VALUE :   none 
+    193          //
+    194          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    195          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    196          BOOL LAPDfrCommandOff(void)
+   \                     LAPDfrCommandOff:
+    197          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    198          #ifdef X90_PROJECT
+    199              return LAPDfrCommandOff_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPDfrCommandOff_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPDfrCommandOff_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    200          }
+    201          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    202          static MEM_TYPE BOOL LAPDfrCommandOff_Static(void)
+   \                     LAPDfrCommandOff_Static:
+    203          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    204          #endif
+    205          
+    206              BOOL bDFRTimeElapsedL;
+    207              BOOL bDeactivationFlagL;
+    208              BOOL bReturnValueL = cFalse;
+   \   0001   A400           MOV       E,#0
+    209          
+    210              if (mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) == cAuthorize)
+   \   0003   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0006   31B603         BT        [HL].3, $+6
+   \   0009   9B....         BR        N:??LAPDfrLeaveStartingStepState_2
+    211              {
+    212              #ifdef X90_PROJECT
+    213                  //adzhelp: 5 NOPs added so that object file produced from rev. 1.22 to be identical with 1.23
+    214                  NOP();
+   \   000C   00             nop
+    215                  NOP();
+   \   000D   00             nop
+    216                  NOP();
+   \   000E   00             nop
+    217                  NOP();
+   \   000F   00             nop
+    218                  NOP();
+   \   0010   00             nop
+    219              #endif
+    220                  
+    221                  bDeactivationFlagL = (BOOL)
+    222                      ((mDATRead(U1Bit,PWR_IGN,Default) == 0)  // prsFS_RDEF-422
+    223                      || 
+    224                      ((mDATRead(U1Bit,ENGINE_RPM,Default) == 0) &&
+    225                      (mDATRead(U1Bit, EEP_INFO_REGIME, Default)== 1) ));
+   \   0011   3103..0D       BF        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_3
+   \   0015   8E....         MOV       A,bDATSpdENGINE_RPM
+   \   0018   4D00           CMP       A,#0
+   \   001A   BD0A           BNZ       ??LAPDfrLeaveStartingStepState_4
+   \   001C   16....         MOVW      HL,#DATDbkMirrors+26
+   \   001F   31C704         BF        [HL].4, ??LAPDfrLeaveStartingStepState_4
+   \                     ??LAPDfrLeaveStartingStepState_3:
+   \   0022   A501           MOV       D,#1
+   \   0024   FA02           BR        ??LAPDfrLeaveStartingStepState_5
+   \                     ??LAPDfrLeaveStartingStepState_4:
+   \   0026   A500           MOV       D,#0
+    226                                       
+    227                  bDFRTimeElapsedL = TOSIsTimerElapsed(&TempoDefrostTimeout, cDefrostTimeoutInTimerTick);
+    228          
+    229                  if(bDFRTimeElapsedL != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_5:
+   \   0028   10....         MOVW      AX,#TempoDefrostTimeout
+   \   002B   128813         MOVW      BC,#5000
+   \   002E   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   002F   4D00           CMP       A,#0
+   \   0031   AD0B           BZ        ??LAPDfrLeaveStartingStepState_6
+    230                  {
+    231                      u8DFRStepTimeoutCounter--;
+   \   0033   8E....         MOV       A,u8DFRStepTimeoutCounter
+   \   0036   51             DEC       A
+   \   0037   9E....         MOV       u8DFRStepTimeoutCounter,A
+    232                      TOSStartTimer(&TempoDefrostTimeout);
+   \   003A   10....         MOVW      AX,#TempoDefrostTimeout
+   \   003D   ..             CALLT     [__T_TOSStartTimer]
+    233                  }
+    234           
+    235                  if( 
+    236                      (bDeactivationFlagL != cFalse)
+    237                      || (u8DFRStepTimeoutCounter == 0)
+    238                      || mIsButtonRaisingEdge()
+    239                   )
+   \                     ??LAPDfrLeaveStartingStepState_6:
+   \   003E   65             MOV       A,D
+   \   003F   4D00           CMP       A,#0
+   \   0041   BD15           BNZ       ??LAPDfrLeaveStartingStepState_7
+   \   0043   8E....         MOV       A,u8DFRStepTimeoutCounter
+   \   0046   4D00           CMP       A,#0
+   \   0048   AD0E           BZ        ??LAPDfrLeaveStartingStepState_7
+   \   004A   8E....         MOV       A,bPreviousButtonState
+   \   004D   4D00           CMP       A,#0
+   \   004F   BD09           BNZ       ??LAPDfrLeaveStartingStepState_8
+   \   0051   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   0054   4D00           CMP       A,#0
+   \   0056   AD02           BZ        ??LAPDfrLeaveStartingStepState_8
+    240                  {
+    241                      bReturnValueL = cTrue;
+   \                     ??LAPDfrLeaveStartingStepState_7:
+   \   0058   A401           MOV       E,#1
+    242                  }
+    243          
+    244                  if (mDATRead(U1Bit, EEP_INFO_REGIME, Default)== 1)
+   \                     ??LAPDfrLeaveStartingStepState_8:
+   \   005A   16....         MOVW      HL,#DATDbkMirrors+26
+   \   005D   31C71B         BF        [HL].4, ??LAPDfrLeaveStartingStepState_9
+    245                  {        
+    246                      // Behaviour after reset
+    247                      if (mDATRead(U1Bit, ENGINE_RPMAvailable, Default) == cFalse)
+   \   0060   8E....         MOV       A,bDATSpdENGINE_RPMAvailable
+   \   0063   4D00           CMP       A,#0
+   \   0065   BD02           BNZ       ??LAPDfrLeaveStartingStepState_10
+    248                      {
+    249                          bReturnValueL = cFalse; // keep output on after reset during RPM signal not measured
+   \   0067   A400           MOV       E,#0
+    250                      }
+    251                      // Update activation timer state
+    252                      if (mDATRead(U1Bit,ENGINE_RPM,Default) == cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_10:
+   \   0069   8E....         MOV       A,bDATSpdENGINE_RPM
+   \   006C   4D00           CMP       A,#0
+   \   006E   BD1D           BNZ       ??LAPDfrLeaveStartingStepState_11
+    253                      {
+    254                          TOSStopTimer(&ActivationTimer);
+   \   0070   10....         MOVW      AX,#ActivationTimer
+   \   0073   ..             CALLT     [__T_TOSStopTimer]
+    255                          bActivationDelayElapsed = cFalse;
+   \   0074   A100           MOV       A,#0
+   \   0076   9E....         MOV       bActivationDelayElapsed,A
+   \   0079   FA12           BR        ??LAPDfrLeaveStartingStepState_11
+    256                      }
+    257                  }
+    258                  else // EEP_INFO_REGIME = 0
+    259                  {
+    260                      if (bPwrIgnAfterReset != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_9:
+   \   007B   8E....         MOV       A,bPwrIgnAfterReset
+   \   007E   4D00           CMP       A,#0
+   \   0080   AD0B           BZ        ??LAPDfrLeaveStartingStepState_11
+    261                      {
+    262                          bReturnValueL = cFalse; // keep output on after reset during PWR_IGN signal not filtered
+   \   0082   A400           MOV       E,#0
+    263          
+    264                          if (mDATRead(U1Bit, PWR_IGN, Default) != cFalse)
+   \   0084   3103..05       BF        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_11
+    265                          {
+    266                              bPwrIgnAfterReset = cFalse; // clear flag
+   \   0088   A100           MOV       A,#0
+   \   008A   9E....         MOV       bPwrIgnAfterReset,A
+    267                          }
+    268                          else
+    269                          {
+    270                              // wait for filtered value of PWR_IGN to become '1'
+    271                          }
+    272                      }
+    273                  }
+    274                  mRefreshButtonState();
+   \                     ??LAPDfrLeaveStartingStepState_11:
+   \   008D   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   0090   9E....         MOV       bPreviousButtonState,A
+   \   0093   FA02           BR        ??LAPDfrLeaveStartingStepState_12
+    275              }
+    276              else
+    277              {
+    278                  bReturnValueL = cTrue; // deactivate output
+   \                     ??LAPDfrLeaveStartingStepState_2:
+   \   0095   A401           MOV       E,#1
+    279              }
+    280           
+    281          	
+    282              return bReturnValueL;
+   \                     ??LAPDfrLeaveStartingStepState_12:
+   \   0097   64             MOV       A,E
+   \   0098   B2             POP       BC
+   \   0099   AF             RET       
+   \   009A                  REQUIRE ?CL78K_V4_6_L00
+    283          }
+    284          //==============================================================================
+    285          // DESCRIPTION : 
+    286          //
+    287          // PARAMETERS (Type,Name,Min,Max) :   none
+    288          //
+    289          // RETURN VALUE :   none 
+    290          //
+    291          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    292          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    293          BOOL LAPDfrCommandOn(void)
+   \                     LAPDfrCommandOn:
+    294          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    295          #ifdef X90_PROJECT
+    296              return LAPDfrCommandOn_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPDfrCommandOn_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPDfrCommandOn_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    297          }
+    298          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    299          static MEM_TYPE BOOL LAPDfrCommandOn_Static(void)
+   \                     LAPDfrCommandOn_Static:
+    300          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    301          #endif
+    302              BOOL bReturnValueL = cFalse;
+   \   0001   A400           MOV       E,#0
+    303              BOOL bTimerStartedL;
+    304              BOOL bTimerElapsedL;
+    305          
+    306              if (bActivateAfterReset != cFalse)
+   \   0003   8E....         MOV       A,bActivateAfterReset
+   \   0006   4D00           CMP       A,#0
+   \   0008   16....         MOVW      HL,#DATDbkMirrors+24
+   \   000B   AD32           BZ        ??LAPDfrLeaveStartingStepState_13
+    307              {
+    308                  mLIBassert(mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) == cAuthorize);
+   \   000D   31B603         BT        [HL].3, ??LAPDfrLeaveStartingStepState_14
+   \   0010   9A....         CALL      LIBAssertionFailed
+    309                  
+    310              #ifdef X90_PROJECT
+    311                  //adzhelp: 6 NOPs added so that object file produced from rev. 1.22 to be identical with 1.23
+    312                  NOP();
+   \                     ??LAPDfrLeaveStartingStepState_14:
+   \   0013   00             nop
+    313                  NOP();
+   \   0014   00             nop
+    314                  NOP();
+   \   0015   00             nop
+    315                  NOP();
+   \   0016   00             nop
+    316                  NOP();
+   \   0017   00             nop
+    317                  NOP();
+   \   0018   00             nop
+    318              #endif
+    319                  if (mDATRead(U1Bit,PWR_IGN,Immediate) == 0) //prsFS_RDEF-422
+   \   0019   8C..15         BT        S:DATDinInputBuffers+15.0, ??LAPDfrLeaveStartingStepState_15
+    320                  {
+    321                      // Do not activate output
+    322                      mDATWrite(U1Bit, EEP_DefrosterActivationState, 0, Default);
+   \   001C   16....         MOVW      HL,#DATDbkMirrors+28
+   \   001F   319707         BF        [HL].1, ??LAPDfrLeaveStartingStepState_16
+   \   0022   A101           MOV       A,#1
+   \   0024   7193           CLR1      [HL].1
+   \   0026   9A....         CALL      DATDbkStartUpdate
+    323                      bActivateAfterReset = cFalse;
+   \                     ??LAPDfrLeaveStartingStepState_16:
+   \   0029   A100           MOV       A,#0
+   \   002B   9E....         MOV       bActivateAfterReset,A
+   \   002E   9B....         BR        N:??LAPDfrLeaveStartingStepState_17
+    324                  }
+    325                  else
+    326                  {
+    327                      //non-filtered state of ignition is on
+    328                      //CCOV: adzhelp: Cannot be covered in unit test environment
+    329                      if (mDATRead(U1Bit,PWR_IGN,Default) != 0)
+   \                     ??LAPDfrLeaveStartingStepState_15:
+   \   0031   3103..02       BF        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_18
+    330                      {
+    331                          // activate output after filtered value of ignition is on
+    332                          bReturnValueL = cTrue;
+   \   0035   A401           MOV       E,#1
+    333                      }
+    334                      bPwrIgnAfterReset = cTrue;
+   \                     ??LAPDfrLeaveStartingStepState_18:
+   \   0037   A101           MOV       A,#1
+   \   0039   9E....         MOV       bPwrIgnAfterReset,A
+   \   003C   9B....         BR        N:??LAPDfrLeaveStartingStepState_17
+    335                  }
+    336              }
+    337              else if (mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) == cAuthorize)
+   \                     ??LAPDfrLeaveStartingStepState_13:
+   \   003F   31B603         BT        [HL].3, $+6
+   \   0042   9B....         BR        N:??LAPDfrLeaveStartingStepState_19
+    338              {
+    339                  if (mDATRead(U1Bit, EEP_INFO_REGIME, Default) != cFalse)
+   \   0045   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0048   31C75D         BF        [HL].4, ??LAPDfrLeaveStartingStepState_20
+    340                  {
+    341                      // Defroster activated on engine status
+    342          
+    343                      if (bActivationDelayElapsed != cFalse)
+   \   004B   8E....         MOV       A,bActivationDelayElapsed
+   \   004E   4D00           CMP       A,#0
+   \   0050   AD19           BZ        ??LAPDfrLeaveStartingStepState_21
+    344                      {
+    345                          if (mDATRead(U1Bit, ENGINE_RPM, Default) != cFalse)
+   \   0052   8E....         MOV       A,bDATSpdENGINE_RPM
+   \   0055   4D00           CMP       A,#0
+   \   0057   AD67           BZ        ??LAPDfrLeaveStartingStepState_22
+    346                          {
+    347                              bReturnValueL = mIsButtonRaisingEdge();
+   \   0059   8E....         MOV       A,bPreviousButtonState
+   \   005C   4D00           CMP       A,#0
+   \   005E   BD65           BNZ       ??LAPDfrLeaveStartingStepState_23
+   \                     ??LAPDfrCommandOn_Static_0:
+   \   0060   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   0063   4D00           CMP       A,#0
+   \   0065   AD5E           BZ        ??LAPDfrLeaveStartingStepState_23
+   \   0067   A401           MOV       E,#1
+   \   0069   FA5A           BR        ??LAPDfrLeaveStartingStepState_23
+    348                          }
+    349                          else
+    350                          {
+    351                              bActivationDelayElapsed = cFalse;
+    352                          }
+    353                      }
+    354                      else
+    355                      {
+    356                          //prsFS_RDEF-287 - Delay for activation
+    357                          bTimerStartedL = TOSIsTimerStarted(&ActivationTimer);
+    358          
+    359                          if (bTimerStartedL == cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_21:
+   \   006B   10....         MOVW      AX,#ActivationTimer
+   \   006E   9A....         CALL      TOSIsTimerStarted
+   \   0071   4D00           CMP       A,#0
+   \   0073   BD0D           BNZ       ??LAPDfrLeaveStartingStepState_24
+    360                          {
+    361                              if (mDATRead(U1Bit, ENGINE_RPM, Default) != cFalse)
+   \   0075   8E....         MOV       A,bDATSpdENGINE_RPM
+   \   0078   4D00           CMP       A,#0
+   \   007A   AD49           BZ        ??LAPDfrLeaveStartingStepState_23
+    362                              {
+    363                                  TOSStartTimer(&ActivationTimer);
+   \   007C   10....         MOVW      AX,#ActivationTimer
+   \   007F   ..             CALLT     [__T_TOSStartTimer]
+   \   0080   FA43           BR        ??LAPDfrLeaveStartingStepState_23
+    364                              }
+    365                              else
+    366                              {
+    367                                  // wait for activation of engine
+    368                              }
+    369                          }
+    370                          else
+    371                          {
+    372                              bTimerElapsedL = 
+    373                                  TOSIsTimerElapsed(&ActivationTimer, cActivationDelayInTimerTick);
+    374          
+    375                              if (bTimerElapsedL != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_24:
+   \   0082   10....         MOVW      AX,#ActivationTimer
+   \   0085   126400         MOVW      BC,#100
+   \   0088   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0089   4D00           CMP       A,#0
+   \   008B   AD0E           BZ        ??LAPDfrLeaveStartingStepState_25
+    376                              {
+    377                                  bActivationDelayElapsed = cTrue;
+   \   008D   A101           MOV       A,#1
+   \   008F   9E....         MOV       bActivationDelayElapsed,A
+    378                                  bReturnValueL = mIsButtonRaisingEdge();
+   \   0092   8E....         MOV       A,bPreviousButtonState
+   \   0095   4D00           CMP       A,#0
+   \   0097   BD2C           BNZ       ??LAPDfrLeaveStartingStepState_23
+   \   0099   FAC5           BR        ??LAPDfrCommandOn_Static_0
+    379                              }
+    380                              else if (mDATRead(U1Bit, ENGINE_RPM, Default) == cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_25:
+   \   009B   8E....         MOV       A,bDATSpdENGINE_RPM
+   \   009E   4D00           CMP       A,#0
+   \   00A0   BD23           BNZ       ??LAPDfrLeaveStartingStepState_23
+    381                              {
+    382                                  // engine stopped during activation timeout
+    383                                  TOSStopTimer(&ActivationTimer);
+   \   00A2   10....         MOVW      AX,#ActivationTimer
+   \   00A5   ..             CALLT     [__T_TOSStopTimer]
+   \   00A6   FA1D           BR        ??LAPDfrLeaveStartingStepState_23
+    384                              }
+    385                              else
+    386                              {
+    387                                  // wait for activation timeout: ignore defrosting request
+    388                              }
+    389                          }
+    390                      }
+    391                  }
+    392                  else
+    393                  {
+    394                      // Defroster activated on ignition status
+    395                      bReturnValueL = (BOOL)
+    396                          ((mDATRead(U1Bit,PWR_IGN,Default) != cFalse) &&
+    397                            mIsButtonRaisingEdge());
+   \                     ??LAPDfrLeaveStartingStepState_20:
+   \   00A8   3103..10       BF        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_26
+   \   00AC   8E....         MOV       A,bPreviousButtonState
+   \   00AF   4D00           CMP       A,#0
+   \   00B1   BD09           BNZ       ??LAPDfrLeaveStartingStepState_26
+   \   00B3   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   00B6   4D00           CMP       A,#0
+   \   00B8   AD02           BZ        ??LAPDfrLeaveStartingStepState_26
+   \   00BA   A401           MOV       E,#1
+    398                      
+    399                      TOSStopTimer(&ActivationTimer);
+   \                     ??LAPDfrLeaveStartingStepState_26:
+   \   00BC   10....         MOVW      AX,#ActivationTimer
+   \   00BF   ..             CALLT     [__T_TOSStopTimer]
+    400                      bActivationDelayElapsed = cFalse;
+   \                     ??LAPDfrLeaveStartingStepState_22:
+   \   00C0   A100           MOV       A,#0
+   \   00C2   9E....         MOV       bActivationDelayElapsed,A
+    401                  }
+    402                  mRefreshButtonState();
+   \                     ??LAPDfrLeaveStartingStepState_23:
+   \   00C5   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   00C8   9E....         MOV       bPreviousButtonState,A
+   \   00CB   FA09           BR        ??LAPDfrLeaveStartingStepState_17
+    403              }
+    404              else
+    405              {
+    406                  // Function not authorized
+    407                  TOSStopTimer(&ActivationTimer);
+   \                     ??LAPDfrLeaveStartingStepState_19:
+   \   00CD   10....         MOVW      AX,#ActivationTimer
+   \   00D0   ..             CALLT     [__T_TOSStopTimer]
+    408                  bActivationDelayElapsed = cFalse;
+   \   00D1   A100           MOV       A,#0
+   \   00D3   9E....         MOV       bActivationDelayElapsed,A
+    409              }
+    410              return bReturnValueL;
+   \                     ??LAPDfrLeaveStartingStepState_17:
+   \   00D6   64             MOV       A,E
+   \   00D7   B2             POP       BC
+   \   00D8   AF             RET       
+   \   00D9                  REQUIRE ?CL78K_V4_6_L00
+    411          }
+    412          //==============================================================================
+    413          // DESCRIPTION : 
+    414          //
+    415          // PARAMETERS (Type,Name,Min,Max) :   none
+    416          //
+    417          // RETURN VALUE :   none
+    418          //
+    419          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    420          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    421          void LAPDfrOff(void)
+   \                     LAPDfrOff:
+    422          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    423          #ifdef X90_PROJECT
+    424              static MEM_TYPE void LAPDfrOff_Static(void);
+    425              LAPDfrOff_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPDfrOff_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPDfrOff_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    426          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    427          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    428          static MEM_TYPE void LAPDfrOff_Static(void)
+   \                     LAPDfrOff_Static:
+    429          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    430          #endif
+    431              mDATWrite(U1Bit,DEFROSTER,cInhibit,Default);
+   \   0000   A101           MOV       A,#1
+   \   0002   1B..           CLR1      S:DATPouSoftOutputBuffer+1.1
+    432              bReadyToSleep = cTrue;
+   \   0004   9E....         MOV       bReadyToSleep,A
+    433              u8DFRStepTimeoutCounter = 0;
+   \   0007   A100           MOV       A,#0
+   \   0009   9E....         MOV       u8DFRStepTimeoutCounter,A
+    434              mDATWrite(U1Bit, EEP_DefrosterActivationState, 0, Default);
+   \   000C   16....         MOVW      HL,#DATDbkMirrors+28
+   \   000F   319707         BF        [HL].1, ??LAPDfrLeaveStartingStepState_27
+   \   0012   A101           MOV       A,#1
+   \   0014   7193           CLR1      [HL].1
+   \   0016   9A....         CALL      DATDbkStartUpdate
+    435          }
+   \                     ??LAPDfrLeaveStartingStepState_27:
+   \   0019   AF             RET       
+   \   001A                  REQUIRE ?CL78K_V4_6_L00
+    436          //==============================================================================
+    437          // DESCRIPTION : 
+    438          //
+    439          // PARAMETERS (Type,Name,Min,Max) :   none
+    440          //
+    441          // RETURN VALUE :   none
+    442          //
+    443          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    444          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    445          void LAPDfrOn(void)
+   \                     LAPDfrOn:
+    446          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    447          #ifdef X90_PROJECT
+    448              static MEM_TYPE void LAPDfrOn_Static(void);
+    449              LAPDfrOn_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPDfrOn_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPDfrOn_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    450          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    451          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    452          static MEM_TYPE void LAPDfrOn_Static(void)
+   \                     LAPDfrOn_Static:
+    453          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    454          #endif
+    455              if (  (mDATRead(U1Bit, PWR_IGN, Default) != cFalse)
+    456                  //CCOV: adzhelp: Cannot be covered in unit test environment
+    457                  ||(bActivateAfterReset != cFalse) )
+   \   0000   8C..07         BT        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_28
+   \   0003   8E....         MOV       A,bActivateAfterReset
+   \   0006   4D00           CMP       A,#0
+   \   0008   AD24           BZ        ??LAPDfrLeaveStartingStepState_29
+    458              {
+    459                  mDATWrite(U1Bit,DEFROSTER,cAuthorize,Default);
+   \                     ??LAPDfrLeaveStartingStepState_28:
+   \   000A   1A..           SET1      S:DATPouSoftOutputBuffer+1.1
+    460                  mDATWrite(U1Bit, EEP_DefrosterActivationState, 1, Default);
+   \   000C   16....         MOVW      HL,#DATDbkMirrors+28
+   \   000F   319607         BT        [HL].1, ??LAPDfrLeaveStartingStepState_30
+   \   0012   A101           MOV       A,#1
+   \   0014   7192           SET1      [HL].1
+   \   0016   9A....         CALL      DATDbkStartUpdate
+    461                  u8DFRStepTimeoutCounter = mDATRead(U8Bit, NEEP_TPS_TEMPO_DEG, Defaut);
+   \                     ??LAPDfrLeaveStartingStepState_30:
+   \   0019   8E....         MOV       A,DATPeeCalibrationData+19
+   \   001C   9E....         MOV       u8DFRStepTimeoutCounter,A
+    462                  bReadyToSleep = cFalse;
+   \   001F   A100           MOV       A,#0
+   \   0021   9E....         MOV       bReadyToSleep,A
+    463                  TOSStartTimer(&TempoDefrostTimeout);
+   \   0024   10....         MOVW      AX,#TempoDefrostTimeout
+   \   0027   ..             CALLT     [__T_TOSStartTimer]
+    464                  bActivateAfterReset = cFalse;
+   \   0028   A100           MOV       A,#0
+   \   002A   9E....         MOV       bActivateAfterReset,A
+   \   002D   AF             RET       
+    465              }
+    466              else
+    467              {
+    468                  // this condition is entered after switching ignition off (INFO_REGIME = 1) 
+    469                  // a rising eddge from DEFROSTER_SW is obtained which may activate defroster
+    470                  // the unwanted activation will be observed on next ignition on
+    471                  u8DFRStepTimeoutCounter = (U8)1U;
+   \                     ??LAPDfrLeaveStartingStepState_29:
+   \   002E   A101           MOV       A,#1
+   \   0030   9E....         MOV       u8DFRStepTimeoutCounter,A
+    472                  TOSStopTimer(&TempoDefrostTimeout);
+   \   0033   10....         MOVW      AX,#TempoDefrostTimeout
+   \   0036   ..             CALLT     [__T_TOSStopTimer]
+    473              }    
+    474          }
+   \   0037   AF             RET       
+   \   0038                  REQUIRE ?CL78K_V4_6_L00
+    475          
+    476          //==============================================================================
+    477          // DESCRIPTION : Initialization of all local variables
+    478          //
+    479          // PARAMETERS (Type,Name,Min,Max) :   none
+    480          //
+    481          // RETURN VALUE :   none 
+    482          //
+    483          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    484          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    485          void LAPDfrInitialize(void)
+   \                     LAPDfrInitialize:
+    486          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    487          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    488          //==============================================================================
+    489          // DESCRIPTION : 
+    490          //
+    491          // PARAMETERS (Type,Name,Min,Max) :   none
+    492          //
+    493          // RETURN VALUE :   none 
+    494          //
+    495          // DESIGN INFORMATION : (pseudo code, algorithm ... )
+    496          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    497          void LAPDfrIsAnybodyMaintainActiveState(void)
+   \                     LAPDfrIsAnybodyMaintainActiveState:
+    498          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    499              if (bReadyToSleep == cFalse)
+   \   0000   8E....         MOV       A,bReadyToSleep
+   \   0003   4D00           CMP       A,#0
+   \   0005   BD04           BNZ       ??LAPDfrLeaveStartingStepState_0
+    500              {
+    501                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   0007   102900         MOVW      AX,#41
+   \   000A   ..             CALLT     [__T_TOSWriteSignal]
+    502              }
+    503          }
+   \                     ??LAPDfrLeaveStartingStepState_0:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    504          //==============================================================================
+    505          // DESCRIPTION : Activation of Defroster 
+    506          //
+    507          // PARAMETERS (Type,Name,Min,Max) :   none
+    508          //
+    509          // RETURN VALUE :   none 
+    510          //
+    511          // DESIGN INFORMATION : prsFS_RDEF-146, prsFS_RDEF-147, prsFS_RDEF-243
+    512          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    513          void LAPDfrEnterActiveState(void)
+   \                     LAPDfrEnterActiveState:
+    514          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    515              TOSSeqActivateGraph(cTOSSeqGraphIdRDFRearDefoggerManagement);
+   \   0000   A110           MOV       A,#16
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    516              TOSSeqActivateGraph(cTOSSeqGraphIdRDFProtectionManagement);
+   \   0003   A111           MOV       A,#17
+   \   0005   ..             CALLT     [__T_TOSSeqActivateGraph]
+    517              mRefreshButtonState();
+   \   0006   8E....         MOV       A,bDATPinDefrosterSWFiltered
+   \   0009   9E....         MOV       bPreviousButtonState,A
+    518              bPWR_IGNOld = cFalse;
+   \   000C   A100           MOV       A,#0
+   \   000E   9E....         MOV       bPWR_IGNOld,A
+    519              u8DfrFaultCounter = 0;
+   \   0011   9E....         MOV       u8DfrFaultCounter,A
+    520              u8HrnFaultCounter = 0;
+   \   0014   9E....         MOV       u8HrnFaultCounter,A
+    521              TOSStopTimer(&ActivationTimer);
+   \   0017   10....         MOVW      AX,#ActivationTimer
+   \   001A   ..             CALLT     [__T_TOSStopTimer]
+    522              bActivationDelayElapsed = cFalse;
+   \   001B   A100           MOV       A,#0
+   \   001D   9E....         MOV       bActivationDelayElapsed,A
+    523          }
+   \   0020   AF             RET       
+   \   0021                  REQUIRE ?CL78K_V4_6_L00
+    524          //==============================================================================
+    525          // DESCRIPTION : 
+    526          //
+    527          // PARAMETERS (Type,Name,Min,Max) :   none
+    528          //
+    529          // RETURN VALUE :   none 
+    530          //
+    531          // DESIGN INFORMATION : prsFS_RDEF-146, prsFS_RDEF-147
+    532          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    533          void LAPDfrLeaveActiveState(void)
+   \                     LAPDfrLeaveActiveState:
+    534          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    535              // configure Outputs
+    536              mDATWrite(U1Bit,DEFROSTER,cInhibit,Default);
+   \   0000   A110           MOV       A,#16
+   \   0002   1B..           CLR1      S:DATPouSoftOutputBuffer+1.1
+    537              TOSSeqDeactivateGraph(cTOSSeqGraphIdRDFRearDefoggerManagement);
+   \   0004   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    538              TOSSeqDeactivateGraph(cTOSSeqGraphIdRDFProtectionManagement);
+   \   0005   A111           MOV       A,#17
+   \   0007   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    539          }
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    540              //==============================================================================
+    541          // DESCRIPTION : Pal Protection Task
+    542          //
+    543          // PARAMETERS (Type,Name,Min,Max) :   none
+    544          //
+    545          // RETURN VALUE :   none
+    546          //
+    547          // DESIGN INFORMATION : 
+    548          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    549          void LAPDfrProtectionTask(void)
+   \                     LAPDfrProtectionTask:
+    550          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    551          #ifdef X90_PROJECT
+    552              LAPDfrProtectionTask_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPDfrProtectionTask_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPDfrProtectionTask_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    553          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    554          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    555          static MEM_TYPE void LAPDfrProtectionTask_Static(void)
+   \                     LAPDfrProtectionTask_Static:
+    556          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    557          #endif
+    558          
+    559              // PWR_IGN rising edge actions
+    560              if(     (cFalse != mDATRead(U1Bit, PWR_IGN, Default))
+    561                   && (cFalse == bPWR_IGNOld)
+    562                )
+   \   0000   3103..1F       BF        S:DATDinInputBuffers+6.0, ??LAPDfrLeaveStartingStepState_31
+   \   0004   8E....         MOV       A,bPWR_IGNOld
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD18           BNZ       ??LAPDfrLeaveStartingStepState_31
+    563              {
+    564                  //amanevd: The counters are shared between SC to VBAT and SC to GND 
+    565                  //because of simplification of the algorithm. 
+    566                  //The only disadvantage of using only one counter is that in some very rare 
+    567                  //cases when we have SC to GND immediately after SC to VBAT or vice versa, 
+    568                  //we will take action for the defect in less samples. But in any case action 
+    569                  //will be taken and the defect will be notified.
+    570                  u8DfrFaultCounter = 0;
+   \   000B   A100           MOV       A,#0
+   \   000D   9E....         MOV       u8DfrFaultCounter,A
+    571                  u8HrnFaultCounter = 0;
+   \   0010   9E....         MOV       u8HrnFaultCounter,A
+    572                  mDATWrite(U1Bit, DEFROSTERProtection, 0, Default);
+   \   0013   1B..           CLR1      S:DATPouHardMaskBuffer+1.1
+    573                  mDATWrite(U1Bit, HORN_RLProtection, 0, Default);
+   \   0015   2B..           CLR1      S:DATPouHardMaskBuffer+2.2
+    574                  mDATWrite(U1Bit, DefDfrToGnd, 0, Default);
+   \   0017   16....         MOVW      HL,#DATCmnData+6
+   \   001A   97             MOV       [HL],A
+    575                  mDATWrite(U1Bit, DefDfrToBat, 0, Default);
+   \   001B   86             INCW      HL
+   \   001C   97             MOV       [HL],A
+    576                  mDATWrite(U1Bit, DefHornCCBat, 0, Default);
+   \   001D   16....         MOVW      HL,#DATCmnData+4
+   \   0020   97             MOV       [HL],A
+    577                  mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \   0021   86             INCW      HL
+   \   0022   97             MOV       [HL],A
+    578              }
+    579          
+    580              // Check if only DEFROSTER output is activated
+    581              if(		(1 == mDATRead(U1Bit, DEFROSTER, Immediate))
+    582                  &&  (0 == mDATRead(U1Bit, HORN_RL, Immediate))
+    583                  &&  (0 == mDATRead(U1Bit, DEFROSTERProtection, Default))
+    584                  &&  (1 == mDATRead(U1Bit, PWR_IGN, Immediate))
+    585                )
+   \                     ??LAPDfrLeaveStartingStepState_31:
+   \   0023   16....         MOVW      HL,#DATDouOutputBuffer+1
+   \   0026   31977E         BF        [HL].1, ??LAPDfrLeaveStartingStepState_32
+   \   0029   86             INCW      HL
+   \   002A   31A67A         BT        [HL].2, ??LAPDfrLeaveStartingStepState_32
+   \   002D   9C..77         BT        S:DATPouHardMaskBuffer+1.1, ??LAPDfrLeaveStartingStepState_32
+   \   0030   3103..73       BF        S:DATDinInputBuffers+15.0, ??LAPDfrLeaveStartingStepState_32
+    586              {
+    587                  if (mDATRead(U1Bit, DIAG_DRIVER_KLAXON_SingleSCBat, Default) != cFalse)
+   \   0034   02....         MOVW      AX,DATAnaBufferFromLDB+6
+   \   0037   EA5D00         CMPW      AX,#93
+   \   003A   8D30           BC        ??LAPDfrLeaveStartingStepState_33
+    588                  {
+    589                      u8DfrFaultCounter++;
+   \   003C   8E....         MOV       A,u8DfrFaultCounter
+   \   003F   41             INC       A
+   \   0040   9E....         MOV       u8DfrFaultCounter,A
+    590                      if(u8DfrFaultCounter >= cFaultCountProtectThreshold)
+   \   0043   4D04           CMP       A,#4
+   \   0045   8D17           BC        ??LAPDfrLeaveStartingStepState_34
+    591                      {
+    592                          mDATWrite(U1Bit, DEFROSTERProtection, 1, Default);
+   \   0047   101000         MOVW      AX,#16
+   \   004A   1A..           SET1      S:DATPouHardMaskBuffer+1.1
+   \   004C   9A....         CALL      TOSActivateTask
+    593                          mDATWrite(U1Bit, EEP_DefDfrToBat, 1, Default);
+   \   004F   16....         MOVW      HL,#DATDbkMirrors+20
+   \   0052   31B652         BT        [HL].3, ??LAPDfrLeaveStartingStepState_32
+   \   0055   A100           MOV       A,#0
+   \   0057   71B2           SET1      [HL].3
+   \   0059   9A....         CALL      DATDbkStartUpdate
+   \   005C   FA49           BR        ??LAPDfrLeaveStartingStepState_32
+    594                      }
+    595                      else if(cFaultCountWarnThreshold == u8DfrFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_34:
+   \   005E   4D02           CMP       A,#2
+   \   0060   BD45           BNZ       ??LAPDfrLeaveStartingStepState_32
+    596                      {
+    597                          mDATWrite(U1Bit, DefDfrToBat, 1, Default);
+   \   0062   A101           MOV       A,#1
+   \   0064   16....         MOVW      HL,#DATCmnData+7
+   \   0067   97             MOV       [HL],A
+    598                          mDATWrite(U1Bit, DefDfrToGnd, 0, Default);
+   \   0068   A100           MOV       A,#0
+   \   006A   FA37           BR        ??LAPDfrLeaveStartingStepState_35
+    599                      }
+    600                      else
+    601                      {
+    602                          // Nothing to do
+    603                      }
+    604                  }
+    605                  else if(mDATRead(U1Bit, DIAG_DRIVER_KLAXON_SCGnd, Default) != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_33:
+   \   006C   EA0900         CMPW      AX,#9
+   \   006F   9D29           BNC       ??LAPDfrLeaveStartingStepState_36
+    606                  {
+    607                      u8DfrFaultCounter++;
+   \   0071   8E....         MOV       A,u8DfrFaultCounter
+   \   0074   41             INC       A
+   \   0075   9E....         MOV       u8DfrFaultCounter,A
+    608                      if(u8DfrFaultCounter >= cFaultCountProtectThreshold)
+   \   0078   4D04           CMP       A,#4
+   \   007A   8D0F           BC        ??LAPDfrLeaveStartingStepState_37
+    609                      {
+    610                          mDATWrite(U1Bit, EEP_DefDfrToGnd, 1, Default);
+   \   007C   16....         MOVW      HL,#DATDbkMirrors+20
+   \   007F   31C625         BT        [HL].4, ??LAPDfrLeaveStartingStepState_32
+   \   0082   A100           MOV       A,#0
+   \   0084   71C2           SET1      [HL].4
+   \   0086   9A....         CALL      DATDbkStartUpdate
+   \   0089   FA1C           BR        ??LAPDfrLeaveStartingStepState_32
+    611                      }
+    612                      else if(cFaultCountWarnThreshold == u8DfrFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_37:
+   \   008B   4D02           CMP       A,#2
+   \   008D   BD18           BNZ       ??LAPDfrLeaveStartingStepState_32
+    613                      {
+    614                          mDATWrite(U1Bit, DefDfrToGnd, 1, Default);
+   \   008F   A101           MOV       A,#1
+   \   0091   16....         MOVW      HL,#DATCmnData+6
+   \   0094   97             MOV       [HL],A
+    615                          mDATWrite(U1Bit, DefDfrToBat, 0, Default);
+   \   0095   A100           MOV       A,#0
+   \   0097   86             INCW      HL
+   \   0098   FA0C           BR        ??LAPDfrLeaveStartingStepState_38
+    616                      }
+    617                      else
+    618                      {
+    619                          // Nothing to do
+    620                      }
+    621                  }
+    622                  else
+    623                  {
+    624                      // No defect found so clear present flags and reset counters
+    625                      u8DfrFaultCounter = 0;
+   \                     ??LAPDfrLeaveStartingStepState_36:
+   \   009A   A100           MOV       A,#0
+   \   009C   9E....         MOV       u8DfrFaultCounter,A
+    626                      mDATWrite(U1Bit, DefDfrToBat, 0, Default);
+   \   009F   16....         MOVW      HL,#DATCmnData+7
+   \   00A2   97             MOV       [HL],A
+    627                      mDATWrite(U1Bit, DefDfrToGnd, 0, Default);
+   \                     ??LAPDfrLeaveStartingStepState_35:
+   \   00A3   16....         MOVW      HL,#DATCmnData+6
+   \                     ??LAPDfrLeaveStartingStepState_38:
+   \   00A6   97             MOV       [HL],A
+    628                  }
+    629              }
+    630          
+    631              // Check if only HORN_RL output is activated
+    632              if(     (1 == mDATRead(U1Bit, HORN_RL, Immediate))
+    633                  &&  (0 == mDATRead(U1Bit, DEFROSTER, Immediate))
+    634                  &&  (0 == mDATRead(U1Bit, HORN_RLProtection, Default))
+    635                  &&  (cFalse == bDefrosterStopped)
+    636                )
+   \                     ??LAPDfrLeaveStartingStepState_32:
+   \   00A7   16....         MOVW      HL,#DATDouOutputBuffer+2
+   \   00AA   31A603         BT        [HL].2, $+6
+   \   00AD   9B....         BR        N:??LAPDfrLeaveStartingStepState_39
+   \   00B0   16....         MOVW      HL,#DATDouOutputBuffer+1
+   \   00B3   31967D         BT        [HL].1, ??LAPDfrLeaveStartingStepState_40
+   \   00B6   AC..7A         BT        S:DATPouHardMaskBuffer+2.2, ??LAPDfrLeaveStartingStepState_40
+   \   00B9   8E....         MOV       A,bDefrosterStopped
+   \   00BC   4D00           CMP       A,#0
+   \   00BE   BD73           BNZ       ??LAPDfrLeaveStartingStepState_40
+    637              {
+    638                  if (mDATRead(U1Bit, DIAG_DRIVER_KLAXON_SingleSCBat, Default) != cFalse)
+   \   00C0   02....         MOVW      AX,DATAnaBufferFromLDB+6
+   \   00C3   EA5D00         CMPW      AX,#93
+   \   00C6   8D30           BC        ??LAPDfrLeaveStartingStepState_41
+    639                  {
+    640                      u8HrnFaultCounter++;
+   \   00C8   8E....         MOV       A,u8HrnFaultCounter
+   \   00CB   41             INC       A
+   \   00CC   9E....         MOV       u8HrnFaultCounter,A
+    641                      if(u8HrnFaultCounter >= cFaultCountProtectThreshold)
+   \   00CF   4D04           CMP       A,#4
+   \   00D1   8D17           BC        ??LAPDfrLeaveStartingStepState_42
+    642                      {
+    643                          mDATWrite(U1Bit, HORN_RLProtection, 1, Default);
+   \   00D3   101000         MOVW      AX,#16
+   \   00D6   2A..           SET1      S:DATPouHardMaskBuffer+2.2
+   \   00D8   9A....         CALL      TOSActivateTask
+    644                          mDATWrite(U1Bit, EEP_DefHornCCBat, 1, Default);
+   \   00DB   16....         MOVW      HL,#DATDbkMirrors+20
+   \   00DE   31D652         BT        [HL].5, ??LAPDfrLeaveStartingStepState_40
+   \   00E1   A100           MOV       A,#0
+   \   00E3   71D2           SET1      [HL].5
+   \   00E5   9A....         CALL      DATDbkStartUpdate
+   \   00E8   FA49           BR        ??LAPDfrLeaveStartingStepState_40
+    645                      }
+    646                      else if(cFaultCountWarnThreshold == u8HrnFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_42:
+   \   00EA   4D02           CMP       A,#2
+   \   00EC   BD45           BNZ       ??LAPDfrLeaveStartingStepState_40
+    647                      {
+    648                          mDATWrite(U1Bit, DefHornCCBat, 1, Default);
+   \   00EE   A101           MOV       A,#1
+   \   00F0   16....         MOVW      HL,#DATCmnData+4
+   \   00F3   97             MOV       [HL],A
+    649                          mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \   00F4   A100           MOV       A,#0
+   \   00F6   FA39           BR        ??LAPDfrLeaveStartingStepState_43
+    650                      }
+    651                      else
+    652                      {
+    653                          // Nothing to do
+    654                      }
+    655                  }
+    656                  else if (mDATRead(U1Bit, DIAG_DRIVER_KLAXON_SCGnd, Default) != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_41:
+   \   00F8   EA0900         CMPW      AX,#9
+   \   00FB   9D2B           BNC       ??LAPDfrLeaveStartingStepState_44
+    657                  {
+    658                      u8HrnFaultCounter++;
+   \   00FD   8E....         MOV       A,u8HrnFaultCounter
+   \   0100   41             INC       A
+   \   0101   9E....         MOV       u8HrnFaultCounter,A
+    659                      if(u8HrnFaultCounter >= cFaultCountProtectThreshold)
+   \   0104   4D04           CMP       A,#4
+   \   0106   8D0F           BC        ??LAPDfrLeaveStartingStepState_45
+    660                      {
+    661                          mDATWrite(U1Bit, EEP_DefHornCCGnd, 1, Default);
+   \   0108   16....         MOVW      HL,#DATDbkMirrors+20
+   \   010B   31E625         BT        [HL].6, ??LAPDfrLeaveStartingStepState_40
+   \   010E   A100           MOV       A,#0
+   \   0110   71E2           SET1      [HL].6
+   \   0112   9A....         CALL      DATDbkStartUpdate
+   \   0115   FA1C           BR        ??LAPDfrLeaveStartingStepState_40
+    662                      }
+    663                      else if(cFaultCountWarnThreshold == u8HrnFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_45:
+   \   0117   4D02           CMP       A,#2
+   \   0119   BD18           BNZ       ??LAPDfrLeaveStartingStepState_40
+    664                      {
+    665                          mDATWrite(U1Bit, DefHornCCGnd, 1, Default);
+   \   011B   A101           MOV       A,#1
+   \   011D   16....         MOVW      HL,#DATCmnData+5
+   \   0120   97             MOV       [HL],A
+    666                          mDATWrite(U1Bit, DefHornCCBat, 0, Default);
+   \   0121   A100           MOV       A,#0
+   \   0123   16....         MOVW      HL,#DATCmnData+4
+   \   0126   FA0A           BR        ??LAPDfrLeaveStartingStepState_46
+    667                      }
+    668                      else
+    669                      {
+    670                          // Nothing to do
+    671                      }
+    672                  }
+    673                  else
+    674                  {
+    675                      // No defect found so clear present flags and reset counters
+    676                      u8HrnFaultCounter = 0;
+   \                     ??LAPDfrLeaveStartingStepState_44:
+   \   0128   A100           MOV       A,#0
+   \   012A   9E....         MOV       u8HrnFaultCounter,A
+    677                      mDATWrite(U1Bit, DefHornCCBat, 0, Default);
+   \   012D   16....         MOVW      HL,#DATCmnData+4
+   \   0130   97             MOV       [HL],A
+    678                      mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \                     ??LAPDfrLeaveStartingStepState_43:
+   \   0131   86             INCW      HL
+   \                     ??LAPDfrLeaveStartingStepState_46:
+   \   0132   97             MOV       [HL],A
+    679                  }
+    680              }
+    681          
+    682              // Case where HORN_RL and DEFROSTER are activated both at the same time.
+    683              // Or Defroster has been temporary stopped.
+    684              if( (       (1 == mDATRead(U1Bit, HORN_RL, Immediate))
+    685                      &&  (1 == mDATRead(U1Bit, DEFROSTER, Immediate))
+    686                      &&  (1 == mDATRead(U1Bit, PWR_IGN, Immediate))
+    687                      &&  (   (0 == mDATRead(U1Bit, HORN_RLProtection, Default))
+    688                           && (0 == mDATRead(U1Bit, DEFROSTERProtection, Default))
+    689                          )
+    690                  )
+    691                  ||  (cFalse != bDefrosterStopped)
+    692                )
+   \                     ??LAPDfrLeaveStartingStepState_40:
+   \   0133   16....         MOVW      HL,#DATDouOutputBuffer+2
+   \   0136   31A711         BF        [HL].2, ??LAPDfrLeaveStartingStepState_39
+   \   0139   16....         MOVW      HL,#DATDouOutputBuffer+1
+   \   013C   31970B         BF        [HL].1, ??LAPDfrLeaveStartingStepState_39
+   \   013F   3103..07       BF        S:DATDinInputBuffers+15.0, ??LAPDfrLeaveStartingStepState_39
+   \   0143   AC..04         BT        S:DATPouHardMaskBuffer+2.2, ??LAPDfrLeaveStartingStepState_39
+   \   0146   3113..0A       BF        S:DATPouHardMaskBuffer+1.1, ??LAPDfrLeaveStartingStepState_47
+   \                     ??LAPDfrLeaveStartingStepState_39:
+   \   014A   8E....         MOV       A,bDefrosterStopped
+   \   014D   4D00           CMP       A,#0
+   \   014F   BD03           BNZ       $+5
+   \   0151   9B....         BR        N:??LAPDfrLeaveStartingStepState_48
+    693              {
+    694                  // Check if SC to VBATT is applied on both outputs
+    695                  if (mDATRead(U1Bit, DIAG_DRIVER_KLAXON_DualSCBat, Default) != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_47:
+   \   0154   02....         MOVW      AX,DATAnaBufferFromLDB+6
+   \   0157   EAB900         CMPW      AX,#185
+   \   015A   8D5D           BC        ??LAPDfrLeaveStartingStepState_49
+    696                  {
+    697                      u8HrnFaultCounter++;
+   \   015C   8E....         MOV       A,u8HrnFaultCounter
+   \   015F   41             INC       A
+   \   0160   9E....         MOV       u8HrnFaultCounter,A
+    698                      u8DfrFaultCounter++;
+   \   0163   8E....         MOV       A,u8DfrFaultCounter
+   \   0166   41             INC       A
+   \   0167   9E....         MOV       u8DfrFaultCounter,A
+    699                      if(u8HrnFaultCounter >= cFaultCountProtectThreshold)
+   \   016A   8E....         MOV       A,u8HrnFaultCounter
+   \   016D   4D04           CMP       A,#4
+   \   016F   8D30           BC        ??LAPDfrLeaveStartingStepState_50
+    700                      {
+    701                          mDATWrite(U1Bit, HORN_RLProtection, 1, Default);
+   \   0171   101000         MOVW      AX,#16
+   \   0174   2A..           SET1      S:DATPouHardMaskBuffer+2.2
+   \   0176   9A....         CALL      TOSActivateTask
+    702                          mDATWrite(U1Bit, EEP_DefHornCCBat, 1, Default);
+   \   0179   16....         MOVW      HL,#DATDbkMirrors+20
+   \   017C   31D607         BT        [HL].5, ??LAPDfrLeaveStartingStepState_51
+   \   017F   A100           MOV       A,#0
+   \   0181   71D2           SET1      [HL].5
+   \   0183   9A....         CALL      DATDbkStartUpdate
+    703                          mDATWrite(U1Bit, DEFROSTERProtection, 1, Default);
+   \                     ??LAPDfrLeaveStartingStepState_51:
+   \   0186   101000         MOVW      AX,#16
+   \   0189   1A..           SET1      S:DATPouHardMaskBuffer+1.1
+   \   018B   9A....         CALL      TOSActivateTask
+    704                          mDATWrite(U1Bit, EEP_DefDfrToBat, 1, Default);
+   \   018E   16....         MOVW      HL,#DATDbkMirrors+20
+   \   0191   31B703         BF        [HL].3, $+6
+   \   0194   9B....         BR        N:??LAPDfrLeaveStartingStepState_48
+   \   0197   A100           MOV       A,#0
+   \   0199   71B2           SET1      [HL].3
+   \   019B   9A....         CALL      DATDbkStartUpdate
+   \   019E   9B....         BR        N:??LAPDfrLeaveStartingStepState_48
+    705                      }
+    706                      else if(cFaultCountWarnThreshold == u8HrnFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_50:
+   \   01A1   4D02           CMP       A,#2
+   \   01A3   AD03           BZ        $+5
+   \   01A5   9B....         BR        N:??LAPDfrLeaveStartingStepState_48
+    707                      {
+    708                          mDATWrite(U1Bit, DefHornCCBat, 1, Default);
+   \   01A8   A101           MOV       A,#1
+   \   01AA   16....         MOVW      HL,#DATCmnData+4
+   \   01AD   97             MOV       [HL],A
+    709                          mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \   01AE   A100           MOV       A,#0
+   \   01B0   86             INCW      HL
+   \   01B1   97             MOV       [HL],A
+    710                          mDATWrite(U1Bit, DefDfrToGnd, 0, Default);
+   \   01B2   86             INCW      HL
+   \   01B3   97             MOV       [HL],A
+    711                          mDATWrite(U1Bit, DefDfrToBat, 1, Default);
+   \   01B4   A101           MOV       A,#1
+   \   01B6   9B....         BR        N:??LAPDfrLeaveStartingStepState_52
+    712                      }
+    713                      else
+    714                      {
+    715                          // Nothing to do
+    716                      }
+    717                  }
+    718                  // Check if only one output is in defective condition
+    719                  else if(mDATRead(U1Bit, DIAG_DRIVER_KLAXON_SingleSCBat, Default) != cFalse)
+   \                     ??LAPDfrLeaveStartingStepState_49:
+   \   01B9   EA5D00         CMPW      AX,#93
+   \   01BC   8D4C           BC        ??LAPDfrLeaveStartingStepState_53
+    720                  {
+    721                      u8HrnFaultCounter++;
+   \   01BE   8E....         MOV       A,u8HrnFaultCounter
+   \   01C1   41             INC       A
+   \   01C2   9E....         MOV       u8HrnFaultCounter,A
+    722                      u8DfrFaultCounter++;
+   \   01C5   8E....         MOV       A,u8DfrFaultCounter
+   \   01C8   41             INC       A
+   \   01C9   9E....         MOV       u8DfrFaultCounter,A
+    723                      if(u8HrnFaultCounter >= cFaultCountProtectThreshold)
+   \   01CC   8E....         MOV       A,u8HrnFaultCounter
+   \   01CF   4D04           CMP       A,#4
+   \   01D1   8D27           BC        ??LAPDfrLeaveStartingStepState_54
+    724                      {
+    725                          mDATWrite(U1Bit, DefHornCCBat, 1, Default);
+   \   01D3   A101           MOV       A,#1
+   \   01D5   16....         MOVW      HL,#DATCmnData+4
+   \   01D8   97             MOV       [HL],A
+    726                          mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \   01D9   A100           MOV       A,#0
+   \   01DB   86             INCW      HL
+   \   01DC   97             MOV       [HL],A
+    727                          mDATWrite(U1Bit, HORN_RLProtection, 1, Default);
+   \   01DD   A010           MOV       X,#16
+   \   01DF   2A..           SET1      S:DATPouHardMaskBuffer+2.2
+   \   01E1   9A....         CALL      TOSActivateTask
+    728                          mDATWrite(U1Bit, EEP_DefHornCCBat, 1, Default);
+   \   01E4   16....         MOVW      HL,#DATDbkMirrors+20
+   \   01E7   31D607         BT        [HL].5, ??LAPDfrLeaveStartingStepState_55
+   \   01EA   A100           MOV       A,#0
+   \   01EC   71D2           SET1      [HL].5
+   \   01EE   9A....         CALL      DATDbkStartUpdate
+    729          
+    730                          // Remove the temporary protectection on DEFROSTER
+    731                          mDATWrite(U1Bit, DEFROSTERProtection, 0, Default);
+   \                     ??LAPDfrLeaveStartingStepState_55:
+   \   01F1   A100           MOV       A,#0
+   \   01F3   1B..           CLR1      S:DATPouHardMaskBuffer+1.1
+    732                          bDefrosterStopped = cFalse;
+   \                     ??LAPDfrProtectionTask_Static_0:
+   \   01F5   9E....         MOV       bDefrosterStopped,A
+   \   01F8   FA45           BR        ??LAPDfrLeaveStartingStepState_48
+    733                      }
+    734                      else if(cFaultCountWarnThreshold == u8HrnFaultCounter)
+   \                     ??LAPDfrLeaveStartingStepState_54:
+   \   01FA   4D02           CMP       A,#2
+   \   01FC   BD41           BNZ       ??LAPDfrLeaveStartingStepState_48
+    735                      {
+    736                          // The strategy for detecting the defective output includes
+    737                          // temporary protection of one of the outputs and then checking
+    738                          // the status of DIAG_DRIVER_KLAXON.
+    739                          // Temporary protect Defroster to detect the defective output
+    740                          mDATWrite(U1Bit, DEFROSTERProtection, 1, Default);
+   \   01FE   101000         MOVW      AX,#16
+   \   0201   1A..           SET1      S:DATPouHardMaskBuffer+1.1
+   \   0203   9A....         CALL      TOSActivateTask
+    741                          bDefrosterStopped = cTrue;
+   \   0206   A101           MOV       A,#1
+   \   0208   FAEB           BR        ??LAPDfrProtectionTask_Static_0
+    742                      }
+    743                      else
+    744                      {
+    745                          // Nothing to do
+    746                      }
+    747                  }
+    748                  else
+    749                  {
+    750                      // Check if Defroster output has been temporary stopped
+    751                      // If yes -> this is the defective output
+    752                      if(cFalse != bDefrosterStopped)
+   \                     ??LAPDfrLeaveStartingStepState_53:
+   \   020A   8E....         MOV       A,bDefrosterStopped
+   \   020D   4D00           CMP       A,#0
+   \   020F   AD1A           BZ        ??LAPDfrLeaveStartingStepState_56
+    753                      {
+    754                          mDATWrite(U1Bit, DefDfrToBat, 1, Default);
+   \   0211   A101           MOV       A,#1
+   \   0213   16....         MOVW      HL,#DATCmnData+7
+   \   0216   97             MOV       [HL],A
+    755                          mDATWrite(U1Bit, EEP_DefDfrToBat, 1, Default);
+   \   0217   16....         MOVW      HL,#DATDbkMirrors+20
+   \   021A   31B607         BT        [HL].3, ??LAPDfrLeaveStartingStepState_57
+   \   021D   A100           MOV       A,#0
+   \   021F   71B2           SET1      [HL].3
+   \   0221   9A....         CALL      DATDbkStartUpdate
+    756                          bDefrosterStopped = cFalse;
+   \                     ??LAPDfrLeaveStartingStepState_57:
+   \   0224   A100           MOV       A,#0
+   \   0226   9E....         MOV       bDefrosterStopped,A
+   \   0229   FA0B           BR        ??LAPDfrLeaveStartingStepState_58
+    757                      }
+    758                      else
+    759                      {
+    760                          u8DfrFaultCounter = 0;
+   \                     ??LAPDfrLeaveStartingStepState_56:
+   \   022B   A100           MOV       A,#0
+   \   022D   9E....         MOV       u8DfrFaultCounter,A
+    761                          mDATWrite(U1Bit, DefDfrToGnd, 0, Default);
+   \   0230   16....         MOVW      HL,#DATCmnData+6
+   \   0233   97             MOV       [HL],A
+    762                          mDATWrite(U1Bit, DefDfrToBat, 0, Default);
+   \   0234   86             INCW      HL
+   \   0235   97             MOV       [HL],A
+    763                      }
+    764          
+    765                      u8HrnFaultCounter = 0;
+   \                     ??LAPDfrLeaveStartingStepState_58:
+   \   0236   9E....         MOV       u8HrnFaultCounter,A
+    766                      mDATWrite(U1Bit, DefHornCCBat, 0, Default);
+   \   0239   16....         MOVW      HL,#DATCmnData+4
+   \   023C   97             MOV       [HL],A
+    767                      mDATWrite(U1Bit, DefHornCCGnd, 0, Default);
+   \                     ??LAPDfrLeaveStartingStepState_52:
+   \   023D   86             INCW      HL
+   \   023E   97             MOV       [HL],A
+    768                  }
+    769              }
+    770          
+    771              bPWR_IGNOld = mDATRead(U1Bit, PWR_IGN, Default);
+   \                     ??LAPDfrLeaveStartingStepState_48:
+   \   023F   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0241   5D01           AND       A,#1
+   \   0243   9E....         MOV       bPWR_IGNOld,A
+    772          }
+   \   0246   AF             RET       
+   \   0247                  REQUIRE ?CL78K_V4_6_L00
+    773          
+    774          //==============================================================================
+    775          // DESCRIPTION : 
+    776          //
+    777          // PARAMETERS (Type,Name,Min,Max) :   none
+    778          //
+    779          // RETURN VALUE :   none 
+    780          //
+    781          // DESIGN INFORMATION : 
+    782          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    783          void LAPDfrLeaveStartingStepState(void)
+   \                     LAPDfrLeaveStartingStepState:
+    784          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    785              if ((mDATRead(U1Bit,EEP_AUTDEGIVRAGE,Default) == cAuthorize) &&
+    786                  (mDATRead(U1Bit, EEP_DefrosterActivationState,  Default) != 0) )
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+24
+   \   0003   31B711         BF        [HL].3, ??LAPDfrLeaveStartingStepState_1
+   \   0006   16....         MOVW      HL,#DATDbkMirrors+28
+   \   0009   31970B         BF        [HL].1, ??LAPDfrLeaveStartingStepState_1
+    787              {
+    788                  bActivateAfterReset = cTrue;
+   \   000C   A101           MOV       A,#1
+   \   000E   9E....         MOV       bActivateAfterReset,A
+    789                  bPwrIgnAfterReset = cTrue;
+   \   0011   9E....         MOV       bPwrIgnAfterReset,A
+    790                  TOSSendControl(cTOSControlWakeUpRequest);
+   \   0014   A102           MOV       A,#2
+   \   0016   ..             CALLT     [__T_TOSSendControl]
+    791              }
+    792          }
+   \                     ??LAPDfrLeaveStartingStepState_1:
+   \   0017   AF             RET       
+   \   0018                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bReadyToSleep>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStopTimer:
+   \   0000   ....           DW       TOSStopTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+    793          /* [EXPORTED_FUNCTIONS_END] */
+
+   Segment part sizes:
+
+     Function/Label                   Bytes
+     --------------                   -----
+     RDFRearDefoggerManagement          12
+     RDFProtectionManagement             6
+     TempoDefrostTimeout                 2
+     ActivationTimer                     2
+     bActivationDelayElapsed             1
+     bReadyToSleep                       1
+     bPreviousButtonState                1
+     u8DFRStepTimeoutCounter             1
+     bActivateAfterReset                 1
+     bPwrIgnAfterReset                   1
+     bPWR_IGNOld                         1
+     bDefrosterStopped                   1
+     u8DfrFaultCounter                   1
+     u8HrnFaultCounter                   1
+     LAPDfrCommandOff                    9
+     LAPDfrCommandOff_Static           154
+     LAPDfrCommandOn                     9
+     LAPDfrCommandOn_Static            217
+     LAPDfrOff                           9
+     LAPDfrOff_Static                   26
+     LAPDfrOn                            9
+     LAPDfrOn_Static                    56
+     LAPDfrInitialize                    1
+     LAPDfrIsAnybodyMaintainActiveState
+                                        12
+     LAPDfrEnterActiveState             33
+     LAPDfrLeaveActiveState              9
+     LAPDfrProtectionTask                9
+     LAPDfrProtectionTask_Static       583
+     LAPDfrLeaveStartingStepState       24
+     ?<Initializer for bReadyToSleep>    1
+     __T_?FAR_CALL_L07                   2
+     __T_TOSIsTimerElapsed               2
+     __T_TOSStartTimer                   2
+     __T_TOSStopTimer                    2
+     __T_TOSWriteSignal                  2
+     __T_TOSSeqActivateGraph             2
+     __T_TOSSeqDeactivateGraph           2
+     __T_TOSSendControl                  2
+
+ 
+ 1 036 bytes in segment BCODE
+    16 bytes in segment CLTVEC
+   124 bytes in segment CODE
+    18 bytes in segment CONST
+     1 byte  in segment NEAR_I
+     1 byte  in segment NEAR_ID
+    13 bytes in segment NEAR_Z
+ 
+ 1 160 bytes of CODE  memory (+ 16 bytes shared)
+    19 bytes of CONST memory
+    14 bytes of DATA  memory
+
+Errors: none
+Warnings: none

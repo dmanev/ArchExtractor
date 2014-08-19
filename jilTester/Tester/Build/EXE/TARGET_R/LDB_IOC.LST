@@ -1,0 +1,187 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:10 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_IOC.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\LDB_IOC.LST -o                           #
+#                    ..\EXE\TARGET_R\LDB_IOC.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_IOC.C                                                  #
+#    List file    =  ..\EXE\TARGET_R\LDB_IOC.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\LDB_IOC.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_IOC.C
+      1          /*============================================================================
+      2            Project ......................... STANDARD
+      3            Component ....................... ldb_ioc
+      4            -------------------------------------------------------------------------
+      5            Copyright ... This software is JCI property. Duplication or
+      6                          disclosure is prohibited without JCI written permission
+      7            ------------------------------------------------------------------------- 
+      8          
+      9            - Macros, constants and types which are not exported are defined in 
+     10              this file
+     11            - Variables and functions which are not exported are defined in this 
+     12              file with the static key word
+     13            
+     14            -------------------------------------------------------------------------
+     15            Comments about the component (role, algorithm, structure, limitations,
+     16                     defined tasks and events...)
+     17            - Role :
+     18            
+     19            -------------------------------------------------------------------------
+     20            ldb_ioc.c file review : 
+     21          
+     22          
+     23            ==========================================================================*/
+     24          
+     25          /*--------------------------------------------------------------------------
+     26            Body Identification
+     27            --------------------------------------------------------------------------*/
+     28          
+     29          #define LDB_IOC   "ldb_ioc"
+     30          
+     31          /*-------------------------------------------------------------------------
+     32            Included files
+     33          
+     34            #include <system_file_name.h>
+     35            #include "project_file_name.h"
+     36            --------------------------------------------------------------------------*/
+     37          
+     38          #include "lib.h"
+     39          #include "ldb_ioc.h"
+     40          #include "ldb_reg.h"
+     41          
+     42          /*--------------------------------------------------------------------------
+     43            Local constants
+     44          
+     45            #define cConstantName   ((tType) ConstantValue)
+     46            --------------------------------------------------------------------------*/
+     47          
+     48          /*--------------------------------------------------------------------------
+     49            Local macros
+     50          
+     51            #define mMacroName   (MacroDefinition)
+     52            --------------------------------------------------------------------------*/
+     53          
+     54          /*--------------------------------------------------------------------------
+     55            Local types
+     56          
+     57            struct  sStructureName { ... };
+     58            union   uUnionName { ... };
+     59            enum    eEnumerationName { ... };
+     60            typedef Expression tTypeName;
+     61            --------------------------------------------------------------------------*/
+     62          
+     63          
+     64          /*--------------------------------------------------------------------------
+     65            Local data
+     66          
+     67            static  tType   VariableName;
+     68            static  tType*  pVariableName; 
+     69            --------------------------------------------------------------------------*/
+     70          
+     71          
+     72          /*--------------------------------------------------------------------------
+     73            Constant local data
+     74          
+     75            static const tType  VariableName;
+     76            --------------------------------------------------------------------------*/
+     77          
+     78          
+     79          /*--------------------------------------------------------------------------
+     80            Exported data
+     81          
+     82            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+     83            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+     84            --------------------------------------------------------------------------*/
+     85          
+     86          
+     87          /*--------------------------------------------------------------------------
+     88            Constant exported data
+     89           
+     90            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+     91            --------------------------------------------------------------------------*/
+     92          
+     93          
+     94          /*--------------------------------------------------------------------------
+     95            Local function prototypes
+     96            
+     97            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+     98            --------------------------------------------------------------------------*/
+     99          
+    100          
+    101          /*============================================================================
+    102            =========================== LOCAL FUNCTIONS ================================
+    103            ==========================================================================*/
+    104          
+    105          /*============================================================================
+    106            DESCRIPTION :
+    107            
+    108            PARAMETERS (Type,Name,Min,Max) :   none
+    109          
+    110            RETURN VALUE :   none
+    111           
+    112            DESIGN INFORMATION :   refer to Detailed Design Document
+    113            ==========================================================================*/
+    114          //static type FunctionName(...)
+    115          
+    116          
+    117          /*============================================================================
+    118            =========================== EXPORTED FUNCTIONS =============================
+    119            ==========================================================================*/
+    120          
+    121          
+    122          /*============================================================================
+    123            DESCRIPTION : LDBIocInit
+    124            
+    125            PARAMETERS (Type,Name,Min,Max) :  None
+    126          
+    127            RETURN VALUE :  none
+    128           
+    129            DESIGN INFORMATION :  refer to Detailed Design Document
+    130          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    131          void LDBIocInit(void)
+   \                     LDBIocInit:
+    132          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    133          
+    134          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+
+   Segment part sizes:
+
+     Function/Label Bytes
+     -------------- -----
+     LDBIocInit        1
+
+ 
+ 1 byte in segment CODE
+ 
+ 1 byte of CODE memory
+
+Errors: none
+Warnings: none

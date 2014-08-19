@@ -1,0 +1,38 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      STK
+// Language:     ANSI-C
+// -----------------------------------------------------------------------------
+// Component:    TOS_SIG
+//               JIL definitions
+// -----------------------------------------------------------------------------
+// $Date:   04 Feb 2009 17:03:08  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SIG.JIL-arc  $
+// $Revision:   1.0  $
+// -----------------------------------------------------------------------------
+/* $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_SIG.JIL-arc  $
+// 
+//    Rev 1.0   04 Feb 2009 17:03:08   adzhelp
+// Initial revision.
+*/
+//******************************************************************************
+#ifndef I_TOS_SIG_JIL
+#define I_TOS_SIG_JIL
+
+
+Component Tos_sig
+{
+    OnControl = CallBack
+    {
+        Ctrl = "TOSInitialize";
+        Fct = "TOSSigInitialize";
+    };
+};
+
+
+#endif  /* I_TOS_SIG_JIL */

@@ -1,0 +1,21 @@
+class DataTypeFactory
+!!!284783.python!!!	getDataType(in self : , in inpDataTypeName : string) : DataType
+        outDataType = None
+        if(inpDataTypeName in self.itsDataTypeMap):
+            outDataType = self.itsDataTypeMap[inpDataTypeName]
+        else:
+            outDataType = Datatype.DataType.DataType()
+            outDataType.setName(inpDataTypeName)
+            self.itsDataTypeMap[inpDataTypeName] = outDataType
+        
+        return outDataType
+!!!284655.python!!!	getArrayDataType(in self : , in inpDataTypeName : string) : ArrayDataType
+        outArrayDataType = None
+        if(inpDataTypeName in self.itsDataTypeMap):
+            outArrayDataType = self.itsDataTypeMap[inpDataTypeName]
+        else:
+            outArrayDataType = Datatype.ArrayDataType.ArrayDataType()
+            outArrayDataType.setName(inpDataTypeName)
+            self.itsDataTypeMap[inpDataTypeName] = outArrayDataType
+
+        return outArrayDataType

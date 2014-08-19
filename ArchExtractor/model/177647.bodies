@@ -1,0 +1,5 @@
+class StkVoid
+!!!173679.python!!!	__init__(inout self : )
+        self.Name = 'void'
+        self.lowerLimit = 0
+        self.upperLimit = 0

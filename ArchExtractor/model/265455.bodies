@@ -1,0 +1,15 @@
+class ComponentFactory
+!!!260207.python!!!	getBaseComponent(in self : , in inpNameCmp : string, out outIComponent : IComponent)
+        outIComponent = None
+        if(inpNameCmp in self.itsIComponentMap.keys()):
+            outIComponent = self.itsIComponentMap[inpNameCmp]
+        else:
+            outIComponent = Components.BaseComponent.BaseComponent(inpNameCmp)
+            self.itsIComponentMap[inpNameCmp] = outIComponent
+        return outIComponent
+!!!261231.python!!!	findComponent(in self : , in inpNameCmp : string, out outIComponent : IComponent)
+        outIComponent = None
+        if(inpNameCmp in self.itsIComponentMap.keys()):
+            outIComponent = self.itsIComponentMap[inpNameCmp]
+
+        return outIComponent

@@ -1,0 +1,678 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:06 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_TPO.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\TOS_TPO.LST -o                           #
+#                    ..\EXE\TARGET_R\TOS_TPO.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\T #
+#                    OS_TPO.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\TOS_TPO.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\TOS_TPO.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\TOS\TOS_TPO.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      STK
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    TOS_TPO
+     12          //               TOS timer management
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Sep 17 2009 10:27:10  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_TPO.C-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          /* $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/EXT_CMP/CPP_CMP/STK/SOURCES/TOS_TPO.C-arc  $
+     19          // 
+     20          //    Rev 1.1   Sep 17 2009 10:27:10   adzhelp
+     21          // Cm003277: Functions defined as CALLT_TYPE
+     22          // 
+     23          //    Rev 1.0   04 Feb 2009 17:03:08   adzhelp
+     24          // Initial revision.
+     25          */
+     26          //******************************************************************************
+     27          
+     28          //------------------------------------------------------------------------------
+     29          // Body Identification
+     30          //------------------------------------------------------------------------------
+     31          #define TOS_TPO "TOS_TPO"
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Included files to resolve specific definitions in this file
+     35          //------------------------------------------------------------------------------
+     36          #include "tos_tpo.h"
+     37          #include "lib.h"
+     38          
+     39          //------------------------------------------------------------------------------
+     40          // Local constants
+     41          //------------------------------------------------------------------------------
+     42          #define cClockCycleInAlarmTick  ((U32)((cTOSTimerTickMs * (U16)1000UL)   \
+     43                                                                       / cTOSTickAlarmUs))
+     44          #define cMinMultiplicationValue  ((U8)0x01u)
+     45          
+     46          //------------------------------------------------------------------------------
+     47          // Local macros
+     48          //------------------------------------------------------------------------------
+     49          #ifdef USE_DISABLE_TOSTIMER
+     50              #define mGetMultiplier()    u8TOSMultiplicationFactor
+     51          #else
+     52              #define mGetMultiplier()    ((U8)0x01u)
+     53          #endif
+     54          
+     55          //------------------------------------------------------------------------------
+     56          // Local types
+     57          //------------------------------------------------------------------------------
+     58          
+     59          //------------------------------------------------------------------------------
+     60          // Local data
+     61          //------------------------------------------------------------------------------
+     62          #ifdef USE_DISABLE_TOSTIMER
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     63              static tTOSAlarm    TOSAlarmTPO;
+   \                     TOSAlarmTPO:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     64              static U8           u8TOSMultiplicationFactor;
+   \                     u8TOSMultiplicationFactor:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     65          #endif
+     66          
+     67          //------------------------------------------------------------------------------
+     68          // Constant local data
+     69          //------------------------------------------------------------------------------
+     70          
+     71          //------------------------------------------------------------------------------
+     72          // Exported data
+     73          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+     74          tTOSClock   TOSClock;
+   \                     TOSClock:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+     75          
+     76          //------------------------------------------------------------------------------
+     77          // Constant exported data
+     78          //------------------------------------------------------------------------------
+     79          
+     80          //------------------------------------------------------------------------------
+     81          // Local function prototypes
+     82          //------------------------------------------------------------------------------
+     83          
+     84          //==============================================================================
+     85          //=========================== LOCAL FUNCTIONS ==================================
+     86          //==============================================================================
+     87          
+     88          //==============================================================================
+     89          //=========================== EXPORTED FUNCTIONS ===============================
+     90          //==============================================================================
+     91          
+     92          //==============================================================================
+     93          // DESCRIPTION:         See component header file
+     94          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+     95          void TOSTpoInitialize( void )
+   \                     TOSTpoInitialize:
+     96          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   100100         MOVW      AX,#1
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+     97          #ifndef USE_DISABLE_TOSTIMER
+     98              static tTOSAlarm  Alarm;
+     99          #endif
+    100          
+    101          #ifdef TOS_PREEMPTIVE
+    102              TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    103          #endif
+    104          
+    105              TOSClock = (tTOSClock) 1;
+   \   0004   03....         MOVW      TOSClock,AX
+    106          
+    107              // This assert check if the Timer tick can be divided by the alarm tick.
+    108              // If this assert fails, verify the values of
+    109              // cTOSTickAlarmUs and cTOSTimerTickMs
+    110              // then change the value of cTOSTimerTickMs
+    111              mLIBassert( ( cClockCycleInAlarmTick * cTOSTickAlarmUs ) ==
+    112                          ( (U32)1000UL * cTOSTimerTickMs ) );
+    113          
+    114          #ifndef USE_DISABLE_TOSTIMER
+    115              Alarm.TaskID = cTOSTaskIdTOSClock;
+    116              TOSSetRelAlarm( &Alarm, 0, cClockCycleInAlarmTick );
+    117          #else
+    118              u8TOSMultiplicationFactor = cMinMultiplicationValue;
+   \   0007   A101           MOV       A,#1
+   \   0009   9E....         MOV       u8TOSMultiplicationFactor,A
+    119              TOSAlarmTPO.TaskID = cTOSTaskIdTOSClock;
+   \   000C   100010         MOVW      AX,#4096
+   \   000F   03....         MOVW      TOSAlarmTPO,AX
+    120              TOSSetRelAlarm(
+    121                             &TOSAlarmTPO,
+    122                             0,
+    123                  (tTOSTickAlarm)(cClockCycleInAlarmTick * ((U32)u8TOSMultiplicationFactor))
+    124                            );
+   \   0012   10....         MOVW      AX,#TOSAlarmTPO
+   \   0015   A302           MOV       B,#2
+   \   0017   9A....         CALL      TOSSetRelAlarm_Interne
+    125          #endif
+    126          
+    127          #ifdef TOS_PREEMPTIVE
+    128              TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    129          #endif
+    130          
+    131          }
+   \   001A   B2             POP       BC
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    132          
+    133          //==============================================================================
+    134          // DESCRIPTION:         See component header file
+    135          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    136          CALLT_TYPE void TOSStartTimer( tTOSTimer* const pTimer )
+   \                     TOSStartTimer:
+    137          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    138              if (pTimer != NULL)
+   \   0000   EA0000         CMPW      AX,#0
+   \   0003   AD08           BZ        ??TOSDisableTimer_0
+    139              {
+    140          #ifdef TOS_PREEMPTIVE
+    141                  TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    142          #endif
+    143          
+    144                  *pTimer = TOSClock;
+   \   0005   D6             MOVW      HL,AX
+   \   0006   02....         MOVW      AX,TOSClock
+   \   0009   BE01           MOV       [HL+0x01],A
+   \   000B   60             MOV       A,X
+   \   000C   97             MOV       [HL],A
+    145          
+    146          #ifdef TOS_PREEMPTIVE
+    147                  TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    148          #endif
+    149              }
+    150          }
+   \                     ??TOSDisableTimer_0:
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    151          
+    152          //==============================================================================
+    153          // DESCRIPTION:         See component header file
+    154          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    155          CALLT_TYPE void TOSStopTimer( tTOSTimer* const pTimer )
+   \                     TOSStopTimer:
+    156          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    157              if (pTimer != NULL)
+   \   0000   EA0000         CMPW      AX,#0
+   \   0003   AD06           BZ        ??TOSDisableTimer_1
+    158              {
+    159          #ifdef TOS_PREEMPTIVE
+    160                  TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    161          #endif
+    162          
+    163                  *pTimer = 0;
+   \   0005   D6             MOVW      HL,AX
+   \   0006   A100           MOV       A,#0
+   \   0008   BE01           MOV       [HL+0x01],A
+   \   000A   97             MOV       [HL],A
+    164          
+    165          #ifdef TOS_PREEMPTIVE
+    166                  TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    167          #endif
+    168              }
+    169          }
+   \                     ??TOSDisableTimer_1:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    170          
+    171          //==============================================================================
+    172          // DESCRIPTION:         See component header file
+    173          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    174          BOOL TOSIsTimerStarted( const tTOSTimer* const pTimer )
+   \                     TOSIsTimerStarted:
+    175          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    176              BOOL bTimerIsStarted = cFalse;
+   \   0001   A200           MOV       C,#0
+    177          
+    178              if (pTimer != NULL)
+   \   0003   EA0000         CMPW      AX,#0
+   \   0006   AD0B           BZ        ??TOSDisableTimer_2
+    179              {
+    180          #ifdef TOS_PREEMPTIVE
+    181                  TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    182          #endif
+    183                  
+    184                  // A timer is never equal to 0
+    185                  // The 0 value is reserved to the timer stoped
+    186                  if ( *pTimer != 0 )
+   \   0008   D6             MOVW      HL,AX
+   \   0009   87             MOV       A,[HL]
+   \   000A   70             MOV       X,A
+   \   000B   AE01           MOV       A,[HL+0x01]
+   \   000D   6168           OR        A,X
+   \   000F   AD02           BZ        ??TOSDisableTimer_2
+    187                  {
+    188                      bTimerIsStarted = cTrue;
+   \   0011   A201           MOV       C,#1
+    189                  }
+    190                  
+    191          #ifdef TOS_PREEMPTIVE
+    192                  TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    193          #endif
+    194              }
+    195          
+    196              return bTimerIsStarted;
+   \                     ??TOSDisableTimer_2:
+   \   0013   62             MOV       A,C
+   \   0014   B2             POP       BC
+   \   0015   AF             RET       
+   \   0016                  REQUIRE ?CL78K_V4_6_L00
+    197          }
+    198          
+    199          //==============================================================================
+    200          // DESCRIPTION:         See component header file
+    201          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    202          CALLT_TYPE BOOL TOSIsTimerElapsed( tTOSTimer* const pTimer, const tTOSTimer Timeout )
+   \                     TOSIsTimerElapsed:
+    203          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001   B3             PUSH      BC
+   \   0002                  ; Total Auto size: 4
+   \   0002   B7             PUSH      HL
+   \   0003   D4             MOVW      DE,AX
+    204              tTOSTimer Delay;
+    205              BOOL bTimerIsElapsed = cFalse;
+   \   0004   A200           MOV       C,#0
+    206          
+    207              if (pTimer != NULL)
+   \   0006   6168           OR        A,X
+   \   0008   AD65           BZ        ??TOSDisableTimer_3
+    208              {
+    209          #ifdef TOS_PREEMPTIVE
+    210                  TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    211          #endif
+    212          
+    213                  // A timer is never equal to 0
+    214                  // The 0 value is reserved to the timer stoped
+    215                  if ( *pTimer == 0 )
+   \   000A   65             MOV       A,D
+   \   000B   D6             MOVW      HL,AX
+   \   000C   87             MOV       A,[HL]
+   \   000D   70             MOV       X,A
+   \   000E   AE01           MOV       A,[HL+0x01]
+   \   0010   6168           OR        A,X
+   \   0012   AD59           BZ        ??TOSDisableTimer_4
+    216                  {
+    217                      bTimerIsElapsed = cTrue;
+    218                  }
+    219                  else
+    220                  {
+    221                      Delay = (tTOSTimer)( TOSClock - *pTimer );
+   \   0014   AE01           MOV       A,[HL+0x01]
+   \   0016   D6             MOVW      HL,AX
+   \   0017   02....         MOVW      AX,TOSClock
+   \   001A   30             XCH       A,X
+   \   001B   611E           SUB       A,L
+   \   001D   30             XCH       A,X
+   \   001E   613F           SUBC      A,H
+   \   0020   B6             POP       HL
+   \   0021   B1             PUSH      AX
+    222                      
+    223                      if ( TOSClock < *pTimer )
+   \   0022   C4             MOVW      AX,DE
+   \   0023   D6             MOVW      HL,AX
+   \   0024   87             MOV       A,[HL]
+   \   0025   70             MOV       X,A
+   \   0026   AE01           MOV       A,[HL+0x01]
+   \   0028   D6             MOVW      HL,AX
+   \   0029   02....         MOVW      AX,TOSClock
+   \   002C   30             XCH       A,X
+   \   002D   611E           SUB       A,L
+   \   002F   60             MOV       A,X
+   \   0030   613F           SUBC      A,H
+   \   0032   9D0D           BNC       ??TOSDisableTimer_5
+    224                      {
+    225                          // The 0 value had been "jump" so we must substact 1 to the delay
+    226                          Delay--;
+   \   0034   891C           MOVW      AX,SP
+   \   0036   D6             MOVW      HL,AX
+   \   0037   87             MOV       A,[HL]
+   \   0038   70             MOV       X,A
+   \   0039   AE01           MOV       A,[HL+0x01]
+   \   003B   90             DECW      AX
+   \   003C   30             XCH       A,X
+   \   003D   97             MOV       [HL],A
+   \   003E   60             MOV       A,X
+   \   003F   BE01           MOV       [HL+0x01],A
+    227                      }
+    228                      
+    229                      if ( (Delay > Timeout) || (Timeout == 0) )
+   \                     ??TOSDisableTimer_5:
+   \   0041   891C           MOVW      AX,SP
+   \   0043   D6             MOVW      HL,AX
+   \   0044   87             MOV       A,[HL]
+   \   0045   70             MOV       X,A
+   \   0046   AE01           MOV       A,[HL+0x01]
+   \   0048   B1             PUSH      AX
+   \   0049   891C           MOVW      AX,SP
+   \   004B   D6             MOVW      HL,AX
+   \   004C   AE04           MOV       A,[HL+0x04]
+   \   004E   70             MOV       X,A
+   \   004F   AE05           MOV       A,[HL+0x05]
+   \   0051   B6             POP       HL
+   \   0052   30             XCH       A,X
+   \   0053   611E           SUB       A,L
+   \   0055   60             MOV       A,X
+   \   0056   613F           SUBC      A,H
+   \   0058   8D0C           BC        ??TOSDisableTimer_6
+   \   005A   891C           MOVW      AX,SP
+   \   005C   D6             MOVW      HL,AX
+   \   005D   AE02           MOV       A,[HL+0x02]
+   \   005F   70             MOV       X,A
+   \   0060   AE03           MOV       A,[HL+0x03]
+   \   0062   6168           OR        A,X
+   \   0064   BD09           BNZ       ??TOSDisableTimer_3
+    230                      {
+    231                          // The timer is stoped
+    232                          *pTimer = 0;
+   \                     ??TOSDisableTimer_6:
+   \   0066   C4             MOVW      AX,DE
+   \   0067   D6             MOVW      HL,AX
+   \   0068   A100           MOV       A,#0
+   \   006A   BE01           MOV       [HL+0x01],A
+   \   006C   97             MOV       [HL],A
+    233                          bTimerIsElapsed = cTrue;
+   \                     ??TOSDisableTimer_4:
+   \   006D   A201           MOV       C,#1
+    234                      }
+    235          
+    236                  }
+    237                  
+    238          #ifdef TOS_PREEMPTIVE
+    239                  TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    240          #endif
+    241              }
+    242          
+    243              return bTimerIsElapsed;
+   \                     ??TOSDisableTimer_3:
+   \   006F   62             MOV       A,C
+   \   0070   B2             POP       BC
+   \   0071   B2             POP       BC
+   \   0072   B4             POP       DE
+   \   0073   AF             RET       
+   \   0074                  REQUIRE ?CL78K_V4_6_L00
+    244          }
+    245          
+    246          //==============================================================================
+    247          // DESCRIPTION:         See component header file
+    248          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    249          tTOSTimer TOSGetTimerElapsedTime( const tTOSTimer* const pTimer )
+   \                     TOSGetTimerElapsedTime:
+    250          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D4             MOVW      DE,AX
+    251              tTOSTimer Delay = (tTOSTimer)0;
+   \   0003   120000         MOVW      BC,#0
+    252          
+    253              if (pTimer != NULL)
+   \   0006   6168           OR        A,X
+   \   0008   AD2A           BZ        ??TOSDisableTimer_7
+    254              {
+    255          #ifdef TOS_PREEMPTIVE
+    256                  TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    257          #endif
+    258          
+    259                  // A timer is never equal to 0
+    260                  // The 0 value is reserved to the timer stoped
+    261                  if ( *pTimer == 0 )
+   \   000A   65             MOV       A,D
+   \   000B   D6             MOVW      HL,AX
+   \   000C   87             MOV       A,[HL]
+   \   000D   70             MOV       X,A
+   \   000E   AE01           MOV       A,[HL+0x01]
+   \   0010   6168           OR        A,X
+   \   0012   AD20           BZ        ??TOSDisableTimer_7
+    262                  {
+    263                      // This function must not be call with a stoped tempo
+    264                      mLIBassert( cFalse );
+    265                  }
+    266                  else
+    267                  {
+    268                      Delay = (tTOSTimer)( TOSClock - *pTimer );
+   \   0014   AE01           MOV       A,[HL+0x01]
+   \   0016   D6             MOVW      HL,AX
+   \   0017   02....         MOVW      AX,TOSClock
+   \   001A   30             XCH       A,X
+   \   001B   611E           SUB       A,L
+   \   001D   30             XCH       A,X
+   \   001E   613F           SUBC      A,H
+   \   0020   D2             MOVW      BC,AX
+    269                      
+    270                      if ( TOSClock < *pTimer )
+   \   0021   C4             MOVW      AX,DE
+   \   0022   D6             MOVW      HL,AX
+   \   0023   87             MOV       A,[HL]
+   \   0024   70             MOV       X,A
+   \   0025   AE01           MOV       A,[HL+0x01]
+   \   0027   D6             MOVW      HL,AX
+   \   0028   02....         MOVW      AX,TOSClock
+   \   002B   30             XCH       A,X
+   \   002C   611E           SUB       A,L
+   \   002E   60             MOV       A,X
+   \   002F   613F           SUBC      A,H
+   \   0031   9D01           BNC       ??TOSDisableTimer_7
+    271                      {
+    272                          // The 0 value had been "jump" so we must substract 1 to the delay
+    273                          Delay--;
+   \   0033   92             DECW      BC
+    274                      }
+    275                  }
+    276          
+    277          #ifdef TOS_PREEMPTIVE
+    278                  TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    279          #endif
+    280              }
+    281          
+    282              return Delay;
+   \                     ??TOSDisableTimer_7:
+   \   0034   C2             MOVW      AX,BC
+   \   0035   B4             POP       DE
+   \   0036   B2             POP       BC
+   \   0037   AF             RET       
+   \   0038                  REQUIRE ?CL78K_V4_6_L00
+    283          }
+    284          
+    285          //==============================================================================
+    286          // DESCRIPTION:         See component header file
+    287          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    288          void TOSClockTask( void )
+   \                     TOSClockTask:
+    289          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    290              TOSClock += mGetMultiplier();
+   \   0000   8E....         MOV       A,u8TOSMultiplicationFactor
+   \   0003   A000           MOV       X,#0
+   \   0005   08....         ADD       A,TOSClock
+   \   0008   30             XCH       A,X
+   \   0009   28....         ADDC      A,TOSClock+1
+   \   000C   03....         MOVW      TOSClock,AX
+    291          
+    292              if ( TOSClock < mGetMultiplier() )
+   \   000F   8E....         MOV       A,u8TOSMultiplicationFactor
+   \   0012   76             MOV       L,A
+   \   0013   8E....         MOV       A,TOSClock+1
+   \   0016   30             XCH       A,X
+   \   0017   611E           SUB       A,L
+   \   0019   60             MOV       A,X
+   \   001A   3D00           SUBC      A,#0
+   \   001C   9D07           BNC       ??TOSDisableTimer_8
+    293              {
+    294                  TOSClock++;
+   \   001E   02....         MOVW      AX,TOSClock
+   \   0021   80             INCW      AX
+   \   0022   03....         MOVW      TOSClock,AX
+    295              }
+    296          }
+   \                     ??TOSDisableTimer_8:
+   \   0025   AF             RET       
+   \   0026                  REQUIRE ?CL78K_V4_6_L00
+    297          
+    298          #ifdef USE_DISABLE_TOSTIMER
+    299          //==============================================================================
+    300          // DESCRIPTION:         See component header file
+    301          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    302          void TOSEnableTimer(const U8 u8Period )
+   \                     TOSEnableTimer:
+    303          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    304          #ifdef TOS_PREEMPTIVE
+    305              TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    306          #endif
+    307          
+    308              mLIBassert( u8Period >= cMinMultiplicationValue );
+    309          
+    310              u8TOSMultiplicationFactor = u8Period;
+   \   0001   9E....         MOV       u8TOSMultiplicationFactor,A
+    311              TOSAlarmTPO.Period = (tTOSTickAlarm)( cClockCycleInAlarmTick *
+    312                                                         ((U32)u8TOSMultiplicationFactor));
+   \   0004   21             CLR1      CY
+   \   0005   27             ROLC      A,0x1
+   \   0006   9E....         MOV       TOSAlarmTPO+2,A
+    313          
+    314              TOSSetRelAlarm(
+    315                             &TOSAlarmTPO,
+    316                             0,
+    317                 (tTOSTickAlarm)(cClockCycleInAlarmTick*((U32)u8TOSMultiplicationFactor))
+    318                            );
+   \   0009   8E....         MOV       A,u8TOSMultiplicationFactor
+   \   000C   21             CLR1      CY
+   \   000D   27             ROLC      A,0x1
+   \   000E   73             MOV       B,A
+   \   000F   10....         MOVW      AX,#TOSAlarmTPO
+   \   0012   9A....         CALL      TOSSetRelAlarm_Interne
+    319          
+    320          #ifdef TOS_PREEMPTIVE
+    321              TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    322          #endif
+    323          }
+   \   0015   B2             POP       BC
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    324          
+    325          //==============================================================================
+    326          // DESCRIPTION:         See component header file
+    327          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    328          void TOSDisableTimer( void )
+   \                     TOSDisableTimer:
+    329          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    330          #ifdef TOS_PREEMPTIVE
+    331              TOSGetSchedulerResource(); //if TOS is preemptive - disable preemption
+    332          #endif
+    333          
+    334              TOSCancelAlarm( &TOSAlarmTPO );
+   \   0000   10....         MOVW      AX,#TOSAlarmTPO
+   \   0003   9B....         BR        N:TOSCancelAlarm
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    335          
+    336          #ifdef TOS_PREEMPTIVE
+    337              TOSReleaseSchedulerResource(); //if TOS is preemptive - release the resource 
+    338          #endif
+    339          }
+    340          #endif
+    341          
+
+   Segment part sizes:
+
+     Function/Label            Bytes
+     --------------            -----
+     TOSAlarmTPO                  4
+     u8TOSMultiplicationFactor    1
+     TOSClock                     2
+     TOSTpoInitialize            28
+     TOSStartTimer               14
+     TOSStopTimer                12
+     TOSIsTimerStarted           22
+     TOSIsTimerElapsed          116
+     TOSGetTimerElapsedTime      56
+     TOSClockTask                38
+     TOSEnableTimer              23
+     TOSDisableTimer              6
+
+ 
+ 315 bytes in segment CODE
+   7 bytes in segment NEAR_Z
+ 
+ 315 bytes of CODE memory
+   7 bytes of DATA memory
+
+Errors: none
+Warnings: none

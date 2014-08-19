@@ -1,0 +1,2119 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:21 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_DBK.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_DBK.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_DBK.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_DBK.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_DBK.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_DBK.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_DBK.C
+      1          /*=========================================================================
+      2            Function ........................ DAT
+      3            Component ....................... DAT_DBK
+      4            PVCS File revision............... $
+      5            Last modification date .......... $Modtime:   Apr 25 2009 21:07:00  $
+      6            ------------------------------------------------------------------------- 
+      7            Copyright ...... This software is JCI property. Duplication or 
+      8            disclosure is prohibited without the JCI writen authorization
+      9            ------------------------------------------------------------------------- 
+     10            DAT_DBK component exported function definition 
+     11            
+     12            This file DAT_DBK.c is compile and a DAT_DBK.o is generated
+     13            The object file includes the functions exported by the component.
+     14            
+     15            - The macros, constatnts et types wich are not exported are defined in 
+     16            this file
+     17            - The variables and functions which are not exported are defined in this 
+     18            file wich the static key word
+     19            
+     20            -------------------------------------------------------------------------
+     21            Document reference : see the DAT_DBK.h file
+     22            ------------------------------------------------------------------------- 
+     23            Component presentation : see the DAT_DBK.h file
+     24            -------------------------------------------------------------------------
+     25            Comments on the component (algorithm, structure, limitations, ...)
+     26          
+     27            -------------------------------------------------------------------------
+     28            DAT_DBK.c file review : 
+     29          	
+     30            $
+     31          
+     32            =========================================================================*/
+     33          
+     34          /*-------------------------------------------------------------------------
+     35            Body Identification
+     36            -------------------------------------------------------------------------*/
+     37          
+     38          
+     39          #define Dat_Dbk    "Dat_Dbk"
+     40          
+     41          /*-------------------------------------------------------------------------
+     42            Included files
+     43          
+     44            #include <nom_du_ficher_systeme.h>
+     45            #include "nom_du_ficher_utilisateur.h"
+     46            -------------------------------------------------------------------------*/ 
+     47          #include "deftypes.h"
+     48          #include "lib.h"              /* defini les types et constantes de bases */
+     49          #include "Dat_Dbk.h"
+     50          #include "Dat_Eep.h"
+     51          
+     52          // Modifs :
+     53          // DATDbkStartUpdate, DATDbkStartReading
+     54          // variable d'etat ecriture / lecture par Double banque
+     55          
+     56          
+     57          /*-------------------------------------------------------------------------
+     58            Local constants
+     59          
+     60            #define cNomConstante   ValeurDeLaConstante
+     61            -------------------------------------------------------------------------*/  
+     62          // attention le checksum doit etre en 0 sinon le prog doit etre modifie
+     63          #define cPosChecksum	0
+     64          
+     65          #define cMskFlagStatusOk  (U8)0x01
+     66          #define cMskFlagWriteMode (U8)0x02
+     67          
+     68          /*-------------------------------------------------------------------------
+     69            Local macro
+     70          
+     71            #define mNomMacro   (DefinitionDeLaMacro)
+     72            -------------------------------------------------------------------------*/  
+     73          
+     74          #define mProcessHandleToDbkHandle(hProc)   ((tDATDbkDoubleBankHandle)(hProc-cDATDbkFirstProcessHandle))
+     75          #define mDbkHandleToProcessHandle(hDbk)   ((tDATEepProcessHandle)(hDbk+cDATDbkFirstProcessHandle))
+     76          
+     77          #define mSetFlagStatusOk(hDbk)    { Flags[hDbk] |=  cMskFlagStatusOk; }
+     78          #define mClearFlagStatusOk(hDbk)  { Flags[hDbk] &= ~cMskFlagStatusOk; }
+     79          #define mReadFlagStatusOk(hDbk)   ((Flags[hDbk] &   cMskFlagStatusOk) != 0 )
+     80          
+     81          #define mSetFlagWriteMode(hDbk)   { Flags[hDbk] |=  cMskFlagWriteMode; }
+     82          #define mClearFlagWriteMode(hDbk) { Flags[hDbk] &= ~cMskFlagWriteMode; }
+     83          #define mReadFlagWriteMode(hDbk)  ((Flags[hDbk] &   cMskFlagWriteMode)!= 0) 
+     84          
+     85          /*-------------------------------------------------------------------------
+     86            Local type
+     87          
+     88            struct  sNomStructure { ... };
+     89            union   uNomUnion { ... };
+     90            enum    eNomEnumeration { ... };
+     91            typedef Expression tNomType;
+     92            -------------------------------------------------------------------------*/
+     93          
+     94          typedef enum
+     95          {
+     96              cDbkNoError,
+     97              cDbkErrorBk1,
+     98              cDbkErrorBk2,
+     99              cDbkErrorBKs
+    100          } tDbkError;
+    101          
+    102          // definition des etats de sortie des graphes
+    103          typedef enum
+    104          {
+    105              cGraphResultProcessing,
+    106              cGraphResultOk,
+    107              cGraphResultError
+    108          } tGraphResult;
+    109          
+    110          // constantes du graph de la CallBack
+    111          typedef enum
+    112          {
+    113              cGraphDbkWaitState,
+    114              cGraphDbkReadState,
+    115              cGraphDbkWriteState
+    116          } tGraphDbkStatus;
+    117          
+    118          // constantes du graph d'ecriture double banque
+    119          typedef enum
+    120          {
+    121              cGraphWriteDbkWaitState,
+    122              cGraphWriteDbkBk1State,
+    123              cGraphWriteDbkBk2State
+    124          } tGraphWriteDbkStatus;
+    125          
+    126          // constantes du graph de lecture double banque
+    127          typedef enum
+    128          {
+    129              cGraphReadDbkWaitState,
+    130              cGraphReadDbkBk1State,
+    131              cGraphReadDbkBk2State,
+    132              cGraphReadDbkCheckState,
+    133              cGraphReadDbkStrategyState
+    134          } tGraphReadDbkStatus;
+    135          
+    136          // constantes du graph de lecture bloc
+    137          typedef enum
+    138          {
+    139              cGraphReadWaitState,
+    140              cGraphReadDatEepState,
+    141              cGraphReadCheckDatEepState
+    142          } tGraphReadStatus;
+    143          
+    144          
+    145          /*-------------------------------------------------------------------------
+    146            Local data
+    147          
+    148            static  tType   NomVariable;
+    149            static  tType*  pNomVariable; 
+    150            -------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    151          static tDbkError DbkError [cNbDbk];
+   \                     DbkError:
+   \   0000                  DS 5
+   \   0005                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    152          static U8 Flags [cNbDbk];
+   \                     Flags:
+   \   0000                  DS 5
+   \   0005                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    153          static BOOL DbkCallBackStatusOk;
+   \                     DbkCallBackStatusOk:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    154          static tDATDbkDoubleBankHandle HandleDbkInUse;
+   \                     HandleDbkInUse:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    155          static tDATEepOffset SizeDbkChkInUse;
+   \                     SizeDbkChkInUse:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    156          
+    157          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    158          static tGraphDbkStatus GraphDbkStatus;
+   \                     GraphDbkStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    159          static tGraphWriteDbkStatus GraphWriteDbkStatus;
+   \                     GraphWriteDbkStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    160          static tGraphReadDbkStatus GraphReadDbkStatus;
+   \                     GraphReadDbkStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    161          static tGraphReadStatus GraphReadStatus;
+   \                     GraphReadStatus:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    162          
+    163          /*-------------------------------------------------------------------------
+    164            Constant local Data
+    165          
+    166            static const tType  NomVariable;
+    167            -------------------------------------------------------------------------*/  
+    168          // Structure en ROM qui permet d'acceder aux adresses des DBK
+
+   \                                 In  segment CONST, align 2
+    169          const tDATDbkTableBankRom DATDbkTableBankRom [cNbDbk] =
+   \                     DATDbkTableBankRom:
+   \   0000   ....           DW DATDbkMirrors
+   \   0002   0C00           DB 12, 0
+   \   0004   ....           DW DATDbkMirrors + 18H
+   \   0006   0300           DB 3, 0
+   \   0008   ....           DW DATDbkMirrors + 1EH
+   \   000A   1300           DB 19, 0
+   \   000C   ....           DW DATDbkMirrors + 44H
+   \   000E   2600           DB 38, 0
+   \   0010   ....           DW DATDbkMirrors + 90H
+   \   0012   2100           DB 33, 0
+    170              {
+    171                  mDATDbkInitTableBankROM()
+    172              };
+    173          
+    174          
+    175          
+    176          /*-------------------------------------------------------------------------
+    177            Exported data
+    178          
+    179            tType   COMNomVariable;          (COM: 3 lettres identifiant ce composant)
+    180            tType*  pCOMNomVariable;         (COM: 3 lettres identifiant ce composant)
+    181            -------------------------------------------------------------------------*/ 
+    182          
+    183          // variable definissant toutes les doubles banques en RAM
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    184          tDATDbkMirrors DATDbkMirrors;
+   \                     DATDbkMirrors:
+   \   0000                  DS 210
+   \   00D2                  REQUIRE __INIT_NEAR_Z
+    185          
+    186          /*-------------------------------------------------------------------------
+    187            Constant exported data
+    188           
+    189            const tType   COMNomVariable;    (COM: 3 lettres identifiant ce composant)
+    190            -------------------------------------------------------------------------*/ 
+    191          
+    192          /*-------------------------------------------------------------------------
+    193            Local functions prototype
+    194            
+    195          	static tTypeRetour NomFonction(tTypeArgument1 NomArgument1, ... );
+    196            -------------------------------------------------------------------------*/
+    197          
+    198          
+    199          tGraphResult WritingDbkGraph ( void );
+    200          tGraphResult ReadingDbkGraph ( void );
+    201          tGraphResult ReadingBlockGraph ( tDATEepOffset  OffsetEeprom );
+    202          U16 ChecksumCalculation ( tDATEepOffset BlockSize );
+    203          
+    204          #ifdef X90_PROJECT
+    205          static MEM_TYPE void DATDbkCallBackEep_Static(tDATEepProcessHandle ProcessHandle, BOOL CallBackStatusOk);
+    206          static MEM_TYPE tGraphResult ReadingBlockGraph_Static(tDATEepOffset OffsetEeprom);
+    207          static MEM_TYPE tGraphResult ReadingDbkGraph_Static(void);
+    208          #endif
+    209          
+    210          
+    211          /*.........................................................................
+    212            ........................... LOCAL FUNCTIONS..............................
+    213            .........................................................................*/
+    214          
+    215          /*=========================================================================
+    216          ! Function .........
+    217          U16 ChecksumCalculation ( tDATEepOffset BlockSize )
+    218          !--------------------------------------------------------------------------
+    219          ! Function purpose :
+    220          //-------------------------------------------------------------------
+    221          // 
+    222          //              FONCTION QUI CALCULE LE CHECKSUM
+    223          //          en utilisant ce qui se trouve en RAM de travail
+    224          // 
+    225          //-------------------------------------------------------------------
+    226          //-------------------------------------------------------------------
+    227          // 
+    228          //              CHECKSUM CALCULATION using working RAM
+    229          // 
+    230          //-------------------------------------------------------------------
+    231          !
+    232          !--------------------------------------------------------------------------
+    233          ! Precondition (parameters):
+    234          !
+    235          ! Type            Name                           Min          Max
+    236          ! -------------------------------------------------------------------------
+    237          ! tDATEepOffset		BlockSize					0			cDATDbkSizeMaxDbk
+    238          !--------------------------------------------------------------------------
+    239          ! Postcondition (return values):
+    240          !
+    241          ! Type            Name                           Min          Max
+    242          ! -------------------------------------------------------------------------
+    243          ! 	U16 Checksum								0			0xFFFF
+    244          !--------------------------------------------------------------------------
+    245          ! Function review:
+    246          !
+    247          ! Author  Ver.  Description
+    248          ! -------------------------------------------------------------------------
+    249          !         1.00  Initial version
+    250          !
+    251          !==========================================================================*/
+    252          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    253          U16 ChecksumCalculation ( tDATEepOffset BlockSize )
+   \                     ChecksumCalculation:
+    254          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   72             MOV       C,A
+    255              U16 Checksum;
+    256          
+    257              // used in debug mode to check param
+    258              // permet de faire en mode debug des verif des param
+    259              // si la condition n'est pas bonne un message d'erreur est genere
+    260              mLIBassert( BlockSize > 1 );
+    261          
+    262              Checksum = 0;
+   \   0003   140000         MOVW      DE,#0
+    263              BlockSize --;
+   \   0006   52             DEC       C
+   \   0007   AD17           BZ        ??DATDbkInit_0
+    264              // boucle de calcul du checksum
+    265              while ( BlockSize > 0 )
+    266              {
+    267                  Checksum += DATEepBuffer [ BlockSize ];
+   \                     ??ChecksumCalculation_0:
+   \   0009   62             MOV       A,C
+   \   000A   A002           MOV       X,#2
+   \   000C   3188           MULU      X
+   \   000E   CA....         ADDW      AX,#DATEepBuffer
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   70             MOV       X,A
+   \   0014   AE01           MOV       A,[HL+0x01]
+   \   0016   30             XCH       A,X
+   \   0017   610C           ADD       A,E
+   \   0019   30             XCH       A,X
+   \   001A   612D           ADDC      A,D
+   \   001C   D4             MOVW      DE,AX
+    268                  BlockSize --;
+    269              }
+   \   001D   52             DEC       C
+   \   001E   BDE9           BNZ       ??ChecksumCalculation_0
+    270              // inverse la valeur du checksum
+    271              Checksum = ~Checksum;
+    272          
+    273              return Checksum;
+   \                     ??DATDbkInit_0:
+   \   0020   C4             MOVW      AX,DE
+   \   0021   30             XCH       A,X
+   \   0022   7DFF           XOR       A,#255
+   \   0024   30             XCH       A,X
+   \   0025   7DFF           XOR       A,#255
+   \   0027   B4             POP       DE
+   \   0028   B2             POP       BC
+   \   0029   AF             RET       
+   \   002A                  REQUIRE ?CL78K_V4_6_L00
+    274          }
+    275          
+    276          
+    277          
+    278          /*--------------------------------------------------------------------------*/
+    279          /*-------  Fonctions des Boites de GRAPHES  (par ordre alphabetique) -------*/
+    280          /*--------------------------------------------------------------------------*/
+    281          /*
+    282          tTypeRetour ComNomFonction(tTypeArgument NomArgument,  ...)
+    283          {
+    284          }
+    285          */
+    286          
+    287          
+    288          /*.........................................................................
+    289            ........................... EXPORTED FUNCTIONS. .........................
+    290            .........................................................................*/
+    291          
+    292          /*=========================================================================
+    293          ! Function .........
+    294          void DATDbkStartReadingAllBanks ( void )
+    295          !--------------------------------------------------------------------------
+    296          ! Function purpose :
+    297          ! Permet de mettre en RAM le contenu de toutes les doubles banques en EEPROM
+    298          ! reading EEPROM to RAM for all double banks
+    299          !--------------------------------------------------------------------------
+    300          ! Precondition (parameters):
+    301          !
+    302          ! Type            Name                           Min          Max
+    303          ! -------------------------------------------------------------------------
+    304          !
+    305          !--------------------------------------------------------------------------
+    306          ! Postcondition (return values):
+    307          !
+    308          ! Type            Name                           Min          Max
+    309          ! -------------------------------------------------------------------------
+    310          ! 
+    311          !--------------------------------------------------------------------------
+    312          ! Function review:
+    313          !
+    314          !
+    315          !==========================================================================*/
+    316          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    317          void DATDbkStartReadingAllBanks ( void )
+   \                     DATDbkStartReadingAllBanks:
+    318          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    319              tDATDbkDoubleBankHandle HandleDbk;
+    320          
+    321              for ( HandleDbk = 0 ; HandleDbk < cNbDbk ; HandleDbk ++ )
+   \   0002   A200           MOV       C,#0
+   \   0004   14....         MOVW      DE,#Flags
+    322              {
+    323                  DATDbkStartReading ( HandleDbk );
+   \                     ??DATDbkStartReadingAllBanks_0:
+   \   0007   C4             MOVW      AX,DE
+   \   0008   D6             MOVW      HL,AX
+   \   0009   62             MOV       A,C
+   \   000A   7193           CLR1      [HL].1
+   \   000C   0D05           ADD       A,#5
+   \   000E   9A....         CALL      DATEepProcessRequest
+    324              }
+   \   0011   42             INC       C
+   \   0012   62             MOV       A,C
+   \   0013   84             INCW      DE
+   \   0014   4D05           CMP       A,#5
+   \   0016   8DEF           BC        ??DATDbkStartReadingAllBanks_0
+    325          }
+   \   0018   B4             POP       DE
+   \   0019   B2             POP       BC
+   \   001A   AF             RET       
+   \   001B                  REQUIRE ?CL78K_V4_6_L00
+    326          
+    327          
+    328          /*=========================================================================
+    329          ! Function .........
+    330          void DATDbkStartReading ( tDATDbkDoubleBankHandle HandleDbk )
+    331          !--------------------------------------------------------------------------
+    332          ! Function purpose :
+    333          ! Permet de mettre en RAM le contenu d'une double banque en EEPROM
+    334          ! reading EEPROM to RAM for one double bank
+    335          !--------------------------------------------------------------------------
+    336          ! Precondition (parameters):
+    337          !
+    338          ! Type            Name                           Min          Max
+    339          ! -------------------------------------------------------------------------
+    340          !tDATDbkDoubleBankHandle HandleDbk					0		cNbDbk-1
+    341          !--------------------------------------------------------------------------
+    342          ! Postcondition (return values):
+    343          !
+    344          ! Type            Name                           Min          Max
+    345          ! -------------------------------------------------------------------------
+    346          ! 
+    347          !--------------------------------------------------------------------------
+    348          ! Function review:
+    349          !
+    350          !
+    351          !==========================================================================*/
+    352          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    353          void DATDbkStartReading ( tDATDbkDoubleBankHandle HandleDbk )
+   \                     DATDbkStartReading:
+    354          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    355              // used in debug mode to check param
+    356              // permet de faire en mode debug des verif des param
+    357              // si la condition n'est pas bonne un message d'erreur est genere
+    358              // mLIBassert( condition )
+    359              mLIBassert( HandleDbk < cNbDbk );
+    360          
+    361              // This assert check that this double-bank is'nt processing
+    362              // a write operation
+    363              mLIBassert(  (!DATEepIsActivate(mDbkHandleToProcessHandle(HandleDbk)))
+    364                           ||( mReadFlagWriteMode(HandleDbk) == cFalse                ) );
+    365          
+    366              mClearFlagWriteMode(HandleDbk);
+   \   0002   70             MOV       X,A
+   \   0003   A100           MOV       A,#0
+   \   0005   CA....         ADDW      AX,#Flags
+   \   0008   D6             MOVW      HL,AX
+   \   0009   62             MOV       A,C
+   \   000A   7193           CLR1      [HL].1
+    367              DATEepProcessRequest( mDbkHandleToProcessHandle ( HandleDbk ));
+   \   000C   0D05           ADD       A,#5
+   \   000E   9A....         CALL      DATEepProcessRequest
+    368          }
+   \   0011   B2             POP       BC
+   \   0012   AF             RET       
+   \   0013                  REQUIRE ?CL78K_V4_6_L00
+    369          
+    370          
+    371          /*=========================================================================
+    372          ! Function .........
+    373          void DATDbkStartUpdate ( tDATDbkDoubleBankHandle HandleDbk )
+    374          !--------------------------------------------------------------------------
+    375          ! Function purpose :
+    376          ! Permet de mettre a jour le contenu d'une double banque en EEPROM depuis 
+    377          !     la RAM
+    378          ! writing RAM to EEPROM for one double bank
+    379          !--------------------------------------------------------------------------
+    380          ! Precondition (parameters):
+    381          !
+    382          ! Type            Name                           Min          Max
+    383          ! -------------------------------------------------------------------------
+    384          !tDATDbkDoubleBankHandle HandleDbk					0		cNbDbk-1
+    385          !--------------------------------------------------------------------------
+    386          ! Postcondition (return values):
+    387          !
+    388          ! Type            Name                           Min          Max
+    389          ! -------------------------------------------------------------------------
+    390          ! 
+    391          !--------------------------------------------------------------------------
+    392          ! Function review:
+    393          !
+    394          !
+    395          !==========================================================================*/
+    396          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    397          void DATDbkStartUpdate ( tDATDbkDoubleBankHandle HandleDbk )
+   \                     DATDbkStartUpdate:
+    398          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    399              // used in debug mode to check param
+    400              // permet de faire en mode debug des verif des param
+    401              // si la condition n'est pas bonne un message d'erreur est genere
+    402              // mLIBassert( condition )
+    403              mLIBassert( HandleDbk < cNbDbk );
+    404          
+    405              // If a write request occurs during a read operation,
+    406              // this request is ignored.
+    407              // This test is a robustness test. The else branch can'not be
+    408              // covered in unitary test.
+    409              if(   (DATEepIsActivate(mDbkHandleToProcessHandle(HandleDbk)) == cFalse)
+    410                 || (mReadFlagWriteMode(HandleDbk) != cFalse                         ) )
+   \   0002   0D05           ADD       A,#5
+   \   0004   9A....         CALL      DATEepIsActivate
+   \   0007   4D00           CMP       A,#0
+   \   0009   AD0B           BZ        ??DATDbkInit_1
+   \   000B   62             MOV       A,C
+   \   000C   70             MOV       X,A
+   \   000D   A100           MOV       A,#0
+   \   000F   CA....         ADDW      AX,#Flags
+   \   0012   D6             MOVW      HL,AX
+   \   0013   319710         BF        [HL].1, ??DATDbkInit_2
+    411              {
+    412                  mSetFlagWriteMode(HandleDbk);
+   \                     ??DATDbkInit_1:
+   \   0016   62             MOV       A,C
+   \   0017   70             MOV       X,A
+   \   0018   A100           MOV       A,#0
+   \   001A   CA....         ADDW      AX,#Flags
+   \   001D   D6             MOVW      HL,AX
+   \   001E   62             MOV       A,C
+   \   001F   7192           SET1      [HL].1
+    413                  DATEepProcessRequest(mDbkHandleToProcessHandle ( HandleDbk ));
+   \   0021   0D05           ADD       A,#5
+   \   0023   9A....         CALL      DATEepProcessRequest
+    414              }
+    415              else
+    416              {
+    417                  // The EEPROM users can'not request to write during the reading.
+    418                  mLIBassert( cFalse );
+    419              }
+    420          }
+   \                     ??DATDbkInit_2:
+   \   0026   B2             POP       BC
+   \   0027   AF             RET       
+   \   0028                  REQUIRE ?CL78K_V4_6_L00
+    421          
+    422          
+    423          /*=========================================================================
+    424          ! Function .........
+    425          BOOL DATDbkIsWriteOk( tDATDbkDoubleBankHandle DoubleBankHandle )
+    426          !--------------------------------------------------------------------------
+    427          ! Function purpose :
+    428          ! Permet de controler que l'ecriture de la banque est terminee
+    429          ! check if double bank writing is terminated
+    430          !--------------------------------------------------------------------------
+    431          ! Precondition (parameters):
+    432          !
+    433          ! Type            Name                           Min          Max
+    434          ! -------------------------------------------------------------------------
+    435          !tDATDbkDoubleBankHandle HandleDbk					0		cNbDbk-1
+    436          !--------------------------------------------------------------------------
+    437          ! Postcondition (return values):
+    438          !
+    439          ! Type            Name                           Min          Max
+    440          ! -------------------------------------------------------------------------
+    441          ! BOOL		IsWriteOk						cFalse		cTrue
+    442          !--------------------------------------------------------------------------
+    443          ! Function review:
+    444          !
+    445          !
+    446          !==========================================================================*/
+    447          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    448          BOOL DATDbkIsWriteOk( tDATDbkDoubleBankHandle HandleDbk )
+   \                     DATDbkIsWriteOk:
+    449          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    450              BOOL IsWriteOk;
+    451          
+    452              // used in debug mode to check param
+    453              // permet de faire en mode debug des verif des param
+    454              // si la condition n'est pas bonne un message d'erreur est genere
+    455              // mLIBassert( condition )
+    456              mLIBassert( HandleDbk < cNbDbk );
+    457          
+    458              IsWriteOk = mReadFlagStatusOk(HandleDbk);
+    459          
+    460              return IsWriteOk;
+   \   0000   70             MOV       X,A
+   \   0001   A100           MOV       A,#0
+   \   0003   CA....         ADDW      AX,#Flags
+   \   0006   D6             MOVW      HL,AX
+   \   0007   87             MOV       A,[HL]
+   \   0008   5D01           AND       A,#1
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    461          }
+    462          
+    463          
+    464          /*=========================================================================
+    465          ! Function .........
+    466          void DATDbkStartRestoringBrokenBanks( void )
+    467          !--------------------------------------------------------------------------
+    468          ! Function purpose :
+    469          ! reconstruction des DBK si un (et un seul) bloc est casse
+    470          ! rebuild DBK if one block is broken
+    471          !--------------------------------------------------------------------------
+    472          ! Precondition (parameters):
+    473          !
+    474          ! Type            Name                           Min          Max
+    475          ! -------------------------------------------------------------------------
+    476          !
+    477          !--------------------------------------------------------------------------
+    478          ! Postcondition (return values):
+    479          !
+    480          ! Type            Name                           Min          Max
+    481          ! -------------------------------------------------------------------------
+    482          !
+    483          !--------------------------------------------------------------------------
+    484          ! Function review:
+    485          !
+    486          !
+    487          !==========================================================================*/
+    488          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    489          void DATDbkStartRestoringBrokenBanks( void )
+   \                     DATDbkStartRestoringBrokenBanks:
+    490          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#DbkError
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 2
+   \   0005   B7             PUSH      HL
+    491              tDATDbkDoubleBankHandle HandleDbk;
+    492          
+    493              for ( HandleDbk = 0 ; HandleDbk < cNbDbk ; HandleDbk ++ )
+   \   0006   A200           MOV       C,#0
+   \   0008   B6             POP       HL
+   \   0009   B1             PUSH      AX
+   \   000A   14....         MOVW      DE,#Flags
+    494              {
+    495                  if (( DbkError [ HandleDbk ] == cDbkErrorBk1 ) || ( DbkError [ HandleDbk ] == cDbkErrorBk2 ))
+   \                     ??DATDbkStartRestoringBrokenBanks_0:
+   \   000D   891C           MOVW      AX,SP
+   \   000F   D6             MOVW      HL,AX
+   \   0010   87             MOV       A,[HL]
+   \   0011   70             MOV       X,A
+   \   0012   AE01           MOV       A,[HL+0x01]
+   \   0014   D6             MOVW      HL,AX
+   \   0015   87             MOV       A,[HL]
+   \   0016   51             DEC       A
+   \   0017   AD0D           BZ        ??DATDbkInit_3
+   \   0019   891C           MOVW      AX,SP
+   \   001B   D6             MOVW      HL,AX
+   \   001C   87             MOV       A,[HL]
+   \   001D   70             MOV       X,A
+   \   001E   AE01           MOV       A,[HL+0x01]
+   \   0020   D6             MOVW      HL,AX
+   \   0021   87             MOV       A,[HL]
+   \   0022   4D02           CMP       A,#2
+   \   0024   BD19           BNZ       ??DATDbkInit_4
+    496                  {
+    497                      // rebuild
+    498                      DATDbkStartUpdate ( HandleDbk );
+   \                     ??DATDbkInit_3:
+   \   0026   62             MOV       A,C
+   \   0027   0D05           ADD       A,#5
+   \   0029   9A....         CALL      DATEepIsActivate
+   \   002C   4D00           CMP       A,#0
+   \   002E   AD05           BZ        ??DATDbkInit_5
+   \   0030   C4             MOVW      AX,DE
+   \   0031   D6             MOVW      HL,AX
+   \   0032   31970A         BF        [HL].1, ??DATDbkInit_4
+   \                     ??DATDbkInit_5:
+   \   0035   C4             MOVW      AX,DE
+   \   0036   D6             MOVW      HL,AX
+   \   0037   62             MOV       A,C
+   \   0038   7192           SET1      [HL].1
+   \   003A   0D05           ADD       A,#5
+   \   003C   9A....         CALL      DATEepProcessRequest
+    499                  }
+    500              }
+   \                     ??DATDbkInit_4:
+   \   003F   42             INC       C
+   \   0040   84             INCW      DE
+   \   0041   891C           MOVW      AX,SP
+   \   0043   D6             MOVW      HL,AX
+   \   0044   87             MOV       A,[HL]
+   \   0045   70             MOV       X,A
+   \   0046   AE01           MOV       A,[HL+0x01]
+   \   0048   D6             MOVW      HL,AX
+   \   0049   86             INCW      HL
+   \   004A   C6             MOVW      AX,HL
+   \   004B   B6             POP       HL
+   \   004C   B1             PUSH      AX
+   \   004D   62             MOV       A,C
+   \   004E   4D05           CMP       A,#5
+   \   0050   8DBB           BC        ??DATDbkStartRestoringBrokenBanks_0
+    501          }
+   \   0052   B0             POP       AX
+   \   0053   B4             POP       DE
+   \   0054   B2             POP       BC
+   \   0055   AF             RET       
+   \   0056                  REQUIRE ?CL78K_V4_6_L00
+    502          
+    503          
+    504          /*=========================================================================
+    505          ! Function .........
+    506          BOOL DATDbkIsBankProcessing ( tDATDbkDoubleBankHandle HandleDbk )
+    507          !--------------------------------------------------------------------------
+    508          ! Function purpose :
+    509          ! Permet de controler que l'ecriture de la banque est terminee
+    510          ! check if double bank writing is terminated
+    511          !--------------------------------------------------------------------------
+    512          ! Precondition (parameters):
+    513          !
+    514          ! Type            Name                           Min          Max
+    515          ! -------------------------------------------------------------------------
+    516          !tDATDbkDoubleBankHandle HandleDbk					0		cNbDbk-1
+    517          !--------------------------------------------------------------------------
+    518          ! Postcondition (return values):
+    519          !
+    520          ! Type            Name                           Min          Max
+    521          ! -------------------------------------------------------------------------
+    522          ! BOOL		IsBankProcessing				cFalse		cTrue
+    523          !--------------------------------------------------------------------------
+    524          ! Function review:
+    525          !
+    526          !
+    527          !==========================================================================*/
+    528          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    529          BOOL DATDbkIsBankProcessing ( tDATDbkDoubleBankHandle HandleDbk )
+   \                     DATDbkIsBankProcessing:
+    530          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    531              BOOL IsBankProcessing;
+    532          
+    533              // used in debug mode to check param
+    534              // permet de faire en mode debug des verif des param
+    535              // si la condition n'est pas bonne un message d'erreur est genere
+    536              // mLIBassert( condition )
+    537              mLIBassert( HandleDbk < cNbDbk );
+    538          
+    539              IsBankProcessing = DATEepIsActivate ( mDbkHandleToProcessHandle ( HandleDbk ));
+    540              return IsBankProcessing;
+   \   0000   0D05           ADD       A,#5
+   \   0002   9B....         BR        N:DATEepIsActivate
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    541          }
+    542          
+    543          
+    544          /*=========================================================================
+    545          ! Function .........
+    546          BOOL DATDbkIsProcessing ( void )
+    547          !--------------------------------------------------------------------------
+    548          ! Function purpose :
+    549          ! Permet de controler que l'ecriture de toutes les banques est terminee
+    550          ! check if all double bank writing is terminated
+    551          !--------------------------------------------------------------------------
+    552          ! Precondition (parameters):
+    553          !
+    554          ! Type            Name                           Min          Max
+    555          ! -------------------------------------------------------------------------
+    556          !
+    557          !--------------------------------------------------------------------------
+    558          ! Postcondition (return values):
+    559          !
+    560          ! Type            Name                           Min          Max
+    561          ! -------------------------------------------------------------------------
+    562          ! BOOL		IsTerminate						cFalse		cTrue
+    563          !--------------------------------------------------------------------------
+    564          ! Function review:
+    565          !
+    566          !
+    567          !==========================================================================*/
+    568          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    569          BOOL DATDbkIsProcessing ( void )
+   \                     DATDbkIsProcessing:
+    570          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    571              BOOL IsProcessing;
+    572              tDATDbkDoubleBankHandle HandleDbk;
+    573          
+    574              IsProcessing = cFalse;
+   \   0001   A300           MOV       B,#0
+    575              for ( HandleDbk = 0 ; HandleDbk < cNbDbk ; HandleDbk ++ )
+   \   0003   A200           MOV       C,#0
+    576              {
+    577                  if ( DATDbkIsBankProcessing ( HandleDbk ) == cTrue )
+   \                     ??DATDbkIsProcessing_0:
+   \   0005   62             MOV       A,C
+   \   0006   0D05           ADD       A,#5
+   \   0008   9A....         CALL      DATEepIsActivate
+   \   000B   51             DEC       A
+   \   000C   BD02           BNZ       ??DATDbkInit_6
+    578                  {
+    579                      IsProcessing = cTrue;
+   \   000E   A301           MOV       B,#1
+    580                  }
+    581              }
+   \                     ??DATDbkInit_6:
+   \   0010   42             INC       C
+   \   0011   62             MOV       A,C
+   \   0012   4D05           CMP       A,#5
+   \   0014   8DEF           BC        ??DATDbkIsProcessing_0
+    582              return IsProcessing;
+   \   0016   63             MOV       A,B
+   \   0017   B2             POP       BC
+   \   0018   AF             RET       
+   \   0019                  REQUIRE ?CL78K_V4_6_L00
+    583          }
+    584          
+    585          
+    586          
+    587          /*=========================================================================
+    588          ! Function .........
+    589          void DATDbkCallBackEep ( tDATEepProcessHandle ProcessHandle, BOOL CallBackStatusOk )
+    590          !--------------------------------------------------------------------------
+    591          ! Function purpose :
+    592          !   fonction qui est appele par DAT_EEP lorsque la precedente demande est terminee
+    593          !	DAT_EEP call this function when previous treatment is terminated
+    594          !
+    595          !--------------------------------------------------------------------------
+    596          ! Precondition (parameters):
+    597          !
+    598          ! Type            Name                           Min          Max
+    599          ! -------------------------------------------------------------------------
+    600          !
+    601          !--------------------------------------------------------------------------
+    602          ! Postcondition (return values):
+    603          !
+    604          ! Type            Name                           Min          Max
+    605          ! -------------------------------------------------------------------------
+    606          ! 
+    607          !--------------------------------------------------------------------------
+    608          ! Function review:
+    609          !
+    610          !
+    611          !==========================================================================*/
+    612          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    613          void DATDbkCallBackEep ( tDATEepProcessHandle ProcessHandle, BOOL CallBackStatusOk )
+   \                     DATDbkCallBackEep:
+    614          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    615          #ifdef X90_PROJECT
+    616              DATDbkCallBackEep_Static(ProcessHandle, CallBackStatusOk);
+   \   0001   16....         MOVW      HL,#LWRD(DATDbkCallBackEep_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATDbkCallBackEep_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    617          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    618          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    619          static MEM_TYPE void DATDbkCallBackEep_Static(tDATEepProcessHandle ProcessHandle, BOOL CallBackStatusOk)
+   \                     DATDbkCallBackEep_Static:
+    620          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    621          #endif
+    622              tGraphResult SlaveStatus;
+    623          
+    624              // used in debug mode to check param
+    625              // permet de faire en mode debug des verif des param
+    626              // si la condition n'est pas bonne un message d'erreur est genere
+    627              // mLIBassert( condition )
+    628              mLIBassert( mProcessHandleToDbkHandle ( ProcessHandle ) < cNbDbk );
+    629          
+    630              // save param in global data
+    631              // sauve les parametres en global pour ne pas avoir a les passer aux fonctions
+    632              HandleDbkInUse = mProcessHandleToDbkHandle ( ProcessHandle );
+   \   0001   0DFB           ADD       A,#251
+   \   0003   9E....         MOV       HandleDbkInUse,A
+    633              DbkCallBackStatusOk = CallBackStatusOk;
+   \   0006   63             MOV       A,B
+   \   0007   9E....         MOV       DbkCallBackStatusOk,A
+    634              // donne la taille de la banque en cours avec le checksum
+    635              SizeDbkChkInUse = (tDATEepOffset) ( DATDbkTableBankRom [HandleDbkInUse].SizeBlockRam + (U8) 1 );
+   \   000A   8E....         MOV       A,HandleDbkInUse
+   \   000D   A004           MOV       X,#4
+   \   000F   3188           MULU      X
+   \   0011   CA....         ADDW      AX,#DATDbkTableBankRom+2
+   \   0014   D6             MOVW      HL,AX
+   \   0015   87             MOV       A,[HL]
+   \   0016   41             INC       A
+   \   0017   9E....         MOV       SizeDbkChkInUse,A
+    636          
+    637              // on ne sort pas de la callback tant que l'on n'a pas fait appel a une fonction Api Eep
+    638              // callback musn't return before calling DAT_EEP function
+    639          
+    640              // graph de gestion de la double banque
+    641              // double bank treatment routine
+    642              switch ( GraphDbkStatus )
+   \   001A   8E....         MOV       A,GraphDbkStatus
+   \   001D   4D00           CMP       A,#0
+   \   001F   AD0E           BZ        ??DATDbkInit_17
+   \   0021   4D01           CMP       A,#1
+   \   0023   AD51           BZ        ??DATDbkInit_18
+   \   0025   4D02           CMP       A,#2
+   \   0027   BD03           BNZ       $+5
+   \   0029   9B....         BR        N:??DATDbkInit_19
+   \   002C   9B....         BR        N:??DATDbkInit_20
+    643              {
+    644              case cGraphDbkWaitState:
+    645                  if ( mReadFlagWriteMode(HandleDbkInUse) != cFalse )
+   \                     ??DATDbkInit_17:
+   \   002F   8E....         MOV       A,HandleDbkInUse
+   \   0032   70             MOV       X,A
+   \   0033   A100           MOV       A,#0
+   \   0035   CA....         ADDW      AX,#Flags
+   \   0038   D6             MOVW      HL,AX
+   \   0039   319733         BF        [HL].1, ??DATDbkInit_21
+    646                  {
+    647                      // execute une demande d'ecriture en double banque
+    648                      // copie la RAM banque en RAM Travail
+    649                      // copy bank RAM to Working RAM
+    650                      // la taille en RAM est en mot (2 octects) et n'a pas de checksum
+    651                      // RAM size is in word and haven't checksum
+    652                      mLIBmemcpy ( (void*)(DATEepBuffer + 1) , (void*)DATDbkTableBankRom [HandleDbkInUse].AddBlockRam , (SizeDbkChkInUse - 1) * 2 );
+   \   003C   8E....         MOV       A,SizeDbkChkInUse
+   \   003F   70             MOV       X,A
+   \   0040   A100           MOV       A,#0
+   \   0042   90             DECW      AX
+   \   0043   21             CLR1      CY
+   \   0044   30             XCH       A,X
+   \   0045   27             ROLC      A,0x1
+   \   0046   30             XCH       A,X
+   \   0047   27             ROLC      A,0x1
+   \   0048   D4             MOVW      DE,AX
+   \   0049   8E....         MOV       A,HandleDbkInUse
+   \   004C   A004           MOV       X,#4
+   \   004E   3188           MULU      X
+   \   0050   CA....         ADDW      AX,#DATDbkTableBankRom
+   \   0053   D6             MOVW      HL,AX
+   \   0054   87             MOV       A,[HL]
+   \   0055   70             MOV       X,A
+   \   0056   AE01           MOV       A,[HL+0x01]
+   \   0058   D2             MOVW      BC,AX
+   \   0059   10....         MOVW      AX,#DATEepBuffer+2
+   \   005C   9A....         CALL      memcpy
+    653                      // Calcule le checksum
+    654                      // checksum calculation
+    655                      DATEepBuffer [ cPosChecksum ] = ChecksumCalculation ( SizeDbkChkInUse );
+   \   005F   8E....         MOV       A,SizeDbkChkInUse
+   \   0062   9A....         CALL      ChecksumCalculation
+   \   0065   03....         MOVW      DATEepBuffer,AX
+    656                      // execute une demande d'ecriture
+    657                      // writing double bank
+    658                      SlaveStatus = WritingDbkGraph ();
+   \   0068   9A....         CALL      WritingDbkGraph
+    659                      // va a l'etape suivante
+    660                      // go to next step
+    661                      GraphDbkStatus = cGraphDbkWriteState;
+   \   006B   A102           MOV       A,#2
+   \   006D   FA6E           BR        ??DATDbkInit_22
+    662                  }
+    663                  else
+    664                  {
+    665                      // execute une demande de lecture de la double banque
+    666                      // reading double bank
+    667                      SlaveStatus = ReadingDbkGraph ();
+   \                     ??DATDbkInit_21:
+   \   006F   9A....         CALL      ReadingDbkGraph
+    668                      // va a l'etape suivante
+    669                      // go to next step
+    670                      GraphDbkStatus = cGraphDbkReadState;
+   \   0072   A101           MOV       A,#1
+   \   0074   FA67           BR        ??DATDbkInit_22
+    671                  }
+    672                  break;
+    673              case cGraphDbkReadState:
+    674                  // execute une demande de lecture de la double banque
+    675                  // reading double bank
+    676                  SlaveStatus = ReadingDbkGraph ();
+    677                  if ( SlaveStatus != cGraphResultProcessing )
+   \                     ??DATDbkInit_18:
+   \   0076   9A....         CALL      ReadingDbkGraph
+   \   0079   4D00           CMP       A,#0
+   \   007B   AD63           BZ        ??DATDbkInit_20
+    678                  {
+    679                      // copie la RAM de Travail dans la RAM de la bank
+    680                      // copy working RAM to bank RAM
+    681                      // la taille en RAM est en mot (2 octects) et n'a pas de checksum
+    682                      // RAM size is in word and haven't checksum
+    683                      mLIBmemcpy ( (void*)DATDbkTableBankRom [HandleDbkInUse].AddBlockRam , (void*)(DATEepBuffer + 1) , (SizeDbkChkInUse - 1) * 2 );
+   \   007D   8E....         MOV       A,SizeDbkChkInUse
+   \   0080   70             MOV       X,A
+   \   0081   A100           MOV       A,#0
+   \   0083   90             DECW      AX
+   \   0084   30             XCH       A,X
+   \   0085   27             ROLC      A,0x1
+   \   0086   30             XCH       A,X
+   \   0087   27             ROLC      A,0x1
+   \   0088   D4             MOVW      DE,AX
+   \   0089   12....         MOVW      BC,#DATEepBuffer+2
+   \   008C   8E....         MOV       A,HandleDbkInUse
+   \   008F   A004           MOV       X,#4
+   \   0091   3188           MULU      X
+   \   0093   CA....         ADDW      AX,#DATDbkTableBankRom
+   \   0096   D6             MOVW      HL,AX
+   \   0097   87             MOV       A,[HL]
+   \   0098   70             MOV       X,A
+   \   0099   AE01           MOV       A,[HL+0x01]
+   \   009B   9A....         CALL      memcpy
+    684                      // le travail sur la bank est termine
+    685                      // work is terminated
+    686                      mSetFlagStatusOk(HandleDbkInUse);
+   \   009E   8E....         MOV       A,HandleDbkInUse
+   \   00A1   70             MOV       X,A
+   \   00A2   A100           MOV       A,#0
+   \   00A4   CA....         ADDW      AX,#Flags
+   \   00A7   D6             MOVW      HL,AX
+   \   00A8   7182           SET1      [HL].0
+    687                      // termine le process
+    688                      // stop the process
+    689                      DATEepTerminateProcess ();
+   \   00AA   9A....         CALL      DATEepTerminateProcess
+    690                      // retourne au repos
+    691                      // go back to wait
+    692                      GraphDbkStatus = cGraphDbkWaitState;
+   \   00AD   FA2C           BR        ??DATDbkInit_23
+    693                  }
+    694                  break;
+    695              case cGraphDbkWriteState:
+    696                  // execute une demande de lecture de la double banque
+    697                  // writing double bank
+    698                  SlaveStatus = WritingDbkGraph ();
+   \                     ??DATDbkInit_19:
+   \   00AF   9A....         CALL      WritingDbkGraph
+   \   00B2   70             MOV       X,A
+    699                  if ( SlaveStatus == cGraphResultOk )
+   \   00B3   51             DEC       A
+   \   00B4   BD11           BNZ       ??DATDbkInit_24
+    700                  {
+    701                      // le travail sur la bank est termine
+    702                      // work is terminated
+    703                      mSetFlagStatusOk(HandleDbkInUse);
+   \   00B6   8E....         MOV       A,HandleDbkInUse
+   \   00B9   70             MOV       X,A
+   \   00BA   A100           MOV       A,#0
+   \   00BC   CA....         ADDW      AX,#Flags
+   \   00BF   D6             MOVW      HL,AX
+   \   00C0   7182           SET1      [HL].0
+    704                      // termine le process
+    705                      // stop the process
+    706                      DATEepTerminateProcess ();
+   \   00C2   9A....         CALL      DATEepTerminateProcess
+    707                      // retourne au repos
+    708                      // go back to wait
+    709                      GraphDbkStatus = cGraphDbkWaitState;
+   \   00C5   FA14           BR        ??DATDbkInit_23
+    710                  }
+    711                  else if ( SlaveStatus == cGraphResultError )
+   \                     ??DATDbkInit_24:
+   \   00C7   60             MOV       A,X
+   \   00C8   4D02           CMP       A,#2
+   \   00CA   BD14           BNZ       ??DATDbkInit_20
+    712                  {
+    713                      // le travail sur la bank est termine
+    714                      // work is terminated
+    715                      mClearFlagStatusOk(HandleDbkInUse);
+   \   00CC   8E....         MOV       A,HandleDbkInUse
+   \   00CF   70             MOV       X,A
+   \   00D0   A100           MOV       A,#0
+   \   00D2   CA....         ADDW      AX,#Flags
+   \   00D5   D6             MOVW      HL,AX
+   \   00D6   7183           CLR1      [HL].0
+    716                      // termine le process
+    717                      // stop the process
+    718                      DATEepTerminateProcess ();
+   \   00D8   9A....         CALL      DATEepTerminateProcess
+    719                      // retourne au repos
+    720                      // go back to wait
+    721                      GraphDbkStatus = cGraphDbkWaitState;
+   \                     ??DATDbkInit_23:
+   \   00DB   A100           MOV       A,#0
+   \                     ??DATDbkInit_22:
+   \   00DD   9E....         MOV       GraphDbkStatus,A
+    722                  }
+    723                  break;
+    724              default:
+    725                  mLIBassert(cFalse);
+    726                  break;
+    727              }
+    728          }
+   \                     ??DATDbkInit_20:
+   \   00E0   B2             POP       BC
+   \   00E1   AF             RET       
+   \   00E2                  REQUIRE ?CL78K_V4_6_L00
+    729          
+    730          
+    731          
+    732          /*=========================================================================
+    733          ! Function .........
+    734          tGraphResult WritingDbkGraph ( void )
+    735          !--------------------------------------------------------------------------
+    736          ! Function purpose :
+    737          //------------------------------------------------------------------------------------------
+    738          // Graph de gestion de l'ecriture EEPROM pour une double bank
+    739          //------------------------------------------------------------------------------------------
+    740          //------------------------------------------------------------------------------------------
+    741          // treatment for double bank writing in EEPROM
+    742          //------------------------------------------------------------------------------------------
+    743          !
+    744          !--------------------------------------------------------------------------
+    745          ! Precondition (parameters):
+    746          !
+    747          ! Type            Name                           Min          Max
+    748          ! -------------------------------------------------------------------------
+    749          ! 
+    750          !--------------------------------------------------------------------------
+    751          ! Postcondition (return values):
+    752          !
+    753          ! Type            Name                           Min          Max
+    754          ! -------------------------------------------------------------------------
+    755          ! tGraphResult	GraphStatus								
+    756          !--------------------------------------------------------------------------
+    757          ! Function review:
+    758          !
+    759          !
+    760          !==========================================================================*/
+    761          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    762          tGraphResult WritingDbkGraph ( void )
+   \                     WritingDbkGraph:
+    763          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    764              tGraphResult  GraphStatus;
+    765          
+    766              // used in debug mode to check param
+    767              // permet de faire en mode debug des verif des param
+    768              mLIBassert( HandleDbkInUse < cNbDbk );
+    769              mLIBassert( SizeDbkChkInUse == DATDbkTableBankRom[HandleDbkInUse].SizeBlockRam+1);
+    770          
+    771              GraphStatus = cGraphResultProcessing;
+   \   0002   A400           MOV       E,#0
+    772              switch ( GraphWriteDbkStatus )
+   \   0004   8E....         MOV       A,GraphWriteDbkStatus
+   \   0007   4D00           CMP       A,#0
+   \   0009   AD0B           BZ        ??DATDbkInit_7
+   \   000B   4D01           CMP       A,#1
+   \   000D   AD2F           BZ        ??DATDbkInit_8
+   \   000F   4D02           CMP       A,#2
+   \   0011   AD6D           BZ        ??DATDbkInit_9
+   \   0013   9B....         BR        N:??DATDbkInit_10
+    773              {
+    774              case cGraphWriteDbkWaitState:
+    775                  // commence par le bloc en erreur
+    776                  if ( DbkError [ HandleDbkInUse ] == cDbkErrorBk2 )
+   \                     ??DATDbkInit_7:
+   \   0016   8E....         MOV       A,HandleDbkInUse
+   \   0019   73             MOV       B,A
+   \   001A   16....         MOVW      HL,#DbkError
+   \   001D   AB             MOV       A,[HL+B]
+   \   001E   4D02           CMP       A,#2
+   \   0020   8E....         MOV       A,SizeDbkChkInUse
+   \   0023   72             MOV       C,A
+   \   0024   BD09           BNZ       ??DATDbkInit_11
+    777                  {
+    778                      // ecrit le bloc 2
+    779                      // write block 2
+    780                      DATEepWrite ( DATEepBuffer , SizeDbkChkInUse , SizeDbkChkInUse );
+   \   0026   73             MOV       B,A
+   \   0027   10....         MOVW      AX,#DATEepBuffer
+   \   002A   9A....         CALL      DATEepWrite
+   \   002D   FA08           BR        ??DATDbkInit_12
+    781                  }
+    782                  else
+    783                  {
+    784                      // ecrit le bloc 1
+    785                      // write block 1
+    786                      DATEepWrite ( DATEepBuffer , 0 , SizeDbkChkInUse );
+   \                     ??DATDbkInit_11:
+   \   002F   10....         MOVW      AX,#DATEepBuffer
+   \   0032   A300           MOV       B,#0
+   \   0034   9A....         CALL      DATEepWrite
+    787                  }
+    788                  // va a l'etape suivante
+    789                  // go to next step
+    790                  GraphWriteDbkStatus = cGraphWriteDbkBk1State;
+   \                     ??DATDbkInit_12:
+   \   0037   A101           MOV       A,#1
+   \                     ??WritingDbkGraph_0:
+   \   0039   9E....         MOV       GraphWriteDbkStatus,A
+   \   003C   FA6E           BR        ??DATDbkInit_10
+    791                  break;
+    792              case cGraphWriteDbkBk1State:
+    793                  if ( DbkCallBackStatusOk == cTrue )
+   \                     ??DATDbkInit_8:
+   \   003E   8E....         MOV       A,DbkCallBackStatusOk
+   \   0041   51             DEC       A
+   \   0042   8E....         MOV       A,HandleDbkInUse
+   \   0045   73             MOV       B,A
+   \   0046   BD21           BNZ       ??DATDbkInit_13
+    794                  {
+    795                      // continue par l'autre bloc
+    796                      if ( DbkError [ HandleDbkInUse ] == cDbkErrorBk2 )
+   \   0048   16....         MOVW      HL,#DbkError
+   \   004B   AB             MOV       A,[HL+B]
+   \   004C   4D02           CMP       A,#2
+   \   004E   8E....         MOV       A,SizeDbkChkInUse
+   \   0051   72             MOV       C,A
+   \   0052   BD0A           BNZ       ??DATDbkInit_14
+    797                      {
+    798                          // ecrit le bloc 1
+    799                          // write block 1
+    800                          DATEepWrite ( DATEepBuffer , 0 , SizeDbkChkInUse );
+   \   0054   10....         MOVW      AX,#DATEepBuffer
+   \   0057   A300           MOV       B,#0
+   \   0059   9A....         CALL      DATEepWrite
+   \   005C   FA07           BR        ??DATDbkInit_15
+    801                      }
+    802                      else
+    803                      {
+    804                          // ecrit le bloc 2
+    805                          // write block 2
+    806                          DATEepWrite ( DATEepBuffer , SizeDbkChkInUse , SizeDbkChkInUse );
+   \                     ??DATDbkInit_14:
+   \   005E   73             MOV       B,A
+   \   005F   10....         MOVW      AX,#DATEepBuffer
+   \   0062   9A....         CALL      DATEepWrite
+    807                      }
+    808                      // va a l'etape suivante
+    809                      // go to next step
+    810                      GraphWriteDbkStatus = cGraphWriteDbkBk2State;
+   \                     ??DATDbkInit_15:
+   \   0065   A102           MOV       A,#2
+   \   0067   FAD0           BR        ??WritingDbkGraph_0
+    811                  }
+    812                  else
+    813                  {
+    814                      // le bloc 1 n'a pas ete ecrite correctement
+    815                      // write in block 1 is wrong
+    816                      DbkError [ HandleDbkInUse ] = cDbkErrorBk1;
+   \                     ??DATDbkInit_13:
+   \   0069   A101           MOV       A,#1
+   \   006B   16....         MOVW      HL,#DbkError
+   \   006E   BB             MOV       [HL+B],A
+    817                      DATPeeErrorIndication ( HandleDbkInUse , cDATDbkErrorWritingBK1 );
+   \   006F   A302           MOV       B,#2
+   \   0071   8E....         MOV       A,HandleDbkInUse
+   \   0074   16....         MOVW      HL,#LWRD(DATPeeErrorIndication)
+   \   0077   A4..           MOV       E,#BYTE3(DATPeeErrorIndication)
+   \   0079   ..             CALLT     [__T_?FAR_CALL_L07]
+    818                      GraphStatus = cGraphResultError;
+   \   007A   A100           MOV       A,#0
+   \   007C   A402           MOV       E,#2
+    819                      GraphWriteDbkStatus = cGraphWriteDbkWaitState;
+   \   007E   FAB9           BR        ??WritingDbkGraph_0
+    820                  }
+    821                  break;
+    822              case cGraphWriteDbkBk2State:
+    823                  GraphWriteDbkStatus = cGraphWriteDbkWaitState;
+   \                     ??DATDbkInit_9:
+   \   0080   A100           MOV       A,#0
+   \   0082   9E....         MOV       GraphWriteDbkStatus,A
+    824                  if ( DbkCallBackStatusOk == cTrue )
+   \   0085   8E....         MOV       A,DbkCallBackStatusOk
+   \   0088   51             DEC       A
+   \   0089   8E....         MOV       A,HandleDbkInUse
+   \   008C   73             MOV       B,A
+   \   008D   BD0A           BNZ       ??DATDbkInit_16
+    825                  {
+    826                      // les blocs 1 et 2 ont ete ecrites correctement
+    827                      // write in block 1 and 2 is rigth
+    828                      DbkError [ HandleDbkInUse ] = cDbkNoError;
+   \   008F   A100           MOV       A,#0
+   \   0091   16....         MOVW      HL,#DbkError
+   \   0094   BB             MOV       [HL+B],A
+    829                      GraphStatus = cGraphResultOk;
+   \   0095   A401           MOV       E,#1
+   \   0097   FA13           BR        ??DATDbkInit_10
+    830                  }
+    831                  else
+    832                  {
+    833                      // le bloc 2 n'a pas ete ecrite correctement
+    834                      // write in block 2 is wrong
+    835                      DbkError [ HandleDbkInUse ] = cDbkErrorBk2;
+   \                     ??DATDbkInit_16:
+   \   0099   A102           MOV       A,#2
+   \   009B   16....         MOVW      HL,#DbkError
+   \   009E   BB             MOV       [HL+B],A
+    836                      DATPeeErrorIndication ( HandleDbkInUse , cDATDbkErrorWritingBK2 );
+   \   009F   A303           MOV       B,#3
+   \   00A1   8E....         MOV       A,HandleDbkInUse
+   \   00A4   16....         MOVW      HL,#LWRD(DATPeeErrorIndication)
+   \   00A7   A4..           MOV       E,#BYTE3(DATPeeErrorIndication)
+   \   00A9   ..             CALLT     [__T_?FAR_CALL_L07]
+    837                      GraphStatus = cGraphResultError;
+   \   00AA   A402           MOV       E,#2
+    838                  }
+    839                  break;
+    840              default:
+    841                  mLIBassert(cFalse);
+    842                  break;
+    843              }
+    844              return ( GraphStatus );
+   \                     ??DATDbkInit_10:
+   \   00AC   64             MOV       A,E
+   \   00AD   B4             POP       DE
+   \   00AE   B2             POP       BC
+   \   00AF   AF             RET       
+   \   00B0                  REQUIRE ?CL78K_V4_6_L00
+    845          }
+    846          
+    847          
+    848          
+    849          
+    850          /*=========================================================================
+    851          ! Function .........
+    852          tGraphResult ReadingDbkGraph ( void )
+    853          !--------------------------------------------------------------------------
+    854          ! Function purpose :
+    855          //------------------------------------------------------------------------------------------
+    856          // Graph de gestion de la lecture EEPROM pour une double banque
+    857          //------------------------------------------------------------------------------------------
+    858          //------------------------------------------------------------------------------------------
+    859          // treatment for double bank reading in EEPROM
+    860          //------------------------------------------------------------------------------------------
+    861          !
+    862          !--------------------------------------------------------------------------
+    863          ! Precondition (parameters):
+    864          !
+    865          ! Type            Name                           Min          Max
+    866          ! -------------------------------------------------------------------------
+    867          ! 
+    868          !--------------------------------------------------------------------------
+    869          ! Postcondition (return values):
+    870          !
+    871          ! Type            Name                           Min          Max
+    872          ! -------------------------------------------------------------------------
+    873          ! tGraphResult	GraphStatus								
+    874          !--------------------------------------------------------------------------
+    875          ! Function review:
+    876          !
+    877          !
+    878          !==========================================================================*/
+    879          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    880          tGraphResult ReadingDbkGraph ( void )
+   \                     ReadingDbkGraph:
+    881          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    882          #ifdef X90_PROJECT
+    883              return ReadingDbkGraph_Static();
+   \   0001   16....         MOVW      HL,#LWRD(ReadingDbkGraph_Static)
+   \   0004   A4..           MOV       E,#BYTE3(ReadingDbkGraph_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    884          }
+    885          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    886          static MEM_TYPE tGraphResult ReadingDbkGraph_Static(void)
+   \                     ReadingDbkGraph_Static:
+    887          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+    888          #endif
+    889              tGraphResult GraphStatus;
+    890              tGraphResult SlaveStatus;
+    891          
+    892              // used in debug mode to check param
+    893              // permet de faire en mode debug des verif des param
+    894              mLIBassert( HandleDbkInUse < cNbDbk );
+    895              mLIBassert( SizeDbkChkInUse == DATDbkTableBankRom[HandleDbkInUse].SizeBlockRam+1);
+    896          
+    897              GraphStatus = cGraphResultProcessing;
+   \   0002   891C           MOVW      AX,SP
+   \   0004   D6             MOVW      HL,AX
+   \   0005   A100           MOV       A,#0
+   \   0007   97             MOV       [HL],A
+    898              switch ( GraphReadDbkStatus )
+   \   0008   8E....         MOV       A,GraphReadDbkStatus
+   \   000B   4D00           CMP       A,#0
+   \   000D   AD12           BZ        ??DATDbkInit_25
+   \   000F   4D01           CMP       A,#1
+   \   0011   AD18           BZ        ??DATDbkInit_26
+   \   0013   4D02           CMP       A,#2
+   \   0015   AD6B           BZ        ??DATDbkInit_27
+   \   0017   4D03           CMP       A,#3
+   \   0019   BD03           BNZ       $+5
+   \   001B   9B....         BR        N:??DATDbkInit_28
+   \   001E   9B....         BR        N:??DATDbkInit_29
+    899              {
+    900              case cGraphReadDbkWaitState:
+    901                  // lit le bloc 1 (appelle le graph de lecture)
+    902                  // block 1 reading
+    903                  SlaveStatus = ReadingBlockGraph ( 0 );
+   \                     ??DATDbkInit_25:
+   \   0021   A100           MOV       A,#0
+   \   0023   9A....         CALL      ReadingBlockGraph
+    904                  // va a l'etape suivante
+    905                  // go to next step
+    906                  GraphReadDbkStatus = cGraphReadDbkBk1State;
+   \   0026   A101           MOV       A,#1
+   \   0028   9B....         BR        N:??DATDbkInit_30
+    907                  break;
+    908              case cGraphReadDbkBk1State:
+    909                  // lit le bloc 1 (appelle le graph de lecture)
+    910                  // block 1 reading
+    911                  SlaveStatus = ReadingBlockGraph ( 0 );
+   \                     ??DATDbkInit_26:
+   \   002B   A100           MOV       A,#0
+   \   002D   9A....         CALL      ReadingBlockGraph
+   \   0030   70             MOV       X,A
+    912                  if ( SlaveStatus == cGraphResultOk )
+   \   0031   51             DEC       A
+   \   0032   BD10           BNZ       ??DATDbkInit_31
+    913                  {
+    914                      // verifie le bloc 2
+    915                      // check block 2
+    916                      DATEepCompare ( DATEepBuffer , SizeDbkChkInUse , SizeDbkChkInUse );
+   \   0034   8E....         MOV       A,SizeDbkChkInUse
+   \   0037   72             MOV       C,A
+   \   0038   73             MOV       B,A
+   \   0039   10....         MOVW      AX,#DATEepBuffer
+   \   003C   9A....         CALL      DATEepCompare
+    917                      // va a l'etape suivante
+    918                      // go to next step
+    919                      GraphReadDbkStatus = cGraphReadDbkCheckState;
+   \   003F   A103           MOV       A,#3
+   \   0041   9B....         BR        N:??DATDbkInit_30
+    920                  }
+    921                  else if ( SlaveStatus == cGraphResultError )
+   \                     ??DATDbkInit_31:
+   \   0044   60             MOV       A,X
+   \   0045   4D02           CMP       A,#2
+   \   0047   AD03           BZ        $+5
+   \   0049   9B....         BR        N:??DATDbkInit_29
+    922                  {
+    923                      // copie la RAM de Travail dans la RAM de la bank
+    924                      // pour pouvoir disposer d'une image des deux blocs pour la strategie
+    925                      // copy working RAM to bank RAM
+    926                      mLIBmemcpy ( (void*)DATDbkTableBankRom [HandleDbkInUse].AddBlockRam , (void*)(DATEepBuffer + 1) , (SizeDbkChkInUse - 1) * 2 );
+   \   004C   8E....         MOV       A,SizeDbkChkInUse
+   \   004F   70             MOV       X,A
+   \   0050   A100           MOV       A,#0
+   \   0052   90             DECW      AX
+   \   0053   21             CLR1      CY
+   \   0054   30             XCH       A,X
+   \   0055   27             ROLC      A,0x1
+   \   0056   30             XCH       A,X
+   \   0057   27             ROLC      A,0x1
+   \   0058   D4             MOVW      DE,AX
+   \   0059   12....         MOVW      BC,#DATEepBuffer+2
+   \   005C   8E....         MOV       A,HandleDbkInUse
+   \   005F   A004           MOV       X,#4
+   \   0061   3188           MULU      X
+   \   0063   CA....         ADDW      AX,#DATDbkTableBankRom
+   \   0066   D6             MOVW      HL,AX
+   \   0067   87             MOV       A,[HL]
+   \   0068   70             MOV       X,A
+   \   0069   AE01           MOV       A,[HL+0x01]
+   \   006B   9A....         CALL      memcpy
+    927                      // positionne un indicateur d'erreur
+    928                      DbkError [ HandleDbkInUse ] = cDbkErrorBk1;
+   \   006E   8E....         MOV       A,HandleDbkInUse
+   \   0071   73             MOV       B,A
+   \   0072   A101           MOV       A,#1
+   \   0074   16....         MOVW      HL,#DbkError
+   \   0077   BB             MOV       [HL+B],A
+    929                      // lit le bloc 2 (appelle le graph)
+    930                      // block 2 reading
+    931                      SlaveStatus = ReadingBlockGraph ( SizeDbkChkInUse );
+   \   0078   8E....         MOV       A,SizeDbkChkInUse
+   \   007B   9A....         CALL      ReadingBlockGraph
+    932                      // va a l'etape suivante
+    933                      // go to next step
+    934                      GraphReadDbkStatus = cGraphReadDbkBk2State;
+   \   007E   A102           MOV       A,#2
+   \   0080   FA68           BR        ??DATDbkInit_30
+    935                  }
+    936                  break;
+    937              case cGraphReadDbkBk2State:
+    938                  // lit le bloc 2 (appelle le graph)
+    939                  // block 2 reading
+    940                  SlaveStatus = ReadingBlockGraph ( SizeDbkChkInUse );
+   \                     ??DATDbkInit_27:
+   \   0082   8E....         MOV       A,SizeDbkChkInUse
+   \   0085   9A....         CALL      ReadingBlockGraph
+   \   0088   70             MOV       X,A
+    941                  if ( SlaveStatus == cGraphResultOk )
+   \   0089   51             DEC       A
+   \   008A   AD56           BZ        ??DATDbkInit_32
+    942                  {
+    943                      // retourne au repos
+    944                      // go back waiting
+    945                      GraphStatus = cGraphResultOk;
+    946                      GraphReadDbkStatus = cGraphReadDbkWaitState;
+    947                  }
+    948                  else if ( SlaveStatus == cGraphResultError )
+   \   008C   60             MOV       A,X
+   \   008D   4D02           CMP       A,#2
+   \   008F   BD5C           BNZ       ??DATDbkInit_29
+    949                  {
+    950                      DbkError [ HandleDbkInUse ] = cDbkErrorBKs;
+   \   0091   8E....         MOV       A,HandleDbkInUse
+   \   0094   73             MOV       B,A
+   \   0095   A103           MOV       A,#3
+   \   0097   16....         MOVW      HL,#DbkError
+   \   009A   BB             MOV       [HL+B],A
+    951                      // Applique la strategie specifique  (appelle le graph)
+    952                      // strategy for total rebuild
+    953                      DATPeeRebuildDoubleBank ( HandleDbkInUse );
+   \   009B   8E....         MOV       A,HandleDbkInUse
+   \   009E   16....         MOVW      HL,#LWRD(DATPeeRebuildDoubleBank)
+   \   00A1   A4..           MOV       E,#BYTE3(DATPeeRebuildDoubleBank)
+   \   00A3   ..             CALLT     [__T_?FAR_CALL_L07]
+    954                      // recopie en RAM de travail le contenu de l'image RAM
+    955                      mLIBmemcpy ( (void*)(DATEepBuffer + 1) , (void*)DATDbkTableBankRom [HandleDbkInUse].AddBlockRam , (SizeDbkChkInUse - 1) * 2 );
+   \   00A4   8E....         MOV       A,SizeDbkChkInUse
+   \   00A7   70             MOV       X,A
+   \   00A8   A100           MOV       A,#0
+   \   00AA   90             DECW      AX
+   \   00AB   21             CLR1      CY
+   \   00AC   30             XCH       A,X
+   \   00AD   27             ROLC      A,0x1
+   \   00AE   30             XCH       A,X
+   \   00AF   27             ROLC      A,0x1
+   \   00B0   D4             MOVW      DE,AX
+   \   00B1   8E....         MOV       A,HandleDbkInUse
+   \   00B4   A004           MOV       X,#4
+   \   00B6   3188           MULU      X
+   \   00B8   CA....         ADDW      AX,#DATDbkTableBankRom
+   \   00BB   D6             MOVW      HL,AX
+   \   00BC   87             MOV       A,[HL]
+   \   00BD   70             MOV       X,A
+   \   00BE   AE01           MOV       A,[HL+0x01]
+   \   00C0   D2             MOVW      BC,AX
+   \   00C1   10....         MOVW      AX,#DATEepBuffer+2
+   \   00C4   9A....         CALL      memcpy
+    956                      // la reconstruction est terminee la ram de travail contient un bloc homogene
+    957                      GraphStatus = cGraphResultError;
+   \   00C7   891C           MOVW      AX,SP
+   \   00C9   D6             MOVW      HL,AX
+   \   00CA   A102           MOV       A,#2
+   \   00CC   FA19           BR        ??DATDbkInit_33
+    958                      GraphReadDbkStatus = cGraphReadDbkWaitState;
+    959                  }
+    960                  break;
+    961              case cGraphReadDbkCheckState:
+    962                  if ( DbkCallBackStatusOk == cTrue )
+   \                     ??DATDbkInit_28:
+   \   00CE   8E....         MOV       A,DbkCallBackStatusOk
+   \   00D1   51             DEC       A
+   \   00D2   8E....         MOV       A,HandleDbkInUse
+   \   00D5   73             MOV       B,A
+   \   00D6   BD04           BNZ       ??DATDbkInit_34
+    963                  {
+    964                      // la verif est ok la ram de travail contient un bloc homogene
+    965                      // chech ok, working RAM contain rigth data
+    966                      DbkError [ HandleDbkInUse ] = cDbkNoError;
+   \   00D8   A100           MOV       A,#0
+   \   00DA   FA02           BR        ??DATDbkInit_35
+    967                      GraphStatus = cGraphResultOk;
+    968                      GraphReadDbkStatus = cGraphReadDbkWaitState;
+    969                  }
+    970                  else
+    971                  {
+    972                      // block 2 <> block 1 and block 1 = ok
+    973                      DbkError [ HandleDbkInUse ] = cDbkErrorBk2;
+   \                     ??DATDbkInit_34:
+   \   00DC   A102           MOV       A,#2
+   \                     ??DATDbkInit_35:
+   \   00DE   16....         MOVW      HL,#DbkError
+   \   00E1   BB             MOV       [HL+B],A
+    974                      // retourne au repos
+    975                      // go back waiting
+    976                      GraphStatus = cGraphResultOk;
+   \                     ??DATDbkInit_32:
+   \   00E2   891C           MOVW      AX,SP
+   \   00E4   D6             MOVW      HL,AX
+   \   00E5   A101           MOV       A,#1
+   \                     ??DATDbkInit_33:
+   \   00E7   97             MOV       [HL],A
+    977                      GraphReadDbkStatus = cGraphReadDbkWaitState;
+   \   00E8   A100           MOV       A,#0
+   \                     ??DATDbkInit_30:
+   \   00EA   9E....         MOV       GraphReadDbkStatus,A
+    978                  }
+    979                  break;
+    980              default:
+    981                  mLIBassert(cFalse);
+    982                  break;
+    983              }
+    984              return ( GraphStatus );
+   \                     ??DATDbkInit_29:
+   \   00ED                  REQUIRE ?CL78K_V4_6_L00
+   \   00ED                  REQUIRE ?Subroutine0
+   \   00ED                  ; // Fall through to label ?Subroutine0
+    985          }
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   891C           MOVW      AX,SP
+   \   0002   D6             MOVW      HL,AX
+   \   0003   87             MOV       A,[HL]
+   \   0004   B2             POP       BC
+   \   0005   B2             POP       BC
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    986          
+    987          
+    988          /*=========================================================================
+    989          ! Function .........
+    990          tGraphResult ReadingBlockGraph ( tDATEepOffset OffsetEeprom )
+    991          !--------------------------------------------------------------------------
+    992          ! Function purpose :
+    993          //------------------------------------------------------------------------------------------
+    994          // Graph de gestion de la lecture EEPROM pour un bloc
+    995          //------------------------------------------------------------------------------------------
+    996          //------------------------------------------------------------------------------------------
+    997          // treatment for one block reading in EEPROM
+    998          //------------------------------------------------------------------------------------------
+    999          !
+   1000          !--------------------------------------------------------------------------
+   1001          ! Precondition (parameters):
+   1002          !
+   1003          ! Type            Name                           Min          Max
+   1004          ! -------------------------------------------------------------------------
+   1005          ! tDATEepOffset		OffsetEeprom					0		SizeDbkChkInUse
+   1006          //      il faut que OffsetEeprom contienne l'offset dans la bk
+   1007          //          soit 0 pour le bloc 1 de la DBK
+   1008          //          soit SizeDbkChkInUse pour le bloc 2 de la DBK
+   1009          // OffsetEeprom must have 0 (bloc 1) or SizeDbkChkInUse value (bloc 2)
+   1010          !--------------------------------------------------------------------------
+   1011          ! Postcondition (return values):
+   1012          !
+   1013          ! Type            Name                           Min          Max
+   1014          ! -------------------------------------------------------------------------
+   1015          ! tGraphResult	GraphStatus								
+   1016          !--------------------------------------------------------------------------
+   1017          ! Function review:
+   1018          !
+   1019          !
+   1020          !==========================================================================*/
+   1021          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1022          tGraphResult ReadingBlockGraph ( tDATEepOffset OffsetEeprom )
+   \                     ReadingBlockGraph:
+   1023          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1024          #ifdef X90_PROJECT
+   1025              return ReadingBlockGraph_Static(OffsetEeprom);
+   \   0001   16....         MOVW      HL,#LWRD(ReadingBlockGraph_Static)
+   \   0004   A4..           MOV       E,#BYTE3(ReadingBlockGraph_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1026          }
+   1027          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1028          static MEM_TYPE tGraphResult ReadingBlockGraph_Static(tDATEepOffset OffsetEeprom)
+   \                     ReadingBlockGraph_Static:
+   1029          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 2
+   \   0001   B7             PUSH      HL
+   \   0002   73             MOV       B,A
+   1030          #endif
+   1031              static U8 NbRetryReadDatEep;
+   1032          
+   1033              tGraphResult GraphStatus;
+   1034              U16 Checksum;
+   1035          
+   1036              // used in debug mode to check param
+   1037              // permet de faire en mode debug des verif des param
+   1038              mLIBassert( HandleDbkInUse < cNbDbk );
+   1039              mLIBassert( SizeDbkChkInUse == DATDbkTableBankRom[HandleDbkInUse].SizeBlockRam+1);
+   1040              mLIBassert( OffsetEeprom < (DATDbkTableBankRom[HandleDbkInUse].SizeBlockRam+1)*2 );
+   1041          
+   1042              // init des variables
+   1043              // init
+   1044              GraphStatus = cGraphResultProcessing;
+   \   0003   891C           MOVW      AX,SP
+   \   0005   D6             MOVW      HL,AX
+   \   0006   A100           MOV       A,#0
+   \   0008   97             MOV       [HL],A
+   1045              switch ( GraphReadStatus )
+   \   0009   8E....         MOV       A,GraphReadStatus
+   \   000C   4D00           CMP       A,#0
+   \   000E   AD0A           BZ        ??DATDbkInit_36
+   \   0010   4D01           CMP       A,#1
+   \   0012   AD17           BZ        ??DATDbkInit_37
+   \   0014   4D02           CMP       A,#2
+   \   0016   AD3D           BZ        ??DATDbkInit_38
+   \   0018   FA78           BR        ??DATDbkInit_39
+   1046              {
+   1047              case cGraphReadWaitState:
+   1048                  // on lit le bloc entier, offsetEeprom vaut 0 pour bloc 1 et TailleBlock pour Bloc 2
+   1049                  // block reading; offsetEeprom = 0 bloc 1 and = TailleBlock Bloc 2
+   1050                  DATEepRead ( DATEepBuffer , OffsetEeprom , SizeDbkChkInUse );
+   \                     ??DATDbkInit_36:
+   \   001A   8E....         MOV       A,SizeDbkChkInUse
+   \   001D   72             MOV       C,A
+   \   001E   10....         MOVW      AX,#DATEepBuffer
+   \   0021   9A....         CALL      DATEepRead
+   1051                  // init variable
+   1052                  NbRetryReadDatEep = cNbRetryReadDatEepMax;
+   \   0024   A164           MOV       A,#100
+   \   0026   9E....         MOV       ??NbRetryReadDatEep,A
+   1053                  // va a l'etape suivante
+   1054                  // go to next step
+   1055                  GraphReadStatus = cGraphReadDatEepState;
+   \   0029   FA62           BR        ??DATDbkInit_40
+   1056                  break;
+   1057              case cGraphReadDatEepState:
+   1058                  // si le Graph est appele et que l'on est a l'etat cGraphReadDatEepState
+   1059                  // cela signifie que la lecture demandee est terminee (transition tjrs vraie)
+   1060                  // calcule le checksum
+   1061                  // cheksum calculation
+   1062                  Checksum = ChecksumCalculation ( SizeDbkChkInUse );
+   \                     ??DATDbkInit_37:
+   \   002B   8E....         MOV       A,SizeDbkChkInUse
+   \   002E   9A....         CALL      ChecksumCalculation
+   1063                  // teste le checksum pour savoir quelle sera l'etape suivante
+   1064                  if ( Checksum == DATEepBuffer [ cPosChecksum ] )
+   \   0031   30             XCH       A,X
+   \   0032   18....         SUB       A,DATEepBuffer
+   \   0035   30             XCH       A,X
+   \   0036   38....         SUBC      A,DATEepBuffer+1
+   \   0039   6168           OR        A,X
+   \   003B   BD0A           BNZ       ??DATDbkInit_41
+   1065                  {
+   1066                      // le checksum est bon
+   1067                      // correct checksum
+   1068                      // la fonction a reussie
+   1069                      GraphStatus = cGraphResultOk;
+   \   003D   891C           MOVW      AX,SP
+   \   003F   D6             MOVW      HL,AX
+   \   0040   A101           MOV       A,#1
+   \                     ??ReadingBlockGraph_Static_0:
+   \   0042   97             MOV       [HL],A
+   1070                      // retourne a l'etat de repos
+   1071                      // go back to wait
+   1072                      GraphReadStatus = cGraphReadWaitState;
+   \   0043   A100           MOV       A,#0
+   \   0045   FA48           BR        ??DATDbkInit_42
+   1073                  }
+   1074                  else
+   1075                  {
+   1076                      // le checksum est faux
+   1077                      // bad checksum
+   1078                      // fait une verification
+   1079                      DATEepCompare ( DATEepBuffer , OffsetEeprom , SizeDbkChkInUse );
+   \                     ??DATDbkInit_41:
+   \   0047   8E....         MOV       A,SizeDbkChkInUse
+   \   004A   72             MOV       C,A
+   \   004B   10....         MOVW      AX,#DATEepBuffer
+   \   004E   9A....         CALL      DATEepCompare
+   1080                      // va a l'etape suivante
+   1081                      // go to next step
+   1082                      GraphReadStatus = cGraphReadCheckDatEepState;
+   \   0051   A102           MOV       A,#2
+   \   0053   FA3A           BR        ??DATDbkInit_42
+   1083                  }
+   1084                  break;
+   1085              case cGraphReadCheckDatEepState:
+   1086                  // teste si la verification est ok
+   1087                  if ( DbkCallBackStatusOk == cTrue )
+   \                     ??DATDbkInit_38:
+   \   0055   8E....         MOV       A,DbkCallBackStatusOk
+   \   0058   51             DEC       A
+   \   0059   BD04           BNZ       ??DATDbkInit_43
+   1088                  {
+   1089                      // le bloc est deteriore retourne une erreur
+   1090                      // block is bad
+   1091                      GraphStatus = cGraphResultError;
+   \   005B   A102           MOV       A,#2
+   \   005D   FAE3           BR        ??ReadingBlockGraph_Static_0
+   1092                      // retourne a l'etat de repos
+   1093                      // go back to wait
+   1094                      GraphReadStatus = cGraphReadWaitState;
+   1095                  }
+   1096                  else
+   1097                  {
+   1098                      // il y a eu une erreur de lecture recommence
+   1099                      // decremente le nombre d'essai
+   1100                      // reading error; NbRetry - 1
+   1101                      NbRetryReadDatEep --;
+   1102                      if ( NbRetryReadDatEep == 0 )
+   \                     ??DATDbkInit_43:
+   \   005F   8E....         MOV       A,??NbRetryReadDatEep
+   \   0062   51             DEC       A
+   \   0063   9E....         MOV       ??NbRetryReadDatEep,A
+   \   0066   BD1B           BNZ       ??DATDbkInit_44
+   1103                      {
+   1104                          // le nombre d'essai autorise est termine
+   1105                          // retourne une erreur
+   1106                          // retry isterminated
+   1107                          GraphStatus = cGraphResultError;
+   \   0068   A102           MOV       A,#2
+   \   006A   97             MOV       [HL],A
+   1108                          if ( OffsetEeprom == 0 )
+   \   006B   63             MOV       A,B
+   \   006C   4D00           CMP       A,#0
+   \   006E   BD04           BNZ       ??DATDbkInit_45
+   1109                          {
+   1110                              // erreur sur le bloc 1
+   1111                              // block 1 error
+   1112                              DATPeeErrorIndication ( HandleDbkInUse , cDATDbkErrorReadingBK1 );
+   \   0070   A300           MOV       B,#0
+   \   0072   FA02           BR        ??DATDbkInit_46
+   1113                          }
+   1114                          else
+   1115                          {
+   1116                              // erreur sur le bloc 2
+   1117                              // block 2 error
+   1118                              DATPeeErrorIndication ( HandleDbkInUse , cDATDbkErrorReadingBK2 );
+   \                     ??DATDbkInit_45:
+   \   0074   A301           MOV       B,#1
+   \                     ??DATDbkInit_46:
+   \   0076   8E....         MOV       A,HandleDbkInUse
+   \   0079   16....         MOVW      HL,#LWRD(DATPeeErrorIndication)
+   \   007C   A4..           MOV       E,#BYTE3(DATPeeErrorIndication)
+   \   007E   ..             CALLT     [__T_?FAR_CALL_L07]
+   1119                          }
+   1120                          // retourne a l'etat de repos
+   1121                          // go back to wait
+   1122                          GraphReadStatus = cGraphReadWaitState;
+   \   007F   A100           MOV       A,#0
+   \   0081   FA0C           BR        ??DATDbkInit_42
+   1123                      }
+   1124                      else
+   1125                      {
+   1126                          // on lit la banque entiere, offsetEeprom vaut 0 pour BK1 et TailleBlock pour BK2
+   1127                          // block reading; offsetEeprom = 0 bloc 1 and = TailleBlock Bloc 2
+   1128                          DATEepRead ( DATEepBuffer , OffsetEeprom , SizeDbkChkInUse );
+   \                     ??DATDbkInit_44:
+   \   0083   8E....         MOV       A,SizeDbkChkInUse
+   \   0086   72             MOV       C,A
+   \   0087   10....         MOVW      AX,#DATEepBuffer
+   \   008A   9A....         CALL      DATEepRead
+   1129                          // va a l'etape suivante
+   1130                          // go to next step
+   1131                          GraphReadStatus = cGraphReadDatEepState;
+   \                     ??DATDbkInit_40:
+   \   008D   A101           MOV       A,#1
+   \                     ??DATDbkInit_42:
+   \   008F   9E....         MOV       GraphReadStatus,A
+   1132                      }
+   1133                  }
+   1134                  break;
+   1135              default:
+   1136                  mLIBassert(cFalse);
+   1137                  break;
+   1138              }
+   1139              return ( GraphStatus );
+   \                     ??DATDbkInit_39:
+   \   0092   9B....         BR        N:?Subroutine0
+   \   0095                  REQUIRE ?CL78K_V4_6_L00
+   1140          }
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+   \                     ??NbRetryReadDatEep:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+   1141          
+   1142          
+   1143          
+   1144          
+   1145          /*=========================================================================
+   1146          ! Function .........
+   1147          void DATDbkInit (void)
+   1148          !--------------------------------------------------------------------------
+   1149          ! Function purpose :
+   1150          //------------------------------------------------------------------------------------------
+   1151          // init du composant DAT_DBK
+   1152          //------------------------------------------------------------------------------------------
+   1153          //------------------------------------------------------------------------------------------
+   1154          // init for DAT_DBK component
+   1155          //------------------------------------------------------------------------------------------
+   1156          !
+   1157          !--------------------------------------------------------------------------
+   1158          ! Precondition (parameters):
+   1159          !
+   1160          ! Type            Name                           Min          Max
+   1161          ! -------------------------------------------------------------------------
+   1162          !
+   1163          !--------------------------------------------------------------------------
+   1164          ! Postcondition (return values):
+   1165          !
+   1166          ! Type            Name                           Min          Max
+   1167          ! -------------------------------------------------------------------------
+   1168          !
+   1169          !--------------------------------------------------------------------------
+   1170          ! Function review:
+   1171          !
+   1172          !
+   1173          !==========================================================================*/
+   1174          
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1175          void DATDbkInit (void)
+   \                     DATDbkInit:
+   1176          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+   1177              // init
+   1178              // graph var
+   1179              GraphDbkStatus = cGraphDbkWaitState;
+   \   0004   9E....         MOV       GraphDbkStatus,A
+   1180              GraphWriteDbkStatus = cGraphWriteDbkWaitState;
+   \   0007   9E....         MOV       GraphWriteDbkStatus,A
+   1181              GraphReadDbkStatus = cGraphReadDbkWaitState;
+   \   000A   9E....         MOV       GraphReadDbkStatus,A
+   1182              GraphReadStatus = cGraphReadWaitState;
+   \   000D   9E....         MOV       GraphReadStatus,A
+   1183          
+   1184              mLIBmemset( Flags, 0, sizeof(Flags) );
+   \   0010   10....         MOVW      AX,#Flags
+   \   0013   140500         MOVW      DE,#5
+   \   0016   120000         MOVW      BC,#0
+   \   0019   9A....         CALL      memset
+   1185              mLIBmemset( DbkError, 0, sizeof(DbkError) );
+   \   001C   10....         MOVW      AX,#DbkError
+   \   001F   140500         MOVW      DE,#5
+   \   0022   120000         MOVW      BC,#0
+   \   0025   9A....         CALL      memset
+   1186          
+   1187              HandleDbkInUse = cNbDbk;
+   \   0028   A105           MOV       A,#5
+   \   002A   9E....         MOV       HandleDbkInUse,A
+   1188          }
+   \   002D   B4             POP       DE
+   \   002E   B2             POP       BC
+   \   002F   AF             RET       
+   \   0030                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+   1189          
+   1190          
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     DbkError                          5
+     Flags                             5
+     DbkCallBackStatusOk               1
+     HandleDbkInUse                    1
+     SizeDbkChkInUse                   1
+     GraphDbkStatus                    1
+     GraphWriteDbkStatus               1
+     GraphReadDbkStatus                1
+     GraphReadStatus                   1
+     DATDbkTableBankRom               20
+     DATDbkMirrors                   210
+     ChecksumCalculation              42
+     DATDbkStartReadingAllBanks       27
+     DATDbkStartReading               19
+     DATDbkStartUpdate                40
+     DATDbkIsWriteOk                  11
+     DATDbkStartRestoringBrokenBanks
+                                      86
+     DATDbkIsBankProcessing            5
+     DATDbkIsProcessing               25
+     DATDbkCallBackEep                 9
+     DATDbkCallBackEep_Static        226
+     WritingDbkGraph                 176
+     ReadingDbkGraph                   9
+     ReadingDbkGraph_Static          237
+     ?Subroutine0                      7
+     ReadingBlockGraph                 9
+     ReadingBlockGraph_Static        149
+     NbRetryReadDatEep                 1
+     DATDbkInit                       48
+     __T_?FAR_CALL_L07                 2
+
+ 
+ 619 bytes in segment BCODE
+   2 bytes in segment CLTVEC
+ 506 bytes in segment CODE
+  20 bytes in segment CONST
+ 228 bytes in segment NEAR_Z
+ 
+ 1 125 bytes of CODE  memory (+ 2 bytes shared)
+    20 bytes of CONST memory
+   228 bytes of DATA  memory
+
+Errors: none
+Warnings: none

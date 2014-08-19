@@ -1,0 +1,754 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:26:29 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PWM.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -Ohs              #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DROM          #
+#                    -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY -l       #
+#                    ..\EXE\TARGET_R\DAT_PWM.LST -o                           #
+#                    ..\EXE\TARGET_R\DAT_PWM.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PWM.C                                                 #
+#    List file    =  ..\EXE\TARGET_R\DAT_PWM.LST                              #
+#    Object file  =  ..\EXE\TARGET_R\DAT_PWM.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_PWM.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    DAT_PWM
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Oct 01 2009 11:52:36  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PWM/DAT_PWM.C-arc  $
+     15          // $Revision:   1.11  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PWM/DAT_PWM.C-arc  $
+     18          // 
+     19          //    Rev 1.11   Oct 01 2009 11:52:36   amarinm1
+     20          // Cm006370: Limit values for ILL PWM changed according to the new HSI.
+     21          // 
+     22          //    Rev 1.10   Sep 07 2009 14:37:12   amarinm1
+     23          // Cm005205: Corrections of issues found during the code review.
+     24          // 
+     25          //    Rev 1.9   Aug 25 2009 13:44:06   amarinm1
+     26          // Cm005205: Changes for compliance with QAC.
+     27          // 
+     28          //    Rev 1.8   Aug 18 2009 09:47:42   adzhelp
+     29          // Cm005205: Corrections to respect padHSI-510 (the rule of 5%-95%)
+     30          // 
+     31          //    Rev 1.7   Jul 16 2009 09:15:52   adzhelp
+     32          // Cm005205: Implementation of roomlamp dimming
+     33          // 
+     34          //    Rev 1.6   Apr 29 2009 12:07:16   adzhelp
+     35          // Cm003209: Functions moved to banked memory area
+     36          // 
+     37          //    Rev 1.5   Apr 22 2009 17:15:06   akodzhh
+     38          // Cm003128: PWM_ROOMLAMP output state reading for AFS.
+     39          // 
+     40          //    Rev 1.4   Mar 31 2009 11:02:00   adzhelp
+     41          // Cm003517: Roomlamp control by diagnostics according to LAP_TFC implementation
+     42          // 
+     43          //    Rev 1.3   Mar 10 2009 17:40:42   amarinm1
+     44          // Cm003209: Two lines were commented to avoid compilator warnings.
+     45          // 
+     46          //    Rev 1.2   Mar 10 2009 17:30:12   amarinm1
+     47          // Cm003209: Problems in the previous revision were fixed.
+     48          // 
+     49          //    Rev 1.1   Feb 25 2009 16:07:16   amarinm1
+     50          // Cm003209: Temporary solution for SW1 was implemented.
+     51          // 
+     52          //    Rev 1.0   02 Dec 2008 15:41:08   ailievb
+     53          // Initial revision.
+     54          //
+     55          //******************************************************************************
+     56          
+     57          //------------------------------------------------------------------------------
+     58          // Body Identification
+     59          //------------------------------------------------------------------------------
+     60          #define dat_pwm   "dat_pwm"
+     61          
+     62          
+     63          //------------------------------------------------------------------------------
+     64          // Included files
+     65          //
+     66          // #include <system_file_name.h>
+     67          // #include "project_file_name.h"
+     68          //------------------------------------------------------------------------------
+     69          #include "lib.h"
+     70          #include "tos.h"
+     71          #include "dat.h"
+     72          #include "dat_pwm.h"
+     73          
+     74          
+     75          //------------------------------------------------------------------------------
+     76          //  Local constants
+     77          //
+     78          //  #define cConstantName   ((tType) ConstantValue)
+     79          //------------------------------------------------------------------------------
+     80          // length of DAT buffer to LDB in bytes
+     81          #define cDatMessageLength       ((U16)3)
+     82          
+     83          // Limits of cyclic ratio adjusted to respect padHSI-510 (the rule of 5%-95%):
+     84          #define cMaximalCyclicRatio     ((U8)95)
+     85          #define cMinimalCyclicRatio     ((U8)4)
+     86          
+     87          #define cFullOutputRation       ((U8)100)
+     88          
+     89          
+     90          //------------------------------------------------------------------------------
+     91          // Local macros
+     92          //
+     93          // #define mMacroName   (MacroDefinition)
+     94          //------------------------------------------------------------------------------
+     95          
+     96          
+     97          //------------------------------------------------------------------------------
+     98          // Local types
+     99          //
+    100          // struct  sStructureName { ... };
+    101          // union   uUnionName { ... };
+    102          // enum    eEnumerationName { ... };
+    103          // typedef Expression tTypeName;
+    104          //------------------------------------------------------------------------------
+    105          
+    106          
+    107          //------------------------------------------------------------------------------
+    108          // Local data
+    109          //
+    110          // static  tType   VariableName;
+    111          // static  tType*  pVariableName; 
+    112          //------------------------------------------------------------------------------
+    113          
+    114          
+    115          //------------------------------------------------------------------------------
+    116          // Constant local data
+    117          //
+    118          // static const tType  VariableName;
+    119          //------------------------------------------------------------------------------
+    120          //QACJ 3207: amarinm1: Variable is used in DATPwmInit().
+
+   \                                 In  segment CONST, align 2
+    121          static const tDATPwmStruct InitPwmBuffer[cDATPwmNumberOfOuput] = 
+   \                     InitPwmBuffer:
+   \   0000   FA00           DW 250
+   \   0002   0000           DB 0, 0
+    122                                                                  cDATPwmInitOutputBuffer;
+    123          
+    124          
+    125          //------------------------------------------------------------------------------
+    126          // Exported data
+    127          //
+    128          // tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    129          // tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    130          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    131          tDATPwmStruct DATPwmSoftBuffer[cDATPwmNumberOfOuput];
+   \                     DATPwmSoftBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    132          tDATPwmStruct DATPwmHardBuffer[cDATPwmNumberOfOuput];
+   \                     DATPwmHardBuffer:
+   \   0000                  DS 4
+   \   0004                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    133          U8            u8DATPwmDiagMask;
+   \                     u8DATPwmDiagMask:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    134          U8            u8DATPwmHardMask;
+   \                     u8DATPwmHardMask:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    135          
+    136          
+    137          //------------------------------------------------------------------------------
+    138          // Constant exported data
+    139          //
+    140          // (LAY: 3 characters to identify the layer)
+    141          // (Cmp: 3 characters to identify this component)
+    142          // 
+    143          // const tType   LAYCmpVariableName;
+    144          //------------------------------------------------------------------------------
+    145          
+    146          
+    147          //------------------------------------------------------------------------------
+    148          // Local function prototypes
+    149          //  
+    150          // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    151          //------------------------------------------------------------------------------
+    152          
+    153          
+    154          //============================================================================
+    155          //=========================== LOCAL FUNCTIONS ================================
+    156          //============================================================================
+    157          
+    158          //==============================================================================
+    159          //  DESCRIPTION :
+    160          //  
+    161          //  PARAMETERS (Type,Name,Min,Max) :   none
+    162          //
+    163          //  RETURN VALUE :   none
+    164          // 
+    165          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    166          //==============================================================================
+    167          //static type FunctionName(...)
+    168          
+    169          
+    170          //============================================================================
+    171          //=========================== EXPORTED FUNCTIONS =============================
+    172          //============================================================================
+    173          
+    174          //==============================================================================
+    175          //  DESCRIPTION :
+    176          //  
+    177          //  PARAMETERS (Type,Name,Min,Max) :  none
+    178          //
+    179          //  RETURN VALUE :  none
+    180          // 
+    181          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    182          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    183          void DATPwmInit(void)
+   \                     DATPwmInit:
+    184          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B3             PUSH      BC
+   \   0003   B5             PUSH      DE
+   \   0004                  ; Total Auto size: 0
+    185              u8DATPwmDiagMask = 0;
+   \   0004   9E....         MOV       u8DATPwmDiagMask,A
+    186              u8DATPwmHardMask = 0;
+   \   0007   9E....         MOV       u8DATPwmHardMask,A
+    187              mLIBmemcpy( DATPwmSoftBuffer, InitPwmBuffer, (sizeof(tDATPwmStruct)*cDATPwmNumberOfOuput) );
+   \   000A   14....         MOVW      DE,#InitPwmBuffer
+   \   000D   16....         MOVW      HL,#DATPwmSoftBuffer
+   \   0010   A304           MOV       B,#4
+   \                     ??DATPwmInit_0:
+   \   0012   85             MOV       A,[DE]
+   \   0013   97             MOV       [HL],A
+   \   0014   86             INCW      HL
+   \   0015   84             INCW      DE
+   \   0016   8BFA           DBNZ      B, ??DATPwmInit_0
+    188              mLIBmemcpy( DATPwmHardBuffer, InitPwmBuffer, (sizeof(tDATPwmStruct)*cDATPwmNumberOfOuput) );
+   \   0018   14....         MOVW      DE,#InitPwmBuffer
+   \   001B   16....         MOVW      HL,#DATPwmHardBuffer
+   \   001E   A304           MOV       B,#4
+   \                     ??DATPwmInit_1:
+   \   0020   85             MOV       A,[DE]
+   \   0021   97             MOV       [HL],A
+   \   0022   86             INCW      HL
+   \   0023   84             INCW      DE
+   \   0024   8BFA           DBNZ      B, ??DATPwmInit_1
+    189          }
+   \   0026   B4             POP       DE
+   \   0027   B2             POP       BC
+   \   0028   AF             RET       
+   \   0029                  REQUIRE ?CL78K_V4_6_L00
+    190          
+    191          
+    192          //==============================================================================
+    193          //  DESCRIPTION :
+    194          //  
+    195          //  PARAMETERS (Type,Name,Min,Max) :  none
+    196          //
+    197          //  RETURN VALUE :  none
+    198          // 
+    199          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    200          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    201          MEM_TYPE void DATPwmWriteOutput(const U8 u8PwmOutputIndexP, const tDATPwmFrequency FrequencyP, const U8 u8CyclicRatioP)
+   \                     DATPwmWriteOutput:
+    202          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 12
+   \   0001   ..             CALLT     [__T_?FUNC_ENTER_L06]
+   \   0002   0A00           DW        0xA
+   \   0004   74             MOV       E,A
+   \   0005   60             MOV       A,X
+   \   0006   73             MOV       B,A
+    203              tMsg Msg;
+    204          
+    205              mLIBassert( FrequencyP != 0 );
+    206              
+    207              DATPwmSoftBuffer[u8PwmOutputIndexP].Freq  = FrequencyP;
+   \   0007   64             MOV       A,E
+   \   0008   A004           MOV       X,#4
+   \   000A   3188           MULU      X
+   \   000C   D6             MOVW      HL,AX
+   \   000D   891C           MOVW      AX,SP
+   \   000F   E6             XCHW      AX,HL
+   \   0010   BE05           MOV       [HL+0x05],A
+   \   0012   60             MOV       A,X
+   \   0013   BE04           MOV       [HL+0x04],A
+   \   0015   AE05           MOV       A,[HL+0x05]
+   \   0017   CA....         ADDW      AX,#DATPwmSoftBuffer
+   \   001A   D6             MOVW      HL,AX
+   \   001B   891C           MOVW      AX,SP
+   \   001D   E6             XCHW      AX,HL
+   \   001E   BE03           MOV       [HL+0x03],A
+   \   0020   60             MOV       A,X
+   \   0021   BE02           MOV       [HL+0x02],A
+   \   0023   AE03           MOV       A,[HL+0x03]
+   \   0025   D6             MOVW      HL,AX
+   \   0026   B7             PUSH      HL
+   \   0027   891C           MOVW      AX,SP
+   \   0029   D6             MOVW      HL,AX
+   \   002A   AE0C           MOV       A,[HL+0x0C]
+   \   002C   70             MOV       X,A
+   \   002D   AE0D           MOV       A,[HL+0x0D]
+   \   002F   B6             POP       HL
+   \   0030   BE01           MOV       [HL+0x01],A
+   \   0032   60             MOV       A,X
+   \   0033   97             MOV       [HL],A
+    208              DATPwmSoftBuffer[u8PwmOutputIndexP].Ratio = u8CyclicRatioP;
+   \   0034   891C           MOVW      AX,SP
+   \   0036   D6             MOVW      HL,AX
+   \   0037   AE02           MOV       A,[HL+0x02]
+   \   0039   70             MOV       X,A
+   \   003A   AE03           MOV       A,[HL+0x03]
+   \   003C   D6             MOVW      HL,AX
+   \   003D   63             MOV       A,B
+   \   003E   86             INCW      HL
+   \   003F   86             INCW      HL
+   \   0040   97             MOV       [HL],A
+    209              
+    210              if ( (u8DATPwmDiagMask & (U8)(1 << u8PwmOutputIndexP) ) == 0)
+   \   0041   891C           MOVW      AX,SP
+   \   0043   D6             MOVW      HL,AX
+   \   0044   AE04           MOV       A,[HL+0x04]
+   \   0046   70             MOV       X,A
+   \   0047   AE05           MOV       A,[HL+0x05]
+   \   0049   CA....         ADDW      AX,#DATPwmHardBuffer
+   \   004C   B6             POP       HL
+   \   004D   B1             PUSH      AX
+   \   004E   64             MOV       A,E
+   \   004F   72             MOV       C,A
+   \   0050   100100         MOVW      AX,#1
+   \   0053   ..             CALLT     [__T_?I_LSH_L02]
+   \   0054   60             MOV       A,X
+   \   0055   58....         AND       A,u8DATPwmDiagMask
+   \   0058   BD5E           BNZ       ??DATPwmLeaveStartingStepState_0
+    211              {
+    212                  DATPwmHardBuffer[u8PwmOutputIndexP].Freq  = DATPwmSoftBuffer[u8PwmOutputIndexP].Freq;
+   \   005A   891C           MOVW      AX,SP
+   \   005C   D6             MOVW      HL,AX
+   \   005D   87             MOV       A,[HL]
+   \   005E   70             MOV       X,A
+   \   005F   AE01           MOV       A,[HL+0x01]
+   \   0061   D6             MOVW      HL,AX
+   \   0062   B7             PUSH      HL
+   \   0063   891C           MOVW      AX,SP
+   \   0065   D6             MOVW      HL,AX
+   \   0066   AE04           MOV       A,[HL+0x04]
+   \   0068   70             MOV       X,A
+   \   0069   AE05           MOV       A,[HL+0x05]
+   \   006B   D6             MOVW      HL,AX
+   \   006C   87             MOV       A,[HL]
+   \   006D   70             MOV       X,A
+   \   006E   AE01           MOV       A,[HL+0x01]
+   \   0070   B6             POP       HL
+   \   0071   BE01           MOV       [HL+0x01],A
+   \   0073   60             MOV       A,X
+   \   0074   97             MOV       [HL],A
+    213          
+    214                  if (   ( u8CyclicRatioP < cMinimalCyclicRatio)
+    215                      || ((u8DATPwmHardMask & (U8)(1 << u8PwmOutputIndexP)) != 0)   )
+   \   0075   63             MOV       A,B
+   \   0076   4D04           CMP       A,#4
+   \   0078   8D0C           BC        ??DATPwmLeaveStartingStepState_1
+   \   007A   64             MOV       A,E
+   \   007B   72             MOV       C,A
+   \   007C   100100         MOVW      AX,#1
+   \   007F   ..             CALLT     [__T_?I_LSH_L02]
+   \   0080   60             MOV       A,X
+   \   0081   58....         AND       A,u8DATPwmHardMask
+   \   0084   AD0C           BZ        ??DATPwmLeaveStartingStepState_2
+    216                  {
+    217                      DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = 0;
+   \                     ??DATPwmLeaveStartingStepState_1:
+   \   0086   891C           MOVW      AX,SP
+   \   0088   D6             MOVW      HL,AX
+   \   0089   87             MOV       A,[HL]
+   \   008A   70             MOV       X,A
+   \   008B   AE01           MOV       A,[HL+0x01]
+   \   008D   D6             MOVW      HL,AX
+   \   008E   A100           MOV       A,#0
+   \   0090   FA23           BR        ??DATPwmLeaveStartingStepState_3
+    218                  }
+    219                  else if ( u8CyclicRatioP > cMaximalCyclicRatio )
+   \                     ??DATPwmLeaveStartingStepState_2:
+   \   0092   63             MOV       A,B
+   \   0093   4D60           CMP       A,#96
+   \   0095   891C           MOVW      AX,SP
+   \   0097   D6             MOVW      HL,AX
+   \   0098   8D09           BC        ??DATPwmLeaveStartingStepState_4
+    220                  {
+    221                      DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = cFullOutputRation;
+   \   009A   87             MOV       A,[HL]
+   \   009B   70             MOV       X,A
+   \   009C   AE01           MOV       A,[HL+0x01]
+   \   009E   D6             MOVW      HL,AX
+   \   009F   A164           MOV       A,#100
+   \   00A1   FA12           BR        ??DATPwmLeaveStartingStepState_3
+    222                  }
+    223                  else
+    224                  {
+    225                      DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = DATPwmSoftBuffer[u8PwmOutputIndexP].Ratio;
+   \                     ??DATPwmLeaveStartingStepState_4:
+   \   00A3   AE02           MOV       A,[HL+0x02]
+   \   00A5   70             MOV       X,A
+   \   00A6   AE03           MOV       A,[HL+0x03]
+   \   00A8   D6             MOVW      HL,AX
+   \   00A9   AE02           MOV       A,[HL+0x02]
+   \   00AB   72             MOV       C,A
+   \   00AC   891C           MOVW      AX,SP
+   \   00AE   D6             MOVW      HL,AX
+   \   00AF   87             MOV       A,[HL]
+   \   00B0   70             MOV       X,A
+   \   00B1   AE01           MOV       A,[HL+0x01]
+   \   00B3   D6             MOVW      HL,AX
+   \   00B4   62             MOV       A,C
+   \                     ??DATPwmLeaveStartingStepState_3:
+   \   00B5   86             INCW      HL
+   \   00B6   86             INCW      HL
+   \   00B7   97             MOV       [HL],A
+    226                  }
+    227              }
+    228              
+    229              Msg.Lng = cDatMessageLength;
+   \                     ??DATPwmLeaveStartingStepState_0:
+   \   00B8   891C           MOVW      AX,SP
+   \   00BA   CA0600         ADDW      AX,#6
+   \   00BD   D6             MOVW      HL,AX
+   \   00BE   A100           MOV       A,#0
+   \   00C0   BE03           MOV       [HL+0x03],A
+   \   00C2   A103           MOV       A,#3
+   \   00C4   BE02           MOV       [HL+0x02],A
+    230              //QACJ 0310: amarinm1: Standart procedure, the array is then casted to its original type.
+    231              Msg.pBuffer = (U8 *) &DATPwmHardBuffer[u8PwmOutputIndexP];
+   \   00C6   891C           MOVW      AX,SP
+   \   00C8   D6             MOVW      HL,AX
+   \   00C9   87             MOV       A,[HL]
+   \   00CA   70             MOV       X,A
+   \   00CB   AE01           MOV       A,[HL+0x01]
+   \   00CD   D6             MOVW      HL,AX
+   \   00CE   891C           MOVW      AX,SP
+   \   00D0   E6             XCHW      AX,HL
+   \   00D1   BE07           MOV       [HL+0x07],A
+   \   00D3   60             MOV       A,X
+   \   00D4   BE06           MOV       [HL+0x06],A
+    232              LDBSendWithAddr(cLDBChannelPwm, u8PwmOutputIndexP, &Msg);
+   \   00D6   891C           MOVW      AX,SP
+   \   00D8   CA0600         ADDW      AX,#6
+   \   00DB   D2             MOVW      BC,AX
+   \   00DC   64             MOV       A,E
+   \   00DD   70             MOV       X,A
+   \   00DE   A100           MOV       A,#0
+   \   00E0   16....         MOVW      HL,#LWRD(LDBPwmSendWithAddr)
+   \   00E3   A4..           MOV       E,#BYTE3(LDBPwmSendWithAddr)
+   \   00E5   ..             CALLT     [__T_?FAR_CALL_L07]
+    233          }
+   \   00E6   ..             CALLT     [__T_?FUNC_DEALL_L06]
+   \   00E7   0C00           DW        0xC
+   \   00E9   AF             RET       
+   \   00EA                  REQUIRE ?CL78K_V4_6_L00
+    234          
+    235          
+    236          //==============================================================================
+    237          //  DESCRIPTION :
+    238          //  
+    239          //  PARAMETERS (Type,Name,Min,Max) :  none
+    240          //
+    241          //  RETURN VALUE :  none
+    242          // 
+    243          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    244          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    245          MEM_TYPE void DATPwmWriteDiagOutput(const U8 u8PwmOutputIndexP, const tDATPwmFrequency FrequencyP, const U8 u8CyclicRatioP)
+   \                     DATPwmWriteDiagOutput:
+    246          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 8
+   \   0001   B7             PUSH      HL
+   \   0002   B7             PUSH      HL
+   \   0003   B7             PUSH      HL
+   \   0004   74             MOV       E,A
+   \   0005   60             MOV       A,X
+   \   0006   73             MOV       B,A
+    247              tMsg Msg;
+    248          
+    249              mLIBassert( (u8DATPwmDiagMask & (1 << u8PwmOutputIndexP)) != 0 );
+    250              mLIBassert( FrequencyP != 0 );
+    251              
+    252              DATPwmHardBuffer[u8PwmOutputIndexP].Freq = FrequencyP;
+   \   0007   64             MOV       A,E
+   \   0008   A004           MOV       X,#4
+   \   000A   3188           MULU      X
+   \   000C   CA....         ADDW      AX,#DATPwmHardBuffer
+   \   000F   B6             POP       HL
+   \   0010   B1             PUSH      AX
+   \   0011   891C           MOVW      AX,SP
+   \   0013   D6             MOVW      HL,AX
+   \   0014   87             MOV       A,[HL]
+   \   0015   70             MOV       X,A
+   \   0016   AE01           MOV       A,[HL+0x01]
+   \   0018   D6             MOVW      HL,AX
+   \   0019   B7             PUSH      HL
+   \   001A   891C           MOVW      AX,SP
+   \   001C   D6             MOVW      HL,AX
+   \   001D   AE08           MOV       A,[HL+0x08]
+   \   001F   70             MOV       X,A
+   \   0020   AE09           MOV       A,[HL+0x09]
+   \   0022   B6             POP       HL
+   \   0023   BE01           MOV       [HL+0x01],A
+   \   0025   60             MOV       A,X
+   \   0026   97             MOV       [HL],A
+    253              
+    254              if (   ( u8CyclicRatioP < cMinimalCyclicRatio )
+    255                  || ((u8DATPwmHardMask & (U8)(1 << u8PwmOutputIndexP)) != 0)   )
+   \   0027   63             MOV       A,B
+   \   0028   4D04           CMP       A,#4
+   \   002A   8D0C           BC        ??DATPwmLeaveStartingStepState_5
+   \   002C   64             MOV       A,E
+   \   002D   72             MOV       C,A
+   \   002E   100100         MOVW      AX,#1
+   \   0031   ..             CALLT     [__T_?I_LSH_L02]
+   \   0032   60             MOV       A,X
+   \   0033   58....         AND       A,u8DATPwmHardMask
+   \   0036   AD0C           BZ        ??DATPwmLeaveStartingStepState_6
+    256              {
+    257                  DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = 0;
+   \                     ??DATPwmLeaveStartingStepState_5:
+   \   0038   891C           MOVW      AX,SP
+   \   003A   D6             MOVW      HL,AX
+   \   003B   87             MOV       A,[HL]
+   \   003C   70             MOV       X,A
+   \   003D   AE01           MOV       A,[HL+0x01]
+   \   003F   D6             MOVW      HL,AX
+   \   0040   A100           MOV       A,#0
+   \   0042   FA12           BR        ??DATPwmLeaveStartingStepState_7
+    258              }
+    259              else if ( u8CyclicRatioP > cMaximalCyclicRatio )
+   \                     ??DATPwmLeaveStartingStepState_6:
+   \   0044   63             MOV       A,B
+   \   0045   4D60           CMP       A,#96
+   \   0047   891C           MOVW      AX,SP
+   \   0049   D6             MOVW      HL,AX
+   \   004A   87             MOV       A,[HL]
+   \   004B   70             MOV       X,A
+   \   004C   AE01           MOV       A,[HL+0x01]
+   \   004E   D6             MOVW      HL,AX
+   \   004F   8D04           BC        ??DATPwmLeaveStartingStepState_8
+    260              {
+    261                  DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = cFullOutputRation;
+   \   0051   A164           MOV       A,#100
+   \   0053   FA01           BR        ??DATPwmLeaveStartingStepState_7
+    262              }
+    263              else
+    264              {
+    265                  DATPwmHardBuffer[u8PwmOutputIndexP].Ratio = u8CyclicRatioP;
+   \                     ??DATPwmLeaveStartingStepState_8:
+   \   0055   63             MOV       A,B
+   \                     ??DATPwmLeaveStartingStepState_7:
+   \   0056   86             INCW      HL
+   \   0057   86             INCW      HL
+   \   0058   97             MOV       [HL],A
+    266              }
+    267          
+    268              Msg.Lng = cDatMessageLength;
+   \   0059   891C           MOVW      AX,SP
+   \   005B   80             INCW      AX
+   \   005C   80             INCW      AX
+   \   005D   D6             MOVW      HL,AX
+   \   005E   A100           MOV       A,#0
+   \   0060   BE03           MOV       [HL+0x03],A
+   \   0062   A103           MOV       A,#3
+   \   0064   BE02           MOV       [HL+0x02],A
+    269              //QACJ 0310: amarinm1: Standart procedure, the array is then casted to its original type.
+    270              Msg.pBuffer = (U8 *) &DATPwmHardBuffer[u8PwmOutputIndexP];
+   \   0066   891C           MOVW      AX,SP
+   \   0068   D6             MOVW      HL,AX
+   \   0069   87             MOV       A,[HL]
+   \   006A   70             MOV       X,A
+   \   006B   AE01           MOV       A,[HL+0x01]
+   \   006D   D6             MOVW      HL,AX
+   \   006E   891C           MOVW      AX,SP
+   \   0070   E6             XCHW      AX,HL
+   \   0071   BE03           MOV       [HL+0x03],A
+   \   0073   60             MOV       A,X
+   \   0074   BE02           MOV       [HL+0x02],A
+    271              LDBSendWithAddr(cLDBChannelPwm, u8PwmOutputIndexP, &Msg);
+   \   0076   891C           MOVW      AX,SP
+   \   0078   80             INCW      AX
+   \   0079   80             INCW      AX
+   \   007A   D2             MOVW      BC,AX
+   \   007B   64             MOV       A,E
+   \   007C   70             MOV       X,A
+   \   007D   A100           MOV       A,#0
+   \   007F   16....         MOVW      HL,#LWRD(LDBPwmSendWithAddr)
+   \   0082   A4..           MOV       E,#BYTE3(LDBPwmSendWithAddr)
+   \   0084   ..             CALLT     [__T_?FAR_CALL_L07]
+    272          }
+   \   0085   ..             CALLT     [__T_?FUNC_DEALL_L06]
+   \   0086   0800           DW        0x8
+   \   0088   AF             RET       
+   \   0089                  REQUIRE ?CL78K_V4_6_L00
+    273          
+    274          
+    275          //==============================================================================
+    276          //  DESCRIPTION :
+    277          //  
+    278          //  PARAMETERS (Type,Name,Min,Max) :  none
+    279          //
+    280          //  RETURN VALUE :  none
+    281          // 
+    282          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    283          //==============================================================================
+    284          //QACJ 3206: amarinm1: Both parameters are used for Assert checks.
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    285          void DATPwmCallBackTxWithAddr(const tAddress Ad, const tStatus Status)
+   \                     DATPwmCallBackTxWithAddr:
+    286          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    287              mLIBassert(Status == cLDBCorrect);
+    288              mLIBassert(Ad < cDATPwmNumberOfOuput);
+    289          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    290          
+    291          
+    292          //==============================================================================
+    293          //  DESCRIPTION :
+    294          //  
+    295          //  PARAMETERS (Type,Name,Min,Max) :  none
+    296          //
+    297          //  RETURN VALUE :  none
+    298          // 
+    299          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    300          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    301          void DATPwmLeaveStartingStepState(void)
+   \                     DATPwmLeaveStartingStepState:
+    302          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+    303              U8 u8Index;
+    304          
+    305              //QACJ 2465: amarinm1: Done like this for flexibility.
+    306              for(u8Index = 0; u8Index < cDATPwmNumberOfOuput; u8Index++)
+    307              {
+    308                  DATPwmWriteOutput(u8Index, 
+    309                                    DATPwmSoftBuffer[u8Index].Freq, 
+    310                                    DATPwmSoftBuffer[u8Index].Ratio
+    311                                   );
+   \   0002   8E....         MOV       A,DATPwmSoftBuffer+2
+   \   0005   74             MOV       E,A
+   \   0006   02....         MOVW      AX,DATPwmSoftBuffer
+   \   0009   D2             MOVW      BC,AX
+   \   000A   64             MOV       A,E
+   \   000B   70             MOV       X,A
+   \   000C   A100           MOV       A,#0
+   \   000E   16....         MOVW      HL,#LWRD(DATPwmWriteOutput)
+   \   0011   A4..           MOV       E,#BYTE3(DATPwmWriteOutput)
+   \   0013   ..             CALLT     [__T_?FAR_CALL_L07]
+    312              }
+    313          }
+   \   0014   B4             POP       DE
+   \   0015   B2             POP       BC
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_LSH_L02:
+   \   0000   ....           DW       ?I_LSH_L02
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_ENTER_L06:
+   \   0000   ....           DW       ?FUNC_ENTER_L06
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_DEALL_L06:
+   \   0000   ....           DW       ?FUNC_DEALL_L06
+    314          
+
+   Segment part sizes:
+
+     Function/Label               Bytes
+     --------------               -----
+     InitPwmBuffer                   4
+     DATPwmSoftBuffer                4
+     DATPwmHardBuffer                4
+     u8DATPwmDiagMask                1
+     u8DATPwmHardMask                1
+     DATPwmInit                     41
+     DATPwmWriteOutput             234
+     DATPwmWriteDiagOutput         137
+     DATPwmCallBackTxWithAddr        1
+     DATPwmLeaveStartingStepState   23
+     __T_?I_LSH_L02                  2
+     __T_?FAR_CALL_L07               2
+     __T_?FUNC_ENTER_L06             2
+     __T_?FUNC_DEALL_L06             2
+
+ 
+ 371 bytes in segment BCODE
+   8 bytes in segment CLTVEC
+  65 bytes in segment CODE
+   4 bytes in segment CONST
+  10 bytes in segment NEAR_Z
+ 
+ 436 bytes of CODE  memory (+ 8 bytes shared)
+   4 bytes of CONST memory
+  10 bytes of DATA  memory
+
+Errors: none
+Warnings: none

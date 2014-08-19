@@ -1,0 +1,1606 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:01 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PEE.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\DAT_PEE.LST -o                        #
+#                    ..\EXE\TARGET_D\DAT_PEE.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\D #
+#                    AT_PEE.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\DAT_PEE.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\DAT_PEE.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\DAT\DAT_PEE.C
+      1          /*============================================================================
+      2            Project ......................... PROJECT_NAME
+      3            Component ....................... DAT_PEE
+      4            File revision.................... :   1.4  $
+      5            Last modification date .......... $Modtime:   Mar 22 2010 17:04:50  $
+      6            -------------------------------------------------------------------------
+      7            Copyright ... This software is JCI property. Duplication or
+      8                          disclosure is prohibited without JCI written permission
+      9            ------------------------------------------------------------------------- 
+     10          
+     11            - Macros, constants and types which are not exported are defined in 
+     12              this file
+     13            - Variables and functions which are not exported are defined in this 
+     14              file with the static key word
+     15            
+     16            -------------------------------------------------------------------------
+     17            Comments about the component (role, algorithm, structure, limitations,
+     18                     defined tasks and events...)
+     19          
+     20            - Role : EEPROM Presentation Software Component (Example of MW1011L2)
+     21            
+     22            -------------------------------------------------------------------------
+     23            DAT_PEE.c file review : 
+     24          
+     25            :   P:/STANDARD/AEH/STK/PVCS/archives/STK/CMP/SOURCES/DAT/EEP/DAT_PEE/Dat_pee.c-arc  $
+     26          
+     27            ==========================================================================*/
+     28          
+     29          /*--------------------------------------------------------------------------
+     30            Body Identification
+     31            --------------------------------------------------------------------------*/
+     32          
+     33          #define dat_pee   "dat_pee"
+     34          
+     35          
+     36          /*-------------------------------------------------------------------------
+     37            Included files
+     38          
+     39            #include <system_file_name.h>
+     40            #include "project_file_name.h"
+     41            --------------------------------------------------------------------------*/
+     42          #include "LIB.h"
+     43          #include "TOS.h"
+     44          #include "LDB.h"
+     45          #include "DAT.h"
+     46          #include "DAT_PEE.h"
+     47          #include "DAT_PEE.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near EepromManager[2]
+   \                     EepromManager:
+   \   0000   ........       DW TOSSeqTrueEval, DATPeeStartTimer
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW DATPeeIsTimerElapsed, DATPeeRestoreBanks
+   \   000A   FFFF           DB 255, 255
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near EepromNormalization[1]
+   \                     EepromNormalization:
+   \   0000   ........       DW TOSSeqTrueEval, DATPeeNormalizeParameters
+   \   0004   FF00           DB 255, 0
+     48          /*--------------------------------------------------------------------------
+     49            Local constants
+     50          
+     51            #define cConstantName   ((tType) ConstantValue)
+     52            --------------------------------------------------------------------------*/
+     53          
+     54          // EEPROMErrorCounter is divided is 3 parts :
+     55          //                     7  6  5  4  3  2  1  0
+     56          //                     X  X  X  X  X  X  X  X
+     57          //       Rebuild flag _|  |  |  |  |  |  |  |_
+     58          //                   _____|  |  |  |  |  |____| 
+     59          // ReadErrorCounter_|________|  |  |  |_______|-WriteErrorCouter
+     60          //                  |___________|  |__________| 
+     61          #define cMaxReadCounter   ((U8) 0x07)
+     62          #define cMaxWriteCounter  ((U8) 0x0F)
+     63          
+     64          #define cTimerPeeMs   ((tTOSTimer) 5000U) // 5 seconds
+     65          
+     66          // Number of EEP Group 
+     67          #define cNumberOfEEPGroup  (cDATEepNumberOfProcess-1)
+     68          
+     69          /*--------------------------------------------------------------------------
+     70            Local macros
+     71          
+     72            #define mMacroName   (MacroDefinition)
+     73            --------------------------------------------------------------------------*/
+     74          
+     75          // The size of EEP Error Table 
+     76          #if (cDATPeeSizeErrorGroup != cNumberOfEEPGroup)
+     77          
+     78            #error "The size of EEP Error Table is different of the number of EEP Group."
+     79          
+     80          #endif
+     81          
+     82          // Direct Access EEP Errors Table
+     83          #define mGetEEPErrorTable(idx) mDATReadTable(U8Bit, EEPErrorTable, idx, Default)
+     84          #define mSetEEPErrorTable(idx, Val) mDATWriteTable(U8Bit, EEPErrorTable, idx, Val, Default)
+     85          
+     86          // Direct Access EEP Write Error Counter
+     87          #define mGetWriteCounter(idx)        (mGetEEPErrorTable(idx) & 0x0F)
+     88          
+     89          // Direct Access EEP Read Error Counter
+     90          #define mGetReadCounter(idx)         ((mGetEEPErrorTable(idx) >> 4) & 0x07)
+     91          
+     92          // Direct Access EEP Rebuild Flag
+     93          #define mGetRebuildFlag(idx)        ((mGetEEPErrorTable(idx) >> 7) & 0x01)
+     94          
+     95          // Handle EEP Write Error Counter
+     96          #define mSetWriteError(idx)                             \
+     97            mSetEEPDtc();                                         \
+     98            if(mGetWriteCounter(idx) < cMaxWriteCounter)          \
+     99            {                                                     \
+    100                mSetEEPErrorTable(idx, (mGetEEPErrorTable(idx) + (U8)(1<<0))); \
+    101            }
+    102          
+    103          // Handle EEP Read Error Counter
+    104          #define mSetReadError(idx)                              \
+    105            mSetEEPDtc();                                         \
+    106            if(mGetReadCounter(idx) < cMaxReadCounter)            \
+    107            {                                                     \
+    108                mSetEEPErrorTable(idx, (mGetEEPErrorTable(idx) + (U8)(1<<4))); \
+    109            } 
+    110                                                              
+    111          // Handle EEP Rebuild Flag
+    112          #define mSetRebuildFlag(idx)                                            \
+    113                             mSetEEPDtc();                                        \
+    114                             mSetEEPErrorTable(idx, (mGetEEPErrorTable(idx) | 0x80))
+    115          
+    116          #define mSetDbkDefaultValue(BankName)   \
+    117              {                                   \
+    118              static const U8 BankName##DefaultValues[cDATPeeSize##BankName] = mDATPeeResetBuffer##BankName();\
+    119              mLIBmemcpy((U8 *)DATDbkMirrors.##BankName, BankName##DefaultValues, cDATPeeSize##BankName);\
+    120              }
+    121          #define mInitDbkBank(BankName,Val)      \
+    122              {                                   \
+    123              mLIBmemset((U8 *)DATDbkMirrors.##BankName, Val, cDATPeeSize##BankName);\
+    124              }
+    125          
+    126          #define mSetSbkDefaultValue(BankName)   \
+    127              {                                   \
+    128              static const U8 BankName##DefaultValues[cDATPeeSize##BankName] = mDATPeeResetBuffer##BankName();\
+    129              mLIBmemcpy((U8 *)DATSbkMirrors.##BankName, BankName##DefaultValues, cDATPeeSize##BankName);\
+    130              }
+    131          #define mInitSbkBank(BankName,Val)      \
+    132              {                                   \
+    133              mLIBmemset((U8 *)DATSbkMirrors.##BankName, Val, cDATPeeSize##BankName);\
+    134              }
+    135          
+    136          // Cm006501: Treatment of DEF_EEPROM
+    137          #define mSetEEPDtc() \
+    138              mDATWrite(U1Bit, DefEEPROM, cTrue, Default); \
+    139              if (bEepReadFinished != cFalse) \
+    140              { \
+    141                  mDATWrite(U1Bit, EEP_DefEeprom, cTrue, Default) \
+    142              }
+    143          
+    144          // Normalization of calibration parameters
+    145          // Cm006814: DIAG: Implement consistency checking of calibration parameters according to prsFS_DIAG-766
+    146          //Normalization of maximal values
+    147          #define mNormalizeMax(PARAM) \
+    148              DATPeeCalibrationData.##PARAM = \
+    149                  ((mDATReadU8BitEEP_##PARAM##Default() > MAX_##PARAM) ? \
+    150                   MAX_##PARAM : mDATReadU8BitEEP_##PARAM##Default())
+    151          
+    152          //Normalization of minimal values 
+    153          //the result from macro mNormalizeMax() is used
+    154          #define mNormalizeMin(PARAM) \
+    155              DATPeeCalibrationData.##PARAM = \
+    156                  ((mDATReadU8BitEEP_##PARAM##Default() < MIN_##PARAM) ? \
+    157                   MIN_##PARAM : DATPeeCalibrationData.##PARAM)
+    158          
+    159          // List of max EEP values
+    160          #define MAX_TPS_RETARD_DETRESSE         (U8)6U
+    161          #define MAX_TIMER_DETRESSE              (U8)144U
+    162          #define MAX_TPS_APC                     (U8)72U
+    163          #define MAX_TPS_PLAF                    (U8)75U
+    164          #define MAX_TPS_ESSUIE_MINI             (U8)25U
+    165          #define MAX_TPS_MAX_COUPLBLOC           (U8)120U
+    166          #define MAX_TPS_ARRET                   (U8)30U
+    167          #define MAX_TPS_REPRISE                 (U8)10U
+    168          #define MAX_PROLONG_APPUI_COURT         (U8)6U
+    169          #define MAX_PROLONG_APPUI_LONG          (U8)6U
+    170          #define MAX_TPS_APPUILAV                (U8)67U
+    171          #define MAX_PROLONG_APPUI_ARR           (U8)6U
+    172          #define MAX_SEUIL_VIT_CONDAROU          (U8)50U
+    173          #define MAX_TPS_COM_MOTEUR              (U8)100U
+    174          #define MAX_NBCOM_MAX                   (U8)40U
+    175          #define MAX_TPS_REF                     (U8)4U
+    176          #define MAX_TIMER_RECONDA_AUTO          (U8)60U
+    177          #define MAX_N_MISE_APC                  (U8)20U
+    178          #define MAX_TPS_OUVPORTE                (U8)20U
+    179          #define MAX_TPS_TEMPO_DEG               (U8)24U
+    180          
+    181          #define MAX_SBR_ACTIVE_SPEED_THRESH_TP  (U8)30U
+    182          #define MAX_SBR_TIMEOUT_TM_TP           (U8)120U
+    183          #define MAX_MAX_NB_ALERT_SEQUENCES_TP   (U8)20U
+    184          #define MAX_TPS_BUZ_CLI                 (U8)8U
+    185          #define MAX_TPS_CLI                     (U8)10U
+    186          #define MAX_TPS_CLIDEGRAD               (U8)5U
+    187          
+    188          // List of min EEP values
+    189          #define MIN_TPS_ESSUIE_MINI             (U8)1U
+    190          #define MIN_TPS_APPUILAV                (U8)1U
+    191          #define MIN_TPS_TEMPO_DEG               (U8)1U
+    192          #define MIN_TPS_CLI                     (U8)1U
+    193          #define MIN_TPS_CLIDEGRAD               (U8)1U
+    194          
+    195          #define MIN_NBCOM_MAX                   (U8)2U
+    196          #define MIN_N_MISE_APC                  (U8)1U
+    197          #define MIN_TPS_MAX_COUPLBLOC           (U8)1U
+    198          #define MIN_TPS_ARRET                   (U8)1U
+    199          #define MIN_TIMER_RECONDA_AUTO          (U8)1U
+    200          #define MIN_MAX_NB_ALERT_SEQUENCES_TP   (U8)1U
+    201          
+    202          /*--------------------------------------------------------------------------
+    203            Local types
+    204          
+    205            struct  sStructureName { ... };
+    206            union   uUnionName { ... };
+    207            enum    eEnumerationName { ... };
+    208            typedef Expression tTypeName;
+    209            --------------------------------------------------------------------------*/
+    210          
+    211          
+    212          /*--------------------------------------------------------------------------
+    213            Local data
+    214          
+    215            static  tType   VariableName;
+    216            static  tType*  pVariableName; 
+    217            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    218          static tTOSTimer TimerPee;
+   \                     TimerPee:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    219          static BOOL      bEepReadFinished = cFalse;
+   \                     bEepReadFinished:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    220          
+    221          /*--------------------------------------------------------------------------
+    222            Constant local data
+    223          
+    224            static const tType  VariableName;
+    225            --------------------------------------------------------------------------*/
+    226          
+    227          /*--------------------------------------------------------------------------
+    228            Exported data
+    229          
+    230            tType   CMPVariableName;      (CMP: 3 characters to identify this component)
+    231            tType*  pCMPVariableName;     (CMP: 3 characters to identify this component)
+    232            --------------------------------------------------------------------------*/
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    233          tDATPeeCalibrationData DATPeeCalibrationData;
+   \                     DATPeeCalibrationData:
+   \   0000                  DS 26
+   \   001A                  REQUIRE __INIT_NEAR_Z
+    234          
+    235          /*--------------------------------------------------------------------------
+    236            Constant exported data
+    237           
+    238            const tType   CMPVariableName;(CMP: 3 characters to identify this component)
+    239            --------------------------------------------------------------------------*/
+    240          
+    241          
+    242          /*--------------------------------------------------------------------------
+    243            Local function prototypes
+    244            
+    245            static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    246            --------------------------------------------------------------------------*/
+    247          
+    248          
+    249          /*============================================================================
+    250            =========================== LOCAL FUNCTIONS ================================
+    251            ==========================================================================*/
+    252          
+    253          /*============================================================================
+    254            DESCRIPTION :
+    255            
+    256            PARAMETERS (Type,Name,Min,Max) :   none
+    257          
+    258            RETURN VALUE :   none
+    259           
+    260            DESIGN INFORMATION :   refer to Detailed Design Document
+    261            ==========================================================================*/
+    262          /* static type FunctionName(...) */
+    263          
+    264          
+    265          /*============================================================================
+    266            =========================== EXPORTED FUNCTIONS =============================
+    267            ==========================================================================*/
+    268          
+    269          /*============================================================================
+    270            DESCRIPTION :
+    271            
+    272            PARAMETERS (Type,Name,Min,Max) :  none
+    273          
+    274            RETURN VALUE :  none
+    275           
+    276            DESIGN INFORMATION :  refer to Detailed Design Document
+    277          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    278          void DATPeeInit(void)
+   \                     DATPeeInit:
+    279          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    280          #ifdef cDATSbkHandleErrorGroup
+    281          
+    282              // The error bank must be the first bank read at startup.
+    283              // If its handle is 0, it will be the case
+    284              
+    285              // if the error bank is not the first bank read.
+    286              // Then, if another bank read previouly set an error,
+    287              // the error bank read will overwrite this error flag.
+    288              
+    289              mLIBassert( cDATSbkHandleErrorGroup==0 );
+    290          #endif
+    291          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    292          
+    293          /*============================================================================
+    294            DESCRIPTION :
+    295            
+    296            PARAMETERS (Type,Name,Min,Max) :  none
+    297          
+    298            RETURN VALUE :  none
+    299           
+    300            DESIGN INFORMATION :  refer to Detailed Design Document
+    301          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    302          BOOL DATPeeIsEepromAccessible(void)
+   \                     DATPeeIsEepromAccessible:
+    303          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    304              return (cTrue);
+   \   0000   A101           MOV       A,#1
+   \   0002   AF             RET       
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    305          }
+    306          
+    307          /*============================================================================
+    308            DESCRIPTION : Rebuild indication
+    309            
+    310            PARAMETERS (Type,Name,Min,Max) :  none
+    311          
+    312            RETURN VALUE :  none
+    313           
+    314            DESIGN INFORMATION :  refer to Detailed Design Document
+    315          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    316          MEM_TYPE void DATPeeRebuildDoubleBank(tDATDbkDoubleBankHandle DoubleBankHandle)
+   \                     DATPeeRebuildDoubleBank:
+    317          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   73             MOV       B,A
+    318              mLIBassert(DoubleBankHandle < cNbDbk);
+   \   0002   4D05           CMP       A,#5
+   \   0004   8D03           BC        ??DATPeeNormalizeParameters_Static_2
+   \   0006   9A....         CALL      LIBAssertionFailed
+    319              mSetRebuildFlag(cDATDbkFirstProcessHandle + DoubleBankHandle)
+   \                     ??DATPeeNormalizeParameters_Static_2:
+   \   0009   A101           MOV       A,#1
+   \   000B   16....         MOVW      HL,#DATCmnData+14
+   \   000E   97             MOV       [HL],A
+   \   000F   8E....         MOV       A,bEepReadFinished
+   \   0012   4D00           CMP       A,#0
+   \   0014   AD0D           BZ        ??DATPeeNormalizeParameters_Static_3
+   \   0016   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0019   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_3
+   \   001C   A100           MOV       A,#0
+   \   001E   71D2           SET1      [HL].5
+   \   0020   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_3:
+   \   0023   16....         MOVW      HL,#DATSbkMirrors+5
+   \   0026   AB             MOV       A,[HL+B]
+   \   0027   6D80           OR        A,#128
+   \   0029   70             MOV       X,A
+   \   002A   AB             MOV       A,[HL+B]
+   \   002B   6148           CMP       A,X
+   \   002D   AD0F           BZ        ??DATPeeNormalizeParameters_Static_4
+   \   002F   C6             MOVW      AX,HL
+   \   0030   30             XCH       A,X
+   \   0031   610B           ADD       A,B
+   \   0033   30             XCH       A,X
+   \   0034   2D00           ADDC      A,#0
+   \   0036   D6             MOVW      HL,AX
+   \   0037   A100           MOV       A,#0
+   \   0039   71F2           SET1      [HL].7
+   \   003B   9A....         CALL      DATSbkStartUpdate
+    320              switch(DoubleBankHandle)
+   \                     ??DATPeeNormalizeParameters_Static_4:
+   \   003E   63             MOV       A,B
+   \   003F   4D00           CMP       A,#0
+   \   0041   AD12           BZ        ??DATPeeNormalizeParameters_Static_5
+   \   0043   4D01           CMP       A,#1
+   \   0045   AD1E           BZ        ??DATPeeNormalizeParameters_Static_6
+   \   0047   4D02           CMP       A,#2
+   \   0049   AD2A           BZ        ??DATPeeNormalizeParameters_Static_7
+   \   004B   4D03           CMP       A,#3
+   \   004D   AD36           BZ        ??DATPeeNormalizeParameters_Static_8
+   \   004F   4D04           CMP       A,#4
+   \   0051   AD42           BZ        ??DATPeeNormalizeParameters_Static_9
+   \   0053   FA4E           BR        ??DATPeeNormalizeParameters_Static_10
+    321              {
+    322              case cDATDbkHandleDiagBank:
+    323                   mSetDbkDefaultValue(DiagBank);
+   \                     ??DATPeeNormalizeParameters_Static_5:
+   \   0055   14....         MOVW      DE,#??DiagBankDefaultValues
+   \   0058   16....         MOVW      HL,#DATDbkMirrors
+   \   005B   A318           MOV       B,#24
+   \                     ??DATPeeRebuildDoubleBank_0:
+   \   005D   85             MOV       A,[DE]
+   \   005E   97             MOV       [HL],A
+   \   005F   86             INCW      HL
+   \   0060   84             INCW      DE
+   \   0061   8BFA           DBNZ      B, ??DATPeeRebuildDoubleBank_0
+   \   0063   FA3E           BR        ??DATPeeNormalizeParameters_Static_10
+    324              break;
+    325          
+    326              case cDATDbkHandleGeneralParameterBank:
+    327                   mSetDbkDefaultValue(GeneralParameterBank);
+   \                     ??DATPeeNormalizeParameters_Static_6:
+   \   0065   14....         MOVW      DE,#??GeneralParameterBankDefaultValues
+   \   0068   16....         MOVW      HL,#DATDbkMirrors+24
+   \   006B   A306           MOV       B,#6
+   \                     ??DATPeeRebuildDoubleBank_1:
+   \   006D   85             MOV       A,[DE]
+   \   006E   97             MOV       [HL],A
+   \   006F   86             INCW      HL
+   \   0070   84             INCW      DE
+   \   0071   8BFA           DBNZ      B, ??DATPeeRebuildDoubleBank_1
+   \   0073   FA2E           BR        ??DATPeeNormalizeParameters_Static_10
+    328                break;
+    329          
+    330              case cDATDbkHandleFactoryConfigBank:
+    331                   mSetDbkDefaultValue(FactoryConfigBank);
+   \                     ??DATPeeNormalizeParameters_Static_7:
+   \   0075   14....         MOVW      DE,#??FactoryConfigBankDefaultValues
+   \   0078   16....         MOVW      HL,#DATDbkMirrors+30
+   \   007B   A326           MOV       B,#38
+   \                     ??DATPeeRebuildDoubleBank_2:
+   \   007D   85             MOV       A,[DE]
+   \   007E   97             MOV       [HL],A
+   \   007F   86             INCW      HL
+   \   0080   84             INCW      DE
+   \   0081   8BFA           DBNZ      B, ??DATPeeRebuildDoubleBank_2
+   \   0083   FA1E           BR        ??DATPeeNormalizeParameters_Static_10
+    332                break;
+    333          
+    334              case cDATDbkHandleStaticImmoBank:
+    335                   mSetDbkDefaultValue(StaticImmoBank);
+   \                     ??DATPeeNormalizeParameters_Static_8:
+   \   0085   14....         MOVW      DE,#??StaticImmoBankDefaultValues
+   \   0088   16....         MOVW      HL,#DATDbkMirrors+68
+   \   008B   A34C           MOV       B,#76
+   \                     ??DATPeeRebuildDoubleBank_3:
+   \   008D   85             MOV       A,[DE]
+   \   008E   97             MOV       [HL],A
+   \   008F   86             INCW      HL
+   \   0090   84             INCW      DE
+   \   0091   8BFA           DBNZ      B, ??DATPeeRebuildDoubleBank_3
+   \   0093   FA0E           BR        ??DATPeeNormalizeParameters_Static_10
+    336                break;
+    337            
+    338              case cDATDbkHandleDynamicImmoDataBank:
+    339                   mSetDbkDefaultValue(DynamicImmoDataBank);
+   \                     ??DATPeeNormalizeParameters_Static_9:
+   \   0095   14....         MOVW      DE,#??DynamicImmoDataBankDefaultValues
+   \   0098   16....         MOVW      HL,#DATDbkMirrors+144
+   \   009B   A341           MOV       B,#65
+   \                     ??DATPeeRebuildDoubleBank_4:
+   \   009D   85             MOV       A,[DE]
+   \   009E   97             MOV       [HL],A
+   \   009F   86             INCW      HL
+   \   00A0   84             INCW      DE
+   \   00A1   8BFA           DBNZ      B, ??DATPeeRebuildDoubleBank_4
+    340                break;
+    341          
+    342              default:
+    343                break;
+    344              }
+    345          }
+   \                     ??DATPeeNormalizeParameters_Static_10:
+   \   00A3   B2             POP       BC
+   \   00A4   AF             RET       
+   \   00A5                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CONST, align 1
+   \                     ??DiagBankDefaultValues:
+   \   0000   0E000000       DB 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 39, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00001027
+   \          00000000
+   \          0000    
+   \   0016   0000           DB 0, 0
+
+   \                                 In  segment CONST, align 1
+   \                     ??GeneralParameterBankDefaultValues:
+   \   0000   00008011       DB 0, 0, 128, 17, 0, 0
+   \          0000    
+
+   \                                 In  segment CONST, align 1
+   \                     ??FactoryConfigBankDefaultValues:
+   \   0000   F4012524       DB 244, 1, 37, 36, 0, 2, 20, 15, 1, 3, 42, 62, 25, 0, 2, 3, 8, 4, 5, 36
+   \          0002140F
+   \          01032A3E
+   \          19000203
+   \          08040524
+   \   0014   0E085C0A       DB 14, 8, 92, 10, 10, 8, 50, 20, 2, 30, 10, 10, 4, 4, 5, 100, 0, 0
+   \          0A083214
+   \          021E0A0A
+   \          04040564
+   \          0000    
+
+   \                                 In  segment CONST, align 1
+   \                     ??StaticImmoBankDefaultValues:
+   \   0000   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+   \   0017   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+   \   002E   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+   \   0045   00000000       DB 0, 0, 0, 0, 0, 0, 17
+   \          000011  
+
+   \                                 In  segment CONST, align 1
+   \                     ??DynamicImmoDataBankDefaultValues:
+   \   0000   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+   \   0017   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+   \   002E   00000000       DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \          00000000
+   \          00000000
+   \          00000000
+   \          000000  
+    346          
+    347          /*============================================================================
+    348            DESCRIPTION :
+    349            
+    350            PARAMETERS (Type,Name,Min,Max) :  none
+    351          
+    352            RETURN VALUE :  none
+    353           
+    354            DESIGN INFORMATION :  refer to Detailed Design Document
+    355          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    356          MEM_TYPE void DATPeeErrorIndication(tDATDbkDoubleBankHandle DoubleBankHandle
+   \                     DATPeeErrorIndication:
+    357                                     , tDATDbkErrorHandle DbkErrorHandle)
+    358          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    359              mLIBassert(DoubleBankHandle < cNbDbk);
+   \   0002   4D05           CMP       A,#5
+   \   0004   8D03           BC        ??DATPeeNormalizeParameters_Static_11
+   \   0006   9A....         CALL      LIBAssertionFailed
+    360          
+    361              if (( DbkErrorHandle == cDATDbkErrorReadingBK1) || ( DbkErrorHandle == cDATDbkErrorReadingBK2))
+   \                     ??DATPeeNormalizeParameters_Static_11:
+   \   0009   63             MOV       A,B
+   \   000A   4D00           CMP       A,#0
+   \   000C   AD03           BZ        ??DATPeeNormalizeParameters_Static_12
+   \   000E   51             DEC       A
+   \   000F   BD3B           BNZ       ??DATPeeNormalizeParameters_Static_13
+    362              {
+    363                  mSetReadError(cDATDbkFirstProcessHandle + DoubleBankHandle);
+   \                     ??DATPeeNormalizeParameters_Static_12:
+   \   0011   A101           MOV       A,#1
+   \   0013   16....         MOVW      HL,#DATCmnData+14
+   \   0016   97             MOV       [HL],A
+   \   0017   8E....         MOV       A,bEepReadFinished
+   \   001A   4D00           CMP       A,#0
+   \   001C   AD0D           BZ        ??DATPeeNormalizeParameters_Static_14
+   \   001E   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0021   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_14
+   \   0024   A100           MOV       A,#0
+   \   0026   71D2           SET1      [HL].5
+   \   0028   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_14:
+   \   002B   16....         MOVW      HL,#DATSbkMirrors+5
+   \   002E   AA             MOV       A,[HL+C]
+   \   002F   24             ROR       A,0x1
+   \   0030   25             RORC      A,0x1
+   \   0031   25             RORC      A,0x1
+   \   0032   25             RORC      A,0x1
+   \   0033   5D07           AND       A,#7
+   \   0035   4D07           CMP       A,#7
+   \   0037   9D55           BNC       ??DATPeeNormalizeParameters_Static_15
+   \   0039   C6             MOVW      AX,HL
+   \   003A   30             XCH       A,X
+   \   003B   610A           ADD       A,C
+   \   003D   30             XCH       A,X
+   \   003E   2D00           ADDC      A,#0
+   \   0040   D6             MOVW      HL,AX
+   \   0041   87             MOV       A,[HL]
+   \   0042   0D10           ADD       A,#16
+   \   0044   97             MOV       [HL],A
+   \   0045   A100           MOV       A,#0
+   \   0047   9A....         CALL      DATSbkStartUpdate
+   \   004A   FA42           BR        ??DATPeeNormalizeParameters_Static_15
+    364              }
+    365              else if (( DbkErrorHandle == cDATDbkErrorWritingBK1) || ( DbkErrorHandle == cDATDbkErrorWritingBK2))
+   \                     ??DATPeeNormalizeParameters_Static_13:
+   \   004C   63             MOV       A,B
+   \   004D   4D02           CMP       A,#2
+   \   004F   AD04           BZ        ??DATPeeNormalizeParameters_Static_16
+   \   0051   4D03           CMP       A,#3
+   \   0053   BD36           BNZ       ??DATPeeNormalizeParameters_Static_17
+    366              {
+    367                  mSetWriteError(cDATDbkFirstProcessHandle + DoubleBankHandle);
+   \                     ??DATPeeNormalizeParameters_Static_16:
+   \   0055   A101           MOV       A,#1
+   \   0057   16....         MOVW      HL,#DATCmnData+14
+   \   005A   97             MOV       [HL],A
+   \   005B   8E....         MOV       A,bEepReadFinished
+   \   005E   4D00           CMP       A,#0
+   \   0060   AD0D           BZ        ??DATPeeNormalizeParameters_Static_18
+   \   0062   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0065   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_18
+   \   0068   A100           MOV       A,#0
+   \   006A   71D2           SET1      [HL].5
+   \   006C   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_18:
+   \   006F   16....         MOVW      HL,#DATSbkMirrors+5
+   \   0072   AA             MOV       A,[HL+C]
+   \   0073   5D0F           AND       A,#15
+   \   0075   4D0F           CMP       A,#15
+   \   0077   9D15           BNC       ??DATPeeNormalizeParameters_Static_15
+   \   0079   C6             MOVW      AX,HL
+   \   007A   30             XCH       A,X
+   \   007B   610A           ADD       A,C
+   \   007D   30             XCH       A,X
+   \   007E   2D00           ADDC      A,#0
+   \   0080   D6             MOVW      HL,AX
+   \   0081   87             MOV       A,[HL]
+   \   0082   41             INC       A
+   \   0083   97             MOV       [HL],A
+   \   0084   A100           MOV       A,#0
+   \   0086   9A....         CALL      DATSbkStartUpdate
+   \   0089   FA03           BR        ??DATPeeNormalizeParameters_Static_15
+    368              }
+    369              else
+    370              {
+    371                  mLIBassert(0);
+   \                     ??DATPeeNormalizeParameters_Static_17:
+   \   008B   9A....         CALL      LIBAssertionFailed
+    372              }
+    373          }
+   \                     ??DATPeeNormalizeParameters_Static_15:
+   \   008E   B2             POP       BC
+   \   008F   AF             RET       
+   \   0090                  REQUIRE ?CL78K_V4_6_L00
+    374          
+    375          
+    376          
+    377          
+    378          /*============================================================================
+    379            DESCRIPTION :
+    380            
+    381            PARAMETERS (Type,Name,Min,Max) :  none
+    382          
+    383            RETURN VALUE :  none
+    384           
+    385            DESIGN INFORMATION :  refer to Detailed Design Document
+    386          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    387          MEM_TYPE void DATPeeRebuildSingleBank( tDATSbkSingleBankHandle HandleSbk )
+   \                     DATPeeRebuildSingleBank:
+    388          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    389              mLIBassert(HandleSbk < cNbSbk);
+   \   0002   4D05           CMP       A,#5
+   \   0004   8D03           BC        ??DATPeeNormalizeParameters_Static_19
+   \   0006   9A....         CALL      LIBAssertionFailed
+    390              mSetRebuildFlag(cDATSbkFirstProcessHandle + HandleSbk);
+   \                     ??DATPeeNormalizeParameters_Static_19:
+   \   0009   A101           MOV       A,#1
+   \   000B   16....         MOVW      HL,#DATCmnData+14
+   \   000E   97             MOV       [HL],A
+   \   000F   8E....         MOV       A,bEepReadFinished
+   \   0012   4D00           CMP       A,#0
+   \   0014   AD0D           BZ        ??DATPeeNormalizeParameters_Static_20
+   \   0016   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0019   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_20
+   \   001C   A100           MOV       A,#0
+   \   001E   71D2           SET1      [HL].5
+   \   0020   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_20:
+   \   0023   16....         MOVW      HL,#DATSbkMirrors
+   \   0026   AA             MOV       A,[HL+C]
+   \   0027   6D80           OR        A,#128
+   \   0029   70             MOV       X,A
+   \   002A   AA             MOV       A,[HL+C]
+   \   002B   6148           CMP       A,X
+   \   002D   AD0F           BZ        ??DATPeeNormalizeParameters_Static_21
+   \   002F   62             MOV       A,C
+   \   0030   70             MOV       X,A
+   \   0031   A100           MOV       A,#0
+   \   0033   CA....         ADDW      AX,#DATSbkMirrors
+   \   0036   D6             MOVW      HL,AX
+   \   0037   A100           MOV       A,#0
+   \   0039   71F2           SET1      [HL].7
+   \   003B   9A....         CALL      DATSbkStartUpdate
+    391              switch(HandleSbk)
+   \                     ??DATPeeNormalizeParameters_Static_21:
+   \   003E   62             MOV       A,C
+   \   003F   4D00           CMP       A,#0
+   \   0041   AD06           BZ        ??DATPeeNormalizeParameters_Static_22
+   \   0043   4D02           CMP       A,#2
+   \   0045   AD10           BZ        ??DATPeeNormalizeParameters_Static_23
+   \   0047   FA1C           BR        ??DATPeeNormalizeParameters_Static_24
+    392              {
+    393              case cDATSbkHandleErrorGroup:
+    394                   mInitSbkBank(ErrorGroup,0);
+   \                     ??DATPeeNormalizeParameters_Static_22:
+   \   0049   10....         MOVW      AX,#DATSbkMirrors
+   \   004C   140A00         MOVW      DE,#10
+   \   004F   120000         MOVW      BC,#0
+   \   0052   9A....         CALL      memset
+   \   0055   FA0E           BR        ??DATPeeNormalizeParameters_Static_24
+    395                break;
+    396            
+    397              case cDATSbkHandleVersionBank:
+    398                   mSetSbkDefaultValue(VersionBank);
+   \                     ??DATPeeNormalizeParameters_Static_23:
+   \   0057   14....         MOVW      DE,#??VersionBankDefaultValues
+   \   005A   16....         MOVW      HL,#DATSbkMirrors+36
+   \   005D   A302           MOV       B,#2
+   \                     ??DATPeeRebuildSingleBank_0:
+   \   005F   85             MOV       A,[DE]
+   \   0060   97             MOV       [HL],A
+   \   0061   86             INCW      HL
+   \   0062   84             INCW      DE
+   \   0063   8BFA           DBNZ      B, ??DATPeeRebuildSingleBank_0
+    399                break;
+    400            
+    401              case cDATSbkHandleSupplierBank:
+    402                   // No Default value;
+    403                break;
+    404            
+    405              case cDATSbkHandleVINBank:
+    406                   // No Default value;
+    407                break;
+    408             
+    409              default:
+    410                break;
+    411              }
+    412          }
+   \                     ??DATPeeNormalizeParameters_Static_24:
+   \   0065   B2             POP       BC
+   \   0066   AF             RET       
+   \   0067                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CONST, align 1
+   \                     ??VersionBankDefaultValues:
+   \   0000   0205           DB 2, 5
+    413          
+    414          /*============================================================================
+    415            DESCRIPTION :
+    416            
+    417            PARAMETERS (Type,Name,Min,Max) :  none
+    418          
+    419            RETURN VALUE :  none
+    420           
+    421            DESIGN INFORMATION :  refer to Detailed Design Document
+    422          ============================================================================*/
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    423          MEM_TYPE void DATPeeSingleBankErrorIndication( tDATSbkSingleBankHandle HandleSbk
+   \                     DATPeeSingleBankErrorIndication:
+    424                                                , tDATSbkErrorHandle SbkErrorHandle )
+    425          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+   \   0001   72             MOV       C,A
+    426              mLIBassert(HandleSbk < cNbSbk);
+   \   0002   4D05           CMP       A,#5
+   \   0004   8D03           BC        ??DATPeeNormalizeParameters_Static_25
+   \   0006   9A....         CALL      LIBAssertionFailed
+    427              if (SbkErrorHandle == cDATSbkErrorReading)
+   \                     ??DATPeeNormalizeParameters_Static_25:
+   \   0009   63             MOV       A,B
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD33           BNZ       ??DATPeeNormalizeParameters_Static_26
+    428              {
+    429                  mSetReadError(cDATSbkFirstProcessHandle + HandleSbk);
+   \   000E   A101           MOV       A,#1
+   \   0010   16....         MOVW      HL,#DATCmnData+14
+   \   0013   97             MOV       [HL],A
+   \   0014   8E....         MOV       A,bEepReadFinished
+   \   0017   4D00           CMP       A,#0
+   \   0019   AD0D           BZ        ??DATPeeNormalizeParameters_Static_27
+   \   001B   16....         MOVW      HL,#DATDbkMirrors+19
+   \   001E   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_27
+   \   0021   A100           MOV       A,#0
+   \   0023   71D2           SET1      [HL].5
+   \   0025   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_27:
+   \   0028   16....         MOVW      HL,#DATSbkMirrors
+   \   002B   AA             MOV       A,[HL+C]
+   \   002C   24             ROR       A,0x1
+   \   002D   25             RORC      A,0x1
+   \   002E   25             RORC      A,0x1
+   \   002F   25             RORC      A,0x1
+   \   0030   5D07           AND       A,#7
+   \   0032   4D07           CMP       A,#7
+   \   0034   9D3F           BNC       ??DATPeeNormalizeParameters_Static_28
+   \   0036   AA             MOV       A,[HL+C]
+   \   0037   0D10           ADD       A,#16
+   \   0039   BA             MOV       [HL+C],A
+   \   003A   A100           MOV       A,#0
+   \   003C   9A....         CALL      DATSbkStartUpdate
+   \   003F   FA34           BR        ??DATPeeNormalizeParameters_Static_28
+    430              }
+    431              else if (SbkErrorHandle == cDATSbkErrorWriting)
+   \                     ??DATPeeNormalizeParameters_Static_26:
+   \   0041   51             DEC       A
+   \   0042   BD2E           BNZ       ??DATPeeNormalizeParameters_Static_29
+    432              {
+    433                  mSetWriteError(cDATSbkFirstProcessHandle + HandleSbk);
+   \   0044   A101           MOV       A,#1
+   \   0046   16....         MOVW      HL,#DATCmnData+14
+   \   0049   97             MOV       [HL],A
+   \   004A   8E....         MOV       A,bEepReadFinished
+   \   004D   4D00           CMP       A,#0
+   \   004F   AD0D           BZ        ??DATPeeNormalizeParameters_Static_30
+   \   0051   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0054   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_30
+   \   0057   A100           MOV       A,#0
+   \   0059   71D2           SET1      [HL].5
+   \   005B   9A....         CALL      DATDbkStartUpdate
+   \                     ??DATPeeNormalizeParameters_Static_30:
+   \   005E   16....         MOVW      HL,#DATSbkMirrors
+   \   0061   AA             MOV       A,[HL+C]
+   \   0062   5D0F           AND       A,#15
+   \   0064   4D0F           CMP       A,#15
+   \   0066   9D0D           BNC       ??DATPeeNormalizeParameters_Static_28
+   \   0068   AA             MOV       A,[HL+C]
+   \   0069   41             INC       A
+   \   006A   BA             MOV       [HL+C],A
+   \   006B   A100           MOV       A,#0
+   \   006D   9A....         CALL      DATSbkStartUpdate
+   \   0070   FA03           BR        ??DATPeeNormalizeParameters_Static_28
+    434              }
+    435              else
+    436              {
+    437                  mLIBassert(0);
+   \                     ??DATPeeNormalizeParameters_Static_29:
+   \   0072   9A....         CALL      LIBAssertionFailed
+    438              }
+    439          }
+   \                     ??DATPeeNormalizeParameters_Static_28:
+   \   0075   B2             POP       BC
+   \   0076   AF             RET       
+   \   0077                  REQUIRE ?CL78K_V4_6_L00
+    440          
+    441          
+    442          /*============================================================================
+    443            DESCRIPTION : Send a signal to maintain the Starting Step if the Reading 
+    444                          of the EEPROM is not finished.
+    445            
+    446            PARAMETERS (Type,Name,Min,Max) :  none
+    447          
+    448            RETURN VALUE :  none
+    449           
+    450            DESIGN INFORMATION :  refer to Detailed Design Document
+    451          ============================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    452          void DATPeeIsMaintainStartingStepState( void )
+   \                     DATPeeIsMaintainStartingStepState:
+    453          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    454              if(mDATRead(U1Bit,IsEepProcessing,Default))
+   \   0000   9A....         CALL      DATEepIsProcessing
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD04           BZ        ??DATPeeNormalizeParameters_Static_0
+    455              {
+    456                  TOSWriteSignal(cTOSSignalSomebodyMaintainStartingStepState);
+   \   0007   102700         MOVW      AX,#39
+   \   000A   ..             CALLT     [__T_TOSWriteSignal]
+    457              }
+    458          }
+   \                     ??DATPeeNormalizeParameters_Static_0:
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    459          
+    460          /*============================================================================
+    461            DESCRIPTION : 5 seconds after the starting step, it's recommended 
+    462                          to restore the EEP.
+    463            
+    464            PARAMETERS (Type,Name,Min,Max) :   none
+    465          
+    466            RETURN VALUE :   none
+    467           
+    468            DESIGN INFORMATION :   refer to Detailed Design Document
+    469            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    470          void DATPeeRestoreBanks(void)
+   \                     DATPeeRestoreBanks:
+    471          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    472              mDATControl(Eep, Restore);
+   \   0000   9B....         BR        N:DATDbkStartRestoringBrokenBanks
+   \   0003                  REQUIRE ?CL78K_V4_6_L00
+    473          }
+    474          
+    475          /*============================================================================
+    476            DESCRIPTION : During the Starting Step, The banks must be read.
+    477            
+    478            PARAMETERS (Type,Name,Min,Max) :   none
+    479          
+    480            RETURN VALUE :   none
+    481           
+    482            DESIGN INFORMATION :   refer to Detailed Design Document
+    483            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    484          void DATPeeReadAllBanks(void)
+   \                     DATPeeReadAllBanks:
+    485          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    486              mDATControl(Eep, ReadEep);
+   \   0000   9A....         CALL      DATSbkStartReadingAllBanks
+   \   0003   9B....         BR        N:DATDbkStartReadingAllBanks
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    487          }
+    488          
+    489          /*============================================================================
+    490            DESCRIPTION : Update the necessary banks before Enter in Sleep State
+    491            
+    492            PARAMETERS (Type,Name,Min,Max) :   none
+    493          
+    494            RETURN VALUE :   none
+    495           
+    496            DESIGN INFORMATION :   refer to Detailed Design Document
+    497            ==========================================================================*/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    498          void DATPeeUpdateBanks(void)
+   \                     DATPeeUpdateBanks:
+    499          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    500              // This function is called when the system leave the active state.
+    501              // Add here the Update command of the differed EEP groups
+    502              // mDATControl(Eep, UpdateGroupName1);
+    503              // mDATControl(Eep, UpdateGroupName2);
+    504              // ...
+    505              // mDATControl(Eep, UpdateGroupName3);
+    506          }
+   \   0000   AF             RET       
+   \   0001                  REQUIRE ?CL78K_V4_6_L00
+    507          
+    508          
+    509          /****************************************************************************
+    510            DESCRIPTION         : Start a 5 seconds timer
+    511          
+    512            PARAMETERS          : None
+    513            (Type,Name,Min,Max) 
+    514          
+    515            RETURN VALUE        : None
+    516          
+    517            DESIGN INFORMATION  : Refer to Detailed Design Document
+    518          
+    519          *****************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    520          void DATPeeStartTimer(void)
+   \                     DATPeeStartTimer:
+    521          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    522              TOSStartTimer(&TimerPee);
+   \   0000   10....         MOVW      AX,#TimerPee
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+    523          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    524          
+    525          /****************************************************************************
+    526            DESCRIPTION         : Check the end of the 5 seconds timer.
+    527          
+    528            PARAMETERS          : None
+    529            (Type,Name,Min,Max) 
+    530          
+    531            RETURN VALUE        : cTrue if the end of the 5 seconds timer is elapsed.
+    532          
+    533            DESIGN INFORMATION  : Refer to Detailed Design Document
+    534          
+    535          *****************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    536          BOOL DATPeeIsTimerElapsed(void)
+   \                     DATPeeIsTimerElapsed:
+    537          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#TimerPee
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    538              return(TOSIsTimerElapsed(&TimerPee, cTimerPeeMs / cTOSTimerTickMs));
+   \   0004   12F401         MOVW      BC,#500
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    539          }
+    540          
+    541          /****************************************************************************
+    542            DESCRIPTION         : Check the end of the 5 seconds timer.
+    543          
+    544            PARAMETERS          : None
+    545            (Type,Name,Min,Max) 
+    546          
+    547            RETURN VALUE        : cTrue if the end of the 5 seconds timer is elapsed.
+    548          
+    549            DESIGN INFORMATION  : Refer to Detailed Design Document
+    550          
+    551          *****************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    552          void DATPeeCanRestoreBanks(void)
+   \                     DATPeeCanRestoreBanks:
+    553          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    554              TOSSeqActivateGraph( cTOSSeqGraphIdEepromManager );
+   \   0003   ..             CALLT     [__T_TOSSeqActivateGraph]
+    555              
+    556              // EEPROM content is read: now safe to set defect if present
+    557              bEepReadFinished = cTrue;
+   \   0004   A101           MOV       A,#1
+   \   0006   9E....         MOV       bEepReadFinished,A
+    558              if (mDATRead(U1Bit, DefEEPROM, Default) != cFalse)
+   \   0009   8E....         MOV       A,DATCmnData+14
+   \   000C   4D00           CMP       A,#0
+   \   000E   AD0D           BZ        ??DATPeeNormalizeParameters_Static_1
+    559              {
+    560                  mDATWrite(U1Bit, EEP_DefEeprom, cTrue, Default);
+   \   0010   16....         MOVW      HL,#DATDbkMirrors+19
+   \   0013   31D607         BT        [HL].5, ??DATPeeNormalizeParameters_Static_1
+   \   0016   A100           MOV       A,#0
+   \   0018   71D2           SET1      [HL].5
+   \   001A   9A....         CALL      DATDbkStartUpdate
+    561              }
+    562              
+    563              // Leave starting step state: normalize parameters immediately
+    564              DATPeeNormalizeParameters();
+   \                     ??DATPeeNormalizeParameters_Static_1:
+   \   001D   16....         MOVW      HL,#LWRD(DATPeeNormalizeParameters_Static)
+   \   0020   A4..           MOV       E,#BYTE3(DATPeeNormalizeParameters_Static)
+   \   0022   ..             CALLT     [__T_?FAR_CALL_L07]
+    565              TOSSeqActivateGraph( cTOSSeqGraphIdEepromNormalization );
+   \   0023   A128           MOV       A,#40
+   \   0025   ..             CALLT     [__T_TOSSeqActivateGraph]
+    566          }
+   \   0026   B4             POP       DE
+   \   0027   AF             RET       
+   \   0028                  REQUIRE ?CL78K_V4_6_L00
+    567          
+    568          /****************************************************************************
+    569            DESCRIPTION         : Normalize calibration parameters periodically
+    570                                  EEP_<PARAM> => NEEP_<PARAM>
+    571                                  taking into account maximal / minimal value limits
+    572          
+    573            PARAMETERS          : None
+    574            (Type,Name,Min,Max) 
+    575          
+    576            RETURN VALUE        : None
+    577          
+    578            DESIGN INFORMATION  : Refer to Detailed Design Document
+    579          
+    580          *****************************************************************************/
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    581          void DATPeeNormalizeParameters (void)
+   \                     DATPeeNormalizeParameters:
+    582          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    583          #ifdef X90_PROJECT
+    584              static MEM_TYPE void DATPeeNormalizeParameters_Static(void);
+    585              DATPeeNormalizeParameters_Static();
+   \   0001   16....         MOVW      HL,#LWRD(DATPeeNormalizeParameters_Static)
+   \   0004   A4..           MOV       E,#BYTE3(DATPeeNormalizeParameters_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    586          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    587          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    588          static MEM_TYPE void DATPeeNormalizeParameters_Static(void)
+   \                     DATPeeNormalizeParameters_Static:
+    589          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    590          #endif
+    591          
+    592              // MAX: Normalize to specified maximal value
+    593              
+    594              mNormalizeMax(TPS_RETARD_DETRESSE);
+   \   0000   8E....         MOV       A,DATDbkMirrors+48
+   \   0003   4D07           CMP       A,#7
+   \   0005   8D02           BC        ??DATPeeNormalizeParameters_Static_31
+   \   0007   A106           MOV       A,#6
+   \                     ??DATPeeNormalizeParameters_Static_31:
+   \   0009   9E....         MOV       DATPeeCalibrationData,A
+    595              mNormalizeMax(TIMER_DETRESSE);
+   \   000C   8E....         MOV       A,DATDbkMirrors+49
+   \   000F   4D91           CMP       A,#145
+   \   0011   8D02           BC        ??DATPeeNormalizeParameters_Static_32
+   \   0013   A190           MOV       A,#144
+   \                     ??DATPeeNormalizeParameters_Static_32:
+   \   0015   9E....         MOV       DATPeeCalibrationData+1,A
+    596              mNormalizeMax(TPS_APC);
+   \   0018   8E....         MOV       A,DATDbkMirrors+33
+   \   001B   4D49           CMP       A,#73
+   \   001D   8D02           BC        ??DATPeeNormalizeParameters_Static_33
+   \   001F   A148           MOV       A,#72
+   \                     ??DATPeeNormalizeParameters_Static_33:
+   \   0021   9E....         MOV       DATPeeCalibrationData+2,A
+    597              mNormalizeMax(TPS_PLAF);
+   \   0024   8E....         MOV       A,DATDbkMirrors+32
+   \   0027   4D4C           CMP       A,#76
+   \   0029   8D02           BC        ??DATPeeNormalizeParameters_Static_34
+   \   002B   A14B           MOV       A,#75
+   \                     ??DATPeeNormalizeParameters_Static_34:
+   \   002D   9E....         MOV       DATPeeCalibrationData+3,A
+    598              mNormalizeMax(TPS_ESSUIE_MINI);
+   \   0030   8E....         MOV       A,DATDbkMirrors+42
+   \   0033   4D1A           CMP       A,#26
+   \   0035   8D02           BC        ??DATPeeNormalizeParameters_Static_35
+   \   0037   A119           MOV       A,#25
+   \                     ??DATPeeNormalizeParameters_Static_35:
+   \   0039   9E....         MOV       DATPeeCalibrationData+4,A
+    599              mNormalizeMax(TPS_MAX_COUPLBLOC);
+   \   003C   8E....         MOV       A,DATDbkMirrors+36
+   \   003F   4D79           CMP       A,#121
+   \   0041   8D02           BC        ??DATPeeNormalizeParameters_Static_36
+   \   0043   A178           MOV       A,#120
+   \                     ??DATPeeNormalizeParameters_Static_36:
+   \   0045   9E....         MOV       DATPeeCalibrationData+5,A
+    600              mNormalizeMax(TPS_ARRET);
+   \   0048   8E....         MOV       A,DATDbkMirrors+37
+   \   004B   4D1F           CMP       A,#31
+   \   004D   8D02           BC        ??DATPeeNormalizeParameters_Static_37
+   \   004F   A11E           MOV       A,#30
+   \                     ??DATPeeNormalizeParameters_Static_37:
+   \   0051   9E....         MOV       DATPeeCalibrationData+6,A
+    601              mNormalizeMax(TPS_REPRISE);
+   \   0054   8E....         MOV       A,DATDbkMirrors+44
+   \   0057   4D0B           CMP       A,#11
+   \   0059   8D02           BC        ??DATPeeNormalizeParameters_Static_38
+   \   005B   A10A           MOV       A,#10
+   \                     ??DATPeeNormalizeParameters_Static_38:
+   \   005D   9E....         MOV       DATPeeCalibrationData+7,A
+    602              mNormalizeMax(PROLONG_APPUI_COURT);
+   \   0060   8E....         MOV       A,DATDbkMirrors+38
+   \   0063   4D07           CMP       A,#7
+   \   0065   8D02           BC        ??DATPeeNormalizeParameters_Static_39
+   \   0067   A106           MOV       A,#6
+   \                     ??DATPeeNormalizeParameters_Static_39:
+   \   0069   9E....         MOV       DATPeeCalibrationData+8,A
+    603              mNormalizeMax(PROLONG_APPUI_LONG);
+   \   006C   8E....         MOV       A,DATDbkMirrors+39
+   \   006F   4D07           CMP       A,#7
+   \   0071   8D02           BC        ??DATPeeNormalizeParameters_Static_40
+   \   0073   A106           MOV       A,#6
+   \                     ??DATPeeNormalizeParameters_Static_40:
+   \   0075   9E....         MOV       DATPeeCalibrationData+9,A
+    604              mNormalizeMax(TPS_APPUILAV);
+   \   0078   8E....         MOV       A,DATDbkMirrors+40
+   \   007B   4D44           CMP       A,#68
+   \   007D   8D02           BC        ??DATPeeNormalizeParameters_Static_41
+   \   007F   A143           MOV       A,#67
+   \                     ??DATPeeNormalizeParameters_Static_41:
+   \   0081   9E....         MOV       DATPeeCalibrationData+10,A
+    605              mNormalizeMax(PROLONG_APPUI_ARR);
+   \   0084   8E....         MOV       A,DATDbkMirrors+45
+   \   0087   4D07           CMP       A,#7
+   \   0089   8D02           BC        ??DATPeeNormalizeParameters_Static_42
+   \   008B   A106           MOV       A,#6
+   \                     ??DATPeeNormalizeParameters_Static_42:
+   \   008D   9E....         MOV       DATPeeCalibrationData+11,A
+    606              mNormalizeMax(SEUIL_VIT_CONDAROU);
+   \   0090   8E....         MOV       A,DATDbkMirrors+55
+   \   0093   4D33           CMP       A,#51
+   \   0095   8D02           BC        ??DATPeeNormalizeParameters_Static_43
+   \   0097   A132           MOV       A,#50
+   \                     ??DATPeeNormalizeParameters_Static_43:
+   \   0099   9E....         MOV       DATPeeCalibrationData+12,A
+    607              mNormalizeMax(TPS_COM_MOTEUR);
+   \   009C   8E....         MOV       A,DATDbkMirrors+56
+   \   009F   4D65           CMP       A,#101
+   \   00A1   8D02           BC        ??DATPeeNormalizeParameters_Static_44
+   \   00A3   A164           MOV       A,#100
+   \                     ??DATPeeNormalizeParameters_Static_44:
+   \   00A5   9E....         MOV       DATPeeCalibrationData+13,A
+    608              mNormalizeMax(NBCOM_MAX);
+   \   00A8   8E....         MOV       A,DATDbkMirrors+57
+   \   00AB   4D29           CMP       A,#41
+   \   00AD   8D02           BC        ??DATPeeNormalizeParameters_Static_45
+   \   00AF   A128           MOV       A,#40
+   \                     ??DATPeeNormalizeParameters_Static_45:
+   \   00B1   9E....         MOV       DATPeeCalibrationData+14,A
+    609              mNormalizeMax(TPS_REF);
+   \   00B4   8E....         MOV       A,DATDbkMirrors+58
+   \   00B7   4D05           CMP       A,#5
+   \   00B9   8D02           BC        ??DATPeeNormalizeParameters_Static_46
+   \   00BB   A104           MOV       A,#4
+   \                     ??DATPeeNormalizeParameters_Static_46:
+   \   00BD   9E....         MOV       DATPeeCalibrationData+15,A
+    610              mNormalizeMax(TIMER_RECONDA_AUTO);
+   \   00C0   8E....         MOV       A,DATDbkMirrors+59
+   \   00C3   4D3D           CMP       A,#61
+   \   00C5   8D02           BC        ??DATPeeNormalizeParameters_Static_47
+   \   00C7   A13C           MOV       A,#60
+   \                     ??DATPeeNormalizeParameters_Static_47:
+   \   00C9   9E....         MOV       DATPeeCalibrationData+16,A
+    611              mNormalizeMax(N_MISE_APC);
+   \   00CC   8E....         MOV       A,DATDbkMirrors+60
+   \   00CF   4D15           CMP       A,#21
+   \   00D1   8D02           BC        ??DATPeeNormalizeParameters_Static_48
+   \   00D3   A114           MOV       A,#20
+   \                     ??DATPeeNormalizeParameters_Static_48:
+   \   00D5   9E....         MOV       DATPeeCalibrationData+17,A
+    612              mNormalizeMax(TPS_OUVPORTE);
+   \   00D8   8E....         MOV       A,DATDbkMirrors+61
+   \   00DB   4D15           CMP       A,#21
+   \   00DD   8D02           BC        ??DATPeeNormalizeParameters_Static_49
+   \   00DF   A114           MOV       A,#20
+   \                     ??DATPeeNormalizeParameters_Static_49:
+   \   00E1   9E....         MOV       DATPeeCalibrationData+18,A
+    613              mNormalizeMax(TPS_TEMPO_DEG);
+   \   00E4   8E....         MOV       A,DATDbkMirrors+50
+   \   00E7   4D19           CMP       A,#25
+   \   00E9   8D02           BC        ??DATPeeNormalizeParameters_Static_50
+   \   00EB   A118           MOV       A,#24
+   \                     ??DATPeeNormalizeParameters_Static_50:
+   \   00ED   9E....         MOV       DATPeeCalibrationData+19,A
+    614              mNormalizeMax(SBR_ACTIVE_SPEED_THRESH_TP);
+   \   00F0   8E....         MOV       A,DATDbkMirrors+53
+   \   00F3   4D1F           CMP       A,#31
+   \   00F5   8D02           BC        ??DATPeeNormalizeParameters_Static_51
+   \   00F7   A11E           MOV       A,#30
+   \                     ??DATPeeNormalizeParameters_Static_51:
+   \   00F9   9E....         MOV       DATPeeCalibrationData+20,A
+    615              mNormalizeMax(SBR_TIMEOUT_TM_TP);
+   \   00FC   8E....         MOV       A,DATDbkMirrors+52
+   \   00FF   4D79           CMP       A,#121
+   \   0101   8D02           BC        ??DATPeeNormalizeParameters_Static_52
+   \   0103   A178           MOV       A,#120
+   \                     ??DATPeeNormalizeParameters_Static_52:
+   \   0105   9E....         MOV       DATPeeCalibrationData+21,A
+    616              mNormalizeMax(MAX_NB_ALERT_SEQUENCES_TP);
+   \   0108   8E....         MOV       A,DATDbkMirrors+54
+   \   010B   4D15           CMP       A,#21
+   \   010D   8D02           BC        ??DATPeeNormalizeParameters_Static_53
+   \   010F   A114           MOV       A,#20
+   \                     ??DATPeeNormalizeParameters_Static_53:
+   \   0111   9E....         MOV       DATPeeCalibrationData+22,A
+    617              mNormalizeMax(TPS_BUZ_CLI);
+   \   0114   8E....         MOV       A,DATDbkMirrors+62
+   \   0117   4D09           CMP       A,#9
+   \   0119   8D02           BC        ??DATPeeNormalizeParameters_Static_54
+   \   011B   A108           MOV       A,#8
+   \                     ??DATPeeNormalizeParameters_Static_54:
+   \   011D   9E....         MOV       DATPeeCalibrationData+23,A
+    618              mNormalizeMax(TPS_CLI);
+   \   0120   8E....         MOV       A,DATDbkMirrors+46
+   \   0123   4D0B           CMP       A,#11
+   \   0125   8D02           BC        ??DATPeeNormalizeParameters_Static_55
+   \   0127   A10A           MOV       A,#10
+   \                     ??DATPeeNormalizeParameters_Static_55:
+   \   0129   9E....         MOV       DATPeeCalibrationData+24,A
+    619              mNormalizeMax(TPS_CLIDEGRAD);
+   \   012C   8E....         MOV       A,DATDbkMirrors+47
+   \   012F   4D06           CMP       A,#6
+   \   0131   8D02           BC        ??DATPeeNormalizeParameters_Static_56
+   \   0133   A105           MOV       A,#5
+   \                     ??DATPeeNormalizeParameters_Static_56:
+   \   0135   9E....         MOV       DATPeeCalibrationData+25,A
+    620          
+    621              // MIN: Normalize to value 1
+    622              // Note that mNormalizeMin() should be used AFTER mNormalizeMax()!
+    623              
+    624              // Parameters leading to value 255 due to direct subtraction:
+    625              mNormalizeMin(TPS_ESSUIE_MINI);
+   \   0138   8E....         MOV       A,DATDbkMirrors+42
+   \   013B   4D00           CMP       A,#0
+   \   013D   BD04           BNZ       ??DATPeeNormalizeParameters_Static_57
+   \   013F   A101           MOV       A,#1
+   \   0141   FA03           BR        ??DATPeeNormalizeParameters_Static_58
+   \                     ??DATPeeNormalizeParameters_Static_57:
+   \   0143   8E....         MOV       A,DATPeeCalibrationData+4
+   \                     ??DATPeeNormalizeParameters_Static_58:
+   \   0146   9E....         MOV       DATPeeCalibrationData+4,A
+    626              mNormalizeMin(TPS_APPUILAV);
+   \   0149   8E....         MOV       A,DATDbkMirrors+40
+   \   014C   4D00           CMP       A,#0
+   \   014E   BD04           BNZ       ??DATPeeNormalizeParameters_Static_59
+   \   0150   A101           MOV       A,#1
+   \   0152   FA03           BR        ??DATPeeNormalizeParameters_Static_60
+   \                     ??DATPeeNormalizeParameters_Static_59:
+   \   0154   8E....         MOV       A,DATPeeCalibrationData+10
+   \                     ??DATPeeNormalizeParameters_Static_60:
+   \   0157   9E....         MOV       DATPeeCalibrationData+10,A
+    627              mNormalizeMin(TPS_TEMPO_DEG);
+   \   015A   8E....         MOV       A,DATDbkMirrors+50
+   \   015D   4D00           CMP       A,#0
+   \   015F   BD04           BNZ       ??DATPeeNormalizeParameters_Static_61
+   \   0161   A101           MOV       A,#1
+   \   0163   FA03           BR        ??DATPeeNormalizeParameters_Static_62
+   \                     ??DATPeeNormalizeParameters_Static_61:
+   \   0165   8E....         MOV       A,DATPeeCalibrationData+19
+   \                     ??DATPeeNormalizeParameters_Static_62:
+   \   0168   9E....         MOV       DATPeeCalibrationData+19,A
+    628              mNormalizeMin(TPS_CLI);
+   \   016B   8E....         MOV       A,DATDbkMirrors+46
+   \   016E   4D00           CMP       A,#0
+   \   0170   BD04           BNZ       ??DATPeeNormalizeParameters_Static_63
+   \   0172   A101           MOV       A,#1
+   \   0174   FA03           BR        ??DATPeeNormalizeParameters_Static_64
+   \                     ??DATPeeNormalizeParameters_Static_63:
+   \   0176   8E....         MOV       A,DATPeeCalibrationData+24
+   \                     ??DATPeeNormalizeParameters_Static_64:
+   \   0179   9E....         MOV       DATPeeCalibrationData+24,A
+    629              mNormalizeMin(TPS_CLIDEGRAD);
+   \   017C   8E....         MOV       A,DATDbkMirrors+47
+   \   017F   4D00           CMP       A,#0
+   \   0181   BD04           BNZ       ??DATPeeNormalizeParameters_Static_65
+   \   0183   A101           MOV       A,#1
+   \   0185   FA03           BR        ??DATPeeNormalizeParameters_Static_66
+   \                     ??DATPeeNormalizeParameters_Static_65:
+   \   0187   8E....         MOV       A,DATPeeCalibrationData+25
+   \                     ??DATPeeNormalizeParameters_Static_66:
+   \   018A   9E....         MOV       DATPeeCalibrationData+25,A
+    630              
+    631              // Parameters that are specified to be normalized:
+    632              mNormalizeMin(TPS_MAX_COUPLBLOC);
+   \   018D   8E....         MOV       A,DATDbkMirrors+36
+   \   0190   4D00           CMP       A,#0
+   \   0192   BD04           BNZ       ??DATPeeNormalizeParameters_Static_67
+   \   0194   A101           MOV       A,#1
+   \   0196   FA03           BR        ??DATPeeNormalizeParameters_Static_68
+   \                     ??DATPeeNormalizeParameters_Static_67:
+   \   0198   8E....         MOV       A,DATPeeCalibrationData+5
+   \                     ??DATPeeNormalizeParameters_Static_68:
+   \   019B   9E....         MOV       DATPeeCalibrationData+5,A
+    633              mNormalizeMin(TPS_ARRET);
+   \   019E   8E....         MOV       A,DATDbkMirrors+37
+   \   01A1   4D00           CMP       A,#0
+   \   01A3   BD04           BNZ       ??DATPeeNormalizeParameters_Static_69
+   \   01A5   A101           MOV       A,#1
+   \   01A7   FA03           BR        ??DATPeeNormalizeParameters_Static_70
+   \                     ??DATPeeNormalizeParameters_Static_69:
+   \   01A9   8E....         MOV       A,DATPeeCalibrationData+6
+   \                     ??DATPeeNormalizeParameters_Static_70:
+   \   01AC   9E....         MOV       DATPeeCalibrationData+6,A
+    634              mNormalizeMin(NBCOM_MAX);
+   \   01AF   8E....         MOV       A,DATDbkMirrors+57
+   \   01B2   4D02           CMP       A,#2
+   \   01B4   9D04           BNC       ??DATPeeNormalizeParameters_Static_71
+   \   01B6   A102           MOV       A,#2
+   \   01B8   FA03           BR        ??DATPeeNormalizeParameters_Static_72
+   \                     ??DATPeeNormalizeParameters_Static_71:
+   \   01BA   8E....         MOV       A,DATPeeCalibrationData+14
+   \                     ??DATPeeNormalizeParameters_Static_72:
+   \   01BD   9E....         MOV       DATPeeCalibrationData+14,A
+    635              mNormalizeMin(TIMER_RECONDA_AUTO);
+   \   01C0   8E....         MOV       A,DATDbkMirrors+59
+   \   01C3   4D00           CMP       A,#0
+   \   01C5   BD04           BNZ       ??DATPeeNormalizeParameters_Static_73
+   \   01C7   A101           MOV       A,#1
+   \   01C9   FA03           BR        ??DATPeeNormalizeParameters_Static_74
+   \                     ??DATPeeNormalizeParameters_Static_73:
+   \   01CB   8E....         MOV       A,DATPeeCalibrationData+16
+   \                     ??DATPeeNormalizeParameters_Static_74:
+   \   01CE   9E....         MOV       DATPeeCalibrationData+16,A
+    636              mNormalizeMin(N_MISE_APC);
+   \   01D1   8E....         MOV       A,DATDbkMirrors+60
+   \   01D4   4D00           CMP       A,#0
+   \   01D6   BD04           BNZ       ??DATPeeNormalizeParameters_Static_75
+   \   01D8   A101           MOV       A,#1
+   \   01DA   FA03           BR        ??DATPeeNormalizeParameters_Static_76
+   \                     ??DATPeeNormalizeParameters_Static_75:
+   \   01DC   8E....         MOV       A,DATPeeCalibrationData+17
+   \                     ??DATPeeNormalizeParameters_Static_76:
+   \   01DF   9E....         MOV       DATPeeCalibrationData+17,A
+    637              mNormalizeMin(MAX_NB_ALERT_SEQUENCES_TP);
+   \   01E2   8E....         MOV       A,DATDbkMirrors+54
+   \   01E5   4D00           CMP       A,#0
+   \   01E7   BD04           BNZ       ??DATPeeNormalizeParameters_Static_77
+   \   01E9   A101           MOV       A,#1
+   \   01EB   FA03           BR        ??DATPeeNormalizeParameters_Static_78
+   \                     ??DATPeeNormalizeParameters_Static_77:
+   \   01ED   8E....         MOV       A,DATPeeCalibrationData+22
+   \                     ??DATPeeNormalizeParameters_Static_78:
+   \   01F0   9E....         MOV       DATPeeCalibrationData+22,A
+    638          
+    639              // Justification of parameters that will not be normalized:
+    640          
+    641              // TPS_RETARD_DETRESSE - value 0 leads to at least one LAP_FLI graph cycle of 20 ms
+    642              // TPS_TIMER_DETRESSE - value 0 leads to 1 step of duration 25 s
+    643              // TPS_APC - value 0 leads to 1 step of duration 50 s
+    644              // TPS_PLAF - value 0 produces minimal duration
+    645              
+    646              // TPS_REPRISE - value 0 produces minimal duration
+    647          
+    648              // TPSFILT_AF - value 0 (and 1) lead to duration of 3...8 ms
+    649              // TPS_POSIT_BALAIS - value 0 produces no steps = 0
+    650          
+    651              // PROLONG_APPUI_COURT - value 0 leads to 1 stroke
+    652              // PROLONG_APPUI_LONG - value 0 leads to 1 stroke
+    653          
+    654              // TPS_POSIT_BALAIS_AR - value 0 produces minimal duration
+    655              // PROLONG_APPUI_ARR - value 0 leads to 1 stroke
+    656          
+    657              // SEUIL_VIT_CONDAROU - value 0 is correct limit speed
+    658              // TPS_COM_MOTEUR - value 0 produces minimal duration 20 ms
+    659          
+    660              // TPS_REF - value 0 produces minimal duration
+    661              // TMPMERA (TimeOutMERA) - value 0 produces minimal duration
+    662              // TPS_OUVPORTE - value 0 produces minimal duration
+    663              
+    664              // TPS_IMPUL_MINI - value 0 produces minimal duration
+    665              // SBR_ACTIVE_SPEED_THRESH_TP - value 0 produces correct limit
+    666              // SBR_TIMEOUT_TM_TP - value 0 produces minimal duration
+    667          
+    668              // TPS_BUZ_CLI - value 0 produces minimal duration
+    669          }
+   \   01F3   AF             RET       
+   \   01F4                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     EepromManager                    12
+     EepromNormalization               6
+     TimerPee                          2
+     bEepReadFinished                  1
+     DATPeeCalibrationData            26
+     DATPeeInit                        1
+     DATPeeIsEepromAccessible          3
+     DATPeeRebuildDoubleBank         165
+     DiagBankDefaultValues            24
+     GeneralParameterBankDefaultValues
+                                       6
+     FactoryConfigBankDefaultValues   38
+     StaticImmoBankDefaultValues      76
+     DynamicImmoDataBankDefaultValues
+                                      65
+     DATPeeErrorIndication           144
+     DATPeeRebuildSingleBank         103
+     VersionBankDefaultValues          2
+     DATPeeSingleBankErrorIndication
+                                     119
+     DATPeeIsMaintainStartingStepState
+                                      12
+     DATPeeRestoreBanks                3
+     DATPeeReadAllBanks                6
+     DATPeeUpdateBanks                 1
+     DATPeeStartTimer                  5
+     DATPeeIsTimerElapsed             10
+     DATPeeCanRestoreBanks            40
+     DATPeeNormalizeParameters         9
+     DATPeeNormalizeParameters_Static
+                                     500
+     __T_TOSWriteSignal                2
+     __T_TOSStartTimer                 2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSSeqActivateGraph           2
+     __T_?FAR_CALL_L07                 2
+
+ 
+ 1 031 bytes in segment BCODE
+    10 bytes in segment CLTVEC
+    90 bytes in segment CODE
+   229 bytes in segment CONST
+    29 bytes in segment NEAR_Z
+ 
+ 1 121 bytes of CODE  memory (+ 10 bytes shared)
+   229 bytes of CONST memory
+    29 bytes of DATA  memory
+
+Errors: none
+Warnings: none

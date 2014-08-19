@@ -1,0 +1,2423 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:29:50 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_CAR.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_CAR.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_CAR.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_CAR.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_CAR.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_CAR.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_CAR.C
+      1          //*****************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // ----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // ----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // ----------------------------------------------------------------------------
+     11          // Component:    LAP_CAR
+     12          // ----------------------------------------------------------------------------
+     13          // $Date:   Jun 16 2010 14:21:28  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/CAR/LAP_CAR.c-arc  $
+     15          // $Revision:   1.18  $
+     16          // ----------------------------------------------------------------------------  
+     17          //
+     18          //  $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/CAR/LAP_CAR.c-arc  $
+     19          // 
+     20          //    Rev 1.18   Jun 16 2010 14:21:28   amanevd
+     21          // Cm009190: EEP_CodeAFSAvailable replaced with EEP_EraseAFSCodeRequest
+     22          // 
+     23          //    Rev 1.17   Mar 01 2010 14:29:04   adzhelp
+     24          // Cm007334: Code review corrections by BI
+     25          // 
+     26          //    Rev 1.16   Feb 25 2010 15:50:56   amanevd
+     27          // Cm007334: DO_DATA_IMMOBILIZERProtection set to 0 on PWR_IGN rising edge
+     28          // 
+     29          //    Rev 1.15   Feb 24 2010 18:25:38   amanevd
+     30          // Cm005797: KeyIsNotAuthenticated sent on MERA elapse
+     31          // 
+     32          //    Rev 1.14   Feb 10 2010 16:45:28   amanevd
+     33          // Cm007075: Volatile Faults and Deprotection cleared at IGN ON
+     34          // 
+     35          //    Rev 1.13   Feb 08 2010 09:25:42   amanevd
+     36          // Cm006744: Perform 32-bit math operations only when values are changed
+     37          // 
+     38          //    Rev 1.12   Feb 02 2010 14:54:48   amanevd
+     39          // Cm005797: cVerlogTimeOut set to 150ms
+     40          // 
+     41          //    Rev 1.11   Jan 15 2010 18:35:04   amanevd
+     42          // Cm005797: CARManageImmobiliserAndCarAntiTheft graph set on 10ms period
+     43          // 
+     44          //    Rev 1.10   Nov 02 2009 13:19:14   amanevd
+     45          // Cm006602: 60ms correction of EEP_TimeOutMERA removed
+     46          // 
+     47          //    Rev 1.9   Nov 02 2009 10:45:22   amanevd
+     48          // Cm006599: Verlog frame start time modified
+     49          // 
+     50          //    Rev 1.8   Sep 29 2009 18:20:58   amanevd
+     51          // Cm006330: Permanent authentication is suspended on ignition switched off
+     52          // 
+     53          //    Rev 1.7   Sep 25 2009 11:21:34   amanevd
+     54          // Cm006166: Resolution of TMP_MERA changed to Min=0 / Step=0,1s / Max=25.5s=> Default = 10s (100)
+     55          // 
+     56          //    Rev 1.6   Sep 03 2009 12:37:04   amanevd
+     57          // Cm005133: Diagnostic information is cleared on MERA timeout, VERLOGON included
+     58          // 
+     59          //    Rev 1.5   Aug 28 2009 17:41:32   amanevd
+     60          // Cm005567: Code review correction
+     61          // 
+     62          //    Rev 1.4   Jul 28 2009 14:59:28   amanevd
+     63          // Cm005567: TestVirginKey is available on unsuccessful authentication with PWR_IGN==1
+     64          // 
+     65          //    Rev 1.3   Jul 16 2009 11:40:46   amanevd
+     66          // Cm005193: Signal ECMIsProtected substituted with EEP_CodeAFSAvailable
+     67          // 
+     68          //    Rev 1.2   Apr 29 2009 13:13:52   amanevd
+     69          // Cm003272 - Intermediate part 3 
+     70          // - PRS compliance
+     71          // 
+     72          //    Rev 1.1   Apr 22 2009 19:23:48   amanevd
+     73          // Cm003272 - Finishing part 1 - pre-integration
+     74          // 
+     75          //    Rev 1.0   Jan 09 2009 14:18:20   amanevd
+     76          // Initial revision.
+     77          //
+     78          //=============================================================================
+     79          
+     80          //-----------------------------------------------------------------------------
+     81          //  Body Identification
+     82          //-----------------------------------------------------------------------------
+     83          
+     84          #define LAP_CAR   "LAP_CAR"
+     85          
+     86          //-----------------------------------------------------------------------------
+     87          //  Included files
+     88          //
+     89          //  #include <system_file_name.h>
+     90          //  #include "project_file_name.h"
+     91          //-----------------------------------------------------------------------------
+     92          
+     93          #include "lib.h"
+     94          #include "tos.h"
+     95          #include "dat.h"
+     96          #include "LAP_CAR.h"
+     97          #include "LAP_CAR.hgr"
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near CARManageImmobiliserAndCarAntiTheft[43]
+   \                     CARManageImmobiliserAndCarAntiTheft:
+   \   0000   ........       DW TOSSeqTrueEval, TOSSeqNoAction
+   \   0004   FF01           DB 255, 1
+   \   0006   ........       DW CARCustomerIgnitionON, CARKeyAuthentication
+   \   000A   1A02           DB 26, 2
+   \   000C   ........       DW CARKeyAuthenticationOK, CARKeyAuthentResultOKandUnprotected
+   \   0010   1103           DB 17, 3
+   \   0012   ........       DW CARKeyNeedResynchroOK, CARKeyResynchronization
+   \   0016   1004           DB 16, 4
+   \   0018   ........       DW CARKeyResynchroFinished, CARPutImmobilizerAntennaInSleepMode
+   \   001C   FF05           DB 255, 5
+   \   001E   ........       DW CARSleepModeFinished, TOSSeqNoAction
+   \   0022   FF06           DB 255, 6
+   \   0024   ........       DW CARTpoECMisElapsed, CARManageVerlogPattern
+   \   0028   0F07           DB 15, 7
+   \   002A   ........       DW CARIgnitionOFF, CARStartTempoMera
+   \   002E   0B08           DB 11, 8
+   \   0030   ........       DW CARTempoMeraFinishedOK, CARTempoMeraElapsedAction
+   \   0034   0A09           DB 10, 9
+   \   0036   ........       DW TOSSeqTrueEval, TOSSeqNoAction
+   \   003A   FF01           DB 255, 1
+   \   003C   ........       DW CARIgnitionON, CARKeyAuthentResultOKandUnprotected
+   \   0040   FF06           DB 255, 6
+   \   0042   ........       DW TOSSeqTrueEval, CARStartTpoSleepVerify
+   \   0046   FF0C           DB 255, 12
+   \   0048   ........       DW CARIgnitionOFF, CARStartTempoMera
+   \   004C   0D08           DB 13, 8
+   \   004E   ........       DW CARTpoSleepVerifyElapsed, CARPutImmobilizerAntennaInSleepMode
+   \   0052   FF0E           DB 255, 14
+   \   0054   ........       DW CARSleepModeFinished, TOSSeqNoAction
+   \   0058   FF07           DB 255, 7
+   \   005A   ........       DW CARIgnitionOFF, CARStartTempoMera
+   \   005E   FF08           DB 255, 8
+   \   0060   ........       DW TOSSeqTrueEval, CARPutImmobilizerAntennaInSleepMode
+   \   0064   FF05           DB 255, 5
+   \   0066   ........       DW CARKeyAuthenticationNOK, CARKeyAuthentErrorAndProtected
+   \   006A   1912           DB 25, 18
+   \   006C   ........       DW TOSSeqTrueEval, CARPutImmobilizerAntennaInSleepMode
+   \   0070   FF13           DB 255, 19
+   \   0072   ........       DW CARSleepModeFinished, TOSSeqNoAction
+   \   0076   FF14           DB 255, 20
+   \   0078   ........       DW CARVirginTestActivated, CARKeyAuthenticationWithTransportISK
+   \   007C   1815           DB 24, 21
+   \   007E   ........       DW CARKeyAuthenticationOK, CARPutImmobilizerAntennaInSleepMode
+   \   0082   1716           DB 23, 22
+   \   0084   ........       DW CARSleepModeFinished, CARVirginKeyEnd
+   \   0088   FF14           DB 255, 20
+   \   008A   ........       DW CARKeyAuthenticationNOK, CARPutImmobilizerAntennaInSleepMode
+   \   008E   FF16           DB 255, 22
+   \   0090   ........       DW CARIgnitionOFF, TOSSeqNoAction
+   \   0094   FF01           DB 255, 1
+   \   0096   ........       DW CARIsVerlogTimerElapsed, CARSendVerlogFrame
+   \   009A   FF02           DB 255, 2
+   \   009C   ........       DW CARIgnitionON, CARImmoWorkingMode
+   \   00A0   1D1B           DB 29, 27
+   \   00A2   ........       DW CARLearningModeInProgress, TOSSeqNoAction
+   \   00A6   1C18           DB 28, 24
+   \   00A8   ........       DW CARBCMBlankOK, CARBCMBlankError
+   \   00AC   FF18           DB 255, 24
+   \   00AE   ........       DW CARAuthentPermActivated, CARInitializePermanentAuthenticationTest
+   \   00B2   2A1E           DB 42, 30
+   \   00B4   ........       DW CARIgnitionON, CARKeyAuthenticationInTestMode
+   \   00B8   291F           DB 41, 31
+   \   00BA   ........       DW CARKeyAuthenticationOK, CARPermanentAuthenticationResultOK
+   \   00BE   2720           DB 39, 32
+   \   00C0   ........       DW CARKeyWithRf, CARKeyResynchronization
+   \   00C4   2621           DB 38, 33
+   \   00C6   ........       DW CARResynchroNOK, CARResynchronizationError
+   \   00CA   2522           DB 37, 34
+   \   00CC   ........       DW CARAuthentPermActivatedAndIgnitionOn, CARKeyAuthenticationInTestMode
+   \   00D0   231F           DB 35, 31
+   \   00D2   ....           DW TOSSeqTrueEval
+   \   00D4   ....           DW CARPutImmobilizerAntennaInSleepModeAndStopPermanentAuthent
+   \   00D6   FF24           DB 255, 36
+   \   00D8   ........       DW CARSleepModeFinished, TOSSeqNoAction
+   \   00DC   FF18           DB 255, 24
+   \   00DE   ........       DW CARResynchroOK, TOSSeqNoAction
+   \   00E2   FF22           DB 255, 34
+   \   00E4   ........       DW TOSSeqTrueEval, TOSSeqNoAction
+   \   00E8   FF22           DB 255, 34
+   \   00EA   ........       DW CARKeyAuthenticationNOK, CARPermanentAuthenticationResultNOK
+   \   00EE   FF28           DB 255, 40
+   \   00F0   ........       DW CARAuthentTimerElapsed, TOSSeqNoAction
+   \   00F4   FF22           DB 255, 34
+   \   00F6   ........       DW CARPermanentAuthentTestDeactivated, TOSSeqNoAction
+   \   00FA   FF01           DB 255, 1
+   \   00FC   ........       DW TOSSeqTrueEval, CARAuthorizedStandByMode
+   \   0100   FF01           DB 255, 1
+     98          
+     99          //-----------------------------------------------------------------------------
+    100          //  Local constants
+    101          //
+    102          //  #define cConstantName   ((tType) ConstantValue)
+    103          //-----------------------------------------------------------------------------
+    104          
+    105          // Time out definition
+    106          #define cTimeOut3sECM       (mTOSConvMsInTimerTick(3000UL))
+    107          #define cTimeOut1sec        (mTOSConvMsInTimerTick(1000UL))
+    108          #define cTimeOut1mn         (mTOSConvMsInTimerTick(60000UL))
+    109          #define cVerlogTimeOut      (mTOSConvMsInTimerTick(150UL))
+    110          
+    111          // amanevd: 'Neg' constants make QAC to shut up. Must update them
+    112          // every time you update the original constant !!!
+    113          #define cReadyToSleep       ((U8) 0x01U)
+    114          #define cNegReadyToSleep    ((U8) 0xFEU)
+    115          #define cTestVirginKey      ((U8) 0x02U)
+    116          #define cNegTestVirginKey   ((U8) 0xFDU)
+    117          #define cPermAuthMode       ((U8) 0x04U)
+    118          #define cNegPermAuthMode    ((U8) 0xFBU)
+    119          
+    120          #define cMaxAuthentPermanentTotalCounter          ((U16)0xFFFFU)
+    121          #define cMaxAuthentPermanentFailCounter           ((U8)0xFFU)
+    122          #define cMaxAuthentPermanentResynchroFailCounter  ((U8)0xFFU)
+    123          
+    124          //-----------------------------------------------------------------------------
+    125          //  Local macros
+    126          //
+    127          //  #define mMacroName   (MacroDefinition)
+    128          //-----------------------------------------------------------------------------
+    129          #define mSetReadyToSleep()    (u8CarImmoFlag |= cReadyToSleep)
+    130          #define mClearReadyToSleep()  (u8CarImmoFlag &= cNegReadyToSleep)
+    131          #define mReadyToSleepIsOn()   ((u8CarImmoFlag & cReadyToSleep) != 0)
+    132          #define mReadyToSleepIsOff()  ((u8CarImmoFlag & cReadyToSleep) == 0)
+    133          
+    134          #define mSetTestVirginKey()   (u8CarImmoFlag |= cTestVirginKey)
+    135          #define mClearTestVirginKey() (u8CarImmoFlag &= cNegTestVirginKey)
+    136          #define mTestVirginKeyIsOn()  ((u8CarImmoFlag & cTestVirginKey) != 0)
+    137          #define mTestVirginKeyIsOff() ((u8CarImmoFlag & cTestVirginKey) == 0)
+    138          
+    139          #define mSetPermAuthMode()    (u8CarImmoFlag |= cPermAuthMode)
+    140          #define mClearPermAuthMode()  (u8CarImmoFlag &= cNegPermAuthMode)
+    141          #define mPermAuthModeIsOn()   ((u8CarImmoFlag & cPermAuthMode) != 0)
+    142          #define mPermAuthModeIsOff()  ((u8CarImmoFlag & cPermAuthMode) == 0)
+    143          
+    144          //QACJ 3443:amanevd: Last instance of mDATRead(cTimeOutMERA -> mDATRead -> mDATRead2 -> [mDATRead]) is a concatenation of mDATRead ## DataType## DataName ## TreatmentType()
+    145          #define mCalcTimeOutMERA()  (mTOSConvMsInTimerTick(((U32)(u8TimeOutMERA = mDATRead(U8Bit, EEP_TimeOutMERA, Default)) * 100UL)))
+    146          
+    147          #define mReadTimeOutMERA()  (CalculatedMERA = \
+    148                                          (u8TimeOutMERA == mDATRead(U8Bit, EEP_TimeOutMERA, Default)) \
+    149                                          ? CalculatedMERA \
+    150              /*//QACJ 3443:amanevd: Last instance of mDATRead(cTimeOutMERA -> mDATRead -> mDATRead2 -> [mDATRead]) is a concatenation of mDATRead ## DataType## DataName ## TreatmentType()*/ \
+    151                                          : mCalcTimeOutMERA())
+    152          
+    153          //-----------------------------------------------------------------------------
+    154          //  Local types
+    155          //
+    156          //  struct  sStructureName { ... };
+    157          //  union   uUnionName { ... };
+    158          //  enum    eEnumerationName { ... };
+    159          //  typedef Expression tTypeName;
+    160          //-----------------------------------------------------------------------------
+    161          
+    162          //-----------------------------------------------------------------------------
+    163          //  Local data
+    164          //
+    165          //  static  tType   VariableName;
+    166          //  static  tType*  pVariableName; 
+    167          //-----------------------------------------------------------------------------
+    168          
+    169          // Timer
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    170          static tTOSTimer    CarImmobilizerTimer;
+   \                     CarImmobilizerTimer:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+
+   \                                 In  segment NEAR_Z, align 2, align-sorted
+    171          static tTOSTimer    CalculatedMERA;
+   \                     CalculatedMERA:
+   \   0000                  DS 2
+   \   0002                  REQUIRE __INIT_NEAR_Z
+    172          
+    173          // Flags
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    174          static U8   u8CarImmoFlag;
+   \                     u8CarImmoFlag:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    175          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    176          static U8   u8TimeOutMERA;
+   \                     u8TimeOutMERA:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    177          
+    178          //-----------------------------------------------------------------------------
+    179          //  Constant local data
+    180          //
+    181          //  static const tType  VariableName;
+    182          //-----------------------------------------------------------------------------
+    183          
+    184          //-----------------------------------------------------------------------------
+    185          //  Exported data
+    186          //
+    187          //  tType   LAYCmpVariableName;   (LAY: 3 characters to identify the layer)
+    188          //  tType*  pLAYCmpVariableName;  (Cmp: 3 characters to identify this component)
+    189          //-----------------------------------------------------------------------------
+    190          
+    191          //-----------------------------------------------------------------------------
+    192          //  Constant exported data
+    193          //
+    194          //              (LAY: 3 characters to identify the layer)
+    195          //              (Cmp: 3 characters to identify this component)
+    196          // 
+    197          //  const tType   LAYCmpVariableName;
+    198          //-----------------------------------------------------------------------------
+    199          
+    200          //-----------------------------------------------------------------------------
+    201          //  Local function prototypes
+    202          //  
+    203          //  static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
+    204          //-----------------------------------------------------------------------------
+    205          
+    206          #ifdef X90_PROJECT
+    207          static MEM_TYPE BOOL CARIgnitionOFF_Static(void);
+    208          static MEM_TYPE void CARAuthorizedStandByMode_Static(void);
+    209          static MEM_TYPE void CARKeyAuthentication_Static(void);
+    210          static MEM_TYPE void CARKeyAuthenticationInTestMode_Static(void);
+    211          static MEM_TYPE void CARKeyAuthenticationWithTransportISK_Static(void);
+    212          static MEM_TYPE void CARPermanentAuthenticationResultNOK_Static(void);
+    213          #endif
+    214          
+    215          //=============================================================================
+    216          //=========================== LOCAL FUNCTIONS =================================
+    217          //=============================================================================
+    218          
+    219          //=============================================================================
+    220          //  DESCRIPTION :
+    221          //  
+    222          //  PARAMETERS (Type,Name,Min,Max) :   none
+    223          //
+    224          //  RETURN VALUE :   none
+    225          // 
+    226          //  DESIGN INFORMATION :   refer to Detailed Design Document
+    227          //=============================================================================
+    228          //static type FunctionName(...)
+    229          
+    230          //=============================================================================
+    231          //============================ EXPORTED FUNCTIONS =============================
+    232          //=============================================================================
+    233          
+    234          //*****************************************************************************
+    235          //  DESCRIPTION :
+    236          //  
+    237          //  PARAMETERS (Type,Name,Min,Max) :  none
+    238          //
+    239          //  RETURN VALUE :  none
+    240          // 
+    241          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    242          //*****************************************************************************
+    243          //type LAYCmpFunctionName(...)
+    244          //{
+    245          //}
+    246          
+    247          //*****************************************************************************
+    248          //  DESCRIPTION : Start the permanent authentication service
+    249          //  
+    250          //  PARAMETERS (Type,Name,Min,Max) :  none
+    251          //
+    252          //  RETURN VALUE :  none
+    253          // 
+    254          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    255          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    256          void CARStartAuthentPermKey(void)
+   \                     CARStartAuthentPermKey:
+    257          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    258              mDATWrite(U16Bit,AuthentPermanentTotalCounter,0,Default);
+   \   0000   100000         MOVW      AX,#0
+   \   0003   03....         MOVW      DATCmnImmoData+24,AX
+    259              mDATWrite(U8Bit,AuthentPermanentFailCounter,0,Default);
+   \   0006   16....         MOVW      HL,#DATCmnImmoData+19
+   \   0009   97             MOV       [HL],A
+    260              mDATWrite(U8Bit,AuthentPermanentResynchroFailCounter,0,Default);
+   \   000A   86             INCW      HL
+   \   000B   97             MOV       [HL],A
+    261          
+    262              // Initialization of the test mode
+    263              mSetPermAuthMode();
+   \   000C   16....         MOVW      HL,#u8CarImmoFlag
+   \   000F   71A2           SET1      [HL].2
+    264          }
+   \   0011   AF             RET       
+   \   0012                  REQUIRE ?CL78K_V4_6_L00
+    265          
+    266          //*****************************************************************************
+    267          //  DESCRIPTION : Exit from the permanent authentication service
+    268          //  
+    269          //  PARAMETERS (Type,Name,Min,Max) :  none
+    270          //
+    271          //  RETURN VALUE :  none
+    272          // 
+    273          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    274          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    275          void CARExitFromAuthentPermKey(void)
+   \                     CARExitFromAuthentPermKey:
+    276          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    277              // Stop the test mode
+    278              mClearPermAuthMode();
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   71A3           CLR1      [HL].2
+    279          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    280          
+    281          //*****************************************************************************
+    282          //  DESCRIPTION : Start test virgin key service
+    283          //  
+    284          //  PARAMETERS (Type,Name,Min,Max) :  none
+    285          //
+    286          //  RETURN VALUE :  none
+    287          // 
+    288          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    289          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    290          void CARStartTestVirginKey(void)
+   \                     CARStartTestVirginKey:
+    291          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    292              // Initialization of the virgin test mode
+    293              mSetTestVirginKey();
+   \   0000   A103           MOV       A,#3
+   \   0002   16....         MOVW      HL,#u8CarImmoFlag
+   \   0005   7192           SET1      [HL].1
+    294          
+    295              // Switch off the LED_VERLOG
+    296              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+   \   0007                  REQUIRE ?Subroutine2
+   \   0007                  ; // Fall through to label ?Subroutine2
+    297          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine2:
+   \   0000   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0003   97             MOV       [HL],A
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    298          
+    299          //*****************************************************************************
+    300          //  DESCRIPTION : Set LAP_CAR component in the Run mode
+    301          //  
+    302          //  PARAMETERS (Type,Name,Min,Max) :  none
+    303          //
+    304          //  RETURN VALUE :  none
+    305          // 
+    306          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    307          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    308          void CARImmoWorkingMode(void)
+   \                     CARImmoWorkingMode:
+    309          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    310              mClearReadyToSleep();
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   7183           CLR1      [HL].0
+    311          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    312          
+    313          //*****************************************************************************
+    314          //  DESCRIPTION : Treat authentication service error
+    315          //  
+    316          //  PARAMETERS (Type,Name,Min,Max) :  none
+    317          //
+    318          //  RETURN VALUE :  none
+    319          // 
+    320          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    321          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    322          void CARKeyAuthentErrorAndProtected(void)
+   \                     CARKeyAuthentErrorAndProtected:
+    323          { 
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A106           MOV       A,#6
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    324              // Error pattern on LED_VERLOG
+    325              mDATWrite(U8Bit, LedVerlogPattern, cDATKeyNotRecognizedVerlogPattern, Default);
+   \   0003   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0006   97             MOV       [HL],A
+    326          
+    327              // Inform that the key is not authenticated
+    328              TOSSendControl(cTOSControlKeyIsNotAuthenticated);
+   \   0007   A12B           MOV       A,#43
+   \   0009   ..             CALLT     [__T_TOSSendControl]
+    329          
+    330              mDATControl(Vlg, cDATVlgStart);
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   \   000A                  REQUIRE ?Subroutine1
+   \   000A                  ; // Fall through to label ?Subroutine1
+    331          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine1:
+   \   0000   A100           MOV       A,#0
+   \   0002                  REQUIRE ?CL78K_V4_6_L00
+   \   0002                  REQUIRE ??Subroutine3_0
+   \   0002                  ; // Fall through to label ??Subroutine3_0
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ??Subroutine3_0:
+   \   0000   16....         MOVW      HL,#LWRD(DATVlgControl)
+   \   0003   A4..           MOV       E,#BYTE3(DATVlgControl)
+   \   0005   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0006   B4             POP       DE
+   \   0007   AF             RET       
+   \   0008                  REQUIRE ?CL78K_V4_6_L00
+    332          
+    333          //*****************************************************************************
+    334          //  DESCRIPTION : Test if the permanent authentication service is requested
+    335          //  
+    336          //  PARAMETERS (Type,Name,Min,Max) :  none
+    337          //
+    338          //  RETURN VALUE :  none
+    339          // 
+    340          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    341          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    342          BOOL CARAuthentPermActivated(void)
+   \                     CARAuthentPermActivated:
+    343          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    344              return (mPermAuthModeIsOn());
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#u8CarImmoFlag
+   \   0005   71A4           MOV1      CY,[HL].2
+   \   0007   27             ROLC      A,0x1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    345          } 
+    346          
+    347          //*****************************************************************************
+    348          //  DESCRIPTION : Test if the permanent authentication service is in progress
+    349          //                  and PWR_IGN==1
+    350          //  
+    351          //  PARAMETERS (Type,Name,Min,Max) :  none
+    352          //
+    353          //  RETURN VALUE :  none
+    354          // 
+    355          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    356          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    357          BOOL CARAuthentPermActivatedAndIgnitionOn(void)
+   \                     CARAuthentPermActivatedAndIgnitionOn:
+    358          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    359              return (mPermAuthModeIsOn() && (cFalse != mDATRead(U1Bit, PWR_IGN, Default)));
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   31A705         BF        [HL].2, ??CARPermanentAuthenticationResultOK_0
+   \   0006   F0..           MOV       A,S:DATDinInputBuffers+6
+   \   0008   5D01           AND       A,#1
+   \   000A   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_0:
+   \   000B   A100           MOV       A,#0
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    360          } 
+    361          
+    362          //*****************************************************************************
+    363          //  DESCRIPTION : Start the MERA timer
+    364          //  
+    365          //  PARAMETERS (Type,Name,Min,Max) :  none
+    366          //
+    367          //  RETURN VALUE :  none
+    368          // 
+    369          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    370          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    371          void CARStartTempoMera(void)
+   \                     CARStartTempoMera:
+    372          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    373              // Switch off LED_VERLOG
+    374              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \   0000   A103           MOV       A,#3
+   \   0002   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0005   97             MOV       [HL],A
+    375          
+    376              TOSStartTimer(&CarImmobilizerTimer);
+   \   0006   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0009   ..             CALLT     [__T_TOSStartTimer]
+    377          }
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    378          
+    379          //*****************************************************************************
+    380          //  DESCRIPTION : Tempo Mera Elapsed Action
+    381          //  
+    382          //  PARAMETERS (Type,Name,Min,Max) :  none
+    383          //
+    384          //  RETURN VALUE :  none
+    385          // 
+    386          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    387          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    388          void CARTempoMeraElapsedAction(void)
+   \                     CARTempoMeraElapsedAction:
+    389          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    390              mDATWrite(U1Bit, VERLOGON, 1, Default);
+   \   0000   A101           MOV       A,#1
+   \   0002   16....         MOVW      HL,#DATCmnImmoData+12
+   \   0005   97             MOV       [HL],A
+    391              mDATControl(Trp, cDATTrpInitDiagInfo);
+   \   0006   A107           MOV       A,#7
+   \   0008   ..             CALLT     [__T_DATTrpControl]
+    392              TOSSendControl(cTOSControlKeyIsNotAuthenticated);
+   \   0009   A12B           MOV       A,#43
+   \   000B   ..             CALLT     [__T_TOSSendControl]
+    393          }
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    394          
+    395          //*****************************************************************************
+    396          //  DESCRIPTION : Start the immobilizer antenna sleep verification timer
+    397          //  
+    398          //  PARAMETERS (Type,Name,Min,Max) :  none
+    399          //
+    400          //  RETURN VALUE :  none
+    401          // 
+    402          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    403          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    404          void CARStartTpoSleepVerify(void)
+   \                     CARStartTpoSleepVerify:
+    405          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    406              TOSStartTimer(&CarImmobilizerTimer);
+   \   0000   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0003   ..             CALLT     [__T_TOSStartTimer]
+    407          }
+   \   0004   AF             RET       
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    408          
+    409          //*****************************************************************************
+    410          //  DESCRIPTION : Test if the MERA time out is elapsed
+    411          //  
+    412          //  PARAMETERS (Type,Name,Min,Max) :  none
+    413          //
+    414          //  RETURN VALUE :  none
+    415          // 
+    416          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    417          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    418          BOOL CARTempoMeraFinishedOK(void)
+   \                     CARTempoMeraFinishedOK:
+    419          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    420              tTOSTimer   CalculatedMERAL;
+    421          
+    422              //QACJ 3226: amanevd: This is intentional and is checked out for problems.
+    423              CalculatedMERAL = mReadTimeOutMERA();
+   \   0001   8E....         MOV       A,u8TimeOutMERA
+   \   0004   48....         CMP       A,DATDbkMirrors+65
+   \   0007   BD05           BNZ       ??CARPermanentAuthenticationResultOK_1
+   \   0009   02....         MOVW      AX,CalculatedMERA
+   \   000C   FA1C           BR        ??CARPermanentAuthenticationResultOK_2
+   \                     ??CARPermanentAuthenticationResultOK_1:
+   \   000E   8E....         MOV       A,DATDbkMirrors+65
+   \   0011   9E....         MOV       u8TimeOutMERA,A
+   \   0014   100000         MOVW      AX,#0
+   \   0017   B1             PUSH      AX
+   \   0018   A00A           MOV       X,#10
+   \   001A   B1             PUSH      AX
+   \   001B   70             MOV       X,A
+   \   001C   B1             PUSH      AX
+   \   001D   A064           MOV       X,#100
+   \   001F   B1             PUSH      AX
+   \   0020   8E....         MOV       A,u8TimeOutMERA
+   \   0023   120000         MOVW      BC,#0
+   \   0026   70             MOV       X,A
+   \   0027   63             MOV       A,B
+   \   0028   ..             CALLT     [__T_?L_MUL_L03]
+   \   0029   ..             CALLT     [__T_?UL_DIV_L03]
+   \                     ??CARPermanentAuthenticationResultOK_2:
+   \   002A   03....         MOVW      CalculatedMERA,AX
+    424              return (TOSIsTimerElapsed(&CarImmobilizerTimer, CalculatedMERAL));
+   \   002D   D2             MOVW      BC,AX
+   \   002E   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0031   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0032   B2             POP       BC
+   \   0033   AF             RET       
+   \   0034                  REQUIRE ?CL78K_V4_6_L00
+    425          }
+    426          
+    427          //*****************************************************************************
+    428          //  DESCRIPTION : Test if the ECM deprotection time out is elapsed
+    429          //  
+    430          //  PARAMETERS (Type,Name,Min,Max) :  none
+    431          //
+    432          //  RETURN VALUE :  none
+    433          // 
+    434          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    435          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    436          BOOL CARTpoECMisElapsed(void)
+   \                     CARTpoECMisElapsed:
+    437          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    438              return (TOSIsTimerElapsed(&CarImmobilizerTimer, cTimeOut3sECM));
+   \   0004   122C01         MOVW      BC,#300
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    439          }
+    440          
+    441          //*****************************************************************************
+    442          //  DESCRIPTION : Test if the immobilizer antenna sleep verification time out
+    443          //  is elapsed
+    444          //  
+    445          //  PARAMETERS (Type,Name,Min,Max) :  none
+    446          //
+    447          //  RETURN VALUE :  none
+    448          // 
+    449          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    450          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    451          BOOL CARTpoSleepVerifyElapsed(void)
+   \                     CARTpoSleepVerifyElapsed:
+    452          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+    453              return (TOSIsTimerElapsed(&CarImmobilizerTimer, cTimeOut1mn));
+   \   0004   127017         MOVW      BC,#6000
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+    454          }
+    455          
+    456          //*****************************************************************************
+    457          //  DESCRIPTION : Initialize LAP_CAR
+    458          //  
+    459          //  PARAMETERS (Type,Name,Min,Max) :  none
+    460          //
+    461          //  RETURN VALUE :  none
+    462          // 
+    463          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    464          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    465          void CARInitialize(void)
+   \                     CARInitialize:
+    466          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    467              mClearPermAuthMode();
+    468              mClearTestVirginKey();
+   \   0000   8E....         MOV       A,u8CarImmoFlag
+   \   0003   5DF9           AND       A,#249
+   \   0005   9E....         MOV       u8CarImmoFlag,A
+    469          }
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    470          
+    471          //*****************************************************************************
+    472          //  DESCRIPTION : Indicate if LAP_CAR is ready to go to sleep mode
+    473          //  
+    474          //  PARAMETERS (Type,Name,Min,Max) :  none
+    475          //
+    476          //  RETURN VALUE :  none
+    477          // 
+    478          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    479          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    480          void CARIsAnybodyMaintainActiveState(void)
+   \                     CARIsAnybodyMaintainActiveState:
+    481          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    482              if (mReadyToSleepIsOff())
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   318604         BT        [HL].0, ??CARPermanentAuthenticationResultOK_3
+    483              {
+    484                  TOSWriteSignal(cTOSSignalSomebodyMaintainActiveState);
+   \   0006   102900         MOVW      AX,#41
+   \   0009   ..             CALLT     [__T_TOSWriteSignal]
+    485              }  
+    486          }
+   \                     ??CARPermanentAuthenticationResultOK_3:
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+    487          
+    488          //*****************************************************************************
+    489          //  DESCRIPTION : Set LAP_CAR in run mode
+    490          //  
+    491          //  PARAMETERS (Type,Name,Min,Max) :  none
+    492          //
+    493          //  RETURN VALUE :  none
+    494          // 
+    495          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    496          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    497          void CAREnterActiveState(void)
+   \                     CAREnterActiveState:
+    498          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    499              TOSSeqActivateGraph(cTOSSeqGraphIdCARManageImmobiliserAndCarAntiTheft);
+   \   0000   A10F           MOV       A,#15
+   \   0002   ..             CALLT     [__T_TOSSeqActivateGraph]
+    500          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    501          
+    502          //*****************************************************************************
+    503          //  DESCRIPTION : Set LAP_CAR in sleep mode
+    504          //  
+    505          //  PARAMETERS (Type,Name,Min,Max) :  none
+    506          //
+    507          //  RETURN VALUE :  none
+    508          // 
+    509          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    510          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    511          void CARLeaveActiveState(void)
+   \                     CARLeaveActiveState:
+    512          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    513              mLIBassert(mReadyToSleepIsOn());
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   318603         BT        [HL].0, ??CARPermanentAuthenticationResultOK_4
+   \   0006   9A....         CALL      LIBAssertionFailed
+    514              TOSSeqDeactivateGraph(cTOSSeqGraphIdCARManageImmobiliserAndCarAntiTheft);
+   \                     ??CARPermanentAuthenticationResultOK_4:
+   \   0009   A10F           MOV       A,#15
+   \   000B   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    515          }
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    516          
+    517          //*****************************************************************************
+    518          //  DESCRIPTION : Test if ignition is Off
+    519          //  
+    520          //  PARAMETERS (Type,Name,Min,Max) :  none
+    521          //
+    522          //  RETURN VALUE :  none
+    523          // 
+    524          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    525          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    526          BOOL CARIgnitionOFF(void)
+   \                     CARIgnitionOFF:
+    527          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    528          #ifdef X90_PROJECT
+    529              return CARIgnitionOFF_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARIgnitionOFF_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARIgnitionOFF_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    530          }
+    531          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    532          static MEM_TYPE BOOL CARIgnitionOFF_Static(void)
+   \                     CARIgnitionOFF_Static:
+    533          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    534          #endif
+    535          
+    536              BOOL bApcOffL;
+    537              if (mDATRead(U1Bit, PWR_IGN, Default) == 0)
+   \   0000   8C..1B         BT        S:DATDinInputBuffers+6.0, ??CARPermanentAuthenticationResultOK_19
+    538              {
+    539                  // Activate RF
+    540                  TOSSendControl(cTOSControlReleaseCarTrpResource);
+   \   0003   A12C           MOV       A,#44
+   \   0005   ..             CALLT     [__T_TOSSendControl]
+    541                  mClearPermAuthMode();
+   \   0006   16....         MOVW      HL,#u8CarImmoFlag
+   \   0009   71A3           CLR1      [HL].2
+    542          
+    543                  if (    (cDATNoLearningMode == mDATRead(U8Bit, LearningModeInProgress, Default))
+    544                       && (1 == mDATRead(U1Bit, VERLOGON, Default))
+    545                     )
+   \   000B   8E....         MOV       A,DATCmnImmoData+17
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD09           BNZ       ??CARPermanentAuthenticationResultOK_20
+   \   0012   8E....         MOV       A,DATCmnImmoData+12
+   \   0015   51             DEC       A
+   \   0016   BD03           BNZ       ??CARPermanentAuthenticationResultOK_20
+    546                  {
+    547                      mDATControl(Trp, cDATTrpInitDiagInfo);
+   \   0018   A107           MOV       A,#7
+   \   001A   ..             CALLT     [__T_DATTrpControl]
+    548                  }
+    549                  bApcOffL = cTrue;
+   \                     ??CARPermanentAuthenticationResultOK_20:
+   \   001B   A101           MOV       A,#1
+   \   001D   AF             RET       
+    550              }
+    551              else
+    552              {
+    553                  bApcOffL = cFalse;
+   \                     ??CARPermanentAuthenticationResultOK_19:
+   \   001E   A100           MOV       A,#0
+    554              }
+    555              return bApcOffL;
+   \   0020   AF             RET       
+   \   0021                  REQUIRE ?CL78K_V4_6_L00
+    556          }
+    557          
+    558          //*****************************************************************************
+    559          //  DESCRIPTION : Test if ignition is On
+    560          //  
+    561          //  PARAMETERS (Type,Name,Min,Max) :  none
+    562          //
+    563          //  RETURN VALUE :  none
+    564          // 
+    565          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    566          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    567          void CARAuthorizedStandByMode(void)
+   \                     CARAuthorizedStandByMode:
+    568          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    569          #ifdef X90_PROJECT
+    570              CARAuthorizedStandByMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARAuthorizedStandByMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARAuthorizedStandByMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    571          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    572          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    573          static MEM_TYPE void CARAuthorizedStandByMode_Static(void)
+   \                     CARAuthorizedStandByMode_Static:
+    574          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    575          #endif
+    576          
+    577              mSetReadyToSleep();
+   \   0000   16....         MOVW      HL,#u8CarImmoFlag
+   \   0003   7182           SET1      [HL].0
+    578          
+    579              // Update Led verlog pattern if condition change by diag
+    580              // If BCM is not blank and no learning in progress
+    581              if (   (mDATRead(U1Bit, EEP_BCMBlank, Default) == 0)
+    582              && (mDATRead(U8Bit, LearningModeInProgress, Default) == cDATNoLearningMode))
+   \   0005   16....         MOVW      HL,#DATDbkMirrors+143
+   \   0008   31860B         BT        [HL].0, ??CARPermanentAuthenticationResultOK_21
+   \   000B   8E....         MOV       A,DATCmnImmoData+17
+   \   000E   4D00           CMP       A,#0
+   \   0010   BD04           BNZ       ??CARPermanentAuthenticationResultOK_21
+    583              {
+    584                  // Protected state pattern on LED_VERLOG
+    585                  mDATWrite(U8Bit, LedVerlogPattern, cDATVehicleProtectedVerlogPattern, Default);
+   \   0012   A104           MOV       A,#4
+   \   0014   FA02           BR        ??CARPermanentAuthenticationResultOK_22
+    586              }
+    587              else
+    588              {
+    589                  mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \                     ??CARPermanentAuthenticationResultOK_21:
+   \   0016   A103           MOV       A,#3
+   \                     ??CARPermanentAuthenticationResultOK_22:
+   \   0018   16....         MOVW      HL,#DATCmnImmoData+18
+   \   001B   97             MOV       [HL],A
+    590              }
+    591          }
+   \   001C   AF             RET       
+   \   001D                  REQUIRE ?CL78K_V4_6_L00
+    592          
+    593          //*****************************************************************************
+    594          //  DESCRIPTION : Test if ignition is On
+    595          //  
+    596          //  PARAMETERS (Type,Name,Min,Max) :  none
+    597          //
+    598          //  RETURN VALUE :  none
+    599          // 
+    600          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    601          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    602          BOOL CARIgnitionON(void)
+   \                     CARIgnitionON:
+    603          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    604              BOOL bApcOnL;
+    605              if (mDATRead(U1Bit, PWR_IGN, Default) != 0)
+   \   0000   3103..06       BF        S:DATDinInputBuffers+6.0, ??CARPermanentAuthenticationResultOK_5
+    606              {
+    607                  // Deactivate RF
+    608                  TOSSendControl(cTOSControlGetCarTrpResource);
+   \   0004   A129           MOV       A,#41
+   \   0006   ..             CALLT     [__T_TOSSendControl]
+    609                  mDATWrite(U1Bit, DefTrpShortCircuitToGnd, 0, Default);
+   \   0007   9B....         BR        N:?Subroutine0
+    610                  mDATWrite(U1Bit, DefTrpShortCircuitToBat, 0, Default);
+    611                  mDATWrite(U1Bit, DO_DATA_IMMOBILIZERProtection, 0, Default);
+    612                  bApcOnL = cTrue;
+    613              }
+    614              else
+    615              {
+    616                  bApcOnL = cFalse;
+   \                     ??CARPermanentAuthenticationResultOK_5:
+   \   000A   A100           MOV       A,#0
+    617              }
+    618              return bApcOnL;
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    619          }
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   \                     ?Subroutine0:
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#DATCmnData+12
+   \   0005   97             MOV       [HL],A
+   \   0006   86             INCW      HL
+   \   0007   97             MOV       [HL],A
+   \   0008   9E....         MOV       bDO_DATA_IMMOBILIZERProtected,A
+   \   000B   A101           MOV       A,#1
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+    620          
+    621          //*****************************************************************************
+    622          //  DESCRIPTION : Test if ignition is On for customer mode
+    623          //  
+    624          //  PARAMETERS (Type,Name,Min,Max) :  none
+    625          //
+    626          //  RETURN VALUE :  none
+    627          // 
+    628          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    629          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    630          BOOL CARCustomerIgnitionON(void)
+   \                     CARCustomerIgnitionON:
+    631          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    632              BOOL bApcOnL;
+    633              if (    (mDATRead(U1Bit, PWR_IGN, Default) != 0)
+    634                   && (mDATRead(U8Bit, LearningModeInProgress, Default) == cDATNoLearningMode)
+    635                   && (mDATRead(U1Bit, EEP_BCMBlank, Default) == 0)
+    636                 )
+   \   0000   3103..1C       BF        S:DATDinInputBuffers+6.0, ??CARPermanentAuthenticationResultOK_6
+   \   0004   8E....         MOV       A,DATCmnImmoData+17
+   \   0007   4D00           CMP       A,#0
+   \   0009   BD15           BNZ       ??CARPermanentAuthenticationResultOK_6
+   \   000B   16....         MOVW      HL,#DATDbkMirrors+143
+   \   000E   31860F         BT        [HL].0, ??CARPermanentAuthenticationResultOK_6
+    637              {
+    638                  // Deactivate RF
+    639                  TOSSendControl(cTOSControlGetCarTrpResource);
+   \   0011   A129           MOV       A,#41
+   \   0013   ..             CALLT     [__T_TOSSendControl]
+    640                  mClearReadyToSleep();
+   \   0014   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0017   16....         MOVW      HL,#u8CarImmoFlag
+   \   001A   7183           CLR1      [HL].0
+    641                  TOSStartTimer(&CarImmobilizerTimer);
+   \   001C   ..             CALLT     [__T_TOSStartTimer]
+    642                  mDATWrite(U1Bit, DefTrpShortCircuitToGnd, 0, Default);
+   \   001D   9B....         BR        N:?Subroutine0
+    643                  mDATWrite(U1Bit, DefTrpShortCircuitToBat, 0, Default);
+    644                  mDATWrite(U1Bit, DO_DATA_IMMOBILIZERProtection, 0, Default);
+    645                  bApcOnL = cTrue;
+    646              }
+    647              else
+    648              {
+    649                  bApcOnL = cFalse;
+   \                     ??CARPermanentAuthenticationResultOK_6:
+   \   0020   A100           MOV       A,#0
+    650              }
+    651              return bApcOnL;
+   \   0022   AF             RET       
+   \   0023                  REQUIRE ?CL78K_V4_6_L00
+    652          }
+    653          
+    654          //*****************************************************************************
+    655          //  DESCRIPTION : Treat BCM blank error
+    656          //  
+    657          //  PARAMETERS (Type,Name,Min,Max) :  none
+    658          //
+    659          //  RETURN VALUE :  none
+    660          // 
+    661          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    662          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    663          void CARBCMBlankError(void)
+   \                     CARBCMBlankError:
+    664          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    665              // Switch off LED_VERLOG
+    666              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \   0000   A103           MOV       A,#3
+   \   0002   9B....         BR        N:?Subroutine2
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+    667          }
+    668          
+    669          //*****************************************************************************
+    670          //  DESCRIPTION : Test if BCM is blank
+    671          //  
+    672          //  PARAMETERS (Type,Name,Min,Max) :  none
+    673          //
+    674          //  RETURN VALUE :  none
+    675          // 
+    676          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    677          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    678          BOOL CARBCMBlankOK(void)
+   \                     CARBCMBlankOK:
+    679          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    680              return(mDATRead(U1Bit, EEP_BCMBlank, Default) != 0);
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+143
+   \   0003   87             MOV       A,[HL]
+   \   0004   5D01           AND       A,#1
+   \   0006   AF             RET       
+   \   0007                  REQUIRE ?CL78K_V4_6_L00
+    681          }
+    682          
+    683          //*****************************************************************************
+    684          //  DESCRIPTION : Realize key authentication in customer mode
+    685          //  
+    686          //  PARAMETERS (Type,Name,Min,Max) :  none
+    687          //
+    688          //  RETURN VALUE :  none
+    689          // 
+    690          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    691          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    692          void CARKeyAuthentication(void)
+   \                     CARKeyAuthentication:
+    693          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    694          #ifdef X90_PROJECT
+    695              CARKeyAuthentication_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARKeyAuthentication_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARKeyAuthentication_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    696          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    697          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    698          static MEM_TYPE void CARKeyAuthentication_Static(void)
+   \                     CARKeyAuthentication_Static:
+    699          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+    700          #endif
+    701          
+    702              U8 u8IndexL;
+    703          
+    704              // Switch On the LED_VERLOG
+    705              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOnVerlogPattern, Default);  
+   \   0003   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0006   97             MOV       [HL],A
+    706          
+    707              mDATWrite(U1Bit, DATTrpAuthentInLearningMode, 0, Default);
+    708              mDATWrite(U1Bit, DATTrpActiveTestMode, 0, Default);
+   \   0007   8E....         MOV       A,DatTrpExportData+50
+   \   000A   5DFA           AND       A,#250
+   \   000C   9E....         MOV       DatTrpExportData+50,A
+    709          
+    710              // Authentication with BCM ISK
+    711              for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+   \   000F   12....         MOVW      BC,#DatTrpExportData
+   \   0012   16....         MOVW      HL,#DATDbkMirrors
+   \   0015   A006           MOV       X,#6
+    712              {
+    713                  mDATWriteTable(U8Bit, DATTrpISKForAuthent, u8IndexL, mDATReadTable(U8Bit, EEP_ImmoSecretKey, u8IndexL, Default), Default);
+   \                     ??CARKeyAuthentication_Static_0:
+   \   0017   B7             PUSH      HL
+   \   0018   B4             POP       DE
+   \   0019   E4             XCHW      AX,DE
+   \   001A   CA6A00         ADDW      AX,#106
+   \   001D   E4             XCHW      AX,DE
+   \   001E   85             MOV       A,[DE]
+   \   001F   B3             PUSH      BC
+   \   0020   B4             POP       DE
+   \   0021   E4             XCHW      AX,DE
+   \   0022   CA2000         ADDW      AX,#32
+   \   0025   E4             XCHW      AX,DE
+   \   0026   95             MOV       [DE],A
+    714              }
+   \   0027   86             INCW      HL
+   \   0028   B3             PUSH      BC
+   \   0029   B4             POP       DE
+   \   002A   84             INCW      DE
+   \   002B   B5             PUSH      DE
+   \   002C   B2             POP       BC
+   \   002D   50             DEC       X
+   \   002E   60             MOV       A,X
+   \   002F   BDE6           BNZ       ??CARKeyAuthentication_Static_0
+    715          
+    716              mDATControl(Trp, cDATTrpAuthenticate);
+   \   0031   A103           MOV       A,#3
+   \   0033   ..             CALLT     [__T_DATTrpControl]
+    717          }
+   \   0034   B2             POP       BC
+   \   0035   AF             RET       
+   \   0036                  REQUIRE ?CL78K_V4_6_L00
+    718          
+    719          //*****************************************************************************
+    720          //  DESCRIPTION : Test if authentication service is not successfully finished
+    721          //  
+    722          //  PARAMETERS (Type,Name,Min,Max) :  none
+    723          //
+    724          //  RETURN VALUE :  none
+    725          // 
+    726          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    727          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    728          BOOL CARKeyAuthenticationNOK(void)
+   \                     CARKeyAuthenticationNOK:
+    729          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    730              return (mDATRead(U8Bit, DATTrpAuthenticationState, Default) == cDATTrpServiceNotSuccessful);
+   \   0000   8E....         MOV       A,DatTrpExportData+44
+   \   0003   4D03           CMP       A,#3
+   \   0005   BD03           BNZ       ??CARPermanentAuthenticationResultOK_7
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_7:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    731          }
+    732          
+    733          //*****************************************************************************
+    734          //  DESCRIPTION : Test if authentication service is successfully finished
+    735          //  
+    736          //  PARAMETERS (Type,Name,Min,Max) :  none
+    737          //
+    738          //  RETURN VALUE :  none
+    739          // 
+    740          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    741          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    742          BOOL CARKeyAuthenticationOK(void)
+   \                     CARKeyAuthenticationOK:
+    743          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    744              return (mDATRead(U8Bit, DATTrpAuthenticationState, Default) == cDATTrpServiceSuccessful);
+   \   0000   8E....         MOV       A,DatTrpExportData+44
+   \   0003   4D02           CMP       A,#2
+   \   0005   BD03           BNZ       ??CARPermanentAuthenticationResultOK_8
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_8:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    745          }
+    746          
+    747          //*****************************************************************************
+    748          //  DESCRIPTION : Test if Verlog Timer Elapsed
+    749          //  
+    750          //  PARAMETERS (Type,Name,Min,Max) :  none
+    751          //
+    752          //  RETURN VALUE :  none
+    753          // 
+    754          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    755          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    756          BOOL CARIsVerlogTimerElapsed(void)
+   \                     CARIsVerlogTimerElapsed:
+    757          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0003   B3             PUSH      BC
+   \   0004   B5             PUSH      DE
+   \   0005                  ; Total Auto size: 0
+    758              const BOOL bTimerStartedL = TOSIsTimerStarted(&CarImmobilizerTimer);
+   \   0005   9A....         CALL      TOSIsTimerStarted
+   \   0008   74             MOV       E,A
+    759              const BOOL bTimerElapsedL = TOSIsTimerElapsed(&CarImmobilizerTimer, cVerlogTimeOut);
+   \   0009   10....         MOVW      AX,#CarImmobilizerTimer
+   \   000C   120F00         MOVW      BC,#15
+   \   000F   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0010   70             MOV       X,A
+    760          
+    761              return  (bTimerStartedL && bTimerElapsedL);
+   \   0011   64             MOV       A,E
+   \   0012   4D00           CMP       A,#0
+   \   0014   AD09           BZ        ??CARPermanentAuthenticationResultOK_9
+   \   0016   60             MOV       A,X
+   \   0017   4D00           CMP       A,#0
+   \   0019   AD04           BZ        ??CARPermanentAuthenticationResultOK_9
+   \   001B   A101           MOV       A,#1
+   \   001D   FA02           BR        ??CARPermanentAuthenticationResultOK_10
+   \                     ??CARPermanentAuthenticationResultOK_9:
+   \   001F   A100           MOV       A,#0
+   \                     ??CARPermanentAuthenticationResultOK_10:
+   \   0021   B4             POP       DE
+   \   0022   B2             POP       BC
+   \   0023   AF             RET       
+   \   0024                  REQUIRE ?CL78K_V4_6_L00
+    762          }
+    763          
+    764          //*****************************************************************************
+    765          //  DESCRIPTION : CARSendVerlogFrame
+    766          //  
+    767          //  PARAMETERS (Type,Name,Min,Max) :  none
+    768          //
+    769          //  RETURN VALUE :  none
+    770          // 
+    771          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    772          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    773          void CARSendVerlogFrame(void)
+   \                     CARSendVerlogFrame:
+    774          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A100           MOV       A,#0
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    775              mDATControl(Vlg, cDATVlgStart);
+   \   0003   9B....         BR        N:??Subroutine3_0
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+    776          }
+    777          
+    778          //*****************************************************************************
+    779          //  DESCRIPTION : Authentication service is successfully finished
+    780          //  
+    781          //  PARAMETERS (Type,Name,Min,Max) :  none
+    782          //
+    783          //  RETURN VALUE :  none
+    784          // 
+    785          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    786          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    787          void CARKeyAuthentResultOKandUnprotected(void)
+   \                     CARKeyAuthentResultOKandUnprotected:
+    788          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A101           MOV       A,#1
+   \   0002   B5             PUSH      DE
+   \   0003                  ; Total Auto size: 0
+    789              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOnVerlogPattern, Default);
+   \   0003   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0006   97             MOV       [HL],A
+    790          
+    791              // Start timer for the ECM deprotection
+    792              TOSStartTimer(&CarImmobilizerTimer);
+   \   0007   10....         MOVW      AX,#CarImmobilizerTimer
+   \   000A   ..             CALLT     [__T_TOSStartTimer]
+    793          
+    794              mDATWrite(U1Bit, VERLOGON, 0, Default);
+   \   000B   A100           MOV       A,#0
+   \   000D   16....         MOVW      HL,#DATCmnImmoData+12
+   \   0010   97             MOV       [HL],A
+    795          
+    796              // Inform that the key is authenticated
+    797              TOSSendControl(cTOSControlKeyIsAuthenticated);
+   \   0011   A12A           MOV       A,#42
+   \   0013   ..             CALLT     [__T_TOSSendControl]
+    798          
+    799              mDATControl(Vlg, cDATVlgStart);  
+   \   0014   9B....         BR        N:?Subroutine1
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+    800          }
+    801          
+    802          //*****************************************************************************
+    803          //  DESCRIPTION : Test if the virgin key test is activated
+    804          //  
+    805          //  PARAMETERS (Type,Name,Min,Max) :  none
+    806          //
+    807          //  RETURN VALUE :  none
+    808          // 
+    809          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    810          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    811          BOOL CARVirginTestActivated(void)
+   \                     CARVirginTestActivated:
+    812          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    813              return (mTestVirginKeyIsOn());
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#u8CarImmoFlag
+   \   0005   7194           MOV1      CY,[HL].1
+   \   0007   27             ROLC      A,0x1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    814          }
+    815          
+    816          //*****************************************************************************
+    817          //  DESCRIPTION : Start immobilizer antenna sleep control
+    818          //  
+    819          //  PARAMETERS (Type,Name,Min,Max) :  none
+    820          //
+    821          //  RETURN VALUE :  none
+    822          // 
+    823          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    824          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    825          void CARPutImmobilizerAntennaInSleepMode(void)
+   \                     CARPutImmobilizerAntennaInSleepMode:
+    826          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    827              mDATControl(Trp, cDATTrpSleep);
+   \   0000   A101           MOV       A,#1
+   \   0002   ..             CALLT     [__T_DATTrpControl]
+    828          }
+   \   0003   AF             RET       
+   \   0004                  REQUIRE ?CL78K_V4_6_L00
+    829          
+    830          //*****************************************************************************
+    831          //  DESCRIPTION : Test if immobilizer antenna sleep control is finished
+    832          //  
+    833          //  PARAMETERS (Type,Name,Min,Max) :  none
+    834          //
+    835          //  RETURN VALUE :  none
+    836          // 
+    837          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    838          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    839          BOOL CARSleepModeFinished(void)
+   \                     CARSleepModeFinished:
+    840          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    841              return mDATRead(U8Bit, DATTrpSleepControlState, Default) != cDATTrpServiceInProgress;
+   \   0000   8E....         MOV       A,DatTrpExportData+46
+   \   0003   51             DEC       A
+   \   0004   AD03           BZ        ??CARPermanentAuthenticationResultOK_11
+   \   0006   A101           MOV       A,#1
+   \   0008   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_11:
+   \   0009   A100           MOV       A,#0
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    842          }
+    843          
+    844          //*****************************************************************************
+    845          //  DESCRIPTION : Test if current key need resynchronization
+    846          //  
+    847          //  PARAMETERS (Type,Name,Min,Max) :  none
+    848          //
+    849          //  RETURN VALUE :  none
+    850          // 
+    851          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    852          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    853          BOOL CARKeyNeedResynchroOK(void)
+   \                     CARKeyNeedResynchroOK:
+    854          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    855              BOOL bResultL   = cFalse;
+   \   0001   A300           MOV       B,#0
+    856          
+    857              if (mDATRead(U1Bit, DATTrpKeyWithRF, Default) != 0)
+   \   0003   16....         MOVW      HL,#DatTrpExportData+51
+   \   0006   31A710         BF        [HL].2, ??CARPermanentAuthenticationResultOK_12
+    858              {
+    859                  bResultL = ((mDATRead(U8Bit, EEP_ResynchroRequest, Default) & (U8)((U8)0x01U << mDATRead(U8Bit, DATTrpIndexOfKeyRecognized, Default))) != 0);
+   \   0009   8E....         MOV       A,DatTrpExportData+41
+   \   000C   72             MOV       C,A
+   \   000D   100100         MOVW      AX,#1
+   \   0010   ..             CALLT     [__T_?I_LSH_L02]
+   \   0011   60             MOV       A,X
+   \   0012   58....         AND       A,DATDbkMirrors+208
+   \   0015   AD02           BZ        ??CARPermanentAuthenticationResultOK_12
+   \   0017   A301           MOV       B,#1
+    860              }
+    861          
+    862              return bResultL;
+   \                     ??CARPermanentAuthenticationResultOK_12:
+   \   0019   63             MOV       A,B
+   \   001A   B2             POP       BC
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    863          }
+    864          
+    865          //*****************************************************************************
+    866          //  DESCRIPTION : Start resynchronization service
+    867          //  
+    868          //  PARAMETERS (Type,Name,Min,Max) :  none
+    869          //
+    870          //  RETURN VALUE :  none
+    871          // 
+    872          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    873          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    874          void CARKeyResynchronization(void)
+   \                     CARKeyResynchronization:
+    875          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    876              mDATWrite(U1Bit, DATTrpWriteSecretKeyHigh, 0, Default);
+   \   0000   A106           MOV       A,#6
+   \   0002   16....         MOVW      HL,#DatTrpExportData+50
+   \   0005   7193           CLR1      [HL].1
+    877              mDATControl(Trp, cDATTrpResynchronize);
+   \   0007   ..             CALLT     [__T_DATTrpControl]
+    878          }
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    879          
+    880          //*****************************************************************************
+    881          //  DESCRIPTION : Test if resynchronization service is finished
+    882          //  
+    883          //  PARAMETERS (Type,Name,Min,Max) :  none
+    884          //
+    885          //  RETURN VALUE :  none
+    886          // 
+    887          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    888          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    889          BOOL CARKeyResynchroFinished(void)
+   \                     CARKeyResynchroFinished:
+    890          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    891              return (mDATRead(U8Bit, DATTrpResynchronizationState, Default) != cDATTrpServiceInProgress);
+   \   0000   8E....         MOV       A,DatTrpExportData+49
+   \   0003   51             DEC       A
+   \   0004   AD03           BZ        ??CARPermanentAuthenticationResultOK_13
+   \   0006   A101           MOV       A,#1
+   \   0008   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_13:
+   \   0009   A100           MOV       A,#0
+   \   000B   AF             RET       
+   \   000C                  REQUIRE ?CL78K_V4_6_L00
+    892          }
+    893          
+    894          //*****************************************************************************
+    895          //  DESCRIPTION : Manage LED_VERLOG pattern
+    896          //  
+    897          //  PARAMETERS (Type,Name,Min,Max) :  none
+    898          //
+    899          //  RETURN VALUE :  none
+    900          // 
+    901          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    902          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    903          void CARManageVerlogPattern(void)
+   \                     CARManageVerlogPattern:
+    904          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    905              // if After Sale Code is requested
+    906              if (1 == mDATRead(U1Bit, EEP_EraseAFSCodeRequest, Default))
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+143
+   \   0003   31B706         BF        [HL].3, ??CARPermanentAuthenticationResultOK_14
+    907              {
+    908                  // Switch off LED_VERLOG
+    909                  mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \   0006   A103           MOV       A,#3
+   \   0008   16....         MOVW      HL,#DATCmnImmoData+18
+   \   000B   97             MOV       [HL],A
+    910              }
+    911          }
+   \                     ??CARPermanentAuthenticationResultOK_14:
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    912          
+    913          //*****************************************************************************
+    914          //  DESCRIPTION : Test if a learning is in progress
+    915          //  
+    916          //  PARAMETERS (Type,Name,Min,Max) :  none
+    917          //
+    918          //  RETURN VALUE :  none
+    919          // 
+    920          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    921          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    922          BOOL CARLearningModeInProgress(void)
+   \                     CARLearningModeInProgress:
+    923          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    924              return (mDATRead(U8Bit, LearningModeInProgress, Default) != cDATNoLearningMode);
+   \   0000   8E....         MOV       A,DATCmnImmoData+17
+   \   0003   4D00           CMP       A,#0
+   \   0005   AD03           BZ        ??CARPermanentAuthenticationResultOK_15
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_15:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+    925          }
+    926          
+    927          //*****************************************************************************
+    928          //  DESCRIPTION :
+    929          //  
+    930          //  PARAMETERS (Type,Name,Min,Max) :  none
+    931          //
+    932          //  RETURN VALUE :  none
+    933          // 
+    934          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    935          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    936          void CARKeyAuthenticationInTestMode(void)
+   \                     CARKeyAuthenticationInTestMode:
+    937          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    938          #ifdef X90_PROJECT
+    939              CARKeyAuthenticationInTestMode_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARKeyAuthenticationInTestMode_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARKeyAuthenticationInTestMode_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    940          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    941          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    942          static MEM_TYPE void CARKeyAuthenticationInTestMode_Static(void)
+   \                     CARKeyAuthenticationInTestMode_Static:
+    943          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    944          #endif
+    945          
+    946              U8  u8IndexL;
+    947              U16 u16AuthentTryCounterL;
+    948          
+    949              u16AuthentTryCounterL = mDATRead(U16Bit, AuthentPermanentTotalCounter, Default);
+   \   0001   02....         MOVW      AX,DATCmnImmoData+24
+    950              if (u16AuthentTryCounterL < cMaxAuthentPermanentTotalCounter)
+   \   0004   EAFFFF         CMPW      AX,#65535
+   \   0007   AD04           BZ        ??CARPermanentAuthenticationResultOK_23
+    951              {
+    952                  mDATWrite(U16Bit, AuthentPermanentTotalCounter, (u16AuthentTryCounterL + 1), Default);
+   \   0009   80             INCW      AX
+   \   000A   03....         MOVW      DATCmnImmoData+24,AX
+    953              }
+    954          
+    955              // Authentication with BCM ISK
+    956              for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+   \                     ??CARPermanentAuthenticationResultOK_23:
+   \   000D   12....         MOVW      BC,#DatTrpExportData
+   \   0010   16....         MOVW      HL,#DATDbkMirrors
+   \   0013   A006           MOV       X,#6
+    957              {
+    958                  mDATWriteTable(U8Bit, DATTrpISKForAuthent, u8IndexL, mDATReadTable(U8Bit, EEP_ImmoSecretKey, u8IndexL, Default), Default);
+   \                     ??CARKeyAuthenticationInTestMode_Static_0:
+   \   0015   B7             PUSH      HL
+   \   0016   B4             POP       DE
+   \   0017   E4             XCHW      AX,DE
+   \   0018   CA6A00         ADDW      AX,#106
+   \   001B   E4             XCHW      AX,DE
+   \   001C   85             MOV       A,[DE]
+   \   001D   B3             PUSH      BC
+   \   001E   B4             POP       DE
+   \   001F   E4             XCHW      AX,DE
+   \   0020   CA2000         ADDW      AX,#32
+   \   0023   E4             XCHW      AX,DE
+   \   0024   95             MOV       [DE],A
+    959              }
+   \   0025   86             INCW      HL
+   \   0026   B3             PUSH      BC
+   \   0027   B4             POP       DE
+   \   0028   84             INCW      DE
+   \   0029   B5             PUSH      DE
+   \   002A   B2             POP       BC
+   \   002B   50             DEC       X
+   \   002C   60             MOV       A,X
+   \   002D   BDE6           BNZ       ??CARKeyAuthenticationInTestMode_Static_0
+    960          
+    961              mDATControl(Vlg, cDATVlgStart);
+   \   002F   A100           MOV       A,#0
+   \   0031   16....         MOVW      HL,#LWRD(DATVlgControl)
+   \   0034   A4..           MOV       E,#BYTE3(DATVlgControl)
+   \   0036   ..             CALLT     [__T_?FAR_CALL_L07]
+    962              mDATControl(Trp, cDATTrpAuthenticate);
+   \   0037   A103           MOV       A,#3
+   \   0039   ..             CALLT     [__T_DATTrpControl]
+    963          }
+   \   003A   B2             POP       BC
+   \   003B   AF             RET       
+   \   003C                  REQUIRE ?CL78K_V4_6_L00
+    964          
+    965          //*****************************************************************************
+    966          //  DESCRIPTION :
+    967          //  
+    968          //  PARAMETERS (Type,Name,Min,Max) :  none
+    969          //
+    970          //  RETURN VALUE :  none
+    971          // 
+    972          //  DESIGN INFORMATION :  refer to Detailed Design Document
+    973          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    974          void CARKeyAuthenticationWithTransportISK(void)
+   \                     CARKeyAuthenticationWithTransportISK:
+    975          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    976          #ifdef X90_PROJECT
+    977              CARKeyAuthenticationWithTransportISK_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARKeyAuthenticationWithTransportISK_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARKeyAuthenticationWithTransportISK_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    978          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    979          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    980          static MEM_TYPE void CARKeyAuthenticationWithTransportISK_Static(void)
+   \                     CARKeyAuthenticationWithTransportISK_Static:
+    981          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   A129           MOV       A,#41
+   \   0002   B3             PUSH      BC
+   \   0003                  ; Total Auto size: 0
+    982          #endif
+    983          
+    984              U8 u8IndexL;
+    985          
+    986              // Deactivate RF
+    987              TOSSendControl(cTOSControlGetCarTrpResource);
+   \   0003   ..             CALLT     [__T_TOSSendControl]
+    988          
+    989              mClearTestVirginKey();
+   \   0004   16....         MOVW      HL,#u8CarImmoFlag
+   \   0007   7193           CLR1      [HL].1
+    990          
+    991              mDATWrite(U1Bit, DATTrpAuthentInLearningMode, 1, Default);
+    992              mDATWrite(U1Bit, DATTrpActiveTestMode, 1, Default);
+   \   0009   8E....         MOV       A,DatTrpExportData+50
+   \   000C   6D05           OR        A,#5
+   \   000E   9E....         MOV       DatTrpExportData+50,A
+    993          
+    994              // Authentication with transport ISK
+    995              for (u8IndexL = 0; u8IndexL < cDATTrpISKLengthInBytes; u8IndexL++)
+   \   0011   14....         MOVW      DE,#DatTrpExportData
+   \   0014   12....         MOVW      BC,#DATTrpTransportISK
+   \   0017   A006           MOV       X,#6
+    996              {
+    997                  mDATWriteTable(U8Bit, DATTrpISKForAuthent, u8IndexL, mDATReadTable(U8Bit, DATTrpTransportISK, u8IndexL, Default), Default);
+   \                     ??CARKeyAuthenticationWithTransportISK_Static_0:
+   \   0019   B3             PUSH      BC
+   \   001A   B6             POP       HL
+   \   001B   87             MOV       A,[HL]
+   \   001C   B5             PUSH      DE
+   \   001D   B6             POP       HL
+   \   001E   E6             XCHW      AX,HL
+   \   001F   CA2000         ADDW      AX,#32
+   \   0022   E6             XCHW      AX,HL
+   \   0023   97             MOV       [HL],A
+    998              }
+   \   0024   B3             PUSH      BC
+   \   0025   B6             POP       HL
+   \   0026   86             INCW      HL
+   \   0027   B7             PUSH      HL
+   \   0028   B2             POP       BC
+   \   0029   84             INCW      DE
+   \   002A   50             DEC       X
+   \   002B   BDEC           BNZ       ??CARKeyAuthenticationWithTransportISK_Static_0
+    999              mDATControl(Trp, cDATTrpAuthenticate);
+   \   002D   A103           MOV       A,#3
+   \   002F   ..             CALLT     [__T_DATTrpControl]
+   1000          }
+   \   0030   B2             POP       BC
+   \   0031   AF             RET       
+   \   0032                  REQUIRE ?CL78K_V4_6_L00
+   1001          
+   1002          //*****************************************************************************
+   1003          //  DESCRIPTION :
+   1004          //  
+   1005          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1006          //
+   1007          //  RETURN VALUE :  none
+   1008          // 
+   1009          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1010          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1011          void CARVirginKeyEnd(void)
+   \                     CARVirginKeyEnd:
+   1012          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1013              mDATWrite(U1Bit, DATTrpActiveTestMode, 0, Default);
+   \   0000   16....         MOVW      HL,#DatTrpExportData+50
+   \   0003   71A3           CLR1      [HL].2
+   1014          }
+   \   0005   AF             RET       
+   \   0006                  REQUIRE ?CL78K_V4_6_L00
+   1015          
+   1016          //*****************************************************************************
+   1017          //  DESCRIPTION :
+   1018          //  
+   1019          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1020          //
+   1021          //  RETURN VALUE :  none
+   1022          // 
+   1023          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1024          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1025          BOOL CARKeyWithRf(void)
+   \                     CARKeyWithRf:
+   1026          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1027              return (mDATRead(U1Bit, DATTrpKeyWithRF, Default) != 0);
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#DatTrpExportData+51
+   \   0005   71A4           MOV1      CY,[HL].2
+   \   0007   27             ROLC      A,0x1
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1028          }
+   1029          
+   1030          //*****************************************************************************
+   1031          //  DESCRIPTION :
+   1032          //  
+   1033          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1034          //
+   1035          //  RETURN VALUE :  none
+   1036          // 
+   1037          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1038          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1039          BOOL CARResynchroNOK(void)
+   \                     CARResynchroNOK:
+   1040          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1041              return (mDATRead(U8Bit, DATTrpResynchronizationState, Default) == cDATTrpServiceNotSuccessful);
+   \   0000   8E....         MOV       A,DatTrpExportData+49
+   \   0003   4D03           CMP       A,#3
+   \   0005   BD03           BNZ       ??CARPermanentAuthenticationResultOK_16
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_16:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1042          }
+   1043          
+   1044          //*****************************************************************************
+   1045          //  DESCRIPTION :
+   1046          //  
+   1047          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1048          //
+   1049          //  RETURN VALUE :  none
+   1050          // 
+   1051          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1052          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1053          BOOL CARResynchroOK(void)
+   \                     CARResynchroOK:
+   1054          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1055              return (mDATRead(U8Bit, DATTrpResynchronizationState, Default) == cDATTrpServiceSuccessful);
+   \   0000   8E....         MOV       A,DatTrpExportData+49
+   \   0003   4D02           CMP       A,#2
+   \   0005   BD03           BNZ       ??CARPermanentAuthenticationResultOK_17
+   \   0007   A101           MOV       A,#1
+   \   0009   AF             RET       
+   \                     ??CARPermanentAuthenticationResultOK_17:
+   \   000A   A100           MOV       A,#0
+   \   000C   AF             RET       
+   \   000D                  REQUIRE ?CL78K_V4_6_L00
+   1056          }
+   1057          
+   1058          //*****************************************************************************
+   1059          //  DESCRIPTION :
+   1060          //  
+   1061          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1062          //
+   1063          //  RETURN VALUE :  none
+   1064          // 
+   1065          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1066          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1067          void CARResynchronizationError(void)
+   \                     CARResynchronizationError:
+   1068          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1069              U8 u8ResynchroErrorCounterL;
+   1070          
+   1071              u8ResynchroErrorCounterL = mDATRead(U8Bit, AuthentPermanentResynchroFailCounter, Default);
+   \   0000   8E....         MOV       A,DATCmnImmoData+20
+   1072              if (u8ResynchroErrorCounterL < cMaxAuthentPermanentResynchroFailCounter)
+   \   0003   41             INC       A
+   \   0004   AD03           BZ        ??CARPermanentAuthenticationResultOK_18
+   1073              {
+   1074                  mDATWrite(U8Bit, AuthentPermanentResynchroFailCounter, (u8ResynchroErrorCounterL + 1), Default);
+   \   0006   9E....         MOV       DATCmnImmoData+20,A
+   1075              }
+   1076          }
+   \                     ??CARPermanentAuthenticationResultOK_18:
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   1077          
+   1078          //*****************************************************************************
+   1079          //  DESCRIPTION :
+   1080          //  
+   1081          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1082          //
+   1083          //  RETURN VALUE :  none
+   1084          // 
+   1085          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1086          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1087          void CARPermanentAuthenticationResultNOK(void)
+   \                     CARPermanentAuthenticationResultNOK:
+   1088          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+   1089          #ifdef X90_PROJECT
+   1090              CARPermanentAuthenticationResultNOK_Static();
+   \   0001   16....         MOVW      HL,#LWRD(CARPermanentAuthenticationResultNOK_Static)
+   \   0004   A4..           MOV       E,#BYTE3(CARPermanentAuthenticationResultNOK_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+   1091          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+   1092          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+   1093          static MEM_TYPE void CARPermanentAuthenticationResultNOK_Static(void)
+   \                     CARPermanentAuthenticationResultNOK_Static:
+   1094          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1095          #endif
+   1096          
+   1097              U8 u8AuthentErrorCounterL;
+   1098          
+   1099              u8AuthentErrorCounterL = mDATRead(U8Bit, AuthentPermanentFailCounter, Default);
+   \   0000   8E....         MOV       A,DATCmnImmoData+19
+   1100              if (u8AuthentErrorCounterL < cMaxAuthentPermanentFailCounter)
+   \   0003   41             INC       A
+   \   0004   AD03           BZ        ??CARPermanentAuthenticationResultOK_24
+   1101              {
+   1102                  mDATWrite(U8Bit, AuthentPermanentFailCounter, (u8AuthentErrorCounterL + 1), Default);
+   \   0006   9E....         MOV       DATCmnImmoData+19,A
+   1103              }
+   1104          
+   1105              // Switch off LED_VERLOG
+   1106              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOffVerlogPattern, Default);
+   \                     ??CARPermanentAuthenticationResultOK_24:
+   \   0009   A103           MOV       A,#3
+   \   000B   16....         MOVW      HL,#DATCmnImmoData+18
+   \   000E   97             MOV       [HL],A
+   1107          
+   1108              TOSStartTimer(&CarImmobilizerTimer);
+   \   000F   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0012   ..             CALLT     [__T_TOSStartTimer]
+   1109          }
+   \   0013   AF             RET       
+   \   0014                  REQUIRE ?CL78K_V4_6_L00
+   1110          
+   1111          //*****************************************************************************
+   1112          //  DESCRIPTION :
+   1113          //  
+   1114          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1115          //
+   1116          //  RETURN VALUE :  none
+   1117          // 
+   1118          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1119          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1120          void CARPutImmobilizerAntennaInSleepModeAndStopPermanentAuthent(void)
+   \                     CARPutImmobilizerAntennaInSleepModeAndStopPermanentAuthent:
+   1121          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1122              mDATWrite(U1Bit, DATTrpActiveTestMode, 0, Default);
+   \   0000   A104           MOV       A,#4
+   \   0002   16....         MOVW      HL,#DatTrpExportData+50
+   \   0005   71A3           CLR1      [HL].2
+   1123              mDATWrite(U8Bit, LedVerlogPattern, cDATVehicleProtectedVerlogPattern, Default);
+   \   0007   16....         MOVW      HL,#DATCmnImmoData+18
+   \   000A   97             MOV       [HL],A
+   1124              mDATControl(Trp, cDATTrpSleep);
+   \   000B   A101           MOV       A,#1
+   \   000D   ..             CALLT     [__T_DATTrpControl]
+   1125          }
+   \   000E   AF             RET       
+   \   000F                  REQUIRE ?CL78K_V4_6_L00
+   1126          
+   1127          //*****************************************************************************
+   1128          //  DESCRIPTION :
+   1129          //  
+   1130          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1131          //
+   1132          //  RETURN VALUE :  none
+   1133          // 
+   1134          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1135          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1136          BOOL CARAuthentTimerElapsed(void)
+   \                     CARAuthentTimerElapsed:
+   1137          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#CarImmobilizerTimer
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 0
+   1138              BOOL bTimerElapsedL;
+   1139              bTimerElapsedL = TOSIsTimerElapsed(&CarImmobilizerTimer, cTimeOut1sec);
+   1140              return bTimerElapsedL;
+   \   0004   126400         MOVW      BC,#100
+   \   0007   ..             CALLT     [__T_TOSIsTimerElapsed]
+   \   0008   B2             POP       BC
+   \   0009   AF             RET       
+   \   000A                  REQUIRE ?CL78K_V4_6_L00
+   1141          }
+   1142          
+   1143          //*****************************************************************************
+   1144          //  DESCRIPTION :
+   1145          //  
+   1146          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1147          //
+   1148          //  RETURN VALUE :  none
+   1149          // 
+   1150          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1151          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1152          void CARInitializePermanentAuthenticationTest(void)
+   \                     CARInitializePermanentAuthenticationTest:
+   1153          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1154              // Switch on LED_VERLOG
+   1155              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOnVerlogPattern, Default);
+   \   0000   A101           MOV       A,#1
+   \   0002   16....         MOVW      HL,#DATCmnImmoData+18
+   \   0005   97             MOV       [HL],A
+   1156          
+   1157              mDATWrite(U1Bit, DATTrpAuthentInLearningMode, 0, Default);
+   1158              mDATWrite(U1Bit, DATTrpActiveTestMode, 1, Default);
+   \   0006   16....         MOVW      HL,#DatTrpExportData+50
+   \   0009   7183           CLR1      [HL].0
+   \   000B   71A2           SET1      [HL].2
+   1159          }
+   \   000D   AF             RET       
+   \   000E                  REQUIRE ?CL78K_V4_6_L00
+   1160          
+   1161          //*****************************************************************************
+   1162          //  DESCRIPTION :
+   1163          //  
+   1164          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1165          //
+   1166          //  RETURN VALUE :  none
+   1167          // 
+   1168          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1169          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1170          BOOL CARPermanentAuthentTestDeactivated(void)
+   \                     CARPermanentAuthentTestDeactivated:
+   1171          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1172              return (mPermAuthModeIsOff());
+   \   0000   A100           MOV       A,#0
+   \   0002   16....         MOVW      HL,#u8CarImmoFlag
+   \   0005   71A4           MOV1      CY,[HL].2
+   \   0007   27             ROLC      A,0x1
+   \   0008   7D01           XOR       A,#1
+   \   000A   AF             RET       
+   \   000B                  REQUIRE ?CL78K_V4_6_L00
+   1173          }
+   1174          
+   1175          //*****************************************************************************
+   1176          //  DESCRIPTION :
+   1177          //  
+   1178          //  PARAMETERS (Type,Name,Min,Max) :  none
+   1179          //
+   1180          //  RETURN VALUE :  none
+   1181          // 
+   1182          //  DESIGN INFORMATION :  refer to Detailed Design Document
+   1183          //*****************************************************************************
+
+   \                                 In  segment CODE, align 1, keep-with-next
+   1184          void CARPermanentAuthenticationResultOK(void)
+   \                     CARPermanentAuthenticationResultOK:
+   1185          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+   1186              // Switch on LED_VERLOG
+   1187              mDATWrite(U8Bit, LedVerlogPattern, cDATSwitchOnVerlogPattern, Default);
+   \   0000   A101           MOV       A,#1
+   \   0002   9B....         BR        N:?Subroutine2
+   \   0005                  REQUIRE ?CL78K_V4_6_L00
+   1188          }
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSendControl:
+   \   0000   ....           DW       TOSSendControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSStartTimer:
+   \   0000   ....           DW       TOSStartTimer
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_DATTrpControl:
+   \   0000   ....           DW       DATTrpControl
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?L_MUL_L03:
+   \   0000   ....           DW       ?L_MUL_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?UL_DIV_L03:
+   \   0000   ....           DW       ?UL_DIV_L03
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSIsTimerElapsed:
+   \   0000   ....           DW       TOSIsTimerElapsed
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSWriteSignal:
+   \   0000   ....           DW       TOSWriteSignal
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?I_LSH_L02:
+   \   0000   ....           DW       ?I_LSH_L02
+
+   Segment part sizes:
+
+     Function/Label                 Bytes
+     --------------                 -----
+     CARManageImmobiliserAndCarAntiTheft
+                                     258
+     CarImmobilizerTimer               2
+     CalculatedMERA                    2
+     u8CarImmoFlag                     1
+     u8TimeOutMERA                     1
+     CARStartAuthentPermKey           18
+     CARExitFromAuthentPermKey         6
+     CARStartTestVirginKey             7
+     ?Subroutine2                      5
+     CARImmoWorkingMode                6
+     CARKeyAuthentErrorAndProtected   10
+     ?Subroutine1                      2
+     ??Subroutine3_0                   8
+     CARAuthentPermActivated           9
+     CARAuthentPermActivatedAndIgnitionOn
+                                      14
+     CARStartTempoMera                11
+     CARTempoMeraElapsedAction        13
+     CARStartTpoSleepVerify            5
+     CARTempoMeraFinishedOK           52
+     CARTpoECMisElapsed               10
+     CARTpoSleepVerifyElapsed         10
+     CARInitialize                     9
+     CARIsAnybodyMaintainActiveState
+                                      11
+     CAREnterActiveState               4
+     CARLeaveActiveState              13
+     CARIgnitionOFF                    9
+     CARIgnitionOFF_Static            33
+     CARAuthorizedStandByMode          9
+     CARAuthorizedStandByMode_Static
+                                      29
+     CARIgnitionON                    13
+     ?Subroutine0                     14
+     CARCustomerIgnitionON            35
+     CARBCMBlankError                  5
+     CARBCMBlankOK                     7
+     CARKeyAuthentication              9
+     CARKeyAuthentication_Static      54
+     CARKeyAuthenticationNOK          13
+     CARKeyAuthenticationOK           13
+     CARIsVerlogTimerElapsed          36
+     CARSendVerlogFrame                6
+     CARKeyAuthentResultOKandUnprotected
+                                      23
+     CARVirginTestActivated            9
+     CARPutImmobilizerAntennaInSleepMode
+                                       4
+     CARSleepModeFinished             12
+     CARKeyNeedResynchroOK            28
+     CARKeyResynchronization           9
+     CARKeyResynchroFinished          12
+     CARManageVerlogPattern           13
+     CARLearningModeInProgress        13
+     CARKeyAuthenticationInTestMode    9
+     CARKeyAuthenticationInTestMode_Static
+                                      60
+     CARKeyAuthenticationWithTransportISK
+                                       9
+     CARKeyAuthenticationWithTransportISK_Static
+                                      50
+     CARVirginKeyEnd                   6
+     CARKeyWithRf                      9
+     CARResynchroNOK                  13
+     CARResynchroOK                   13
+     CARResynchronizationError        10
+     CARPermanentAuthenticationResultNOK
+                                       9
+     CARPermanentAuthenticationResultNOK_Static
+                                      20
+     CARPutImmobilizerAntennaInSleepModeAndStopPermanentAuthent
+                                      15
+     CARAuthentTimerElapsed           10
+     CARInitializePermanentAuthenticationTest
+                                      14
+     CARPermanentAuthentTestDeactivated
+                                      11
+     CARPermanentAuthenticationResultOK
+                                       5
+     __T_TOSSendControl                2
+     __T_?FAR_CALL_L07                 2
+     __T_TOSStartTimer                 2
+     __T_DATTrpControl                 2
+     __T_?L_MUL_L03                    2
+     __T_?UL_DIV_L03                   2
+     __T_TOSIsTimerElapsed             2
+     __T_TOSWriteSignal                2
+     __T_TOSSeqActivateGraph           2
+     __T_TOSSeqDeactivateGraph         2
+     __T_?I_LSH_L02                    2
+
+ 
+ 246 bytes in segment BCODE
+  22 bytes in segment CLTVEC
+ 648 bytes in segment CODE
+ 258 bytes in segment CONST
+   6 bytes in segment NEAR_Z
+ 
+ 894 bytes of CODE  memory (+ 22 bytes shared)
+ 258 bytes of CONST memory
+   6 bytes of DATA  memory
+
+Errors: none
+Warnings: none

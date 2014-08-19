@@ -1,0 +1,1707 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:50 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_DOU.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_DOU.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_DOU.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_DOU.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_DOU.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_DOU.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_DOU.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_DOU
+     12          // -----------------------------------------------------------------------------
+     13          // $Date:   Mar 09 2010 09:48:20  $
+     14          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_DOU/LDB_DOU.C-arc  $
+     15          // $Revision:   1.18  $
+     16          // -----------------------------------------------------------------------------
+     17          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_DOU/LDB_DOU.C-arc   $
+     18          // 
+     19          //    Rev 1.18   Mar 09 2010 09:48:20   adzhelp
+     20          // Cm007644: DLK: Doolock Led switched off in sleep mode
+     21          // 
+     22          //    Rev 1.17   Feb 04 2010 12:28:30   adzhelp
+     23          // Cm007297: Implementation EEPROM reprogramming mode loop
+     24          // 
+     25          //    Rev 1.16   Jan 14 2010 17:40:46   amanevd
+     26          // Cm007119: Writing of outputs protected with critical section
+     27          // 
+     28          //    Rev 1.15   Dec 15 2009 11:23:30   amanevd
+     29          // Cm005566: QAC fix and RESULT.TXT update
+     30          // 
+     31          //    Rev 1.14   Dec 15 2009 10:38:24   amanevd
+     32          // Cm005566: DO_VERLOG SC detection strategy updated
+     33          // 
+     34          //    Rev 1.13   Dec 10 2009 09:50:34   adzhelp
+     35          // Cm005566: DO_VERLOG SCGnd and SCBat detection
+     36          // 
+     37          //    Rev 1.12   Dec 03 2009 11:38:04   amanevd
+     38          // Cm006751: DO_VERLOG set to 0 when not sending frame
+     39          // 
+     40          //    Rev 1.11   Nov 04 2009 17:42:06   adzhelp
+     41          // Cm005566: HW Protection - check for DO_VERLOG SC to gnd
+     42          // 
+     43          //    Rev 1.10   Oct 07 2009 09:03:48   adzhelp
+     44          // Cm005497: Protection from repeated controls nominal/sleep
+     45          // 
+     46          //    Rev 1.9   Oct 06 2009 11:40:46   adzhelp
+     47          // Cm005497: Implementation of unused pins treatment
+     48          // 
+     49          //    Rev 1.8   Sep 21 2009 12:04:40   amanevd
+     50          // Cm005044: Init value for port cLDBHarVerlogOut changed to 1
+     51          // 
+     52          //    Rev 1.7   Jul 15 2009 18:09:24   adzhelp
+     53          // Cm005205: Port1 mask updated: P16 removed from control
+     54          // 
+     55          //    Rev 1.6   Apr 27 2009 15:56:22   adzhelp
+     56          // Cm003272: Direct setting of VERLOG_LED output restricted only for sleep mode
+     57          // 
+     58          //    Rev 1.5   Apr 23 2009 17:47:52   adzhelp
+     59          // Cm003265: Last message byte removed
+     60          // 
+     61          //    Rev 1.4   Apr 23 2009 14:03:36   adzhelp
+     62          // Cm003272: Added possibility to command directly VERLOG_LED
+     63          // 
+     64          //    Rev 1.3   Apr 23 2009 13:31:56   adzhelp
+     65          // Cm003271: Added possibility to disable OPEN DOOR LED output
+     66          // 
+     67          //    Rev 1.2   Mar 19 2009 14:29:48   adzhelp
+     68          // Cm003619: Value masked before applying to port
+     69          // 
+     70          //    Rev 1.1   Mar 12 2009 08:57:48   adzhelp
+     71          // Cm003619: Parameterization of digital outputs
+     72          // 
+     73          //    Rev 1.0   10 Nov 2008 15:28:18   ailievb
+     74          // Initial revision.
+     75          //******************************************************************************
+     76          
+     77          
+     78          //------------------------------------------------------------------------------
+     79          // Body Identification
+     80          //------------------------------------------------------------------------------
+     81          
+     82          #define ldb_dou "ldb_dou"
+     83          
+     84          //------------------------------------------------------------------------------
+     85          // Included files to resolve specific definitions in this file
+     86          //------------------------------------------------------------------------------
+     87          #include "ldbtypes.h"
+     88          #include "ldb.h"
+     89          #include "ldb_int.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff03
+   \   union <unnamed> volatile __saddr _A_P3
+   \                     _A_P3:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff04
+   \   union <unnamed> volatile __saddr _A_P4
+   \                     _A_P4:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff05
+   \   union <unnamed> volatile __saddr _A_P5
+   \                     _A_P5:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff06
+   \   union <unnamed> volatile __saddr _A_P6
+   \                     _A_P6:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff07
+   \   union <unnamed> volatile __saddr _A_P7
+   \                     _A_P7:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0c
+   \   union <unnamed> volatile __saddr _A_P12
+   \                     _A_P12:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0d
+   \   union <unnamed> volatile __saddr _A_P13
+   \                     _A_P13:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff22
+   \   union <unnamed> volatile __sfr _A_PM2
+   \                     _A_PM2:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff23
+   \   union <unnamed> volatile __sfr _A_PM3
+   \                     _A_PM3:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff24
+   \   union <unnamed> volatile __sfr _A_PM4
+   \                     _A_PM4:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff25
+   \   union <unnamed> volatile __sfr _A_PM5
+   \                     _A_PM5:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff26
+   \   union <unnamed> volatile __sfr _A_PM6
+   \                     _A_PM6:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff27
+   \   union <unnamed> volatile __sfr _A_PM7
+   \                     _A_PM7:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2c
+   \   union <unnamed> volatile __sfr _A_PM12
+   \                     _A_PM12:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2e
+   \   union <unnamed> volatile __sfr _A_PM14
+   \                     _A_PM14:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2f
+   \   union <unnamed> volatile __sfr _A_ADPC
+   \                     _A_ADPC:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff99
+   \   unsigned char volatile __sfr __no_bit_access WDTE
+   \                     WDTE:
+   \   0000                  DS 1
+     90          #include "ldb_reg.h"
+     91          #include "ldb_har.h"
+     92          #include "ldb_dou.h"
+     93          #include "ldb_doup.h"
+     94          
+     95          
+     96          //------------------------------------------------------------------------------
+     97          // Local constants
+     98          //------------------------------------------------------------------------------
+     99          // Active bits in mask ('1') inform which pins are digital outputs 
+    100          // managed by DOU channel
+    101          // Some ports can have dynamic masks when certain outputs are not driven
+    102          // depending on ECU type (set to 0V output)
+    103          
+    104          #define cBuffer0Port        1
+    105          #define cBuffer0Mask        u8Buffer0Mask
+    106          #define cBuffer0MaskInit    (U8)0x0CU
+    107          
+    108          #define cBuffer1Port        4
+    109          #define cBuffer1Mask        cBuffer1MaskInit
+    110          #define cBuffer1MaskInit    (U8)0x02U
+    111          
+    112          #define cBuffer2Port        5
+    113          #define cBuffer2Mask        u8Buffer2Mask
+    114          #define cBuffer2MaskInit    (U8)0x04U
+    115          
+    116          #define cBuffer3Port        7
+    117          #define cBuffer3Mask        u8Buffer3Mask
+    118          #define cBuffer3MaskInit    (U8)0xFFU
+    119          
+    120          #define cBufferSize         4U
+    121          
+    122          #define cPortResetValue         ((U8)0x00U)
+    123          #define cVerlogOutActiveValue   1
+    124          #define cVerlogOutSleepValue    0
+    125          
+    126          // Digital outputs that can be disabled
+    127          #define cOutputBuffer3Port75    ((U8)0x20U)
+    128          #define cOutputBuffer3Port73    ((U8)0x08U)
+    129          #define cOutputBuffer3Port71    ((U8)0x02U)
+    130          #define cOutputBuffer3Port70    ((U8)0x01U)
+    131          #define cOutputBuffer2Port52    ((U8)0x04U)
+    132          #define cOutputBuffer0Port13    ((U8)0x08U)
+    133          
+    134          // EEPROM regrogramming constants
+    135          #define cCsManagementAllowed    ((U8)0x4AU)
+    136          #define cCsManagementForbidden  ((U8)0U)
+    137          #define cWatchdogRefreshValue   ((U8)0xACU)
+    138          
+    139          //------------------------------------------------------------------------------
+    140          // Local macros
+    141          //------------------------------------------------------------------------------
+    142          //QACJ 3443: adzhelp: Macro concatenation used
+    143          #define mConfigureDOPorts(Mode) mConfigureDOPorts##Mode()
+    144          
+    145          // Configure all managed DO port pins as outputs
+    146          #define mConfigureDOPortsNominal() \
+    147              mConfigurePort(cBuffer0Port, cBuffer0MaskInit); \
+    148              mConfigurePort(cBuffer1Port, cBuffer1MaskInit); \
+    149              mConfigurePort(cBuffer2Port, cBuffer2MaskInit); \
+    150              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    151              mConfigurePort(cBuffer3Port, cBuffer3MaskInit)
+    152          
+    153          // Independant from mode or ECU type all predefined outputs remain such:
+    154          #define mConfigureDOPortsSleep() mConfigureDOPortsNominal()
+    155          
+    156          #define mConfigurePort(Port, Mask) mConfigurePort2(Port, Mask)
+    157          #define mConfigurePort2(Port, Mask) \
+    158              /* //QACJ 0881: adzhelp: Order of evalution of parameters not important */ \
+    159              /* //QACJ 3435: adzhelp: Multiple use of parameters not important */ \
+    160              mLDBRegWrite8BitRegister(PM##Port, (U8)(mLDBRegRead8BitRegister(PM##Port) & (U8)(~(Mask))))
+    161          
+    162          
+    163          // Set zeros for all managed DO port pins
+    164          #define mResetDOPorts() \
+    165              mResetPort(cBuffer0Port, cBuffer0Mask); \
+    166              mResetPort(cBuffer1Port, cBuffer1Mask); \
+    167              mResetPort(cBuffer2Port, cBuffer2Mask); \
+    168              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    169              mResetPort(cBuffer3Port, cBuffer3Mask)
+    170          
+    171          #define mResetPort(Port, Mask) mWritePort(Port, Mask, cPortResetValue)
+    172          
+    173          #define mWritePort(Port, Mask, Value) mWritePort2(Port, Mask, Value)
+    174          
+    175          #ifndef _QAC_
+    176          #define mWritePort2(Port, Mask, Value) \
+    177              { \
+    178                  U8 u8InvMask; \
+    179                  U8 u8Result; \
+    180                  u8Result = (U8)((U8)(Value) & (U8)(Mask)); \
+    181                  u8InvMask = (U8)~((U8)(Mask)); \
+    182                  mLDBIntDisableAllIts(); \
+    183                  mLDBRegWrite8BitRegister(P##Port, \
+    184                      (U8)( (U8)((U8)mLDBRegRead8BitRegister(P##Port) & (U8)u8InvMask) | \
+    185                            (U8)u8Result) ); \
+    186                  mLDBIntEnableAllIts(); \
+    187              }
+    188          #else
+    189          #define mWritePort2(Port, Mask, Value)  NOP()
+    190          #endif
+    191          
+    192          // Special masks treatment
+    193          // P13 - OPEN_DOOR_LED
+    194          // Unmask - disable control of pin
+    195          #define mUnmaskOPEN_DOOR_LED()  (u8Buffer0Mask &= (U8)0xF7U)
+    196          // Mask - enable control of pin
+    197          #define mMaskOPEN_DOOR_LED() (u8Buffer0Mask |= (U8)cOutputBuffer0Port13)
+    198          // Restore masks
+    199          #define mRestoreMasks() \
+    200              u8Buffer0Mask = cBuffer0MaskInit; \
+    201              u8Buffer2Mask = cBuffer2MaskInit; \
+    202              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    203              u8Buffer3Mask = cBuffer3MaskInit
+    204          
+    205          // Digital outputs disabled on ECU type in active mode
+    206          // Outputs will be driven 0 V even if requested active by application
+    207          
+    208          // L1
+    209          #define mConfigUnusedDigitalOutputsActiveL1() \
+    210              mRestoreMasks(); \
+    211              u8Buffer3Mask &= (U8)~(cOutputBuffer3Port73 | cOutputBuffer3Port71 | cOutputBuffer3Port70); \
+    212              u8Buffer2Mask &= (U8)~(cOutputBuffer2Port52); \
+    213              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    214              u8Buffer0Mask &= (U8)~(cOutputBuffer0Port13)
+    215          
+    216          // L2
+    217          #define mConfigUnusedDigitalOutputsActiveL2() \
+    218              mRestoreMasks(); \
+    219              u8Buffer3Mask &= (U8)~(cOutputBuffer3Port75 | cOutputBuffer3Port73); \
+    220              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    221              u8Buffer2Mask &= (U8)~(cOutputBuffer2Port52)
+    222          
+    223          // L3
+    224          #define mConfigUnusedDigitalOutputsActiveL3() \
+    225              mRestoreMasks()
+    226          
+    227          // L4
+    228          #define mConfigUnusedDigitalOutputsActiveL4() \
+    229              mRestoreMasks(); \
+    230              u8Buffer3Mask &= (U8)~(cOutputBuffer3Port75 | cOutputBuffer3Port73 | cOutputBuffer3Port71 | cOutputBuffer3Port70); \
+    231              u8Buffer2Mask &= (U8)~(cOutputBuffer2Port52); \
+    232              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    233              u8Buffer0Mask &= (U8)~(cOutputBuffer0Port13)
+    234          
+    235          // L5
+    236          #define mConfigUnusedDigitalOutputsActiveL5() \
+    237              mRestoreMasks(); \
+    238              u8Buffer3Mask &= (U8)~(cOutputBuffer3Port75 | cOutputBuffer3Port71 ); \
+    239              /* //QACJ 3412: adzhelp: Last line statement is not necessary */ \
+    240              u8Buffer2Mask &= (U8)~(cOutputBuffer2Port52)
+    241          
+    242          // L6
+    243          #define mConfigUnusedDigitalOutputsActiveL6() \
+    244              mConfigUnusedDigitalOutputsActiveL5()
+    245          
+    246          #define mConfigUnusedDigitalOutputsActiveL7() \
+    247              mRestoreMasks()
+    248          
+    249          // EEPROM reprogramming management:
+    250          #define mConfigureAllPortsAsInputs() \
+    251              mLDBRegWrite8BitRegister(PM0, 0xFFU); \
+    252              mLDBRegWrite8BitRegister(PM1, 0xFFU); \
+    253              mLDBRegWrite8BitRegister(PM2, 0xFFU); \
+    254              mLDBRegWrite8BitRegister(PM3, 0xFFU); \
+    255              mLDBRegWrite8BitRegister(PM4, 0xFFU); \
+    256              mLDBRegWrite8BitRegister(PM5, 0xFFU); \
+    257              mLDBRegWrite8BitRegister(PM6, 0xFFU); \
+    258              mLDBRegWrite8BitRegister(PM7, 0xFFU); \
+    259              mLDBRegWrite8BitRegister(PM12, 0xFFU); \
+    260              /*//QACJ 3412: adzhelp: Last line statement will be appended on use */\
+    261              mLDBRegWrite8BitRegister(PM14, 0xFFU)
+    262          
+    263          //------------------------------------------------------------------------------
+    264          // Local types
+    265          //------------------------------------------------------------------------------
+    266          
+    267          
+    268          //------------------------------------------------------------------------------
+    269          // Local data
+    270          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    271          static BOOL bSleepMode = cTrue;
+   \                     bSleepMode:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for bSleepMode>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    272          
+
+   \                                 In  segment SADDR_I, align 1, align-sorted
+    273          static MEM_FAST U8 u8Buffer0Mask = cBuffer0MaskInit;
+   \                     u8Buffer0Mask:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for u8Buffer0Mask>`
+   \   0001                  REQUIRE __INIT_SADDR_I
+    274          //QACJ 3207: adzhelp: Variable is used in macros
+
+   \                                 In  segment SADDR_I, align 1, align-sorted
+    275          static MEM_FAST U8 u8Buffer2Mask = cBuffer2MaskInit;
+   \                     u8Buffer2Mask:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for u8Buffer2Mask>`
+   \   0001                  REQUIRE __INIT_SADDR_I
+    276          //QACJ 3207: adzhelp: Variable is used in macros
+
+   \                                 In  segment SADDR_I, align 1, align-sorted
+    277          static MEM_FAST U8 u8Buffer3Mask = cBuffer3MaskInit;
+   \                     u8Buffer3Mask:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for u8Buffer3Mask>`
+   \   0001                  REQUIRE __INIT_SADDR_I
+    278          
+
+   \                                 In  segment NEAR_I, align 1, align-sorted
+    279          static U8 u8EcuType = (U8)cLDBDouEcuTypeL7; // all pins used
+   \                     u8EcuType:
+   \   0000                  DS 1
+   \   0001                  REQUIRE `?<Initializer for u8EcuType>`
+   \   0001                  REQUIRE __INIT_NEAR_I
+    280          
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+    281          static U8 u8EepromReprogCsManagement;
+   \                     u8EepromReprogCsManagement:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+    282          
+    283          //------------------------------------------------------------------------------
+    284          // Constant local data
+    285          //------------------------------------------------------------------------------
+    286          
+    287          // This is an example:
+    288          // static const tType  cConstantName;
+    289          
+    290          //------------------------------------------------------------------------------
+    291          // Exported data
+    292          //------------------------------------------------------------------------------
+    293          
+    294          
+    295          //------------------------------------------------------------------------------
+    296          // Constant exported data
+    297          //------------------------------------------------------------------------------
+    298          
+    299          
+    300          //------------------------------------------------------------------------------
+    301          // Local function prototypes
+    302          //------------------------------------------------------------------------------
+    303          static MEM_TYPE void ConfigUnusedPins (void);
+    304          
+    305          //==============================================================================
+    306          //=========================== LOCAL FUNCTIONS ==================================
+    307          //==============================================================================
+    308          
+    309          //==============================================================================
+    310          // DESCRIPTION :
+    311          //  
+    312          // PARAMETERS (Type,Name,Min,Max) :  none
+    313          //
+    314          // RETURN VALUE :  none
+    315          // 
+    316          // DESIGN INFORMATION :  refer to Detailed Design Document
+    317          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    318          static MEM_TYPE void ConfigUnusedPins (void)
+   \                     ConfigUnusedPins:
+    319          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    320              if (bSleepMode == cFalse)
+   \   0000   8E....         MOV       A,bSleepMode
+   \   0003   4D00           CMP       A,#0
+   \   0005   8E....         MOV       A,u8EcuType
+   \   0008   AD03           BZ        $+5
+   \   000A   9B....         BR        N:??LDBDouSendWithoutAddr_0
+    321              {
+    322                  // Active mode configuration
+    323                  switch (u8EcuType)
+   \   000D   4D10           CMP       A,#16
+   \   000F   AD27           BZ        ??LDBDouSendWithoutAddr_1
+   \   0011   4D11           CMP       A,#17
+   \   0013   AD4F           BZ        ??LDBDouSendWithoutAddr_2
+   \   0015   4D12           CMP       A,#18
+   \   0017   AD7B           BZ        ??LDBDouSendWithoutAddr_3
+   \   0019   4D14           CMP       A,#20
+   \   001B   BD03           BNZ       $+5
+   \   001D   9B....         BR        N:??LDBDouSendWithoutAddr_4
+   \   0020   4D15           CMP       A,#21
+   \   0022   BD03           BNZ       $+5
+   \   0024   9B....         BR        N:??LDBDouSendWithoutAddr_5
+   \   0027   4D16           CMP       A,#22
+   \   0029   BD03           BNZ       $+5
+   \   002B   9B....         BR        N:??LDBDouSendWithoutAddr_5
+   \   002E   4D17           CMP       A,#23
+   \   0030   BD03           BNZ       $+5
+   \   0032   9B....         BR        N:??LDBDouSendWithoutAddr_6
+   \   0035   9B....         BR        N:LIBAssertionFailed
+    324                  {
+    325                  case cLDBDouEcuTypeL1:
+    326                      mLDBDouConfigUnusedPins(Active, L1);
+   \                     ??LDBDouSendWithoutAddr_1:
+   \   0038   710A24         SET1      0xFF24.0
+   \   003B   4B0C           CLR1      S:0xFF0C.4
+   \   003D   714B2C         CLR1      0xFF2C.4
+   \   0040   710A26         SET1      0xFF26.0
+   \   0043   711A26         SET1      0xFF26.1
+   \   0046   712A26         SET1      0xFF26.2
+   \   0049   713A26         SET1      0xFF26.3
+   \   004C   711A25         SET1      0xFF25.1
+   \   004F   1B00           CLR1      S:0xFF00.1
+   \   0051   711B20         CLR1      0xFF20.1
+   \   0054   1322FF         MOV       0xFF22,#255
+   \   0057   132F00         MOV       0xFF2F,#0
+   \   005A   11..F4         MOV       S:u8Buffer3Mask,#244
+   \                     ??ConfigUnusedPins_0:
+   \   005D   11..00         MOV       S:u8Buffer2Mask,#0
+   \   0060   11..04         MOV       S:u8Buffer0Mask,#4
+   \   0063   AF             RET       
+    327                      break;
+    328                  case cLDBDouEcuTypeL2:
+    329                      mLDBDouConfigUnusedPins(Active, L2);
+   \                     ??LDBDouSendWithoutAddr_2:
+   \   0064   710A24         SET1      0xFF24.0
+   \   0067   714A2C         SET1      0xFF2C.4
+   \   006A   0B06           CLR1      S:0xFF06.0
+   \   006C   710B26         CLR1      0xFF26.0
+   \   006F   1B06           CLR1      S:0xFF06.1
+   \   0071   711B26         CLR1      0xFF26.1
+   \   0074   2B06           CLR1      S:0xFF06.2
+   \   0076   712B26         CLR1      0xFF26.2
+   \   0079   3B06           CLR1      S:0xFF06.3
+   \   007B   713B26         CLR1      0xFF26.3
+   \   007E   711A25         SET1      0xFF25.1
+   \   0081   711A20         SET1      0xFF20.1
+   \   0084   1322FE         MOV       0xFF22,#254
+   \   0087   132F01         MOV       0xFF2F,#1
+   \   008A   11..0C         MOV       S:u8Buffer0Mask,#12
+   \   008D   11..D7         MOV       S:u8Buffer3Mask,#215
+   \                     ??ConfigUnusedPins_1:
+   \   0090   11..00         MOV       S:u8Buffer2Mask,#0
+   \   0093   AF             RET       
+    330                      break;
+    331                  case cLDBDouEcuTypeL3:
+    332                      mLDBDouConfigUnusedPins(Active, L3);
+   \                     ??LDBDouSendWithoutAddr_3:
+   \   0094   710A24         SET1      0xFF24.0
+   \   0097   714A2C         SET1      0xFF2C.4
+   \   009A   0B06           CLR1      S:0xFF06.0
+   \   009C   710B26         CLR1      0xFF26.0
+   \   009F   1B06           CLR1      S:0xFF06.1
+   \   00A1   711B26         CLR1      0xFF26.1
+   \   00A4   2B06           CLR1      S:0xFF06.2
+   \   00A6   712B26         CLR1      0xFF26.2
+   \   00A9   3B06           CLR1      S:0xFF06.3
+   \   00AB   713B26         CLR1      0xFF26.3
+   \                     ??ConfigUnusedPins_2:
+   \   00AE   711A25         SET1      0xFF25.1
+   \   00B1   711A20         SET1      0xFF20.1
+   \   00B4   1322FF         MOV       0xFF22,#255
+   \   00B7   132F00         MOV       0xFF2F,#0
+   \   00BA   11..0C         MOV       S:u8Buffer0Mask,#12
+   \   00BD   11..04         MOV       S:u8Buffer2Mask,#4
+   \   00C0   11..FF         MOV       S:u8Buffer3Mask,#255
+   \   00C3   AF             RET       
+    333                      break;
+    334                  case cLDBDouEcuTypeL4:
+    335                      mLDBDouConfigUnusedPins(Active, L4);
+   \                     ??LDBDouSendWithoutAddr_4:
+   \   00C4   0B04           CLR1      S:0xFF04.0
+   \   00C6   710B24         CLR1      0xFF24.0
+   \   00C9   4B0C           CLR1      S:0xFF0C.4
+   \   00CB   714B2C         CLR1      0xFF2C.4
+   \   00CE   0B06           CLR1      S:0xFF06.0
+   \   00D0   710B26         CLR1      0xFF26.0
+   \   00D3   1B06           CLR1      S:0xFF06.1
+   \   00D5   711B26         CLR1      0xFF26.1
+   \   00D8   2B06           CLR1      S:0xFF06.2
+   \   00DA   712B26         CLR1      0xFF26.2
+   \   00DD   3B06           CLR1      S:0xFF06.3
+   \   00DF   713B26         CLR1      0xFF26.3
+   \   00E2   1B05           CLR1      S:0xFF05.1
+   \   00E4   711B25         CLR1      0xFF25.1
+   \   00E7   1B00           CLR1      S:0xFF00.1
+   \   00E9   711B20         CLR1      0xFF20.1
+   \   00EC   1322F8         MOV       0xFF22,#248
+   \   00EF   132F03         MOV       0xFF2F,#3
+   \   00F2   11..D4         MOV       S:u8Buffer3Mask,#212
+   \   00F5   9B....         BR        N:??ConfigUnusedPins_0
+    336                      break;
+    337                  case cLDBDouEcuTypeL5:
+    338                      mLDBDouConfigUnusedPins(Active, L5);
+   \                     ??LDBDouSendWithoutAddr_5:
+   \   00F8   710A24         SET1      0xFF24.0
+   \   00FB   714A2C         SET1      0xFF2C.4
+   \   00FE   0B06           CLR1      S:0xFF06.0
+   \   0100   710B26         CLR1      0xFF26.0
+   \   0103   1B06           CLR1      S:0xFF06.1
+   \   0105   711B26         CLR1      0xFF26.1
+   \   0108   2B06           CLR1      S:0xFF06.2
+   \   010A   712B26         CLR1      0xFF26.2
+   \   010D   3B06           CLR1      S:0xFF06.3
+   \   010F   713B26         CLR1      0xFF26.3
+   \   0112   711A25         SET1      0xFF25.1
+   \   0115   711A20         SET1      0xFF20.1
+   \   0118   1322FE         MOV       0xFF22,#254
+   \   011B   132F01         MOV       0xFF2F,#1
+   \   011E   11..0C         MOV       S:u8Buffer0Mask,#12
+   \   0121   11..DD         MOV       S:u8Buffer3Mask,#221
+   \   0124   9B....         BR        N:??ConfigUnusedPins_1
+    339                      break;
+    340                  case cLDBDouEcuTypeL6:
+    341                      mLDBDouConfigUnusedPins(Active, L6);
+    342                      break;
+    343                  case cLDBDouEcuTypeL7:
+    344                      mLDBDouConfigUnusedPins(Active, L7);
+   \                     ??LDBDouSendWithoutAddr_6:
+   \   0127   710A24         SET1      0xFF24.0
+   \   012A   714A2C         SET1      0xFF2C.4
+   \   012D   710A26         SET1      0xFF26.0
+   \   0130   711A26         SET1      0xFF26.1
+   \   0133   712A26         SET1      0xFF26.2
+   \   0136   713A26         SET1      0xFF26.3
+   \   0139   9B....         BR        N:??ConfigUnusedPins_2
+    345                      break;
+    346                  default:
+    347                      mLIBassert(cFalse);
+   \                     ??ConfigUnusedPins_3:
+   \   013C   9B....         BR        N:LIBAssertionFailed
+    348                      break;
+    349                  }
+    350              }
+    351              else
+    352              {
+    353                  // Sleep mode configuration
+    354                  switch (u8EcuType)
+   \                     ??LDBDouSendWithoutAddr_0:
+   \   013F   4D10           CMP       A,#16
+   \   0141   AD1D           BZ        ??LDBDouSendWithoutAddr_7
+   \   0143   4D11           CMP       A,#17
+   \   0145   AD3C           BZ        ??LDBDouSendWithoutAddr_8
+   \   0147   4D12           CMP       A,#18
+   \   0149   AD5F           BZ        ??LDBDouSendWithoutAddr_9
+   \   014B   4D14           CMP       A,#20
+   \   014D   AD77           BZ        ??LDBDouSendWithoutAddr_10
+   \   014F   4D15           CMP       A,#21
+   \   0151   AD30           BZ        ??LDBDouSendWithoutAddr_8
+   \   0153   4D16           CMP       A,#22
+   \   0155   AD2C           BZ        ??LDBDouSendWithoutAddr_8
+   \   0157   4D17           CMP       A,#23
+   \   0159   BD03           BNZ       $+5
+   \   015B   9B....         BR        N:??LDBDouSendWithoutAddr_11
+   \   015E   FADC           BR        ??ConfigUnusedPins_3
+    355                  {
+    356                  case cLDBDouEcuTypeL1:
+    357                      mLDBDouConfigUnusedPins(Sleep, L1);
+   \                     ??LDBDouSendWithoutAddr_7:
+   \   0160   710A24         SET1      0xFF24.0
+   \   0163   4B0C           CLR1      S:0xFF0C.4
+   \   0165   714B2C         CLR1      0xFF2C.4
+   \   0168   710A26         SET1      0xFF26.0
+   \   016B   711A26         SET1      0xFF26.1
+   \   016E   712A26         SET1      0xFF26.2
+   \   0171   713A26         SET1      0xFF26.3
+   \   0174   711A25         SET1      0xFF25.1
+   \   0177   1B00           CLR1      S:0xFF00.1
+   \   0179   711B20         CLR1      0xFF20.1
+   \   017C   1322FF         MOV       0xFF22,#255
+   \                     ??ConfigUnusedPins_4:
+   \   017F   132F08         MOV       0xFF2F,#8
+   \   0182   AF             RET       
+    358                      break;
+    359                  case cLDBDouEcuTypeL2:
+    360                      mLDBDouConfigUnusedPins(Sleep, L2);
+   \                     ??LDBDouSendWithoutAddr_8:
+   \   0183   710A24         SET1      0xFF24.0
+   \   0186   714A2C         SET1      0xFF2C.4
+   \   0189   0B06           CLR1      S:0xFF06.0
+   \   018B   710B26         CLR1      0xFF26.0
+   \   018E   1B06           CLR1      S:0xFF06.1
+   \   0190   711B26         CLR1      0xFF26.1
+   \   0193   2B06           CLR1      S:0xFF06.2
+   \   0195   712B26         CLR1      0xFF26.2
+   \   0198   3B06           CLR1      S:0xFF06.3
+   \   019A   713B26         CLR1      0xFF26.3
+   \   019D   711A25         SET1      0xFF25.1
+   \   01A0   711A20         SET1      0xFF20.1
+   \   01A3   1322FE         MOV       0xFF22,#254
+   \   01A6   132F01         MOV       0xFF2F,#1
+   \   01A9   AF             RET       
+    361                      break;
+    362                  case cLDBDouEcuTypeL3:
+    363                      mLDBDouConfigUnusedPins(Sleep, L3);
+   \                     ??LDBDouSendWithoutAddr_9:
+   \   01AA   710A24         SET1      0xFF24.0
+   \   01AD   714A2C         SET1      0xFF2C.4
+   \   01B0   0B06           CLR1      S:0xFF06.0
+   \   01B2   710B26         CLR1      0xFF26.0
+   \   01B5   1B06           CLR1      S:0xFF06.1
+   \   01B7   711B26         CLR1      0xFF26.1
+   \   01BA   2B06           CLR1      S:0xFF06.2
+   \   01BC   712B26         CLR1      0xFF26.2
+   \   01BF   3B06           CLR1      S:0xFF06.3
+   \   01C1   713B26         CLR1      0xFF26.3
+   \   01C4   FA3F           BR        ??LDBDouSendWithoutAddr_12
+    364                      break;
+    365                  case cLDBDouEcuTypeL4:
+    366                      mLDBDouConfigUnusedPins(Sleep, L4);
+   \                     ??LDBDouSendWithoutAddr_10:
+   \   01C6   0B04           CLR1      S:0xFF04.0
+   \   01C8   710B24         CLR1      0xFF24.0
+   \   01CB   4B0C           CLR1      S:0xFF0C.4
+   \   01CD   714B2C         CLR1      0xFF2C.4
+   \   01D0   0B06           CLR1      S:0xFF06.0
+   \   01D2   710B26         CLR1      0xFF26.0
+   \   01D5   1B06           CLR1      S:0xFF06.1
+   \   01D7   711B26         CLR1      0xFF26.1
+   \   01DA   2B06           CLR1      S:0xFF06.2
+   \   01DC   712B26         CLR1      0xFF26.2
+   \   01DF   3B06           CLR1      S:0xFF06.3
+   \   01E1   713B26         CLR1      0xFF26.3
+   \   01E4   1B05           CLR1      S:0xFF05.1
+   \   01E6   711B25         CLR1      0xFF25.1
+   \   01E9   1B00           CLR1      S:0xFF00.1
+   \   01EB   711B20         CLR1      0xFF20.1
+   \   01EE   1322F8         MOV       0xFF22,#248
+   \   01F1   FA8C           BR        ??ConfigUnusedPins_4
+    367                      break;
+    368                  case cLDBDouEcuTypeL5:
+    369                      mLDBDouConfigUnusedPins(Sleep, L5);
+    370                      break;
+    371                  case cLDBDouEcuTypeL6:
+    372                      mLDBDouConfigUnusedPins(Sleep, L6);
+    373                      break;
+    374                  case cLDBDouEcuTypeL7:
+    375                      mLDBDouConfigUnusedPins(Sleep, L7);
+   \                     ??LDBDouSendWithoutAddr_11:
+   \   01F3   710A24         SET1      0xFF24.0
+   \   01F6   714A2C         SET1      0xFF2C.4
+   \   01F9   710A26         SET1      0xFF26.0
+   \   01FC   711A26         SET1      0xFF26.1
+   \   01FF   712A26         SET1      0xFF26.2
+   \   0202   713A26         SET1      0xFF26.3
+   \                     ??LDBDouSendWithoutAddr_12:
+   \   0205   711A25         SET1      0xFF25.1
+   \   0208   711A20         SET1      0xFF20.1
+   \   020B   1322FF         MOV       0xFF22,#255
+   \   020E   132F00         MOV       0xFF2F,#0
+    376                      break;
+    377                  default:
+    378                      mLIBassert(cFalse);
+    379                      break;
+    380                  }
+    381              }
+    382          }
+   \   0211   AF             RET       
+   \   0212                  REQUIRE ?CL78K_V4_6_L00
+   \   0212                  REQUIRE _A_P0
+   \   0212                  REQUIRE _A_P4
+   \   0212                  REQUIRE _A_P5
+   \   0212                  REQUIRE _A_P6
+   \   0212                  REQUIRE _A_P12
+   \   0212                  REQUIRE _A_PM0
+   \   0212                  REQUIRE _A_PM2
+   \   0212                  REQUIRE _A_PM4
+   \   0212                  REQUIRE _A_PM5
+   \   0212                  REQUIRE _A_PM6
+   \   0212                  REQUIRE _A_PM12
+   \   0212                  REQUIRE _A_ADPC
+    383          
+    384          
+    385          //==============================================================================
+    386          //=========================== EXPORTED FUNCTIONS ===============================
+    387          //==============================================================================
+    388          
+    389          //==============================================================================
+    390          // DESCRIPTION :
+    391          //  
+    392          // PARAMETERS (Type,Name,Min,Max) :  none
+    393          //
+    394          // RETURN VALUE :  none
+    395          // 
+    396          // DESIGN INFORMATION :  refer to Detailed Design Document
+    397          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    398          MEM_TYPE void LDBDouInit(void)
+   \                     LDBDouInit:
+    399          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    400              mConfigureDOPorts(Nominal);
+   \   0000   F421           MOV       A,0xFF21
+   \   0002   5DF3           AND       A,#243
+   \   0004   F621           MOV       0xFF21,A
+   \   0006   711B24         CLR1      0xFF24.1
+   \   0009   712B25         CLR1      0xFF25.2
+   \   000C   F427           MOV       A,0xFF27
+   \   000E   132700         MOV       0xFF27,#0
+    401              mResetDOPorts();
+   \   0011   F0..           MOV       A,S:u8Buffer0Mask
+   \   0013   7DFF           XOR       A,#255
+   \   0015   70             MOV       X,A
+   \   0016   7B1E           DI
+   \   0018   F001           MOV       A,S:0xFF01
+   \   001A   6158           AND       A,X
+   \   001C   F201           MOV       S:0xFF01,A
+   \   001E   7A1E           EI
+   \   0020   7B1E           DI
+   \   0022   1B04           CLR1      S:0xFF04.1
+   \   0024   7A1E           EI
+   \   0026   F0..           MOV       A,S:u8Buffer2Mask
+   \   0028   7DFF           XOR       A,#255
+   \   002A   70             MOV       X,A
+   \   002B   7B1E           DI
+   \   002D   F005           MOV       A,S:0xFF05
+   \   002F   6158           AND       A,X
+   \   0031   F205           MOV       S:0xFF05,A
+   \   0033   7A1E           EI
+   \   0035   F0..           MOV       A,S:u8Buffer3Mask
+   \   0037   7DFF           XOR       A,#255
+   \   0039   70             MOV       X,A
+   \   003A   7B1E           DI
+   \   003C   F007           MOV       A,S:0xFF07
+   \   003E   6158           AND       A,X
+   \   0040   F207           MOV       S:0xFF07,A
+   \   0042   7A1E           EI
+    402              // VERLOG output
+    403              mLDBHarWrite(cLDBHarVerlogOut, cVerlogOutSleepValue);
+   \   0044   5B01           CLR1      S:0xFF01.5
+    404              mLDBHarConfig(cLDBHarVerlogOut, cLDBHarOutput);
+   \   0046   715B21         CLR1      0xFF21.5
+    405          }
+   \   0049   AF             RET       
+   \   004A                  REQUIRE ?CL78K_V4_6_L00
+   \   004A                  REQUIRE _A_P1
+   \   004A                  REQUIRE _A_P4
+   \   004A                  REQUIRE _A_P5
+   \   004A                  REQUIRE _A_P7
+   \   004A                  REQUIRE _A_PM1
+   \   004A                  REQUIRE _A_PM4
+   \   004A                  REQUIRE _A_PM5
+   \   004A                  REQUIRE _A_PM7
+    406          
+    407          //==============================================================================
+    408          // DESCRIPTION :
+    409          //  
+    410          // PARAMETERS (Type,Name,Min,Max) :  none
+    411          //
+    412          // RETURN VALUE :  none
+    413          // 
+    414          // DESIGN INFORMATION :  refer to Detailed Design Document
+    415          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    416          MEM_TYPE void LDBDouControl(const tCtrl Ctrl)
+   \                     LDBDouControl:
+    417          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 0
+    418              switch(Ctrl)
+   \   0001   16....         MOVW      HL,#`?<Jumptable for LDBDouControl>_0`
+   \   0004   9B....         BR        ?C_SSWITCH_L10
+    419              {
+    420              case cLDBDouEnterNominalMode :
+    421                  if (bSleepMode != cFalse)  // controls are called by DAT_DOU and DAT_CPU
+   \                     ??LDBDouControl_0:
+   \   0007   8E....         MOV       A,bSleepMode
+   \   000A   4D00           CMP       A,#0
+   \   000C   BD03           BNZ       $+5
+   \   000E   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    422                  {
+    423                      bSleepMode = cFalse;
+   \   0011   A100           MOV       A,#0
+   \   0013   9E....         MOV       bSleepMode,A
+    424                      mConfigureDOPorts(Nominal);
+   \   0016   F421           MOV       A,0xFF21
+   \   0018   5DF3           AND       A,#243
+   \   001A   F621           MOV       0xFF21,A
+   \   001C   711B24         CLR1      0xFF24.1
+   \   001F   712B25         CLR1      0xFF25.2
+   \   0022   F427           MOV       A,0xFF27
+   \   0024   132700         MOV       0xFF27,#0
+    425                      mLDBHarWrite(cLDBHarVerlogOut, cVerlogOutSleepValue);
+   \   0027   5B01           CLR1      S:0xFF01.5
+    426                      ConfigUnusedPins();
+   \   0029   16....         MOVW      HL,#LWRD(ConfigUnusedPins)
+   \   002C   A4..           MOV       E,#BYTE3(ConfigUnusedPins)
+   \   002E   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    427                      u8EepromReprogCsManagement = cCsManagementForbidden;
+   \   002F   A100           MOV       A,#0
+   \                     ??LDBDouControl_1:
+   \   0031   9E....         MOV       u8EepromReprogCsManagement,A
+   \   0034   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    428                  }
+    429                  break;
+    430              case cLDBDouEnterSleepMode :
+    431                  if (bSleepMode == cFalse)   // controls are called by DAT_DOU and DAT_CPU
+   \                     ??LDBDouControl_2:
+   \   0037   8E....         MOV       A,bSleepMode
+   \   003A   4D00           CMP       A,#0
+   \   003C   AD03           BZ        $+5
+   \   003E   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    432                  {
+    433                      bSleepMode = cTrue;
+   \   0041   A101           MOV       A,#1
+   \   0043   9E....         MOV       bSleepMode,A
+    434                      mConfigureDOPorts(Sleep);
+   \   0046   F421           MOV       A,0xFF21
+   \   0048   5DF3           AND       A,#243
+   \   004A   F621           MOV       0xFF21,A
+   \   004C   711B24         CLR1      0xFF24.1
+   \   004F   712B25         CLR1      0xFF25.2
+   \   0052   F427           MOV       A,0xFF27
+   \   0054   132700         MOV       0xFF27,#0
+    435                      mResetDOPorts(); // disable all managed outputs
+   \   0057   F0..           MOV       A,S:u8Buffer0Mask
+   \   0059   7DFF           XOR       A,#255
+   \   005B   70             MOV       X,A
+   \   005C   7B1E           DI
+   \   005E   F001           MOV       A,S:0xFF01
+   \   0060   6158           AND       A,X
+   \   0062   F201           MOV       S:0xFF01,A
+   \   0064   7A1E           EI
+   \   0066   7B1E           DI
+   \   0068   1B04           CLR1      S:0xFF04.1
+   \   006A   7A1E           EI
+   \   006C   F0..           MOV       A,S:u8Buffer2Mask
+   \   006E   7DFF           XOR       A,#255
+   \   0070   70             MOV       X,A
+   \   0071   7B1E           DI
+   \   0073   F005           MOV       A,S:0xFF05
+   \   0075   6158           AND       A,X
+   \   0077   F205           MOV       S:0xFF05,A
+   \   0079   7A1E           EI
+   \   007B   F0..           MOV       A,S:u8Buffer3Mask
+   \   007D   7DFF           XOR       A,#255
+   \   007F   70             MOV       X,A
+   \   0080   7B1E           DI
+   \   0082   F007           MOV       A,S:0xFF07
+   \   0084   6158           AND       A,X
+   \   0086   F207           MOV       S:0xFF07,A
+   \   0088   7A1E           EI
+    436                      mLDBHarWrite(cLDBHarVerlogOut, cVerlogOutSleepValue);
+   \   008A   5B01           CLR1      S:0xFF01.5
+    437                      ConfigUnusedPins();
+   \                     ??LDBDouControl_3:
+   \   008C   16....         MOVW      HL,#LWRD(ConfigUnusedPins)
+   \   008F   A4..           MOV       E,#BYTE3(ConfigUnusedPins)
+   \   0091   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0092   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    438                  }
+    439                  break;
+    440              
+    441              // Control DO_DATA_IMMOBILIZER (cLDBHarTrpOut)
+    442              case cLDBControlSetDO_DATA_IMMOBILIZER:
+    443                  mLDBHarWrite(cLDBHarTrpOut, 1);
+   \                     ??LDBDouControl_4:
+   \   0095   6A00           SET1      S:0xFF00.6
+   \   0097   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    444                  break;
+    445              case cLDBControlClearDO_DATA_IMMOBILIZER:
+    446                  mLDBHarWrite(cLDBHarTrpOut, 0);
+   \                     ??LDBDouControl_5:
+   \   009A   6B00           CLR1      S:0xFF00.6
+   \   009C   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    447                  break;
+    448              
+    449              // Control DO_VERLOG (cLDBHarVerlogOut)
+    450              case cLDBControlSetDO_VERLOG:
+    451                  mLDBHarWrite(cLDBHarVerlogOut, 1);
+   \                     ??LDBDouControl_6:
+   \   009F   5A01           SET1      S:0xFF01.5
+   \   00A1   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    452                  break;
+    453              case cLDBControlClearDO_VERLOG:
+    454                  mLDBHarWrite(cLDBHarVerlogOut, 0);
+   \                     ??LDBDouControl_7:
+   \   00A4   5B01           CLR1      S:0xFF01.5
+   \   00A6   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    455                  break;
+    456          
+    457              case cLDBControlCheckDO_VERLOGSCDetect:
+    458                  //QACJ 3346: amanevd: Value depends from digital input state
+    459                  if(0 == mLDBHarRead(cLDBHarVerlogOut))
+   \                     ??LDBDouControl_8:
+   \   00A9   DC0115         BT        S:0xFF01.5, ??LDBDouSendWithoutAddr_14
+    460                  {
+    461                      // Check SC to Gnd on DIO_ECM
+    462                      //QACJ 3325: amanevd: Value depends from digital input state
+    463                      if(1 == mLDBHarRead(cLDBHarVerlogIn))
+   \   00AC   A10C           MOV       A,#12
+   \   00AE   3103030B       BF        S:0xFF03.0, ??LDBDouSendWithoutAddr_15
+    464                      //QACJ 3201: amanevd: Statement is reachable
+    465                      {
+    466                          // Output set to '0' (active) but Verlog line seen not active
+    467                          DATVlgCallBackEndCtrl(cLDBControlCheckDO_VERLOGSCGnd, cLDBError);
+   \                     ??LDBDouControl_9:
+   \   00B2   A301           MOV       B,#1
+   \                     ??LDBDouControl_10:
+   \   00B4   16....         MOVW      HL,#LWRD(DATVlgCallBackEndCtrl)
+   \   00B7   A4..           MOV       E,#BYTE3(DATVlgCallBackEndCtrl)
+   \   00B9   ..             CALLT     [__T_?FAR_CALL_L07]
+   \   00BA   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    468                      }
+    469                      else
+    470                      {
+    471                          DATVlgCallBackEndCtrl(cLDBControlCheckDO_VERLOGSCGnd, cLDBCorrect);
+   \                     ??LDBDouSendWithoutAddr_15:
+   \   00BD   A300           MOV       B,#0
+   \   00BF   FAF3           BR        ??LDBDouControl_10
+    472                      }
+    473                  }
+    474                  else
+    475                  //QACJ 3201: amanevd: Statement is reachable
+    476                  {
+    477                      // Check SC to Bat on DIO_ECM
+    478                      //QACJ 3346: adzhelp: Value depends from digital input state
+    479                      if(0 == mLDBHarRead(cLDBHarVerlogIn))
+   \                     ??LDBDouSendWithoutAddr_14:
+   \   00C1   A10D           MOV       A,#13
+   \   00C3   8C03F7         BT        S:0xFF03.0, ??LDBDouSendWithoutAddr_15
+    480                      {
+    481                          // Output set to '1' (active) but Verlog line seen active
+    482                          DATVlgCallBackEndCtrl(cLDBControlCheckDO_VERLOGSCBat, cLDBError);
+   \   00C6   FAEA           BR        ??LDBDouControl_9
+    483                      }
+    484                      else
+    485                      {
+    486                          DATVlgCallBackEndCtrl(cLDBControlCheckDO_VERLOGSCBat, cLDBCorrect);
+    487                      }
+    488                  }
+    489                  break;
+    490          
+    491              // Control DOOR_LOCK_LED
+    492              case cLDBDouEnableOPEN_DOOR_LED:
+    493                  mMaskOPEN_DOOR_LED();
+   \                     ??LDBDouControl_11:
+   \   00C8   3A..           SET1      S:u8Buffer0Mask.3
+   \   00CA   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    494                  break;
+    495              case cLDBDouDisableOPEN_DOOR_LED:
+    496                  if ((u8EcuType != cLDBDouEcuTypeL1) && (u8EcuType != cLDBDouEcuTypeL4))
+   \                     ??LDBDouControl_12:
+   \   00CD   8E....         MOV       A,u8EcuType
+   \   00D0   4D10           CMP       A,#16
+   \   00D2   BD03           BNZ       $+5
+   \   00D4   9B....         BR        N:??LDBDouSendWithoutAddr_13
+   \   00D7   4D14           CMP       A,#20
+   \   00D9   BD03           BNZ       $+5
+   \   00DB   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    497                  {
+    498                      mUnmaskOPEN_DOOR_LED();
+   \   00DE   3B..           CLR1      S:u8Buffer0Mask.3
+   \   00E0   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    499                  }
+    500                  break;
+    501          
+    502              // Control VERLOG_LED (cLDBHarVerlogLed)
+    503              case cLDBControlSetVERLOG_LED:
+    504                  if (bSleepMode != cFalse)
+   \                     ??LDBDouControl_13:
+   \   00E3   8E....         MOV       A,bSleepMode
+   \   00E6   4D00           CMP       A,#0
+   \   00E8   BD03           BNZ       $+5
+   \   00EA   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    505                  {
+    506                      mLDBHarWrite(cLDBHarVerlogLed, 1);
+   \   00ED   2A01           SET1      S:0xFF01.2
+   \   00EF   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    507                  }
+    508                  break;
+    509              case cLDBControlClearVERLOG_LED:
+    510                  if (bSleepMode != cFalse)
+   \                     ??LDBDouControl_14:
+   \   00F2   8E....         MOV       A,bSleepMode
+   \   00F5   4D00           CMP       A,#0
+   \   00F7   BD03           BNZ       $+5
+   \   00F9   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    511                  {
+    512                      mLDBHarWrite(cLDBHarVerlogLed, 0);
+   \   00FC   2B01           CLR1      S:0xFF01.2
+   \   00FE   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    513                  }
+    514                  break;
+    515          
+    516              // EEPROM reprogramming CS management
+    517              case cLDBDouPrepareEepromReprog:
+    518                  u8EepromReprogCsManagement = cCsManagementAllowed;
+   \                     ??LDBDouControl_15:
+   \   0101   A14A           MOV       A,#74
+   \   0103   9B....         BR        N:??LDBDouControl_1
+    519                  break;
+    520          
+    521              case cLDBDouStartEepromReprog:
+    522                  if (u8EepromReprogCsManagement == cCsManagementAllowed)
+   \                     ??LDBDouControl_16:
+   \   0106   8E....         MOV       A,u8EepromReprogCsManagement
+   \   0109   4D4A           CMP       A,#74
+   \   010B   AD03           BZ        $+5
+   \   010D   9B....         BR        N:??LDBDouSendWithoutAddr_13
+    523                  {
+    524                      mLDBIntDisableAllIts();
+   \   0110   7B1E           DI
+    525                      mConfigureAllPortsAsInputs();
+   \   0112   1320FF         MOV       0xFF20,#255
+   \   0115   1321FF         MOV       0xFF21,#255
+   \   0118   1322FF         MOV       0xFF22,#255
+   \   011B   1323FF         MOV       0xFF23,#255
+   \   011E   1324FF         MOV       0xFF24,#255
+   \   0121   1325FF         MOV       0xFF25,#255
+   \   0124   1326FF         MOV       0xFF26,#255
+   \   0127   1327FF         MOV       0xFF27,#255
+   \   012A   132CFF         MOV       0xFF2C,#255
+   \   012D   132EFF         MOV       0xFF2E,#255
+    526          
+    527                      //QACJ 3323: adzhelp: The endless loop is intentional
+    528                      while (cTrue != cFalse) // Exit from this mode by reset only
+    529                      {
+    530                          // endless loop is intentional
+    531                          // this is very specific manufacturing mode
+    532                          mLDBHarWrite(cLDBHarEepCS, mLDBHarRead(cLDBHarEepCsShadow));
+   \                     ??LDBDouControl_17:
+   \   0130   717407         MOV1      CY,S:0xFF07.7
+   \   0133   71010D         MOV1      S:0xFF0D.0,CY
+    533                          mLDBRegWrite8BitRegister(WDTE, cWatchdogRefreshValue);
+   \   0136   1399AC         MOV       0xFF99,#172
+   \   0139   FAF5           BR        ??LDBDouControl_17
+    534                      }
+    535                  }
+    536                  break;
+    537              
+    538              // ECU Type controls //
+    539          
+    540              case cLDBDouSetEcuType0:
+    541                  mResetDOPorts();
+   \                     ??LDBDouControl_18:
+   \   013B   F0..           MOV       A,S:u8Buffer0Mask
+   \   013D   7DFF           XOR       A,#255
+   \   013F   70             MOV       X,A
+   \   0140   7B1E           DI
+   \   0142   F001           MOV       A,S:0xFF01
+   \   0144   6158           AND       A,X
+   \   0146   F201           MOV       S:0xFF01,A
+   \   0148   7A1E           EI
+   \   014A   7B1E           DI
+   \   014C   1B04           CLR1      S:0xFF04.1
+   \   014E   7A1E           EI
+   \   0150   F0..           MOV       A,S:u8Buffer2Mask
+   \   0152   7DFF           XOR       A,#255
+   \   0154   70             MOV       X,A
+   \   0155   7B1E           DI
+   \   0157   F005           MOV       A,S:0xFF05
+   \   0159   6158           AND       A,X
+   \   015B   F205           MOV       S:0xFF05,A
+   \   015D   7A1E           EI
+   \   015F   F0..           MOV       A,S:u8Buffer3Mask
+   \   0161   7DFF           XOR       A,#255
+   \   0163   70             MOV       X,A
+   \   0164   7B1E           DI
+   \   0166   F007           MOV       A,S:0xFF07
+   \   0168   6158           AND       A,X
+   \   016A   F207           MOV       S:0xFF07,A
+   \   016C   A110           MOV       A,#16
+   \                     ??LDBDouControl_19:
+   \   016E   7A1E           EI
+    542                  u8EcuType = cLDBDouSetEcuType0;
+   \                     ??LDBDouControl_20:
+   \   0170   9E....         MOV       u8EcuType,A
+    543                  ConfigUnusedPins();
+   \   0173   9B....         BR        N:??LDBDouControl_3
+    544                  break;
+    545              case cLDBDouSetEcuType1:
+    546                  mResetDOPorts();
+   \                     ??LDBDouControl_21:
+   \   0176   F0..           MOV       A,S:u8Buffer0Mask
+   \   0178   7DFF           XOR       A,#255
+   \   017A   70             MOV       X,A
+   \   017B   7B1E           DI
+   \   017D   F001           MOV       A,S:0xFF01
+   \   017F   6158           AND       A,X
+   \   0181   F201           MOV       S:0xFF01,A
+   \   0183   7A1E           EI
+   \   0185   7B1E           DI
+   \   0187   1B04           CLR1      S:0xFF04.1
+   \   0189   7A1E           EI
+   \   018B   F0..           MOV       A,S:u8Buffer2Mask
+   \   018D   7DFF           XOR       A,#255
+   \   018F   70             MOV       X,A
+   \   0190   7B1E           DI
+   \   0192   F005           MOV       A,S:0xFF05
+   \   0194   6158           AND       A,X
+   \   0196   F205           MOV       S:0xFF05,A
+   \   0198   7A1E           EI
+   \   019A   F0..           MOV       A,S:u8Buffer3Mask
+   \   019C   7DFF           XOR       A,#255
+   \   019E   70             MOV       X,A
+   \   019F   7B1E           DI
+   \   01A1   F007           MOV       A,S:0xFF07
+   \   01A3   6158           AND       A,X
+   \   01A5   F207           MOV       S:0xFF07,A
+   \   01A7   A111           MOV       A,#17
+   \                     ??LDBDouControl_22:
+   \   01A9   7A1E           EI
+    547                  u8EcuType = cLDBDouSetEcuType1;
+   \                     ??LDBDouControl_23:
+   \   01AB   FAC3           BR        ??LDBDouControl_20
+    548                  ConfigUnusedPins();
+    549                  break;
+    550              case cLDBDouSetEcuType2:
+    551                  mResetDOPorts();
+   \                     ??LDBDouControl_24:
+   \   01AD   F0..           MOV       A,S:u8Buffer0Mask
+   \   01AF   7DFF           XOR       A,#255
+   \   01B1   70             MOV       X,A
+   \   01B2   7B1E           DI
+   \   01B4   F001           MOV       A,S:0xFF01
+   \   01B6   6158           AND       A,X
+   \   01B8   F201           MOV       S:0xFF01,A
+   \   01BA   7A1E           EI
+   \   01BC   7B1E           DI
+   \   01BE   1B04           CLR1      S:0xFF04.1
+   \   01C0   7A1E           EI
+   \   01C2   F0..           MOV       A,S:u8Buffer2Mask
+   \   01C4   7DFF           XOR       A,#255
+   \   01C6   70             MOV       X,A
+   \   01C7   7B1E           DI
+   \   01C9   F005           MOV       A,S:0xFF05
+   \   01CB   6158           AND       A,X
+   \   01CD   F205           MOV       S:0xFF05,A
+   \   01CF   7A1E           EI
+   \   01D1   F0..           MOV       A,S:u8Buffer3Mask
+   \   01D3   7DFF           XOR       A,#255
+   \   01D5   70             MOV       X,A
+   \   01D6   7B1E           DI
+   \   01D8   F007           MOV       A,S:0xFF07
+   \   01DA   6158           AND       A,X
+   \   01DC   F207           MOV       S:0xFF07,A
+   \   01DE   A112           MOV       A,#18
+   \   01E0   FA8C           BR        ??LDBDouControl_19
+    552                  u8EcuType = cLDBDouSetEcuType2;
+    553                  ConfigUnusedPins();
+    554                  break;
+    555              case cLDBDouSetEcuType3:
+    556                  mResetDOPorts();
+   \                     ??LDBDouControl_25:
+   \   01E2   F0..           MOV       A,S:u8Buffer0Mask
+   \   01E4   7DFF           XOR       A,#255
+   \   01E6   70             MOV       X,A
+   \   01E7   7B1E           DI
+   \   01E9   F001           MOV       A,S:0xFF01
+   \   01EB   6158           AND       A,X
+   \   01ED   F201           MOV       S:0xFF01,A
+   \   01EF   7A1E           EI
+   \   01F1   7B1E           DI
+   \   01F3   1B04           CLR1      S:0xFF04.1
+   \   01F5   7A1E           EI
+   \   01F7   F0..           MOV       A,S:u8Buffer2Mask
+   \   01F9   7DFF           XOR       A,#255
+   \   01FB   70             MOV       X,A
+   \   01FC   7B1E           DI
+   \   01FE   F005           MOV       A,S:0xFF05
+   \   0200   6158           AND       A,X
+   \   0202   F205           MOV       S:0xFF05,A
+   \   0204   7A1E           EI
+   \   0206   F0..           MOV       A,S:u8Buffer3Mask
+   \   0208   7DFF           XOR       A,#255
+   \   020A   70             MOV       X,A
+   \   020B   7B1E           DI
+   \   020D   F007           MOV       A,S:0xFF07
+   \   020F   6158           AND       A,X
+   \   0211   F207           MOV       S:0xFF07,A
+   \   0213   7A1E           EI
+    557                  mLIBassert(cFalse); // this type is not supported
+   \   0215   9A....         CALL      LIBAssertionFailed
+    558                  u8EcuType = cLDBDouEcuTypeL7; // set to L7 for target - no restrictions
+   \   0218   A117           MOV       A,#23
+   \   021A   FA8F           BR        ??LDBDouControl_23
+    559                  ConfigUnusedPins();
+    560                  break;
+    561              case cLDBDouSetEcuType4:
+    562                  mResetDOPorts();
+   \                     ??LDBDouControl_26:
+   \   021C   F0..           MOV       A,S:u8Buffer0Mask
+   \   021E   7DFF           XOR       A,#255
+   \   0220   70             MOV       X,A
+   \   0221   7B1E           DI
+   \   0223   F001           MOV       A,S:0xFF01
+   \   0225   6158           AND       A,X
+   \   0227   F201           MOV       S:0xFF01,A
+   \   0229   7A1E           EI
+   \   022B   7B1E           DI
+   \   022D   1B04           CLR1      S:0xFF04.1
+   \   022F   7A1E           EI
+   \   0231   F0..           MOV       A,S:u8Buffer2Mask
+   \   0233   7DFF           XOR       A,#255
+   \   0235   70             MOV       X,A
+   \   0236   7B1E           DI
+   \   0238   F005           MOV       A,S:0xFF05
+   \   023A   6158           AND       A,X
+   \   023C   F205           MOV       S:0xFF05,A
+   \   023E   7A1E           EI
+   \   0240   F0..           MOV       A,S:u8Buffer3Mask
+   \   0242   7DFF           XOR       A,#255
+   \   0244   70             MOV       X,A
+   \   0245   7B1E           DI
+   \   0247   F007           MOV       A,S:0xFF07
+   \   0249   6158           AND       A,X
+   \   024B   F207           MOV       S:0xFF07,A
+   \   024D   A114           MOV       A,#20
+   \   024F   9B....         BR        N:??LDBDouControl_19
+    563                  u8EcuType = cLDBDouSetEcuType4;
+    564                  ConfigUnusedPins();
+    565                  break;
+    566              case cLDBDouSetEcuType5:
+    567                  mResetDOPorts();
+   \                     ??LDBDouControl_27:
+   \   0252   F0..           MOV       A,S:u8Buffer0Mask
+   \   0254   7DFF           XOR       A,#255
+   \   0256   70             MOV       X,A
+   \   0257   7B1E           DI
+   \   0259   F001           MOV       A,S:0xFF01
+   \   025B   6158           AND       A,X
+   \   025D   F201           MOV       S:0xFF01,A
+   \   025F   7A1E           EI
+   \   0261   7B1E           DI
+   \   0263   1B04           CLR1      S:0xFF04.1
+   \   0265   7A1E           EI
+   \   0267   F0..           MOV       A,S:u8Buffer2Mask
+   \   0269   7DFF           XOR       A,#255
+   \   026B   70             MOV       X,A
+   \   026C   7B1E           DI
+   \   026E   F005           MOV       A,S:0xFF05
+   \   0270   6158           AND       A,X
+   \   0272   F205           MOV       S:0xFF05,A
+   \   0274   7A1E           EI
+   \   0276   F0..           MOV       A,S:u8Buffer3Mask
+   \   0278   7DFF           XOR       A,#255
+   \   027A   70             MOV       X,A
+   \   027B   7B1E           DI
+   \   027D   F007           MOV       A,S:0xFF07
+   \   027F   6158           AND       A,X
+   \   0281   F207           MOV       S:0xFF07,A
+   \   0283   A115           MOV       A,#21
+   \   0285   9B....         BR        N:??LDBDouControl_19
+    568                  u8EcuType = cLDBDouSetEcuType5;
+    569                  ConfigUnusedPins();
+    570                  break;
+    571              case cLDBDouSetEcuType6:
+    572                  mResetDOPorts();
+   \                     ??LDBDouControl_28:
+   \   0288   F0..           MOV       A,S:u8Buffer0Mask
+   \   028A   7DFF           XOR       A,#255
+   \   028C   70             MOV       X,A
+   \   028D   7B1E           DI
+   \   028F   F001           MOV       A,S:0xFF01
+   \   0291   6158           AND       A,X
+   \   0293   F201           MOV       S:0xFF01,A
+   \   0295   7A1E           EI
+   \   0297   7B1E           DI
+   \   0299   1B04           CLR1      S:0xFF04.1
+   \   029B   7A1E           EI
+   \   029D   F0..           MOV       A,S:u8Buffer2Mask
+   \   029F   7DFF           XOR       A,#255
+   \   02A1   70             MOV       X,A
+   \   02A2   7B1E           DI
+   \   02A4   F005           MOV       A,S:0xFF05
+   \   02A6   6158           AND       A,X
+   \   02A8   F205           MOV       S:0xFF05,A
+   \   02AA   7A1E           EI
+   \   02AC   F0..           MOV       A,S:u8Buffer3Mask
+   \   02AE   7DFF           XOR       A,#255
+   \   02B0   70             MOV       X,A
+   \   02B1   7B1E           DI
+   \   02B3   F007           MOV       A,S:0xFF07
+   \   02B5   6158           AND       A,X
+   \   02B7   F207           MOV       S:0xFF07,A
+   \   02B9   A116           MOV       A,#22
+   \   02BB   9B....         BR        N:??LDBDouControl_19
+    573                  u8EcuType = cLDBDouSetEcuType6;
+    574                  ConfigUnusedPins();
+    575                  break;
+    576              case cLDBDouSetEcuType7:
+    577                  mResetDOPorts();
+   \                     ??LDBDouControl_29:
+   \   02BE   F0..           MOV       A,S:u8Buffer0Mask
+   \   02C0   7DFF           XOR       A,#255
+   \   02C2   70             MOV       X,A
+   \   02C3   7B1E           DI
+   \   02C5   F001           MOV       A,S:0xFF01
+   \   02C7   6158           AND       A,X
+   \   02C9   F201           MOV       S:0xFF01,A
+   \   02CB   7A1E           EI
+   \   02CD   7B1E           DI
+   \   02CF   1B04           CLR1      S:0xFF04.1
+   \   02D1   7A1E           EI
+   \   02D3   F0..           MOV       A,S:u8Buffer2Mask
+   \   02D5   7DFF           XOR       A,#255
+   \   02D7   70             MOV       X,A
+   \   02D8   7B1E           DI
+   \   02DA   F005           MOV       A,S:0xFF05
+   \   02DC   6158           AND       A,X
+   \   02DE   F205           MOV       S:0xFF05,A
+   \   02E0   7A1E           EI
+   \   02E2   F0..           MOV       A,S:u8Buffer3Mask
+   \   02E4   7DFF           XOR       A,#255
+   \   02E6   70             MOV       X,A
+   \   02E7   7B1E           DI
+   \   02E9   F007           MOV       A,S:0xFF07
+   \   02EB   6158           AND       A,X
+   \   02ED   F207           MOV       S:0xFF07,A
+   \   02EF   A117           MOV       A,#23
+   \   02F1   9B....         BR        N:??LDBDouControl_22
+    578                  u8EcuType = cLDBDouSetEcuType7;
+    579                  ConfigUnusedPins();
+    580                  break;
+    581          
+    582              default :
+    583                  mLIBassert(0);
+   \                     ??LDBDouControl_30:
+   \   02F4   9A....         CALL      LIBAssertionFailed
+    584                  break;
+    585              }
+    586          }
+   \                     ??LDBDouSendWithoutAddr_13:
+   \   02F7   B2             POP       BC
+   \   02F8   AF             RET       
+   \   02F9                  REQUIRE ?CL78K_V4_6_L00
+   \   02F9                  REQUIRE _A_P0
+   \   02F9                  REQUIRE _A_P1
+   \   02F9                  REQUIRE _A_P3
+   \   02F9                  REQUIRE _A_P4
+   \   02F9                  REQUIRE _A_P5
+   \   02F9                  REQUIRE WDTE
+   \   02F9                  REQUIRE _A_P7
+   \   02F9                  REQUIRE _A_P13
+   \   02F9                  REQUIRE _A_PM0
+   \   02F9                  REQUIRE _A_PM1
+   \   02F9                  REQUIRE _A_PM2
+   \   02F9                  REQUIRE _A_PM3
+   \   02F9                  REQUIRE _A_PM4
+   \   02F9                  REQUIRE _A_PM5
+   \   02F9                  REQUIRE _A_PM6
+   \   02F9                  REQUIRE _A_PM7
+   \   02F9                  REQUIRE _A_PM12
+   \   02F9                  REQUIRE _A_PM14
+    587          //==============================================================================
+    588          // DESCRIPTION : Write digital outputs states
+    589          //  
+    590          // PARAMETERS (Type,Name,Min,Max) :  none
+    591          //
+    592          // RETURN VALUE :  none
+    593          // 
+    594          // DESIGN INFORMATION :  refer to Detailed Design Document
+    595          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    596          void LDBDouSendWithoutAddr(const tMsg* const pMsg)
+   \                     LDBDouSendWithoutAddr:
+    597          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001   B5             PUSH      DE
+   \   0002                  ; Total Auto size: 0
+   \   0002   D2             MOVW      BC,AX
+    598              //QACJ 3203: adzhelp: Identifier used in macro mWritePort
+    599              U8* pu8Buffer;
+    600          
+    601              if (pMsg != NULL)
+   \   0003   6168           OR        A,X
+   \   0005   AD6C           BZ        ??LDBDouSendWithoutAddr_16
+    602              {
+    603                  //QACJ 3199: adzhelp: Identifier used in macro mWritePort
+    604                  pu8Buffer = pMsg->pBuffer;
+   \   0007   63             MOV       A,B
+   \   0008   D6             MOVW      HL,AX
+   \   0009   87             MOV       A,[HL]
+   \   000A   70             MOV       X,A
+   \   000B   AE01           MOV       A,[HL+0x01]
+   \   000D   D4             MOVW      DE,AX
+    605                  mLIBassert(pMsg->Lng == cBufferSize);
+   \   000E   AE02           MOV       A,[HL+0x02]
+   \   0010   70             MOV       X,A
+   \   0011   AE03           MOV       A,[HL+0x03]
+   \   0013   EA0400         CMPW      AX,#4
+   \   0016   AD03           BZ        ??LDBDouSendWithoutAddr_17
+   \   0018   9A....         CALL      LIBAssertionFailed
+    606          
+    607                  mWritePort(cBuffer0Port, cBuffer0Mask, pu8Buffer[0]);
+   \                     ??LDBDouSendWithoutAddr_17:
+   \   001B   85             MOV       A,[DE]
+   \   001C   5E..           AND       A,S:u8Buffer0Mask
+   \   001E   70             MOV       X,A
+   \   001F   F0..           MOV       A,S:u8Buffer0Mask
+   \   0021   7DFF           XOR       A,#255
+   \   0023   72             MOV       C,A
+   \   0024   7B1E           DI
+   \   0026   F001           MOV       A,S:0xFF01
+   \   0028   615A           AND       A,C
+   \   002A   6168           OR        A,X
+   \   002C   F201           MOV       S:0xFF01,A
+   \   002E   7A1E           EI
+    608                  mWritePort(cBuffer1Port, cBuffer1Mask, pu8Buffer[1]);
+   \   0030   B5             PUSH      DE
+   \   0031   B6             POP       HL
+   \   0032   AE01           MOV       A,[HL+0x01]
+   \   0034   5D02           AND       A,#2
+   \   0036   70             MOV       X,A
+   \   0037   7B1E           DI
+   \   0039   F004           MOV       A,S:0xFF04
+   \   003B   5DFD           AND       A,#253
+   \   003D   6168           OR        A,X
+   \   003F   F204           MOV       S:0xFF04,A
+   \   0041   7A1E           EI
+    609                  mWritePort(cBuffer2Port, cBuffer2Mask, pu8Buffer[2]);
+   \   0043   B5             PUSH      DE
+   \   0044   B6             POP       HL
+   \   0045   AE02           MOV       A,[HL+0x02]
+   \   0047   5E..           AND       A,S:u8Buffer2Mask
+   \   0049   70             MOV       X,A
+   \   004A   F0..           MOV       A,S:u8Buffer2Mask
+   \   004C   7DFF           XOR       A,#255
+   \   004E   72             MOV       C,A
+   \   004F   7B1E           DI
+   \   0051   F005           MOV       A,S:0xFF05
+   \   0053   615A           AND       A,C
+   \   0055   6168           OR        A,X
+   \   0057   F205           MOV       S:0xFF05,A
+   \   0059   7A1E           EI
+    610                  mWritePort(cBuffer3Port, cBuffer3Mask, pu8Buffer[3]);
+   \   005B   84             INCW      DE
+   \   005C   84             INCW      DE
+   \   005D   84             INCW      DE
+   \   005E   85             MOV       A,[DE]
+   \   005F   5E..           AND       A,S:u8Buffer3Mask
+   \   0061   70             MOV       X,A
+   \   0062   F0..           MOV       A,S:u8Buffer3Mask
+   \   0064   7DFF           XOR       A,#255
+   \   0066   72             MOV       C,A
+   \   0067   7B1E           DI
+   \   0069   F007           MOV       A,S:0xFF07
+   \   006B   615A           AND       A,C
+   \   006D   6168           OR        A,X
+   \   006F   F207           MOV       S:0xFF07,A
+   \   0071   7A1E           EI
+    611              }
+    612          }
+   \                     ??LDBDouSendWithoutAddr_16:
+   \   0073   B4             POP       DE
+   \   0074   B2             POP       BC
+   \   0075   AF             RET       
+   \   0076                  REQUIRE ?CL78K_V4_6_L00
+   \   0076                  REQUIRE _A_P1
+   \   0076                  REQUIRE _A_P4
+   \   0076                  REQUIRE _A_P5
+   \   0076                  REQUIRE _A_P7
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for bSleepMode>`:
+   \   0000   01             DB 1
+
+   \                                 In  segment SADDR_ID, align 1, align-sorted
+   \                     `?<Initializer for u8Buffer0Mask>`:
+   \   0000   0C             DB 12
+
+   \                                 In  segment SADDR_ID, align 1, align-sorted
+   \                     `?<Initializer for u8Buffer2Mask>`:
+   \   0000   04             DB 4
+
+   \                                 In  segment SADDR_ID, align 1, align-sorted
+   \                     `?<Initializer for u8Buffer3Mask>`:
+   \   0000   FF             DB 255
+
+   \                                 In  segment NEAR_ID, align 1, align-sorted
+   \                     `?<Initializer for u8EcuType>`:
+   \   0000   17             DB 23
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+
+   \                                 In  segment SWITCH, align 1
+   \                     `?<Jumptable for LDBDouControl>_0`:
+   \   0000   0100           DW        1
+   \   0002   1700           DW        23
+   \   0004   ....           DW        ??LDBDouControl_30
+   \   0006   ....           DW        ??LDBDouControl_0
+   \   0008   ....           DW        ??LDBDouControl_2
+   \   000A   ....           DW        ??LDBDouControl_4
+   \   000C   ....           DW        ??LDBDouControl_5
+   \   000E   ....           DW        ??LDBDouControl_6
+   \   0010   ....           DW        ??LDBDouControl_7
+   \   0012   ....           DW        ??LDBDouControl_11
+   \   0014   ....           DW        ??LDBDouControl_12
+   \   0016   ....           DW        ??LDBDouControl_13
+   \   0018   ....           DW        ??LDBDouControl_14
+   \   001A   ....           DW        ??LDBDouControl_8
+   \   001C   ....           DW        ??LDBDouControl_30
+   \   001E   ....           DW        ??LDBDouControl_30
+   \   0020   ....           DW        ??LDBDouControl_15
+   \   0022   ....           DW        ??LDBDouControl_16
+   \   0024   ....           DW        ??LDBDouControl_18
+   \   0026   ....           DW        ??LDBDouControl_21
+   \   0028   ....           DW        ??LDBDouControl_24
+   \   002A   ....           DW        ??LDBDouControl_25
+   \   002C   ....           DW        ??LDBDouControl_26
+   \   002E   ....           DW        ??LDBDouControl_27
+   \   0030   ....           DW        ??LDBDouControl_28
+   \   0032   ....           DW        ??LDBDouControl_29
+
+   Segment part sizes:
+
+     Function/Label                   Bytes
+     --------------                   -----
+     _A_P0                               1
+     _A_P1                               1
+     _A_P3                               1
+     _A_P4                               1
+     _A_P5                               1
+     _A_P6                               1
+     _A_P7                               1
+     _A_P12                              1
+     _A_P13                              1
+     _A_PM0                              1
+     _A_PM1                              1
+     _A_PM2                              1
+     _A_PM3                              1
+     _A_PM4                              1
+     _A_PM5                              1
+     _A_PM6                              1
+     _A_PM7                              1
+     _A_PM12                             1
+     _A_PM14                             1
+     _A_ADPC                             1
+     WDTE                                1
+     bSleepMode                          1
+     u8Buffer0Mask                       1
+     u8Buffer2Mask                       1
+     u8Buffer3Mask                       1
+     u8EcuType                           1
+     u8EepromReprogCsManagement          1
+     ConfigUnusedPins                  530
+     LDBDouInit                         74
+     LDBDouControl                     761
+     LDBDouSendWithoutAddr             118
+     ?<Initializer for bSleepMode>       1
+     ?<Initializer for u8Buffer0Mask>    1
+     ?<Initializer for u8Buffer2Mask>    1
+     ?<Initializer for u8Buffer3Mask>    1
+     ?<Initializer for u8EcuType>        1
+     __T_?FAR_FAST_CALL_L07              2
+     __T_?FAR_CALL_L07                   2
+     ?<Jumptable for LDBDouControl>_0   52
+
+ 
+ 1 365 bytes in segment BCODE
+     4 bytes in segment CLTVEC
+   118 bytes in segment CODE
+    12 bytes in segment NEAR_A
+     2 bytes in segment NEAR_I
+     2 bytes in segment NEAR_ID
+     1 byte  in segment NEAR_Z
+     9 bytes in segment SADDR_A
+     3 bytes in segment SADDR_I
+     3 bytes in segment SADDR_ID
+    52 bytes in segment SWITCH
+ 
+ 1 483 bytes of CODE  memory (+  4 bytes shared)
+    57 bytes of CONST memory
+     6 bytes of DATA  memory (+ 21 bytes shared)
+
+Errors: none
+Warnings: none

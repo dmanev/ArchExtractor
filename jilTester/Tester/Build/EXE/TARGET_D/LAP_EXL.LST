@@ -1,0 +1,372 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:30:01 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_EXL.C                                                 #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LAP_EXL.LST -o                        #
+#                    ..\EXE\TARGET_D\LAP_EXL.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\L #
+#                    AP_EXL.C                                                 #
+#    List file    =  ..\EXE\TARGET_D\LAP_EXL.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LAP_EXL.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\SOURCES\LAP\LAP_EXL.C
+      1          #ifndef _QAC_
+      2          //******************************************************************************
+      3          // Company:      Johnson Controls Inc.
+      4          // -----------------------------------------------------------------------------
+      5          // Copyright:    This software is JCI property.
+      6          //               Duplication or disclosure without JCI written authorization
+      7          //               is prohibited.
+      8          // -----------------------------------------------------------------------------
+      9          // Project:      X90_BCM
+     10          // Language:     ANSI-C
+     11          // -----------------------------------------------------------------------------
+     12          // Component:    LAP_EXL
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Sep 24 2009 15:07:12  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_EXL/LAP_EXL.c-arc  $
+     16          // $Revision:   1.1  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_EXL/LAP_EXL.c-arc  $
+     19          // 
+     20          //    Rev 1.1   Sep 24 2009 15:07:12   adzhelp
+     21          // Cm004744: Integration changes
+     22          // 
+     23          //    Rev 1.0   Sep 14 2009 16:12:16   akodzhh
+     24          // Initial revision.
+     25          //******************************************************************************
+     26          #endif
+     27          
+     28          //------------------------------------------------------------------------------
+     29          // Body Identification
+     30          //------------------------------------------------------------------------------
+     31          #define lap_exl   "lap_exl"
+     32          
+     33          //------------------------------------------------------------------------------
+     34          // Included files to resolve specific definitions in this file
+     35          //------------------------------------------------------------------------------
+     36          #include "lib.h"        
+     37          #include "tos.h"        
+     38          #include "dat.h"        
+     39          #include "lap_exl.h"    
+     40          #include "lap_exl.hgr"  
+
+   \                                 In  segment CONST, align 2
+   \   tTOSSeqRuleType const __near LAPExlGraph[1]
+   \                     LAPExlGraph:
+   \   0000   ........       DW TOSSeqTrueEval, LAPExlManagement
+   \   0004   FF00           DB 255, 0
+     41          
+     42          //------------------------------------------------------------------------------
+     43          // Local constants
+     44          //------------------------------------------------------------------------------
+     45          #define cRRFogOutputOn             ((U8)0x00)
+     46          #define cRRFogOutputOff            ((U8)0x01)
+     47          
+     48          //------------------------------------------------------------------------------
+     49          // Local macros
+     50          //------------------------------------------------------------------------------
+     51          
+     52          //------------------------------------------------------------------------------
+     53          // Local types
+     54          //------------------------------------------------------------------------------
+     55          
+     56          //------------------------------------------------------------------------------
+     57          // Local data
+     58          //------------------------------------------------------------------------------
+
+   \                                 In  segment NEAR_Z, align 1, align-sorted
+     59          static U8 u8LAPExlState;
+   \                     u8LAPExlState:
+   \   0000                  DS 1
+   \   0001                  REQUIRE __INIT_NEAR_Z
+     60          
+     61          //------------------------------------------------------------------------------
+     62          // Constant local data
+     63          //------------------------------------------------------------------------------
+     64          
+     65          //------------------------------------------------------------------------------
+     66          // Exported data
+     67          //------------------------------------------------------------------------------
+     68          
+     69          //------------------------------------------------------------------------------
+     70          // Constant exported data
+     71          //------------------------------------------------------------------------------
+     72          
+     73          //------------------------------------------------------------------------------
+     74          // Local function prototypes
+     75          //------------------------------------------------------------------------------
+     76          #ifdef X90_PROJECT
+     77          static MEM_TYPE void LAPExlManagement_Static(void);
+     78          #endif
+     79          
+     80          //==============================================================================
+     81          //=========================== LOCAL FUNCTIONS ==================================
+     82          //==============================================================================
+     83          
+     84          //==============================================================================
+     85          // DESCRIPTION:         < short description of the function >
+     86          //
+     87          // PARAMETERS:          < type,usage and constraints for all parameters >
+     88          //
+     89          // RETURN VALUE:        < type and usage >
+     90          //
+     91          // DESIGN INFORMATION:  < usage, pseudo code, algorithm, constraints ... >
+     92          //==============================================================================
+     93          
+     94          //==============================================================================
+     95          //=========================== EXPORTED FUNCTIONS ===============================
+     96          //==============================================================================
+     97          
+     98          //==============================================================================
+     99          // DESCRIPTION:         LAPExlEnterActiveState
+    100          //
+    101          // PARAMETERS:          none
+    102          //
+    103          // RETURN VALUE:        none
+    104          //
+    105          // DESIGN INFORMATION:  
+    106          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    107          void LAPExlEnterActiveState(void)
+   \                     LAPExlEnterActiveState:
+    108          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    109              mLIBassert(mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Default) == cFalse );
+   \   0000   3153..03       BF        S:DATPouSoftOutputBuffer+3.5, ??LAPExlManagement_Static_0
+   \   0004   9A....         CALL      LIBAssertionFailed
+    110              // RearWiper and RearFog functions are never authorized at same time
+    111              mLIBassert( ( mDATRead(U1Bit, EEP_EV_ARR        , Default)
+    112                          &&mDATRead(U1Bit, EEP_FEU_BROUILLARD, Default)) == cFalse );
+   \                     ??LAPExlManagement_Static_0:
+   \   0007   8E....         MOV       A,DATDbkMirrors+26
+   \   000A   5D0C           AND       A,#12
+   \   000C   4D0C           CMP       A,#12
+   \   000E   BD03           BNZ       ??LAPExlManagement_Static_1
+   \   0010   9A....         CALL      LIBAssertionFailed
+    113           
+    114              u8LAPExlState = cRRFogOutputOff;
+   \                     ??LAPExlManagement_Static_1:
+   \   0013   A101           MOV       A,#1
+   \   0015   9E....         MOV       u8LAPExlState,A
+    115              TOSSeqActivateGraph(cTOSSeqGraphIdLAPExlGraph);
+   \   0018   A127           MOV       A,#39
+   \   001A   ..             CALLT     [__T_TOSSeqActivateGraph]
+    116          }
+   \   001B   AF             RET       
+   \   001C                  REQUIRE ?CL78K_V4_6_L00
+    117          
+    118          //==============================================================================
+    119          // DESCRIPTION:         LAPExlLeaveActiveState
+    120          //
+    121          // PARAMETERS:          none
+    122          //
+    123          // RETURN VALUE:        none
+    124          //
+    125          // DESIGN INFORMATION:  
+    126          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    127          void LAPExlLeaveActiveState(void)
+   \                     LAPExlLeaveActiveState:
+    128          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    129              mLIBassert(mDATRead(U1Bit, RR_WIPER_RR_FOG_LAMP, Default) == cFalse );
+   \   0000   3153..03       BF        S:DATPouSoftOutputBuffer+3.5, ??LAPExlManagement_Static_2
+   \   0004   9A....         CALL      LIBAssertionFailed
+    130              u8LAPExlState = cRRFogOutputOff;
+   \                     ??LAPExlManagement_Static_2:
+   \   0007   A101           MOV       A,#1
+   \   0009   9E....         MOV       u8LAPExlState,A
+    131              TOSSeqDeactivateGraph(cTOSSeqGraphIdLAPExlGraph);
+   \   000C   A127           MOV       A,#39
+   \   000E   ..             CALLT     [__T_TOSSeqDeactivateGraph]
+    132          }
+   \   000F   AF             RET       
+   \   0010                  REQUIRE ?CL78K_V4_6_L00
+    133          
+    134          //==============================================================================
+    135          // DESCRIPTION:         LAPExlManagement
+    136          //
+    137          // PARAMETERS:          none
+    138          //
+    139          // RETURN VALUE:        none
+    140          //
+    141          // DESIGN INFORMATION:  
+    142          //==============================================================================
+
+   \                                 In  segment CODE, align 1, keep-with-next
+    143          void LAPExlManagement(void)
+   \                     LAPExlManagement:
+    144          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B5             PUSH      DE
+   \   0001                  ; Total Auto size: 0
+    145          #ifdef X90_PROJECT
+    146              LAPExlManagement_Static();
+   \   0001   16....         MOVW      HL,#LWRD(LAPExlManagement_Static)
+   \   0004   A4..           MOV       E,#BYTE3(LAPExlManagement_Static)
+   \   0006   ..             CALLT     [__T_?FAR_CALL_L07]
+    147          }
+   \   0007   B4             POP       DE
+   \   0008   AF             RET       
+   \   0009                  REQUIRE ?CL78K_V4_6_L00
+    148          #pragma optimize=no_inline
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    149          static MEM_TYPE void LAPExlManagement_Static(void)
+   \                     LAPExlManagement_Static:
+    150          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    151          #endif
+    152          
+    153              BOOL bRRFogAuthorised;
+    154          
+    155              bRRFogAuthorised = mDATRead(U1Bit, EEP_FEU_BROUILLARD, Default);
+   \   0000   16....         MOVW      HL,#DATDbkMirrors+26
+   \   0003   31A704         BF        [HL].2, ??LAPExlManagement_Static_3
+   \   0006   A001           MOV       X,#1
+   \   0008   FA02           BR        ??LAPExlManagement_Static_4
+   \                     ??LAPExlManagement_Static_3:
+   \   000A   A000           MOV       X,#0
+    156              
+    157              switch(u8LAPExlState)
+   \                     ??LAPExlManagement_Static_4:
+   \   000C   8E....         MOV       A,u8LAPExlState
+   \   000F   4D00           CMP       A,#0
+   \   0011   AD1B           BZ        ??LAPExlManagement_Static_5
+   \   0013   51             DEC       A
+   \   0014   BD2F           BNZ       ??LAPExlManagement_Static_6
+    158              {
+    159              case cRRFogOutputOff:
+    160                  // check On conditions
+    161                  if(   ( bRRFogAuthorised == cTrue)
+    162                      &&( mDATRead(U1Bit, PWR_IGN, Default)       == cTrue )
+    163                      &&( mDATRead(U1Bit, RR_FOG_SW, Default)     == cTrue )
+    164                      &&( mDATRead(U1Bit, HIGH_LOW_BEAM, Default) == cTrue ) )
+   \   0016   60             MOV       A,X
+   \   0017   51             DEC       A
+   \   0018   BD2E           BNZ       ??LAPExlManagement_Static_7
+   \   001A   3103..2A       BF        S:DATDinInputBuffers+6.0, ??LAPExlManagement_Static_7
+   \   001E   F0..           MOV       A,S:DATDinInputBuffers+5
+   \   0020   5D03           AND       A,#3
+   \   0022   4D03           CMP       A,#3
+   \   0024   BD22           BNZ       ??LAPExlManagement_Static_7
+    165                  {
+    166                      mDATWrite(U1Bit,RR_WIPER_RR_FOG_LAMP, cTrue, Default);
+   \   0026   A100           MOV       A,#0
+   \   0028   5A..           SET1      S:DATPouSoftOutputBuffer+3.5
+    167                      u8LAPExlState = cRRFogOutputOn;
+   \                     ??LAPExlManagement_Static_8:
+   \   002A   9E....         MOV       u8LAPExlState,A
+   \   002D   AF             RET       
+    168                  }
+    169          
+    170                  break;
+    171                  
+    172              case cRRFogOutputOn:
+    173                  // check off conditions
+    174                  if(  ( bRRFogAuthorised == cFalse )
+    175                     ||( mDATRead(U1Bit, PWR_IGN, Default)       == cFalse )
+    176                     ||( mDATRead(U1Bit, RR_FOG_SW, Default)     == cFalse ) 
+    177                     ||( mDATRead(U1Bit, HIGH_LOW_BEAM, Default) == cFalse ) )
+   \                     ??LAPExlManagement_Static_5:
+   \   002E   60             MOV       A,X
+   \   002F   4D00           CMP       A,#0
+   \   0031   AD0C           BZ        ??LAPExlManagement_Static_9
+   \   0033   3103..08       BF        S:DATDinInputBuffers+6.0, ??LAPExlManagement_Static_9
+   \   0037   F0..           MOV       A,S:DATDinInputBuffers+5
+   \   0039   5D03           AND       A,#3
+   \   003B   4D03           CMP       A,#3
+   \   003D   AD09           BZ        ??LAPExlManagement_Static_7
+    178                  {
+    179                      mDATWrite(U1Bit,RR_WIPER_RR_FOG_LAMP, cFalse, Default);
+   \                     ??LAPExlManagement_Static_9:
+   \   003F   A101           MOV       A,#1
+   \   0041   5B..           CLR1      S:DATPouSoftOutputBuffer+3.5
+    180                      u8LAPExlState = cRRFogOutputOff;
+   \   0043   FAE5           BR        ??LAPExlManagement_Static_8
+    181                  }
+    182                  
+    183                  break;
+    184          
+    185              //CCOV: akodzhh: can't be tested because of assert
+    186              default:
+    187                  mLIBassert(cFalse);
+   \                     ??LAPExlManagement_Static_6:
+   \   0045   9A....         CALL      LIBAssertionFailed
+    188                  break;
+    189              }
+    190          
+    191          }
+   \                     ??LAPExlManagement_Static_7:
+   \   0048   AF             RET       
+   \   0049                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqActivateGraph:
+   \   0000   ....           DW       TOSSeqActivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_TOSSeqDeactivateGraph:
+   \   0000   ....           DW       TOSSeqDeactivateGraph
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_CALL_L07:
+   \   0000   ....           DW       ?FAR_CALL_L07
+    192          
+
+   Segment part sizes:
+
+     Function/Label            Bytes
+     --------------            -----
+     LAPExlGraph                  6
+     u8LAPExlState                1
+     LAPExlEnterActiveState      28
+     LAPExlLeaveActiveState      16
+     LAPExlManagement             9
+     LAPExlManagement_Static     73
+     __T_TOSSeqActivateGraph      2
+     __T_TOSSeqDeactivateGraph    2
+     __T_?FAR_CALL_L07            2
+
+ 
+ 73 bytes in segment BCODE
+  6 bytes in segment CLTVEC
+ 53 bytes in segment CODE
+  6 bytes in segment CONST
+  1 byte  in segment NEAR_Z
+ 
+ 126 bytes of CODE  memory (+ 6 bytes shared)
+   6 bytes of CONST memory
+   1 byte  of DATA  memory
+
+Errors: none
+Warnings: none

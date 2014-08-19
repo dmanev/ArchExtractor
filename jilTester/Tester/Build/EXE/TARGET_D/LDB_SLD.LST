@@ -1,0 +1,1198 @@
+###############################################################################
+#                                                                             #
+# IAR C/C++ Compiler V4.61A/W32 for 78K0 and 78K0S      15/Feb/2011  13:28:58 #
+# Copyright 1992-2008 IAR Systems AB.                                         #
+#                                                                             #
+#    Core         =  78k0                                                     #
+#    Code model   =  Standard                                                 #
+#                 =                                                           #
+#    Source file  =  D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SLD.C                                                  #
+#    Command line =  --code_model standard --core 78k0 -e                     #
+#                    -DMEM_TYPE=__banked -DMEM_FAST=__saddr                   #
+#                    -DCALLT_TYPE=__callt -DX90_PROJECT                       #
+#                    --generate_callt_runtime_library_calls -r -Ohs           #
+#                    "-IC:\Program Files\IAR Systems\Embedded Workbench       #
+#                    5.0\78k\inc" "-IC:\Program Files\IAR Systems\Embedded    #
+#                    Workbench 5.0\78k\inc\clib" -I. -I..\EXE\GEN\            #
+#                    -I..\SOURCES\DAT -I..\SOURCES\LAP -I..\SOURCES\LDB_API   #
+#                    -I..\SOURCES\LIB -I..\SOURCES\TOS -I.\LDB -DEMUL         #
+#                    -DDEBUG -DUSE_LIBSTK -DDONT_KEEP_OLD_TYPE_COMPATIBILITY  #
+#                    -l ..\EXE\TARGET_D\LDB_SLD.LST -o                        #
+#                    ..\EXE\TARGET_D\LDB_SLD.R26                              #
+#                    D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LD #
+#                    B_SLD.C                                                  #
+#    List file    =  ..\EXE\TARGET_D\LDB_SLD.LST                              #
+#    Object file  =  ..\EXE\TARGET_D\LDB_SLD.R26                              #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\X90_BCM\DEVELOPMENT\X90_BCM\K0\L7\BUILD\TARGET\LDB\LDB_SLD.C
+      1          //******************************************************************************
+      2          // Company:      Johnson Controls Inc.
+      3          // -----------------------------------------------------------------------------
+      4          // Copyright:    This software is JCI property.
+      5          //               Duplication or disclosure without JCI written authorization
+      6          //               is prohibited.
+      7          // -----------------------------------------------------------------------------
+      8          // Project:      X90_BCM
+      9          // Language:     ANSI-C
+     10          // -----------------------------------------------------------------------------
+     11          // Component:    LDB_SLD
+     12          //               Solder test component
+     13          // -----------------------------------------------------------------------------
+     14          // $Date:   Mar 10 2010 16:09:02  $
+     15          // $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SLD/LDB_SLD.c-arc  $
+     16          // $Revision:   1.2  $
+     17          // -----------------------------------------------------------------------------
+     18          // $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LDB/LDB_SLD/LDB_SLD.c-arc  $ 
+     19          // 
+     20          //    Rev 1.2   Mar 10 2010 16:09:02   adzhelp
+     21          // Cm006219: Code review corrections - init ADC register
+     22          // 
+     23          //    Rev 1.1   Feb 17 2010 14:45:50   adzhelp
+     24          // Cm006219: SPI type set to '4'. Output only pins retained to '0'.
+     25          // 
+     26          //    Rev 1.0   Feb 10 2010 10:15:40   adzhelp
+     27          // Initial revision.
+     28          //
+     29          //******************************************************************************
+     30          
+     31          //------------------------------------------------------------------------------
+     32          // Body Identification
+     33          //------------------------------------------------------------------------------
+     34          #define ldb_sld   "ldb_sld"
+     35          
+     36          //------------------------------------------------------------------------------
+     37          // Included files to resolve specific definitions in this file
+     38          //------------------------------------------------------------------------------
+     39          #ifndef _QAC_
+     40          #include "io78f0536_64.h"
+
+   \                                 In  segment SADDR_A, at 0xff00
+   \   union <unnamed> volatile __saddr _A_P0
+   \                     _A_P0:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff01
+   \   union <unnamed> volatile __saddr _A_P1
+   \                     _A_P1:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff02
+   \   union <unnamed> volatile __saddr _A_P2
+   \                     _A_P2:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff03
+   \   union <unnamed> volatile __saddr _A_P3
+   \                     _A_P3:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff04
+   \   union <unnamed> volatile __saddr _A_P4
+   \                     _A_P4:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff05
+   \   union <unnamed> volatile __saddr _A_P5
+   \                     _A_P5:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff06
+   \   union <unnamed> volatile __saddr _A_P6
+   \                     _A_P6:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff07
+   \   union <unnamed> volatile __saddr _A_P7
+   \                     _A_P7:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0c
+   \   union <unnamed> volatile __saddr _A_P12
+   \                     _A_P12:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff0e
+   \   union <unnamed> volatile __saddr _A_P14
+   \                     _A_P14:
+   \   0000                  DS 1
+
+   \                                 In  segment SADDR_A, at 0xff1a
+   \   unsigned char volatile __saddr __no_bit_access CMP01
+   \                     CMP01:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff20
+   \   union <unnamed> volatile __sfr _A_PM0
+   \                     _A_PM0:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff21
+   \   union <unnamed> volatile __sfr _A_PM1
+   \                     _A_PM1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff22
+   \   union <unnamed> volatile __sfr _A_PM2
+   \                     _A_PM2:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff23
+   \   union <unnamed> volatile __sfr _A_PM3
+   \                     _A_PM3:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff24
+   \   union <unnamed> volatile __sfr _A_PM4
+   \                     _A_PM4:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff25
+   \   union <unnamed> volatile __sfr _A_PM5
+   \                     _A_PM5:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff26
+   \   union <unnamed> volatile __sfr _A_PM6
+   \                     _A_PM6:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff27
+   \   union <unnamed> volatile __sfr _A_PM7
+   \                     _A_PM7:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2c
+   \   union <unnamed> volatile __sfr _A_PM12
+   \                     _A_PM12:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2e
+   \   union <unnamed> volatile __sfr _A_PM14
+   \                     _A_PM14:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff2f
+   \   union <unnamed> volatile __sfr _A_ADPC
+   \                     _A_ADPC:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff40
+   \   union <unnamed> volatile __sfr _A_CKS
+   \                     _A_CKS:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff4a
+   \   unsigned char const volatile __sfr __no_bit_access SIO11
+   \                     SIO11:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff4c
+   \   unsigned char volatile __sfr __no_bit_access SOTB11
+   \                     SOTB11:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff6c
+   \   union <unnamed> volatile __sfr _A_TMHMD1
+   \                     _A_TMHMD1:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff88
+   \   union <unnamed> volatile __sfr _A_CSIM11
+   \                     _A_CSIM11:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff89
+   \   union <unnamed> volatile __sfr _A_CSIC11
+   \                     _A_CSIC11:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xff99
+   \   unsigned char volatile __sfr __no_bit_access WDTE
+   \                     WDTE:
+   \   0000                  DS 1
+
+   \                                 In  segment NEAR_A, at 0xffe0
+   \   union <unnamed> volatile __sfr _A_IF0
+   \                     _A_IF0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe4
+   \   union <unnamed> volatile __sfr _A_MK0
+   \                     _A_MK0:
+   \   0000                  DS 2
+
+   \                                 In  segment NEAR_A, at 0xffe6
+   \   union <unnamed> volatile __sfr _A_MK1
+   \                     _A_MK1:
+   \   0000                  DS 2
+     41          #include "intrinsics.h"
+     42          #endif
+     43          
+     44          #include "deftypes.h"
+     45          #include "lib.h"
+     46          #include "ldb_sld.h"
+     47          #include "ldb_sldp.h"
+     48          
+     49          #ifdef UTEST
+     50          #include "dat.h"
+     51          #endif
+     52          
+     53          //------------------------------------------------------------------------------
+     54          // Local constants
+     55          //------------------------------------------------------------------------------
+     56          
+     57          #define cByteMax        ((U8)0xFFU)
+     58          
+     59          // SPI / CSI (UART)
+     60          
+     61          // CSI registers configuration for SPI mode
+     62          
+     63          // Register CSIM11 - Serial Operation Mode Register
+     64          //   transmit/receive mode, MSB first 
+     65          #define cCSIM11Init     ((U8)0x40U)
+     66          // Register CSI11 - Serial clock selection register
+     67          //  SPI Clock type 4, external clock
+     68          #define cCSIC11Init     ((U8)0x1FU)
+     69          
+     70          // Note: SPI clock type is 4 for new versions of Solder Control PC SW 
+     71          
+     72          // Timer configuration (used for 'ton' determination) - Timer H1
+     73          // TMHMD1 Register: count source fprs / 2^12, interval timer, output disabled
+     74          #define cTMH1MDInit  ((U8)0x40U)
+     75          
+     76          // TH1 Register: trigger value
+     77          #define cTimerTrigger       mConvMsInTimerTick(cLDBSldTonMs)
+     78          #define cTimerTickUs        256UL // Fprs / 2^12
+     79          
+     80          #define cCKSInit            ((U8)0x07U)
+     81          
+     82          #ifdef _QAC_
+     83          
+     84          // adzhelp: exclude message for missing declartion of MCU registers
+     85          #pragma PRQA_MESSAGES_OFF 3447 
+     86          
+     87          // Here are written the identifiers of all utilized MCU registers and register bits
+     88          extern volatile U8 P0, P1, P2, P3, P4, P5, P6, P7, P12, P12, P14,
+     89                            PM0, PM1, PM2, PM3, PM4, PM5, PM6, PM7, PM12, PM14, ADPC,
+     90                            CSIE11, TMHMD1, WDTE, CSIM11, CSIMK11, SOTB11, SIO11, CLOE;
+     91          
+     92          #pragma PRQA_MESSAGES_ON 3447
+     93          
+     94          #endif
+     95          
+     96          
+     97          //------------------------------------------------------------------------------
+     98          // Local macros
+     99          //------------------------------------------------------------------------------
+    100          // Test pin
+    101          #define mIsTestPinEnterActive() (cLDBSldBitTestSolderPin == (U8)cLDBSldBitTestSolderPinEnterLevel)
+    102          #define mIsTestPinActive()      (cLDBSldBitTestSolderPin != (U8)cLDBSldBitTestSolderPinSleepLevel)
+    103          #define mIsTestPinSleep()       (cLDBSldBitTestSolderPin == (U8)cLDBSldBitTestSolderPinSleepLevel)
+    104          
+    105          // SPI
+    106          #ifndef _QAC_
+    107          #define mInitSpi()              CSIM11 = cCSIM11Init; \
+    108                                          CSIC11 = cCSIC11Init; \
+    109                                          P0_bit.no2 = 0 /* SPI OUT */
+    110          
+    111          #define mInitClockOutput()      CKS = cCKSInit; \
+    112                                          P14_bit.no0 = 0 /* CLOCK OUT */
+    113          #endif
+    114          
+    115          
+    116          #define mEnableSpi()            CSIMK11 = 1; /* disable interrupt */\
+    117                                          /*//QACJ 3412: adzhelp: Missing statement is appended on use */\
+    118                                          CSIE11 = 1
+    119          
+    120          #define mSendSpi(Data)          (SOTB11 = (U8)(Data))
+    121          #define mReceiveSpi()           (SIO11)
+    122          
+    123          #define mEnableClockOutput()    (CLOE = 1)
+    124          
+    125          #ifndef _QAC_
+    126          
+    127          #define mIsCommunicationInProgress()    (CSIM11_bit.no0 == 1) // CSOT11 bit
+    128          
+    129          // Timer control
+    130              #define mInitTimer()        TMHMD1 = cTMH1MDInit; \
+    131                                          CMP01 = cTimerTrigger
+    132          
+    133              #define mStartTimer()       TMMKH1 = 1; /* disable interrupt */\
+    134                                          TMHE1 = 1
+    135          
+    136              #define mIsTimerElapsed()   (TMIFH1 == 1)
+    137          
+    138          #else
+    139              #define mIsCommunicationInProgress()    (CSIM11 == 1)
+    140          
+    141              #define mInitTimer()        NOP()
+    142              #define mStartTimer()       NOP()
+    143              #define mInitSpi()          NOP()
+    144              #define mInitClockOutput()  NOP()
+    145              #define mIsTimerElapsed()   (TMHMD1 == 0)
+    146          #endif
+    147          
+    148          #define mConvMsInTimerTick(PeriodMs) \
+    149              ((((PeriodMs) * 1000UL) / cTimerTickUs) - 1UL)
+    150          
+    151          #define mRefreshWatchdog()      (WDTE = (U8)0xACU)
+    152          
+    153          // Set to main port mode for all pins (important for NEC K0)
+    154          #define mSetPortFunction()      (ADPC = (U8)0x08U) // P2 pins set to port function
+    155          
+    156          //------------------------------------------------------------------------------
+    157          // Local types
+    158          //------------------------------------------------------------------------------
+    159          typedef volatile U8 * const tpRegister;
+    160          
+    161          //------------------------------------------------------------------------------
+    162          // Local data
+    163          //------------------------------------------------------------------------------
+
+   \                                 In  segment CONST, align 2
+    164          static tpRegister pPortRegisters[cLDBSldPortsNumber] = cLDBSldPortRegistersList();
+   \                     pPortRegisters:
+   \   0000   ........       DW _A_P0, _A_P1, _A_P2, _A_P3, _A_P4, _A_P5, _A_P6, _A_P7, _A_P12
+   \          ........
+   \          ........
+   \          ........
+   \          ....    
+   \   0012   ....           DW _A_P14
+
+   \                                 In  segment CONST, align 2
+    165          static tpRegister pPortDirRegisters[cLDBSldPortsNumber] = cLDBSldPortDirRegistersList();
+   \                     pPortDirRegisters:
+   \   0000   ........       DW _A_PM0, _A_PM1, _A_PM2, _A_PM3, _A_PM4, _A_PM5, _A_PM6, _A_PM7
+   \          ........
+   \          ........
+   \          ........
+   \   0010   ........       DW _A_PM12, _A_PM14
+    166          
+    167          //------------------------------------------------------------------------------
+    168          // Constant local data
+    169          //------------------------------------------------------------------------------
+    170          #if (cLDBSldTestCommunications == 0)
+
+   \                                 In  segment CONST, align 1
+    171          static const U8 InputOnlyPins[cLDBSldPortsNumber] = cLDBSldPortInputOnlyPinsList();
+   \                     InputOnlyPins:
+   \   0000   980000F0       DB 152, 0, 0, 240, 240, 240, 240, 64, 230, 252
+   \          F0F0F040
+   \          E6FC    
+    172          #endif
+    173          
+
+   \                                 In  segment CONST, align 1
+    174          static const U8 OutputOnlyPins[cLDBSldPortsNumber] = cLDBSldPortOutputOnlyPinsList();
+   \                     OutputOnlyPins:
+   \   0000   04000000       DB 4, 0, 0, 0, 0, 0, 0, 0, 0, 1
+   \          00000000
+   \          0001    
+    175          
+    176          //------------------------------------------------------------------------------
+    177          // Exported data
+    178          //------------------------------------------------------------------------------
+    179          
+    180          //------------------------------------------------------------------------------
+    181          // Constant exported data
+    182          //------------------------------------------------------------------------------
+    183          
+    184          // This is an example:
+    185          // Reduce to minimum the usage of extern constant data members!!!
+    186          // extern const tType  cLAYCmpConstantName;
+    187          // extern const U32    cu32LAYCmpConstantName;
+    188          
+    189          //------------------------------------------------------------------------------
+    190          // Local function prototypes
+    191          //------------------------------------------------------------------------------
+    192          static MEM_TYPE BOOL CheckSolderModeEntry(void);
+    193          static MEM_TYPE void SldInit(void);
+    194          static MEM_TYPE void SolderTestProcedure(void);
+    195          static MEM_TYPE void SetPortDirection(const U8 u8PortNum, const U8 u8Dir);
+    196          static MEM_TYPE U8   SpiProcess (const U8 u8TxData);
+    197          
+    198          //==============================================================================
+    199          //=========================== LOCAL FUNCTIONS ==================================
+    200          //==============================================================================
+    201          
+    202          //==============================================================================
+    203          // DESCRIPTION:         Check if entry into solder test mode is requested
+    204          //
+    205          // PARAMETERS:          None
+    206          //
+    207          // RETURN VALUE:        BOOL: cTrue when requested entry into solder mode
+    208          //
+    209          // DESIGN INFORMATION:  Refer to DCD
+    210          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    211          static MEM_TYPE BOOL CheckSolderModeEntry(void)
+   \                     CheckSolderModeEntry:
+    212          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    213              BOOL bResult = cFalse;
+   \   0000   A000           MOV       X,#0
+    214          
+    215              //QACJ 3416: No side effects
+    216              if (mIsTestPinEnterActive())
+   \   0002   3163071E       BF        S:0xFF07.6, ??LDBSldEnterSolderTest_0
+    217              {
+    218                  // Wait for time 'ton'        
+    219                  mInitTimer();
+   \   0006   136C40         MOV       0xFF6C,#64
+   \   0009   111A26         MOV       S:0xFF1A,#38
+    220                  mStartTimer();
+   \   000C   713AE5         SET1      0xFFE5.3
+   \   000F   717A6C         SET1      0xFF6C.7
+   \   0012   FA03           BR        ??LDBSldEnterSolderTest_1
+    221                  
+    222                  //QACJ 3416: No side effects
+    223                  while (!mIsTimerElapsed())
+    224                  {
+    225                      //QACJ 3416: No side effects
+    226                      if (!mIsTestPinEnterActive()) // pin level shall be maintained
+    227                      {
+    228                          bResult = cFalse;
+    229                          break;
+    230                      }
+    231                      else
+    232                      {
+    233                          // wait
+    234                          mRefreshWatchdog();
+   \                     ??CheckSolderModeEntry_0:
+   \   0014   1399AC         MOV       0xFF99,#172
+    235                      }
+   \                     ??LDBSldEnterSolderTest_1:
+   \   0017   3136E103       BT        0xFFE1.3, ??LDBSldEnterSolderTest_2
+   \   001B   EC07F6         BT        S:0xFF07.6, ??CheckSolderModeEntry_0
+    236                  //QACJ 2468: control variable is being changed by HW timer
+    237                  }
+    238                  
+    239                  //QACJ 3416: No side effects
+    240                  if (mIsTestPinEnterActive()) 
+   \                     ??LDBSldEnterSolderTest_2:
+   \   001E   31630702       BF        S:0xFF07.6, ??LDBSldEnterSolderTest_0
+    241                  {
+    242                      bResult = cTrue; // enable solder test mode
+   \   0022   A001           MOV       X,#1
+    243                  }        
+    244              }    
+    245              return bResult;
+   \                     ??LDBSldEnterSolderTest_0:
+   \   0024   60             MOV       A,X
+   \   0025   AF             RET       
+   \   0026                  REQUIRE ?CL78K_V4_6_L00
+   \   0026                  REQUIRE _A_P7
+   \   0026                  REQUIRE CMP01
+   \   0026                  REQUIRE _A_TMHMD1
+   \   0026                  REQUIRE WDTE
+   \   0026                  REQUIRE _A_IF0
+   \   0026                  REQUIRE _A_MK0
+    246          }
+    247          
+    248          //==============================================================================
+    249          // DESCRIPTION:         Component initialization
+    250          //
+    251          // PARAMETERS:          None
+    252          //
+    253          // RETURN VALUE:        None
+    254          //
+    255          // DESIGN INFORMATION:  Refer to DCD
+    256          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    257          static MEM_TYPE void SldInit(void)
+   \                     SldInit:
+    258          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   10....         MOVW      AX,#OutputOnlyPins
+   \   0003   B3             PUSH      BC
+   \   0004                  ; Total Auto size: 2
+   \   0004   B7             PUSH      HL
+    259              U8 i;
+    260          
+    261          #if (cLDBSldBitTestSolderPinEnterLevel == 0U)
+    262              // when entry is performed with low level of control pin
+    263                  
+    264              while (mIsTestPinActive())
+    265              {
+    266                  // wait for rising edge
+    267                  mRefreshWatchdog();
+    268              }    
+    269          #endif
+    270          
+    271              // Set to main port mode for all pins (important for NEC K0)
+    272              mSetPortFunction();
+   \   0005   132F08         MOV       0xFF2F,#8
+    273          
+    274              // Initial port direction configuration
+    275              for (i = 0; i < cLDBSldPortsNumber; ++i)
+   \   0008   B6             POP       HL
+   \   0009   B1             PUSH      AX
+   \   000A   14....         MOVW      DE,#pPortDirRegisters
+   \   000D   A30A           MOV       B,#10
+    276              {
+    277                  // set all ports inputs except output only
+    278                  SetPortDirection(i, ((U8)cByteMax) & ((U8)~OutputOnlyPins[i]));
+   \                     ??SldInit_0:
+   \   000F   891C           MOVW      AX,SP
+   \   0011   D6             MOVW      HL,AX
+   \   0012   87             MOV       A,[HL]
+   \   0013   70             MOV       X,A
+   \   0014   AE01           MOV       A,[HL+0x01]
+   \   0016   D6             MOVW      HL,AX
+   \   0017   87             MOV       A,[HL]
+   \   0018   7DFF           XOR       A,#255
+   \   001A   72             MOV       C,A
+   \   001B   C4             MOVW      AX,DE
+   \   001C   D6             MOVW      HL,AX
+   \   001D   87             MOV       A,[HL]
+   \   001E   70             MOV       X,A
+   \   001F   AE01           MOV       A,[HL+0x01]
+   \   0021   D6             MOVW      HL,AX
+   \   0022   62             MOV       A,C
+   \   0023   97             MOV       [HL],A
+    279              }
+   \   0024   84             INCW      DE
+   \   0025   84             INCW      DE
+   \   0026   891C           MOVW      AX,SP
+   \   0028   D6             MOVW      HL,AX
+   \   0029   87             MOV       A,[HL]
+   \   002A   70             MOV       X,A
+   \   002B   AE01           MOV       A,[HL+0x01]
+   \   002D   D6             MOVW      HL,AX
+   \   002E   86             INCW      HL
+   \   002F   C6             MOVW      AX,HL
+   \   0030   B6             POP       HL
+   \   0031   B1             PUSH      AX
+   \   0032   53             DEC       B
+   \   0033   BDDA           BNZ       ??SldInit_0
+    280              
+    281              // Init SPI registers
+    282              mInitSpi();
+   \   0035   138840         MOV       0xFF88,#64
+   \   0038   13891F         MOV       0xFF89,#31
+   \   003B   2B00           CLR1      S:0xFF00.2
+    283              mEnableSpi();
+   \   003D   711AE7         SET1      0xFFE7.1
+   \   0040   717A88         SET1      0xFF88.7
+    284          
+    285              // Enable clock output
+    286              mInitClockOutput();
+   \   0043   134007         MOV       0xFF40,#7
+   \   0046   0B0E           CLR1      S:0xFF0E.0
+    287              mEnableClockOutput();
+   \   0048   714A40         SET1      0xFF40.4
+    288          }
+   \   004B   B0             POP       AX
+   \   004C   B2             POP       BC
+   \   004D   AF             RET       
+   \   004E                  REQUIRE ?CL78K_V4_6_L00
+   \   004E                  REQUIRE _A_P0
+   \   004E                  REQUIRE _A_P14
+   \   004E                  REQUIRE _A_ADPC
+   \   004E                  REQUIRE _A_CKS
+   \   004E                  REQUIRE _A_CSIM11
+   \   004E                  REQUIRE _A_CSIC11
+   \   004E                  REQUIRE _A_MK1
+    289          
+    290          //==============================================================================
+    291          // DESCRIPTION:         Transmit and receive a byte via SPI
+    292          //
+    293          // PARAMETERS:          U8 u8TxData: byte to transmit
+    294          //
+    295          // RETURN VALUE:        U8: received byte
+    296          //
+    297          // DESIGN INFORMATION:  Refer to DCD
+    298          //==============================================================================
+    299          static MEM_TYPE U8 SpiProcess (const U8 u8TxData)
+    300          {
+    301              U8 u8RxData;
+    302          
+    303              //QACJ 3416: No side effects
+    304              while (mIsCommunicationInProgress())
+    305              {
+    306                  // wait until transmit buffer empty
+    307                  mRefreshWatchdog();
+    308                  //QACJ 2468: adzhelp: control variable is a register bit
+    309              }
+    310              mSendSpi(u8TxData);
+    311          
+    312              //QACJ 3416: No side effects
+    313              while (mIsCommunicationInProgress()) // is here an incoming data: receive complete
+    314              {
+    315                  // wait until receive buffer full
+    316                  mRefreshWatchdog();
+    317                  //QACJ 2468: adzhelp: control variable is a register bit
+    318              }
+    319              u8RxData = mReceiveSpi();	
+    320          
+    321              return u8RxData;
+    322          }
+    323          
+    324          //==============================================================================
+    325          // DESCRIPTION:         Set port direction register
+    326          //
+    327          // PARAMETERS:          U8 u8PortNum: port number; U8 u8Dir: direction bits
+    328          //
+    329          // RETURN VALUE:        None
+    330          //
+    331          // DESIGN INFORMATION:  Refer to DCD
+    332          //==============================================================================
+    333          static MEM_TYPE void SetPortDirection(const U8 u8PortNum, const U8 u8Dir)
+    334          {
+    335              if (u8PortNum < cLDBSldPortsNumber)    
+    336              {
+    337          #if (cLDBSldPortOutputValue != 0)
+    338                  // '0' is output acc. to solder test specification
+    339                  // INVERSE is required for MCU direction registers
+    340                  *(pPortDirRegisters[u8PortNum]) = (U8)(~u8Dir); 
+    341          #else
+    342                  *(pPortDirRegisters[u8PortNum]) = u8Dir;
+    343          #endif
+    344              }
+    345          }
+    346          
+    347          //==============================================================================
+    348          // DESCRIPTION:         Solder test procedure
+    349          //
+    350          // PARAMETERS:          None
+    351          //
+    352          // RETURN VALUE:        None
+    353          //
+    354          // DESIGN INFORMATION:  Refer to DCD
+    355          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    356          static MEM_TYPE void SolderTestProcedure(void)
+   \                     SolderTestProcedure:
+    357          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000   B3             PUSH      BC
+   \   0001                  ; Total Auto size: 42
+   \   0001   ..             CALLT     [__T_?FUNC_ENTER_L06]
+   \   0002   2A00           DW        0x2A
+    358              U8 i;
+    359              U8 PortWrite[cLDBSldPortsNumber];  // wanted states of ports
+    360              U8 PortRead[cLDBSldPortsNumber];   // read states of ports
+    361              U8 PortDir[cLDBSldPortsNumber];    // wanted direction of ports 
+    362                                                    // (bit 0 - output, bit 1 - input)
+    363          
+    364              // Initial port read
+    365              for (i = 0; i < cLDBSldPortsNumber; ++i)
+   \   0004   891C           MOVW      AX,SP
+   \   0006   CA0C00         ADDW      AX,#12
+   \   0009   D2             MOVW      BC,AX
+   \   000A   14....         MOVW      DE,#pPortRegisters
+   \   000D   CAFEFF         ADDW      AX,#65534
+   \   0010   D6             MOVW      HL,AX
+   \   0011   A10A           MOV       A,#10
+   \   0013   97             MOV       [HL],A
+    366              {
+    367              #if (cLDBSldTestCommunications == 1) // Test Mode enabled
+    368                  PortRead[i] = 0xA0U + i; // return known values in first frame
+    369              #else
+    370                  // Read ports
+    371                  PortRead[i] = *(pPortRegisters[i]);
+   \                     ??SolderTestProcedure_0:
+   \   0014   C4             MOVW      AX,DE
+   \   0015   D6             MOVW      HL,AX
+   \   0016   87             MOV       A,[HL]
+   \   0017   70             MOV       X,A
+   \   0018   AE01           MOV       A,[HL+0x01]
+   \   001A   D6             MOVW      HL,AX
+   \   001B   87             MOV       A,[HL]
+   \   001C   B3             PUSH      BC
+   \   001D   B6             POP       HL
+   \   001E   97             MOV       [HL],A
+    372              #endif
+    373              }   
+   \   001F   84             INCW      DE
+   \   0020   84             INCW      DE
+   \   0021   B3             PUSH      BC
+   \   0022   B6             POP       HL
+   \   0023   86             INCW      HL
+   \   0024   B7             PUSH      HL
+   \   0025   B2             POP       BC
+   \   0026   891C           MOVW      AX,SP
+   \   0028   D6             MOVW      HL,AX
+   \   0029   AE0A           MOV       A,[HL+0x0A]
+   \   002B   51             DEC       A
+   \   002C   BE0A           MOV       [HL+0x0A],A
+   \   002E   BDE4           BNZ       ??SolderTestProcedure_0
+    374             
+    375              
+    376              // Solder test procedure endless loop
+    377              for (;;)
+    378              {
+    379                  // SPI transfer
+    380          
+    381                  for (i = 0; i < cLDBSldPortsNumber; ++i)
+   \                     ??SolderTestProcedure_1:
+   \   0030   A200           MOV       C,#0
+   \   0032   891C           MOVW      AX,SP
+   \   0034   CA1600         ADDW      AX,#22
+   \   0037   B6             POP       HL
+   \   0038   B1             PUSH      AX
+   \   0039   CAF6FF         ADDW      AX,#65526
+   \   003C   D6             MOVW      HL,AX
+   \   003D   891C           MOVW      AX,SP
+   \   003F   E6             XCHW      AX,HL
+   \   0040   BE03           MOV       [HL+0x03],A
+   \   0042   60             MOV       A,X
+   \   0043   BE02           MOV       [HL+0x02],A
+   \   0045   891C           MOVW      AX,SP
+   \   0047   CA2000         ADDW      AX,#32
+   \   004A   D4             MOVW      DE,AX
+    382                  {            
+    383                      // receive direction / send broadcasting index
+    384                      PortDir[i] = SpiProcess(i + 1);   
+   \                     ??SolderTestProcedure_2:
+   \   004B   62             MOV       A,C
+   \   004C   70             MOV       X,A
+   \   004D   40             INC       X
+   \   004E   FA03           BR        ??LDBSldEnterSolderTest_3
+   \                     ??SolderTestProcedure_3:
+   \   0050   1399AC         MOV       0xFF99,#172
+   \                     ??LDBSldEnterSolderTest_3:
+   \   0053   310688F9       BT        0xFF88.0, ??SolderTestProcedure_3
+   \   0057   60             MOV       A,X
+   \   0058   F64C           MOV       0xFF4C,A
+   \   005A   FA03           BR        ??LDBSldEnterSolderTest_4
+   \                     ??SolderTestProcedure_4:
+   \   005C   1399AC         MOV       0xFF99,#172
+   \                     ??LDBSldEnterSolderTest_4:
+   \   005F   310688F9       BT        0xFF88.0, ??SolderTestProcedure_4
+   \   0063   F44A           MOV       A,0xFF4A
+   \   0065   73             MOV       B,A
+   \   0066   891C           MOVW      AX,SP
+   \   0068   D6             MOVW      HL,AX
+   \   0069   87             MOV       A,[HL]
+   \   006A   70             MOV       X,A
+   \   006B   AE01           MOV       A,[HL+0x01]
+   \   006D   D6             MOVW      HL,AX
+   \   006E   63             MOV       A,B
+   \   006F   97             MOV       [HL],A
+    385                      // receive wanted port states / send previously read port states
+    386                      
+    387                      PortWrite[i] = SpiProcess(PortRead[i]);
+   \   0070   891C           MOVW      AX,SP
+   \   0072   D6             MOVW      HL,AX
+   \   0073   AE02           MOV       A,[HL+0x02]
+   \   0075   70             MOV       X,A
+   \   0076   AE03           MOV       A,[HL+0x03]
+   \   0078   D6             MOVW      HL,AX
+   \   0079   87             MOV       A,[HL]
+   \   007A   FA03           BR        ??LDBSldEnterSolderTest_5
+   \                     ??SolderTestProcedure_5:
+   \   007C   1399AC         MOV       0xFF99,#172
+   \                     ??LDBSldEnterSolderTest_5:
+   \   007F   310688F9       BT        0xFF88.0, ??SolderTestProcedure_5
+   \   0083   F64C           MOV       0xFF4C,A
+   \   0085   FA03           BR        ??LDBSldEnterSolderTest_6
+   \                     ??SolderTestProcedure_6:
+   \   0087   1399AC         MOV       0xFF99,#172
+   \                     ??LDBSldEnterSolderTest_6:
+   \   008A   310688F9       BT        0xFF88.0, ??SolderTestProcedure_6
+   \   008E   F44A           MOV       A,0xFF4A
+    388                  }
+   \   0090   95             MOV       [DE],A
+   \   0091   42             INC       C
+   \   0092   84             INCW      DE
+   \   0093   891C           MOVW      AX,SP
+   \   0095   D6             MOVW      HL,AX
+   \   0096   AE02           MOV       A,[HL+0x02]
+   \   0098   70             MOV       X,A
+   \   0099   AE03           MOV       A,[HL+0x03]
+   \   009B   D6             MOVW      HL,AX
+   \   009C   86             INCW      HL
+   \   009D   891C           MOVW      AX,SP
+   \   009F   E6             XCHW      AX,HL
+   \   00A0   BE03           MOV       [HL+0x03],A
+   \   00A2   60             MOV       A,X
+   \   00A3   BE02           MOV       [HL+0x02],A
+   \   00A5   87             MOV       A,[HL]
+   \   00A6   70             MOV       X,A
+   \   00A7   AE01           MOV       A,[HL+0x01]
+   \   00A9   D6             MOVW      HL,AX
+   \   00AA   86             INCW      HL
+   \   00AB   C6             MOVW      AX,HL
+   \   00AC   B6             POP       HL
+   \   00AD   B1             PUSH      AX
+   \   00AE   62             MOV       A,C
+   \   00AF   4D0A           CMP       A,#10
+   \   00B1   8D98           BC        ??SolderTestProcedure_2
+    389          
+    390                  //QACJ 3416: No side effects
+    391                  while (mIsTestPinSleep())
+   \                     ??SolderTestProcedure_7:
+   \   00B3   31630705       BF        S:0xFF07.6, ??LDBSldEnterSolderTest_7
+    392                  {
+    393                      // wait for falling edge
+    394                      mRefreshWatchdog();
+   \   00B7   1399AC         MOV       0xFF99,#172
+   \   00BA   FAF7           BR        ??SolderTestProcedure_7
+    395                      //QACJ 2468: adzhelp: control variable is a register bit
+    396                  }
+    397          
+    398          #if (cLDBSldTestCommunications == 1) // Test Mode enabled
+    399                  
+    400                  for (i = 0; i < cLDBSldPortsNumber; ++i)
+    401                  {
+    402                      // Read
+    403                      PortRead[i] = PortWrite[i]; // prepare to return values received by tester       
+    404                      PortDir[i] = PortDir[i]; // remove warning
+    405                  }
+    406          
+    407          #else // normal mode
+    408          
+    409                  for (i = 0; i < cLDBSldPortsNumber; ++i)
+   \                     ??LDBSldEnterSolderTest_7:
+   \   00BC   891C           MOVW      AX,SP
+   \   00BE   CA0C00         ADDW      AX,#12
+   \   00C1   D2             MOVW      BC,AX
+   \   00C2   14....         MOVW      DE,#pPortRegisters
+   \   00C5   CAFEFF         ADDW      AX,#65534
+   \   00C8   D6             MOVW      HL,AX
+   \   00C9   A10A           MOV       A,#10
+   \   00CB   97             MOV       [HL],A
+    410                  {
+    411                      // Read
+    412                      PortRead[i] = *(pPortRegisters[i]);
+   \                     ??SolderTestProcedure_8:
+   \   00CC   C4             MOVW      AX,DE
+   \   00CD   D6             MOVW      HL,AX
+   \   00CE   87             MOV       A,[HL]
+   \   00CF   70             MOV       X,A
+   \   00D0   AE01           MOV       A,[HL+0x01]
+   \   00D2   D6             MOVW      HL,AX
+   \   00D3   87             MOV       A,[HL]
+   \   00D4   B3             PUSH      BC
+   \   00D5   B6             POP       HL
+   \   00D6   97             MOV       [HL],A
+    413                  }
+   \   00D7   84             INCW      DE
+   \   00D8   84             INCW      DE
+   \   00D9   B3             PUSH      BC
+   \   00DA   B6             POP       HL
+   \   00DB   86             INCW      HL
+   \   00DC   B7             PUSH      HL
+   \   00DD   B2             POP       BC
+   \   00DE   891C           MOVW      AX,SP
+   \   00E0   D6             MOVW      HL,AX
+   \   00E1   AE0A           MOV       A,[HL+0x0A]
+   \   00E3   51             DEC       A
+   \   00E4   BE0A           MOV       [HL+0x0A],A
+   \   00E6   BDE4           BNZ       ??SolderTestProcedure_8
+    414          
+    415                  for (i = 0; i < cLDBSldPortsNumber; ++i)
+   \   00E8   891C           MOVW      AX,SP
+   \   00EA   CA2000         ADDW      AX,#32
+   \   00ED   D6             MOVW      HL,AX
+   \   00EE   891C           MOVW      AX,SP
+   \   00F0   E6             XCHW      AX,HL
+   \   00F1   BE03           MOV       [HL+0x03],A
+   \   00F3   60             MOV       A,X
+   \   00F4   BE02           MOV       [HL+0x02],A
+   \   00F6   10....         MOVW      AX,#OutputOnlyPins
+   \   00F9   B6             POP       HL
+   \   00FA   B1             PUSH      AX
+   \   00FB   10....         MOVW      AX,#InputOnlyPins
+   \   00FE   D6             MOVW      HL,AX
+   \   00FF   891C           MOVW      AX,SP
+   \   0101   E6             XCHW      AX,HL
+   \   0102   BE09           MOV       [HL+0x09],A
+   \   0104   60             MOV       A,X
+   \   0105   BE08           MOV       [HL+0x08],A
+   \   0107   891C           MOVW      AX,SP
+   \   0109   CA1600         ADDW      AX,#22
+   \   010C   D4             MOVW      DE,AX
+   \   010D   10....         MOVW      AX,#pPortRegisters
+   \   0110   D6             MOVW      HL,AX
+   \   0111   891C           MOVW      AX,SP
+   \   0113   E6             XCHW      AX,HL
+   \   0114   BE07           MOV       [HL+0x07],A
+   \   0116   60             MOV       A,X
+   \   0117   BE06           MOV       [HL+0x06],A
+   \   0119   10....         MOVW      AX,#pPortDirRegisters
+   \   011C   D6             MOVW      HL,AX
+   \   011D   891C           MOVW      AX,SP
+   \   011F   E6             XCHW      AX,HL
+   \   0120   BE05           MOV       [HL+0x05],A
+   \   0122   60             MOV       A,X
+   \   0123   BE04           MOV       [HL+0x04],A
+   \   0125   A30A           MOV       B,#10
+    416                  {
+    417                      // Write
+    418                      // For NEC K0 - output only pins' latches should be fixed to certain values
+    419                      // These values are '0':
+    420                      *(pPortRegisters[i]) = PortWrite[i] & ((U8)~OutputOnlyPins[i]);
+   \                     ??SolderTestProcedure_9:
+   \   0127   87             MOV       A,[HL]
+   \   0128   70             MOV       X,A
+   \   0129   AE01           MOV       A,[HL+0x01]
+   \   012B   D6             MOVW      HL,AX
+   \   012C   87             MOV       A,[HL]
+   \   012D   7DFF           XOR       A,#255
+   \   012F   72             MOV       C,A
+   \   0130   891C           MOVW      AX,SP
+   \   0132   D6             MOVW      HL,AX
+   \   0133   AE02           MOV       A,[HL+0x02]
+   \   0135   70             MOV       X,A
+   \   0136   AE03           MOV       A,[HL+0x03]
+   \   0138   D6             MOVW      HL,AX
+   \   0139   87             MOV       A,[HL]
+   \   013A   615A           AND       A,C
+   \   013C   72             MOV       C,A
+   \   013D   891C           MOVW      AX,SP
+   \   013F   D6             MOVW      HL,AX
+   \   0140   AE06           MOV       A,[HL+0x06]
+   \   0142   70             MOV       X,A
+   \   0143   AE07           MOV       A,[HL+0x07]
+   \   0145   D6             MOVW      HL,AX
+   \   0146   87             MOV       A,[HL]
+   \   0147   70             MOV       X,A
+   \   0148   AE01           MOV       A,[HL+0x01]
+   \   014A   D6             MOVW      HL,AX
+   \   014B   62             MOV       A,C
+   \   014C   97             MOV       [HL],A
+    421          
+    422                      // Change direction
+    423                      SetPortDirection(i, ((InputOnlyPins[i]) | 
+    424                                           ((PortDir[i]) & ((U8)~OutputOnlyPins[i]))));
+   \   014D   891C           MOVW      AX,SP
+   \   014F   D6             MOVW      HL,AX
+   \   0150   87             MOV       A,[HL]
+   \   0151   70             MOV       X,A
+   \   0152   AE01           MOV       A,[HL+0x01]
+   \   0154   D6             MOVW      HL,AX
+   \   0155   87             MOV       A,[HL]
+   \   0156   7DFF           XOR       A,#255
+   \   0158   70             MOV       X,A
+   \   0159   85             MOV       A,[DE]
+   \   015A   6158           AND       A,X
+   \   015C   72             MOV       C,A
+   \   015D   891C           MOVW      AX,SP
+   \   015F   D6             MOVW      HL,AX
+   \   0160   AE08           MOV       A,[HL+0x08]
+   \   0162   70             MOV       X,A
+   \   0163   AE09           MOV       A,[HL+0x09]
+   \   0165   D6             MOVW      HL,AX
+   \   0166   87             MOV       A,[HL]
+   \   0167   616A           OR        A,C
+   \   0169   72             MOV       C,A
+   \   016A   891C           MOVW      AX,SP
+   \   016C   D6             MOVW      HL,AX
+   \   016D   AE04           MOV       A,[HL+0x04]
+   \   016F   70             MOV       X,A
+   \   0170   AE05           MOV       A,[HL+0x05]
+   \   0172   D6             MOVW      HL,AX
+   \   0173   87             MOV       A,[HL]
+   \   0174   70             MOV       X,A
+   \   0175   AE01           MOV       A,[HL+0x01]
+   \   0177   D6             MOVW      HL,AX
+   \   0178   62             MOV       A,C
+   \   0179   97             MOV       [HL],A
+    425                  }
+   \   017A   891C           MOVW      AX,SP
+   \   017C   D6             MOVW      HL,AX
+   \   017D   AE04           MOV       A,[HL+0x04]
+   \   017F   70             MOV       X,A
+   \   0180   AE05           MOV       A,[HL+0x05]
+   \   0182   D6             MOVW      HL,AX
+   \   0183   86             INCW      HL
+   \   0184   86             INCW      HL
+   \   0185   891C           MOVW      AX,SP
+   \   0187   E6             XCHW      AX,HL
+   \   0188   BE05           MOV       [HL+0x05],A
+   \   018A   60             MOV       A,X
+   \   018B   BE04           MOV       [HL+0x04],A
+   \   018D   AE06           MOV       A,[HL+0x06]
+   \   018F   70             MOV       X,A
+   \   0190   AE07           MOV       A,[HL+0x07]
+   \   0192   D6             MOVW      HL,AX
+   \   0193   86             INCW      HL
+   \   0194   86             INCW      HL
+   \   0195   891C           MOVW      AX,SP
+   \   0197   E6             XCHW      AX,HL
+   \   0198   BE07           MOV       [HL+0x07],A
+   \   019A   60             MOV       A,X
+   \   019B   BE06           MOV       [HL+0x06],A
+   \   019D   84             INCW      DE
+   \   019E   AE08           MOV       A,[HL+0x08]
+   \   01A0   70             MOV       X,A
+   \   01A1   AE09           MOV       A,[HL+0x09]
+   \   01A3   D6             MOVW      HL,AX
+   \   01A4   86             INCW      HL
+   \   01A5   891C           MOVW      AX,SP
+   \   01A7   E6             XCHW      AX,HL
+   \   01A8   BE09           MOV       [HL+0x09],A
+   \   01AA   60             MOV       A,X
+   \   01AB   BE08           MOV       [HL+0x08],A
+   \   01AD   87             MOV       A,[HL]
+   \   01AE   70             MOV       X,A
+   \   01AF   AE01           MOV       A,[HL+0x01]
+   \   01B1   D6             MOVW      HL,AX
+   \   01B2   86             INCW      HL
+   \   01B3   C6             MOVW      AX,HL
+   \   01B4   B6             POP       HL
+   \   01B5   B1             PUSH      AX
+   \   01B6   891C           MOVW      AX,SP
+   \   01B8   D6             MOVW      HL,AX
+   \   01B9   AE02           MOV       A,[HL+0x02]
+   \   01BB   70             MOV       X,A
+   \   01BC   AE03           MOV       A,[HL+0x03]
+   \   01BE   D6             MOVW      HL,AX
+   \   01BF   86             INCW      HL
+   \   01C0   891C           MOVW      AX,SP
+   \   01C2   E6             XCHW      AX,HL
+   \   01C3   BE03           MOV       [HL+0x03],A
+   \   01C5   60             MOV       A,X
+   \   01C6   BE02           MOV       [HL+0x02],A
+   \   01C8   53             DEC       B
+   \   01C9   AD03           BZ        $+5
+   \   01CB   9B....         BR        N:??SolderTestProcedure_9
+    426          #endif
+    427          
+    428                  //QACJ 3416: No side effects
+    429                  while (mIsTestPinActive())
+   \                     ??SolderTestProcedure_10:
+   \   01CE   31630703       BF        S:0xFF07.6, $+7
+   \   01D2   9B....         BR        N:??SolderTestProcedure_1
+    430                  {
+    431                      // wait for rising edge
+    432                      mRefreshWatchdog();
+   \   01D5   1399AC         MOV       0xFF99,#172
+   \   01D8   FAF4           BR        ??SolderTestProcedure_10
+   \   01DA                  REQUIRE ?CL78K_V4_6_L00
+   \   01DA                  REQUIRE _A_P7
+   \   01DA                  REQUIRE WDTE
+   \   01DA                  REQUIRE SIO11
+   \   01DA                  REQUIRE SOTB11
+   \   01DA                  REQUIRE _A_CSIM11
+    433                      //QACJ 2468: adzhelp: control variable is a register bit
+    434                  }   
+    435              }  
+    436          }
+    437          
+    438          //==============================================================================
+    439          //=========================== EXPORTED FUNCTIONS ===============================
+    440          //==============================================================================
+    441          
+    442          //==============================================================================
+    443          // DESCRIPTION:         Enters into solder test mode depending on the test pin
+    444          //
+    445          // PARAMETERS:          None
+    446          //
+    447          // RETURN VALUE:        None
+    448          //
+    449          // DESIGN INFORMATION:  Refer to DCD
+    450          //==============================================================================
+
+   \                                 In  segment BCODE, align 1, keep-with-next
+    451          MEM_TYPE void LDBSldEnterSolderTest(void)
+   \                     LDBSldEnterSolderTest:
+    452          {
+   \   0000                  ; * Stack frame (at entry) *
+   \   0000                  ; Param size: 0
+   \   0000                  ; Total Auto size: 0
+    453              const BOOL bCheck = CheckSolderModeEntry();
+    454          
+    455              if (bCheck != cFalse)
+   \   0000   16....         MOVW      HL,#LWRD(CheckSolderModeEntry)
+   \   0003   A4..           MOV       E,#BYTE3(CheckSolderModeEntry)
+   \   0005   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+   \   0006   4D00           CMP       A,#0
+   \   0008   AD0C           BZ        ??LDBSldEnterSolderTest_8
+    456              {
+    457                  SldInit();
+   \   000A   16....         MOVW      HL,#LWRD(SldInit)
+   \   000D   A4..           MOV       E,#BYTE3(SldInit)
+   \   000F   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    458                  SolderTestProcedure();
+   \   0010   16....         MOVW      HL,#LWRD(SolderTestProcedure)
+   \   0013   A4..           MOV       E,#BYTE3(SolderTestProcedure)
+   \   0015   ..             CALLT     [__T_?FAR_FAST_CALL_L07]
+    459              }
+    460          }
+   \                     ??LDBSldEnterSolderTest_8:
+   \   0016   AF             RET       
+   \   0017                  REQUIRE ?CL78K_V4_6_L00
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FAR_FAST_CALL_L07:
+   \   0000   ....           DW       ?FAR_FAST_CALL_L07
+
+   \                                 In  segment CLTVEC, align 2
+   \                     __T_?FUNC_ENTER_L06:
+   \   0000   ....           DW       ?FUNC_ENTER_L06
+    461          
+
+   Segment part sizes:
+
+     Function/Label         Bytes
+     --------------         -----
+     _A_P0                     1
+     _A_P1                     1
+     _A_P2                     1
+     _A_P3                     1
+     _A_P4                     1
+     _A_P5                     1
+     _A_P6                     1
+     _A_P7                     1
+     _A_P12                    1
+     _A_P14                    1
+     CMP01                     1
+     _A_PM0                    1
+     _A_PM1                    1
+     _A_PM2                    1
+     _A_PM3                    1
+     _A_PM4                    1
+     _A_PM5                    1
+     _A_PM6                    1
+     _A_PM7                    1
+     _A_PM12                   1
+     _A_PM14                   1
+     _A_ADPC                   1
+     _A_CKS                    1
+     SIO11                     1
+     SOTB11                    1
+     _A_TMHMD1                 1
+     _A_CSIM11                 1
+     _A_CSIC11                 1
+     WDTE                      1
+     _A_IF0                    2
+     _A_MK0                    2
+     _A_MK1                    2
+     pPortRegisters           20
+     pPortDirRegisters        20
+     InputOnlyPins            10
+     OutputOnlyPins           10
+     CheckSolderModeEntry     38
+     SldInit                  78
+     SolderTestProcedure     474
+     LDBSldEnterSolderTest    23
+     __T_?FAR_FAST_CALL_L07    2
+     __T_?FUNC_ENTER_L06       2
+
+ 
+ 613 bytes in segment BCODE
+   4 bytes in segment CLTVEC
+  60 bytes in segment CONST
+  24 bytes in segment NEAR_A
+  11 bytes in segment SADDR_A
+ 
+ 613 bytes of CODE  memory (+  4 bytes shared)
+  60 bytes of CONST memory
+   0 bytes of DATA  memory (+ 35 bytes shared)
+
+Errors: none
+Warnings: none

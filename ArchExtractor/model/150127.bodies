@@ -1,0 +1,14 @@
+class StkJilFileParser
+!!!196079.python!!!	__init__(inout self : , in inpIPortCriteriaList : IPortCriteria)
+        self.fileFilterCriteria = r'\w+\.jil$'
+!!!189423.python!!!	preprocessFile(in self : any, in inpFilePath : string)
+        bResult = True
+        self.fileContent = open(inpFilePath, 'r').read()
+        
+        self.removeComment()
+        
+        # don't scan LIB.JIL file or any who contains implementation part
+        if re.search(r'IMPLEMENTATION\s+Implementation', self.fileContent):
+            bResult = False
+        
+        return bResult
