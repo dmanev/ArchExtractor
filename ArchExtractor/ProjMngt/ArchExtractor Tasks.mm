@@ -106,6 +106,14 @@
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#990000" CREATED="1408470299377" ID="ID_1893860112" MODIFIED="1408470314350" TEXT="Contact S. Ilieva">
 <icon BUILTIN="yes"/>
+<node COLOR="#999999" CREATED="1408473064590" ID="ID_1327581564" MODIFIED="1408473089865" TEXT="Discuss intership finishing details">
+<font NAME="SansSerif" SIZE="10"/>
+<icon BUILTIN="edit"/>
+</node>
+<node COLOR="#999999" CREATED="1408473097750" ID="ID_1822350254" MODIFIED="1408473112073" TEXT="Discuss MD diploma finishing details">
+<font NAME="SansSerif" SIZE="10"/>
+<icon BUILTIN="edit"/>
+</node>
 </node>
 <node COLOR="#990000" CREATED="1408470315818" ID="ID_483991954" MODIFIED="1408470340063" TEXT="Contact Alexander Dimov, initiate review">
 <icon BUILTIN="yes"/>
