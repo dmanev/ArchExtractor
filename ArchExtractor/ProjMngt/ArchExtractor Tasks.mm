@@ -7,9 +7,9 @@
 <icon BUILTIN="yes"/>
 <icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#990000" CREATED="1408468723787" ID="ID_1051024860" MODIFIED="1408470474926" TEXT="Fill-in Tasks in GitHub">
+<node COLOR="#338800" CREATED="1408468723787" ID="ID_1051024860" MODIFIED="1408474422300" TEXT="Fill-in Tasks in GitHub">
 <icon BUILTIN="yes"/>
-<icon BUILTIN="hourglass"/>
+<icon BUILTIN="button_ok"/>
 </node>
 </node>
 <node COLOR="#006633" CREATED="1408461698834" ID="ID_80881935" MODIFIED="1408465320243" POSITION="right" STYLE="fork" TEXT="Design Tasks">

@@ -35,7 +35,7 @@ import os
 
 if __name__ == '__main__':
     
-    directory = '/home/mitko/git/mddiploma/jilTester/Tester/Build'
+    directory = '/home/mitko/git/ArchExtractor/jilTester/Tester/Build'
     
     JilCmpCriteria = StkJilComponentCriteria()
     JilOnCtrlCriteria = StkJilOnControlCriteria()
