@@ -24,6 +24,13 @@
 # Author contact: raphael.marvie@lifl.fr
 #
 
+import uuid
+
+
+def genUUID():
+    return uuid.uuid3(uuid.uuid1(), "XMI")
+
+
 class Enumeration(object):
     def __init__(self, names):
         for number,name in enumerate(names.split()):
@@ -58,7 +65,8 @@ class Element(object):
     def __init__(self, ):
         super(Element, self).__init__()
         Element._id += 1
-        self._xmi_id = 'Element:%s' % Element._id
+#         self._xmi_id = 'Element:%s' % Element._id
+        self._xmi_id = str(genUUID())
 
     def __eq__(self, other):
         if hasattr(self, 'visited'):
@@ -79,7 +87,7 @@ class Object(Element):
     def __init__(self, ):
         super(Object, self).__init__()
         Object._id += 1
-        self._xmi_id = 'Object:%s' % Object._id
+#         self._xmi_id = 'Object:%s' % Object._id
 
     def __eq__(self, other):
         if hasattr(self, 'visited'):
@@ -121,7 +129,7 @@ class NamedElement(Object):
     def __init__(self, name=None):
         super(NamedElement, self).__init__()
         NamedElement._id += 1
-        self._xmi_id = 'NamedElement:%s' % NamedElement._id
+#         self._xmi_id = 'NamedElement:%s' % NamedElement._id
         self._name = name
 
     def __eq__(self, other):
@@ -148,7 +156,7 @@ class Tag(Object):
     def __init__(self, name=None, value=None, element=None):
         super(Tag, self).__init__()
         Tag._id += 1
-        self._xmi_id = 'Tag:%s' % Tag._id
+#         self._xmi_id = 'Tag:%s' % Tag._id
         self._name = name
         self._value = value
         if not element:
@@ -191,7 +199,7 @@ class Component(NamedElement):
     def __init__(self, requiredClass=None, providedClass=None, name=None):
         super(Component, self).__init__()
         Component._id += 1
-        self._xmi_id = 'Component:%s' % Component._id
+#         self._xmi_id = 'Component:%s' % Component._id
         self._name = name
         if not requiredClass:
             requiredClass = list_composite()        
@@ -224,7 +232,7 @@ class Package(NamedElement):
     def __init__(self, uri=None, nestedPackage=None, nestingPackage=None, ownedType=None, name=None):
         super(Package, self).__init__()
         Package._id += 1
-        self._xmi_id = 'Package:%s' % Package._id
+#         self._xmi_id = 'Package:%s' % Package._id
         self._uri = uri
         if not nestedPackage:
             nestedPackage = list_composite()
@@ -290,7 +298,7 @@ class TypedElement(NamedElement):
     def __init__(self, type=None, name=None, visibility=None):
         super(TypedElement, self).__init__()
         TypedElement._id += 1
-        self._xmi_id = 'TypedElement:%s' % TypedElement._id
+#         self._xmi_id = 'TypedElement:%s' % TypedElement._id
         self._type = type
         self._name = name
         self._visibility = visibility        
@@ -327,7 +335,7 @@ class EnumerationLiteral(NamedElement):
     def __init__(self, enumeration=None, name=None):
         super(EnumerationLiteral, self).__init__()
         EnumerationLiteral._id += 1
-        self._xmi_id = 'EnumerationLiteral:%s' % EnumerationLiteral._id
+#         self._xmi_id = 'EnumerationLiteral:%s' % EnumerationLiteral._id
         self._enumeration = enumeration
         self._name = name
 
@@ -362,7 +370,7 @@ class Type(NamedElement):
     def __init__(self, name=None):
         super(Type, self).__init__()
         Type._id += 1
-        self._xmi_id = 'Type:%s' % Type._id
+#         self._xmi_id = 'Type:%s' % Type._id
         self._name = name
 
     def __eq__(self, other):
@@ -387,7 +395,7 @@ class MultiplicityElement(TypedElement):
     def __init__(self, isOrdered=False, isUnique=True, lower=None, upper=None, type=None, name=None):
         super(MultiplicityElement, self).__init__()
         MultiplicityElement._id += 1
-        self._xmi_id = 'MultiplicityElement:%s' % MultiplicityElement._id
+#         self._xmi_id = 'MultiplicityElement:%s' % MultiplicityElement._id
         self._isOrdered = isOrdered
         self._isUnique = isUnique
         self._lower = lower
@@ -438,7 +446,7 @@ class DataType(Type):
     def __init__(self, serializable=None, defaultValue=None, allowNull=None, name=None):
         super(DataType, self).__init__()
         DataType._id += 1
-        self._xmi_id = 'DataType:%s' % DataType._id
+#         self._xmi_id = 'DataType:%s' % DataType._id
         self._serializable = serializable
         self._defaultValue = defaultValue
         self._allowNull = allowNull
@@ -481,7 +489,7 @@ class Class(Type):
     def __init__(self, isAbstract=False, ownedAttribute=None, ownedOperation=None, superClass=None, name=None):
         super(Class, self).__init__()
         Class._id += 1
-        self._xmi_id = 'Class:%s' % Class._id
+#         self._xmi_id = 'Class:%s' % Class._id
         self._isAbstract = isAbstract
         if not ownedAttribute:
             ownedAttribute = list_composite()
@@ -549,7 +557,7 @@ class Operation(MultiplicityElement):
     def __init__(self, raisedException=None, ownedParameter=None, class_=None, isOrdered=False, isUnique=True, lower=None, upper=None, type=None, name=None):
         super(Operation, self).__init__()
         Operation._id += 1
-        self._xmi_id = 'Operation:%s' % Operation._id
+#         self._xmi_id = 'Operation:%s' % Operation._id
         if not raisedException:
             raisedException = list()
         self._raisedException = raisedException
@@ -613,7 +621,7 @@ class Parameter(MultiplicityElement):
     def __init__(self, operation=None, isOrdered=False, isUnique=True, lower=None, upper=None, type=None, name=None):
         super(Parameter, self).__init__()
         Parameter._id += 1
-        self._xmi_id = 'Parameter:%s' % Parameter._id
+#         self._xmi_id = 'Parameter:%s' % Parameter._id
         if not operation:
             operation = list()
         self._operation = operation
@@ -655,7 +663,7 @@ class Property(MultiplicityElement):
     def __init__(self, isReadOnly=False, default=None, isComposite=False, isDerived=False, isId=None, opposite=None, class_=None, isOrdered=False, isUnique=True, lower=None, upper=None, type=None, name=None):
         super(Property, self).__init__()
         Property._id += 1
-        self._xmi_id = 'Property:%s' % Property._id
+#         self._xmi_id = 'Property:%s' % Property._id
         self._isReadOnly = isReadOnly
         self._default = default
         self._isComposite = isComposite
@@ -737,7 +745,7 @@ class Enumeration(DataType):
     def __init__(self, ownedLiteral=None, serializable=None, defaultValue=None, allowNull=None, name=None):
         super(Enumeration, self).__init__()
         Enumeration._id += 1
-        self._xmi_id = 'Enumeration:%s' % Enumeration._id
+#         self._xmi_id = 'Enumeration:%s' % Enumeration._id
         if not ownedLiteral:
             ownedLiteral = list_composite()
         self._ownedLiteral = ownedLiteral
@@ -777,7 +785,7 @@ class PrimitiveType(DataType):
     def __init__(self, serializable=None, defaultValue=None, allowNull=None, name=None):
         super(PrimitiveType, self).__init__()
         PrimitiveType._id += 1
-        self._xmi_id = 'PrimitiveType:%s' % PrimitiveType._id
+#         self._xmi_id = 'PrimitiveType:%s' % PrimitiveType._id
         self._serializable = serializable
         self._defaultValue = defaultValue
         self._allowNull = allowNull
@@ -802,7 +810,7 @@ class Integer(PrimitiveType):
     def __init__(self, ):
         super(Integer, self).__init__()
         Integer._id += 1
-        self._xmi_id = 'Integer:%s' % Integer._id
+#         self._xmi_id = 'Integer:%s' % Integer._id
 
 
 class Boolean(PrimitiveType):
@@ -813,7 +821,7 @@ class Boolean(PrimitiveType):
     def __init__(self, ):
         super(Boolean, self).__init__()
         Boolean._id += 1
-        self._xmi_id = 'Boolean:%s' % Boolean._id
+#         self._xmi_id = 'Boolean:%s' % Boolean._id
 
 
 class String(PrimitiveType):
@@ -824,7 +832,7 @@ class String(PrimitiveType):
     def __init__(self, ):
         super(String, self).__init__()
         String._id += 1
-        self._xmi_id = 'String:%s' % String._id
+#         self._xmi_id = 'String:%s' % String._id
 
 
 class Repository(object):

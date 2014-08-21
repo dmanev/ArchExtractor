@@ -66,13 +66,16 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Remove ownedOperation's attribute "isUnique" -->
-	<xsl:template match="ownedOperation/@isUnique" />   
-
     <!-- Remove xmi:XMI tag and preserve the rest -->
 	<xsl:template match="/xmi:XMI">
 		<xsl:apply-templates />
 	</xsl:template>
+    
+    <!-- Remove packagedElement's attribute "nestingPackage" -->
+    <xsl:template match="packagedElement/@nestingPackage" />
+    	
+    <!-- Remove ownedOperation's attribute "isUnique" -->
+    <xsl:template match="ownedOperation/@isUnique" />
 
 	<!-- Replace "http://schema.omg.org/spec/UML/2.1/uml.xml" with "pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml" -->
 	<xsl:template match="@*[contains(., 'http://schema.omg.org/spec/UML/2.1/uml.xml')]">
@@ -86,6 +89,23 @@
                 <xsl:with-param name="by" select="'pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml'" />
             </xsl:call-template>
         </xsl:attribute>
+    </xsl:template>
+
+    <!-- Remove ownedAttribute's attribute "class" -->
+    <xsl:template match="ownedAttribute/@class" />
+
+    <!-- Remove ownedAttribute's attribute "isUnique" -->
+    <xsl:template match="ownedAttribute/@isUnique" />
+
+    <!-- Remove ownedAttribute's attribute "xmi:type" -->
+    <xsl:template match="ownedAttribute/@xmi:type" />
+    
+    <!-- Remove ownedOperation's attribute "class" -->
+    <xsl:template match="ownedOperation/@class" />
+
+    <!-- Replace Interface classes attribute "xmi:type" from "uml:Class" to "uml:Interface" -->
+    <xsl:template match="packagedElement[@name='Interfaces']/packagedElement[@xmi:type='uml:Class']/@xmi:type">
+        <xsl:attribute name="xmi:type" namespace="{namespace-uri()}">uml:Interface</xsl:attribute>        
     </xsl:template>
 
 </xsl:stylesheet>

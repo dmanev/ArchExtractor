@@ -142,7 +142,7 @@ class Component(NamedElement):
         for o in obj.providedClass:
             child = self._doc.createElement('interfaceRealization')
             child.setAttributeNS('xmi', 'xmi:type', 'uml:InterfaceRealization')
-            child.setAttributeNS('xmi', 'xmi:id', 'provided'+i.__str__()+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('supplier', o._xmi_id)
             child.setAttribute('client', obj._xmi_id)
             child.setAttribute('contract', o._xmi_id)                
@@ -152,7 +152,7 @@ class Component(NamedElement):
         for o in obj.requiredClass:
             child = self._doc.createElement('packagedElement')
             child.setAttributeNS('xmi', 'xmi:type', 'uml:Usage')
-            child.setAttributeNS('xmi', 'xmi:id', 'required'+i.__str__()+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('supplier', o._xmi_id)
             child.setAttribute('client', obj._xmi_id)            
             elt.appendChild(child)
@@ -272,14 +272,14 @@ class MultiplicityElement (TypedElement):
             #elt.setAttributeNS(None, 'lower', str(obj.lower))
             child = self._doc.createElement('lowerValue')
             child.setAttributeNS('xmi', 'xmi:type', 'uml:LiteralString')
-            child.setAttributeNS('xmi', 'xmi:id', 'multiplicity_l_'+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('value', str(obj.lower))
             elt.appendChild(child)
         if obj.upper:
             #elt.setAttributeNS(None, 'upper', str(obj.upper))
             child = self._doc.createElement('upperValue')
             child.setAttributeNS('xmi', 'xmi:type', 'uml:LiteralString')
-            child.setAttributeNS('xmi', 'xmi:id', 'multiplicity_u_'+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('value', str(obj.upper))
             elt.appendChild(child)
             
@@ -320,6 +320,7 @@ class Class (Type):
                 pass
         else:
             elt.setAttributeNS('xmi', 'xmi:type', 'uml:Class')
+
         if obj.isAbstract:
             elt.setAttributeNS(None, 'isAbstract', str(obj.isAbstract))
         for o in obj.ownedAttribute:
@@ -356,7 +357,7 @@ class Operation (MultiplicityElement):
 #             elt.removeAttributeNS(None, 'isUnique')
         if obj.type:
             child = self._doc.createElement('ownedParameter')
-            child.setAttributeNS('xmi', 'xmi:id', 'return_'+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('name', 'return')            
             child.setAttribute('direction', 'return')
             if type(obj.type) in dumpers:
@@ -418,7 +419,7 @@ class Property (MultiplicityElement):
             #elt.setAttributeNS(None, 'default', str(obj.default))
             child = self._doc.createElement('defaultValue')
             child.setAttributeNS('xmi', 'xmi:type', 'uml:LiteralString')
-            child.setAttributeNS('xmi', 'xmi:id', 'default_value_'+obj._xmi_id)
+            child.setAttributeNS('xmi', 'xmi:id', obj._xmi_id)
             child.setAttribute('value', str(obj.default))
             elt.appendChild(child)
         if obj.isComposite:
