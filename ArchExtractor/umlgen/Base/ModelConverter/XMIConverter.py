@@ -82,7 +82,7 @@ class XMIConverter(object):
         xmiIfCls.name = inpSRIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
         self.xmiTypesMap[xmiIfCls.name] = xmiIfCls
-		# Show inheritense in model
+        # Show inheritance in model
         superClassName = inpSRIf.__class__.__name__
         if superClassName in self.xmiTypesMap:
             xmiIfCls.add_superClass(self.xmiTypesMap[superClassName])
@@ -102,7 +102,7 @@ class XMIConverter(object):
         xmiIfCls.name = inpCSIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
         self.xmiTypesMap[xmiIfCls.name] = xmiIfCls
-		# Show inheritense in model
+        # Show inheritance in model
         superClassName = inpCSIf.__class__.__name__
         if superClassName in self.xmiTypesMap:
             xmiIfCls.add_superClass(self.xmiTypesMap[superClassName])
