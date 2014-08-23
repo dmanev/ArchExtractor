@@ -76,6 +76,11 @@ class XMIConverter(object):
         return inoutXmiPackage
         ## Bouml preserved body end 000454EF
         
+    def importBaseInterfaces(self, inoutXmiPackage):
+        ## Bouml preserved body begin 00054C6F
+        return inoutXmiPackage
+        ## Bouml preserved body end 00054C6F
+        
     def importSenderReceiverInterface(self, inpSRIf, inoutXmiPackage):
         ## Bouml preserved body begin 000455EF
         xmiIfCls = self.xmiFactory.create_Class()
