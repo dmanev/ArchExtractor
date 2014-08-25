@@ -23,7 +23,7 @@
 // Body Identification
 //------------------------------------------------------------------------------
 
-#define RTE_PC  "RTE_PC"
+#define RTE_C  "RTE_C"
 
 //------------------------------------------------------------------------------
 // Included files to resolve specific definitions in this file
