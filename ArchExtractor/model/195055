@@ -1,6 +1,6 @@
 format 74
 "StkCFileCriteria" // EA_Model::System::Specific::STK::StkParser::StkCFileCriteria
-  revision 13
+  revision 14
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

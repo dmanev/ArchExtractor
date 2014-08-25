@@ -19,17 +19,17 @@ class StkCHeaderProvReadDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
             gttrMode = self.itsAccessModes[gttrMode]
             if (gttrName + gttrMode) not in signalIdentifiers:
                 signalIdentifiers.append(gttrName + gttrMode)
-                
+
             DE = PortInterface.DataElement.DataElement()
             DE.setName(gttrName)
             dtf = self.getDataTypeFactory()
             DT = dtf.getDataType(gttrType)
-                                        
+
             if gttrIsTable:
-                arrayDT = dtf.getArrayDataType('Arr'+gttrType)                
+                arrayDT = dtf.getArrayDataType('Arr'+gttrType)
                 arrayDT.itsDataType = DT
                 # array size unknown
-                #arrayDT.setMaxNumberOfElements(dataTypeDim)                                
+                # arrayDT.setMaxNumberOfElements(dataTypeDim)
                 DE.itsDataType = arrayDT
             else:
                 DE.itsDataType = DT

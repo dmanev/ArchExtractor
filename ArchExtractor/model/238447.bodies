@@ -22,6 +22,6 @@ class StkCFileReqWriteDataCriteria
                 DE.itsDataType = DT
             pif = self.getPortInterfaceFactory()
             sendRecvIf = pif.getSenderReceiverIf(sttrName, [DE])
-            reqPortGetter = PortInterface.ProvidedPort.ProvidedPort(sendRecvIf)
+            reqPortGetter = PortInterface.RequiredPort.RequiredPort(sendRecvIf)
             reqPortGetter.setName("set"+sttrName)
             inoutIComponent.addPort(reqPortGetter)  

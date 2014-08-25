@@ -5,6 +5,7 @@ import StkPortInterfaces.StkTOSSignalIf
 import StkPortInterfaces.StkDATControlIf
 import Datatype.DataTypeFactory
 import PortInterface.ClientServerInterface
+import PortInterface.SenderReceiverInterface
 
 class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFactory):
     def getStkControlIf(self, inpNameIf):
@@ -21,15 +22,15 @@ class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFa
         
     def getStkTOSSignalIf(self, inpNameIf, inpDataTypeFactory):
         ## Bouml preserved body begin 0003DA6F
-        outIPortInterface = self.getAbstractPortInterface('TOSSig_'+inpNameIf+'_If', 
-                                                          PortInterface.ClientServerInterface.ClientServerInterface)
-        if(len(outIPortInterface.getItsOperationList()) == 0):
-            setOp = PortInterface.Operation.Operation()
-            setOp.setName('Set')
-            getOp = PortInterface.Operation.Operation()
-            getOp.setName('Get')
-            getOp.itsDataType = inpDataTypeFactory.getStkU1();
-            outIPortInterface.itsOperationList = [setOp, getOp]
+        outIPortInterface = self.getAbstractPortInterface('TOSSig_'+inpNameIf+'_If',
+                                                          PortInterface.SenderReceiverInterface.SenderReceiverInterface)
+
+        if(len(outIPortInterface.getItsDataElementList()) == 0):
+            DE = PortInterface.DataElement.DataElement()
+            DE.setName(inpNameIf)
+            DT = inpDataTypeFactory.getDataType('U1')
+            DE.itsDataType = DT
+            outIPortInterface.setItsDataElementList([DE])
 
         return outIPortInterface
         ## Bouml preserved body end 0003DA6F
@@ -38,7 +39,7 @@ class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFa
         ## Bouml preserved body begin 0003DAEF
         outIPortInterface = self.getAbstractPortInterface('DATCtrl_'+inpNameIf+'_If', 
                                                           PortInterface.ClientServerInterface.ClientServerInterface)
-        if(len(outIPortInterface.getItsOperationList()) == 0):            
+        if(len(outIPortInterface.getItsOperationList()) == 0):
             ctrlOp = PortInterface.Operation.Operation()
             ctrlOp.setName('Envoke')
             param = PortInterface.ParamData.ParamData()

@@ -47,24 +47,39 @@ class XMIConverter
                 pass
         inoutXmiPackage.add_ownedType(xmiComponent)
         return inoutXmiPackage
+!!!347247.python!!!	importBaseInterfaces(in self : , in inoutXmiPackage : )
+        baseIfList = [iface() for iface in self.interfaceCreateMap.keys()]
+        for baseIf in baseIfList:
+            xmiBaseIf = self.xmiFactory.create_Class()
+            xmiBaseIf.name = baseIf.__class__.__name__
+            inoutXmiPackage.add_ownedType(xmiBaseIf)
+            self.xmiTypesMap[xmiBaseIf.name] = xmiBaseIf
 !!!284143.python!!!	importSenderReceiverInterface(in self : , in inpSRIf : SenderReceiverInterface, inout inoutXmiPackage : )
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpSRIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
-        self.xmiTypesMap[xmiIfCls.name] = xmiIfCls        
+        self.xmiTypesMap[xmiIfCls.name] = xmiIfCls
+        # Show inheritance in model
+        superClassName = inpSRIf.__class__.__name__
+        if superClassName in self.xmiTypesMap:
+            xmiIfCls.add_superClass(self.xmiTypesMap[superClassName])
         for dataElement in inpSRIf.getItsDataElementList():
             xmiProp = self.xmiFactory.create_Property()
             xmiProp.name = dataElement.getName()
             dtName = dataElement.getItsDataType().getName()
             xmiDT = self.xmiTypesMap[dtName]
             xmiProp.set_type(xmiDT)
-            xmiIfCls.add_ownedAttribute(xmiProp)        
+            xmiIfCls.add_ownedAttribute(xmiProp)
         return inoutXmiPackage
 !!!284271.python!!!	importClientServerInterface(in self : , in inpCSIf : ClientServerInterface, inout inoutXmiPackage : )
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpCSIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
         self.xmiTypesMap[xmiIfCls.name] = xmiIfCls
+        # Show inheritance in model
+        superClassName = inpCSIf.__class__.__name__
+        if superClassName in self.xmiTypesMap:
+            xmiIfCls.add_superClass(self.xmiTypesMap[superClassName])
         for op in inpCSIf.getItsOperationList():
             xmiOp = self.xmiFactory.create_Operation()
             xmiOp.name = op.getName()
@@ -138,10 +153,19 @@ class XMIConverter
         xmiIfPack = self.xmiFactory.create_Package()
         xmiIfPack.name = "Interfaces"
         inoutXmiPackage.add_nestedPackage(xmiIfPack)
+        # Import base interfaces SenderReceiverInterface
+        # and ClientServerInterface.
+        # Needed to show the inheritance of the rest of
+        # the interfaces. Those could be surpassed with
+        # the use of <<stereotypes>>, but such are missing
+        # from current XMI implementation
+        self.importBaseInterfaces(xmiIfPack)
         for ifName in sorted(pif.getItsIPortInterfaceMap()):
             aeInterface = pif.getItsIPortInterfaceMap()[ifName]
             if type(aeInterface) in self.interfaceCreateMap:
-                xmiIfPack = self.interfaceCreateMap[type(aeInterface)](self, aeInterface, xmiIfPack)
+                xmiIfPack = self.interfaceCreateMap[type(aeInterface)](self,
+                                                                       aeInterface,
+                                                                       xmiIfPack)
 
         return inoutXmiPackage
 !!!275695.python!!!	convert(in self : , in inpAEModel : AEModel, out outXMIMdlRepo : )

@@ -33,12 +33,12 @@ relationcanvas 128879 relation_ref 167023 // <generalisation>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 129007 relation_ref 275055 // <dependency>
-  from ref 128239 z 2007 stereotype "<<import>>" xyz 207 219.5 3000 to ref 128495
+  from ref 128239 z 2007 stereotype "<<import>>" xyz 207 219 3000 to ref 128495
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 129263 relation_ref 275183 // <dependency>
-  from ref 128239 z 2007 stereotype "<<import>>" xyz 131.5 277.5 3000 to point 186 376
+  from ref 128239 z 2007 stereotype "<<import>>" xyz 131 277 3000 to point 186 376
   line 129391 z 2007 to ref 128751
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b

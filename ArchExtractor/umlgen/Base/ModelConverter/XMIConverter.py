@@ -76,6 +76,16 @@ class XMIConverter(object):
         return inoutXmiPackage
         ## Bouml preserved body end 000454EF
         
+    def importBaseInterfaces(self, inoutXmiPackage):
+        ## Bouml preserved body begin 00054C6F
+        baseIfList = [iface() for iface in self.interfaceCreateMap.keys()]
+        for baseIf in baseIfList:
+            xmiBaseIf = self.xmiFactory.create_Class()
+            xmiBaseIf.name = baseIf.__class__.__name__
+            inoutXmiPackage.add_ownedType(xmiBaseIf)
+            self.xmiTypesMap[xmiBaseIf.name] = xmiBaseIf
+        ## Bouml preserved body end 00054C6F
+        
     def importSenderReceiverInterface(self, inpSRIf, inoutXmiPackage):
         ## Bouml preserved body begin 000455EF
         xmiIfCls = self.xmiFactory.create_Class()

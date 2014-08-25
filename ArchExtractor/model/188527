@@ -1,6 +1,6 @@
 format 74
 "StkPortInterfaces" // EA_Model::System::Specific::STK::StkPortInterfaces
-  revision 10
+  revision 11
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -46,7 +46,7 @@ format 74
     show_infonote default drawing_language default show_stereotype_properties default
     classdiagram 261999 "StkPortInterfaceFactory class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A4
+      size A3
     end
 
     classdiagram 207983 "StkControlIf class diag"
@@ -162,6 +162,15 @@ ${docstring}${body}
 	    classrelation_ref 317551 // <dependency>
 	  b parent class_ref 163951 // ClientServerInterface
       end
+
+      classrelation 330863 // <dependency>
+	relation 330351 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 330863 // <dependency>
+	  b parent class_ref 164079 // SenderReceiverInterface
+      end
     end
 
     class 204911 "StkControlIf"
@@ -218,23 +227,6 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 219247 // <generalisation>
-	relation 218991 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 219247 // <generalisation>
-	  b parent class_ref 163951 // ClientServerInterface
-      end
-
-      classrelation 219375 // <dependency>
-	relation 219119 -_->
-	  stereotype "import"
-	  a package
-	    python "${type}"
-	    classrelation_ref 219375 // <dependency>
-	  b parent class_ref 164207 // Operation
-      end
-
       operation 211183 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 1
@@ -249,13 +241,12 @@ ${body}
 	
       end
 
-      classrelation 219503 // <dependency>
-	relation 219247 -_->
-	  stereotype "import"
-	  a package
+      classrelation 330735 // <generalisation>
+	relation 330223 ---|>
+	  a public
 	    python "${type}"
-	    classrelation_ref 219503 // <dependency>
-	  b parent class_ref 177775 // StkU1
+	    classrelation_ref 330735 // <generalisation>
+	  b parent class_ref 164079 // SenderReceiverInterface
       end
     end
 

@@ -1,6 +1,6 @@
 format 74
 "StkDataTypes" // EA_Model::System::Specific::STK::StkDataTypes
-  revision 7
+  revision 8
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

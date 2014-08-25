@@ -19,5 +19,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
-Export-Package: org.dmanev.ArchExtractor.psm.uml.gen.main
+Export-Package: org.dmanev.ArchExtractor.psm.uml.gen.files,
+ org.dmanev.ArchExtractor.psm.uml.gen.main,
+ org.dmanev.ArchExtractor.psm.uml.gen.services
 

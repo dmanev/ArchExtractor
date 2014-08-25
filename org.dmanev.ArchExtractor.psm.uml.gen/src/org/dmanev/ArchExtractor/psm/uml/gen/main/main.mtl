@@ -1,10 +1,12 @@
 [comment encoding = UTF-8 /]
 [module main('http://www.eclipse.org/uml2/4.0.0/UML')]
 
+[import org::dmanev::ArchExtractor::psm::uml::gen::files::RteImpl /] 
 
 [template public genArch(aModel : Model)]
 [comment @main/]
-[file (aModel.name, false, 'UTF-8')]
-    [aModel.name/]
-[/file]
+
+    [comment ** Generate RteType.h file ** /]
+    [aModel.genRteImpl() /]
+
 [/template]

@@ -1,6 +1,6 @@
 format 74
 "PortInterface" // EA_Model::System::Base::SwComponent::PortInterface
-  revision 13
+  revision 14
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
