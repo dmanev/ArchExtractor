@@ -1,8 +1,6 @@
 [comment encoding = UTF-8 /]
 [module RteImpl('http://www.eclipse.org/uml2/4.0.0/UML')]
 
-[import org::dmanev::ArchExtractor::psm::uml::gen::services::uml2services]
-
 [template public genRteImpl(aModel : Model)]
 
 [file ('interfaces/rte.c', false, 'UTF-8')]

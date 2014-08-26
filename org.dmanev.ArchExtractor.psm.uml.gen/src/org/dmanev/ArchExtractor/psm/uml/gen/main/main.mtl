@@ -1,8 +1,11 @@
 [comment encoding = UTF-8 /]
 [module main('http://www.eclipse.org/uml2/4.0.0/UML')]
 
+[import org::dmanev::ArchExtractor::psm::uml::gen::services::uml2services]
+
 [import org::dmanev::ArchExtractor::psm::uml::gen::files::RteImpl /]
 [import org::dmanev::ArchExtractor::psm::uml::gen::files::RteHeader /]
+[import org::dmanev::ArchExtractor::psm::uml::gen::files::RteComponentHeader /]
 
 [template public genArch(aModel : Model)]
 [comment @main/]
@@ -12,5 +15,12 @@
 
     [comment ** Generate Rte.h file ** /]
     [aModel.genRteHeader() /]
+
+    [comment ** Generate Rte_<component>.h file ** /]
+    [for(cmp: Component | aModel.getAllComponentsRecursively()->filter(Component))]
+        [if(cmp.interfaceRealization->notEmpty() or cmp.ownedElement->filter(Usage)->notEmpty())]
+            [cmp.genRteComponentHeader() /]
+        [/if]
+    [/for]
 
 [/template]
