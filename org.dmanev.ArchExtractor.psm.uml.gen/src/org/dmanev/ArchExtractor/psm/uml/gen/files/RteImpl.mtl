@@ -29,7 +29,7 @@
 // Included files to resolve specific definitions in this file
 //------------------------------------------------------------------------------
 
-
+#include "rte.h"
 
 //------------------------------------------------------------------------------
 // Local constants
@@ -44,9 +44,6 @@
 //
 // #define mMacroName   (MacroDefinition)
 //------------------------------------------------------------------------------
-
-#define PVAR(TYPE, VARIABLE)    ((TYPE) *(VALUE))
-#define PDATA(VARIABLE)         (*VARIABLE)
 
 //------------------------------------------------------------------------------
 // Local types
@@ -63,6 +60,21 @@
 // static  tType*  pu8VariableName;  
 //------------------------------------------------------------------------------
 
+    [comment]SenderReceiverInterface's variables[/comment]
+    [for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
+                            select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
+        [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
+                            select(iface: Interface | 
+                                iface.generalization.general.
+                                    name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
+                                        sortedBy(name))]
+            [for(prop: Property | SRIf.ownedElement->filter(Property))]
+// Variable for "[SRIf.name /]" interface type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
+static [prop.type.name /] [SRIf.name /]_de_[prop.name /];
+            [/for]
+        [/for]
+    [/for]
+
 //------------------------------------------------------------------------------
 // Constant local data
 //
@@ -77,20 +89,6 @@
 // tType*  pu8LAYCmpVariableName;(Cmp: 3 characters to identify the component)
 //------------------------------------------------------------------------------
 
-[comment]SenderReceiverInterface's variables[/comment]
-    [for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
-                            select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
-        [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
-                            select(iface: Interface | 
-                                iface.generalization.general.
-                                    name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
-                                        sortedBy(name))]
-            [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Variable for "[SRIf.name /]" interface type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
-[prop.type.name /] [SRIf.name /]_de_[prop.name /];
-            [/for]
-        [/for]
-    [/for]
 
 //------------------------------------------------------------------------------
 // Constant exported data
