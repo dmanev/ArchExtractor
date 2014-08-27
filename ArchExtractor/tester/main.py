@@ -34,9 +34,9 @@ from xmi.dumper import Dumper
 import os
 
 if __name__ == '__main__':
-    
+
     directory = '/home/mitko/git/ArchExtractor/jilTester/Tester/Build'
-    
+
     JilCmpCriteria = StkJilComponentCriteria()
     JilOnCtrlCriteria = StkJilOnControlCriteria()
     JilProdCtrlCriteria = StkJilProdControlCriteria()

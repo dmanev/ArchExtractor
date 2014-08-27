@@ -530,7 +530,7 @@ dumpers = {
 class Dumper (object):
     '''emof model dumper to an XMI file.'''
     
-    def __init__(self, modelName):
+    def __init__(self, modelName='NameToBeAdded'):
         super(Dumper, self).__init__()
         self._doc = minidom.Document()
         root = self._doc.createElement('xmi:XMI')
