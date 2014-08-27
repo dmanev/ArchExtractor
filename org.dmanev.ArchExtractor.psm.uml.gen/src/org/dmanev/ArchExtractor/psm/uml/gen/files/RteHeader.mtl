@@ -99,7 +99,7 @@ extern void Read_[SRIf.name /]_de_[prop.name /](PVAR([prop.type.name /], data));
             [comment]ClientServerInterface call[/comment]
             [for(op: Operation | CSIf.ownedElement->filter(Operation))]
 // Provided Call of "[CSIf.name /]" interface of type "[CSIf.generalization.general.name /]" operation "[op.name /]"
-extern  [CSIf.name /]_[op.name /](void);
+extern  [CSIf.name /]_[op.name /]([if (op.ownedElement->filter(Parameter)->isEmpty())]void[/if][for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')][par.type.name/] [par.name/][/for]);
             [/for]
         [/for]
     [/for]

@@ -79,7 +79,7 @@
         [comment]ClientServerInterface call[/comment]
         [for(op: Operation | CSIf.ownedElement->filter(Operation))]
 // Required Call of "[CSIf.name /]" interface of type "[CSIf.generalization.general.name /]" operation "[op.name /]"
-#define Call_[CSIf.name /]_[op.name /]()    [CSIf.name /]_[op.name /]()
+#define Call_[CSIf.name /]_[op.name /]([for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')][par.name/][/for])    [CSIf.name /]_[op.name /]([for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')]([par.name/])[/for])
         [/for]
     [/for]
 
