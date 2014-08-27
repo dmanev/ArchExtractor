@@ -530,7 +530,7 @@ dumpers = {
 class Dumper (object):
     '''emof model dumper to an XMI file.'''
     
-    def __init__(self):
+    def __init__(self, modelName):
         super(Dumper, self).__init__()
         self._doc = minidom.Document()
         root = self._doc.createElement('xmi:XMI')
@@ -547,7 +547,7 @@ class Dumper (object):
 #         self._model.setAttribute('xmlns:xmi', 'http://www.omg.org/spec/XMI/20110701')
 #         self._model.setAttribute('xmlns:uml', 'http://www.eclipse.org/uml2/4.0.0/UML')
         self._model.setAttribute('xmi:id', 'themodel')
-        self._model.setAttribute('name', 'NameToBeAdded')
+        self._model.setAttribute('name', modelName)
         root.appendChild(self._model)
         self._doc.appendChild(root)
         

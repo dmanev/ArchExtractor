@@ -8,7 +8,7 @@ class StkControlIf(PortInterface.ClientServerInterface.ClientServerInterface):
         ## Bouml preserved body begin 00031EEF
         self.setName('Control')
         ctrlOp = PortInterface.Operation.Operation()
-        ctrlOp.setName('Envoke')
+        ctrlOp.setName('Invoke')
         self.itsOperationList = [ctrlOp] 
         ## Bouml preserved body end 00031EEF
         

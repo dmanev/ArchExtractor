@@ -14,7 +14,7 @@ class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFa
                                                           PortInterface.ClientServerInterface.ClientServerInterface)
         if(len(outIPortInterface.getItsOperationList()) == 0):
             ctrlOp = PortInterface.Operation.Operation()
-            ctrlOp.setName('Envoke')
+            ctrlOp.setName('Invoke')
             outIPortInterface.itsOperationList = [ctrlOp]
 
         return outIPortInterface        
@@ -41,7 +41,7 @@ class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFa
                                                           PortInterface.ClientServerInterface.ClientServerInterface)
         if(len(outIPortInterface.getItsOperationList()) == 0):
             ctrlOp = PortInterface.Operation.Operation()
-            ctrlOp.setName('Envoke')
+            ctrlOp.setName('Invoke')
             param = PortInterface.ParamData.ParamData()
             param.itsDataType = inpDataTypeFactory.getStkU8()
             param.setName('SubControlSelector')

@@ -1,10 +1,15 @@
 [comment encoding = UTF-8 /]
 [module RteComponentHeader('http://www.eclipse.org/uml2/4.0.0/UML')]
 
+[import org::dmanev::ArchExtractor::psm::uml::gen::services::uml2services]
 
 [template public genRteComponentHeader(aComponent : Component)]
 
-[file ('interfaces/rte_' + aComponent.name + '.h', false, 'UTF-8')]
+[comment][file ('interfaces/rte_' + aComponent.name + '.h', false, 'UTF-8')][/comment]
+[file (aComponent.getModel().nestedPackage.nestedPackage->
+        select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')).getElementPath()
+        + '/Interfaces/rte_' + aComponent.name + '.h',
+        false, 'UTF-8')]
 //***********************************************************************************************************************
 //   Company:      Personal use
 //   ---------------------------------------------------------------------------------------------------------------------

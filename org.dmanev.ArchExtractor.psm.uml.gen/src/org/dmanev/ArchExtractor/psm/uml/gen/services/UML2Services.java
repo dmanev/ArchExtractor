@@ -4,6 +4,8 @@ import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Component;
 import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Element;
+
+import java.io.File;
 import java.util.ArrayList;
 
 public class UML2Services {
@@ -33,5 +35,19 @@ public class UML2Services {
 		}
 		
 		return elResult;		
+	}
+	
+	public String getElementPath(Element inpElement)
+			throws java.lang.IllegalArgumentException {
+		String sResult="";
+		
+		if(inpElement.getOwner() == null){
+			sResult = "";
+		} else {
+			sResult += getElementPath(inpElement.getOwner().getNearestPackage()) + File.separator 
+						+inpElement.getOwner().getNearestPackage().getName();
+		}
+
+		return sResult;
 	}
 }

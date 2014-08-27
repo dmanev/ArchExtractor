@@ -5,3 +5,7 @@
 	= invoke('org.dmanev.ArchExtractor.psm.uml.gen.services.UML2Services', 'getAllComponentsRecursively(org.eclipse.uml2.uml.Model)', Sequence{arg0})
 /]
 
+[query public getElementPath(arg0 : Element) : String
+	= invoke('org.dmanev.ArchExtractor.psm.uml.gen.services.UML2Services', 'getElementPath(org.eclipse.uml2.uml.Element)', Sequence{arg0})
+/]
+

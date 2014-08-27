@@ -1,15 +1,11 @@
 [comment encoding = UTF-8 /]
-[module RteImpl('http://www.eclipse.org/uml2/4.0.0/UML')]
+[module RteComponentImpl('http://www.eclipse.org/uml2/4.0.0/UML')]
 
 [import org::dmanev::ArchExtractor::psm::uml::gen::services::uml2services]
 
-[template public genRteImpl(aModel : Model)]
+[template public genRteComponentImpl(aComponent : Component)]
 
-[comment][file ('interfaces/rte.c', false, 'UTF-8')][/comment]
-[file (aModel.nestedPackage.nestedPackage->
-        select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')).getElementPath() 
-        + '/Interfaces/rte.c', 
-        false, 'UTF-8')]
+[file (aComponent.getElementPath() + '/' + aComponent.name + '.c', false, 'UTF-8')]
 //***********************************************************************************************************************
 //   Company:      Personal use
 //   ---------------------------------------------------------------------------------------------------------------------
@@ -18,7 +14,7 @@
 //   Project:      RTE Simualation
 //   Language:     ANSI-C
 //   ---------------------------------------------------------------------------------------------------------------------
-//   Component:    RTE
+//   Component:    [aComponent.name.toUpper()/]
 //  ---------------------------------------------------------------------------------------------------------------------
 //
 //***********************************************************************************************************************
@@ -27,13 +23,15 @@
 // Body Identification
 //------------------------------------------------------------------------------
 
-#define RTE_C  "RTE_C"
+#define [aComponent.name.toUpper() /]
 
 //------------------------------------------------------------------------------
 // Included files to resolve specific definitions in this file
+//
+// #include <system_file_name.h>
+// #include "project_file_name.h"
 //------------------------------------------------------------------------------
-
-#include "rte.h"
+#include <rte_[aComponent.name /].h>
 
 //------------------------------------------------------------------------------
 // Local constants
@@ -42,19 +40,18 @@
 //------------------------------------------------------------------------------
 
 
-
 //------------------------------------------------------------------------------
 // Local macros
 //
 // #define mMacroName   (MacroDefinition)
 //------------------------------------------------------------------------------
 
+
 //------------------------------------------------------------------------------
 // Local types
 //
 // typedef Expression    tTypeName;
 //------------------------------------------------------------------------------
-    
 
 
 // -----------------------------------------------------------------------------
@@ -64,20 +61,6 @@
 // static  tType*  pu8VariableName;  
 //------------------------------------------------------------------------------
 
-    [comment]SenderReceiverInterface's variables[/comment]
-    [for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
-                            select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
-        [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
-                            select(iface: Interface | 
-                                iface.generalization.general.
-                                    name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
-                                        sortedBy(name))]
-            [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Variable for "[SRIf.name /]" interface type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
-static [prop.type.name /] [SRIf.name /]_de_[prop.name /];
-            [/for]
-        [/for]
-    [/for]
 
 //------------------------------------------------------------------------------
 // Constant local data
@@ -110,47 +93,41 @@ static [prop.type.name /] [SRIf.name /]_de_[prop.name /];
 // static tTypeRetour FunctionName(tTypeArgument1 ArgumentName1, ... );
 //------------------------------------------------------------------------------
 
-
-
 //==============================================================================
 //=========================== LOCAL FUNCTIONS ==================================
 //==============================================================================
 
-//  [ '[' /]LOCAL_FUNCTIONS_END[ ']' /]
+// ['['/]LOCAL_FUNCTIONS_END[']'/]
 
 //==============================================================================
 //=========================== EXPORTED FUNCTIONS ===============================
 //==============================================================================
 
-
-[comment]SenderReceiverInterface's getter/setter methods[/comment]
-[for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
-                        select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
-    [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
-                            select(iface: Interface | 
+    [comment]ClientServerInterface's provided methods implementation[/comment]
+    [for(CSIf: Interface | aComponent.interfaceRealization.supplier->filter(Interface)->
+                                select(iface: Interface | 
                                 iface.generalization.general.
-                                    name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
-                                        sortedBy(name) )]
-
-        [comment]SenderReceiverInterface setter[/comment]
-        [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
-void Write_[SRIf.name /]_de_[prop.name /]([prop.type.name /] data)
+                                    name.equalsIgnoreCase('ClientServerInterface')->includes(true))->
+                                        sortedBy(name))]
+        [comment]ClientServerInterface call implementation[/comment]
+        [for(op: Operation | CSIf.ownedElement->filter(Operation))]
+//==============================================================================
+// DESCRIPTION : Provided Call of "[CSIf.name /]" interface 
+//               of type "[CSIf.generalization.general.name /]" 
+//               operation "[op.name /]"
+//
+// PARAMETERS :   [if (op.ownedElement->filter(Parameter)->isEmpty())]none[/if][for(par: Parameter | op.ownedElement->filter(Parameter)) separator('; ')][par.name/]:[par.type.name/][/for]
+//
+// RETURN VALUE :   none
+//
+// DESIGN INFORMATION : (pseudo code, algorithm ... )
+//==============================================================================
+void [CSIf.name /]_[op.name /]([if (op.ownedElement->filter(Parameter)->isEmpty())]void[/if][for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')][par.type.name/] [par.name/][/for])
 {
-    [SRIf.name /]_de_[prop.name /] = data;
-}
-        [/for]
-
-        [comment]SenderReceiverInterface getter[/comment]
-        [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
-void Read_[SRIf.name /]_de_[prop.name /](PVAR([prop.type.name /], data))
-{
-    PDATA(data) = [SRIf.name /]_de_[prop.name /];
+    //TODO: Add code
 }
         [/for]
     [/for]
-[/for]
 
 //  [ '[' /]EXPORTED_FUNCTIONS_END[ ']' /]
 

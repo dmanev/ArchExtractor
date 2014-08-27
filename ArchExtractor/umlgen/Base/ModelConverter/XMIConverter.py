@@ -221,10 +221,10 @@ class XMIConverter(object):
         self.xmiFactory = xmi.core.Factory(outXMIMdlRepo)
 
         xmiProjPackage = self.xmiFactory.create_Package()
-        xmiProjPackage.name = inpAEModel.getName()
-        
+        xmiProjPackage.name = inpAEModel.getName() + 'Prj'
+
         self.importTypes(inpAEModel, xmiProjPackage)
-        
+
         self.importInterfaces(inpAEModel, xmiProjPackage)
 
         for pack in sorted(inpAEModel.getPackageList()):

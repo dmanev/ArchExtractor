@@ -42,7 +42,7 @@ if __name__ == '__main__':
     JilProdCtrlCriteria = StkJilProdControlCriteria()
     JilTOSCtrlCriteria = StkJilTOSSignalCriteria()
     JilDataCriteria = StkJilDataCriteria()
-    
+
     JilFp = StkJilFileParser([JilCmpCriteria, JilOnCtrlCriteria, JilProdCtrlCriteria, 
                                    JilTOSCtrlCriteria, JilDataCriteria])
 
@@ -73,5 +73,6 @@ if __name__ == '__main__':
     xmiConv = XMIConverter()
     xmiMdlRepo = None
     xmiMdlRepo = xmiConv.convert(aeModel, xmiMdlRepo)
-    
-    Dumper().dump(xmiMdlRepo, os.path.join(directory, aeModel.getName() + '.xmi'))
+
+    Dumper('AEModel').dump(xmiMdlRepo,
+                           os.path.join(directory, aeModel.getName() + '.xmi'))

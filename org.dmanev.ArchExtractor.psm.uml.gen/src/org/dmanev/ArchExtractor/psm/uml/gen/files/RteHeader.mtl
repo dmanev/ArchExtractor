@@ -1,9 +1,14 @@
 [comment encoding = UTF-8 /]
 [module RteHeader('http://www.eclipse.org/uml2/4.0.0/UML')]
 
+[import org::dmanev::ArchExtractor::psm::uml::gen::services::uml2services]
+
 [template public genRteHeader(aModel : Model)]
 
-[file ('interfaces/rte.h', false, 'UTF-8')]
+[file (aModel.nestedPackage.nestedPackage->
+        select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')).getElementPath()
+        + '/Interfaces/rte.h', 
+        false, 'UTF-8')]
 //***********************************************************************************************************************
 //   Company:      Personal use
 //   ---------------------------------------------------------------------------------------------------------------------
@@ -99,7 +104,7 @@ extern void Read_[SRIf.name /]_de_[prop.name /](PVAR([prop.type.name /], data));
             [comment]ClientServerInterface call[/comment]
             [for(op: Operation | CSIf.ownedElement->filter(Operation))]
 // Provided Call of "[CSIf.name /]" interface of type "[CSIf.generalization.general.name /]" operation "[op.name /]"
-extern  [CSIf.name /]_[op.name /]([if (op.ownedElement->filter(Parameter)->isEmpty())]void[/if][for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')][par.type.name/] [par.name/][/for]);
+extern  void [CSIf.name /]_[op.name /]([if (op.ownedElement->filter(Parameter)->isEmpty())]void[/if][for(par: Parameter | op.ownedElement->filter(Parameter)) separator(',')][par.type.name/] [par.name/][/for]);
             [/for]
         [/for]
     [/for]

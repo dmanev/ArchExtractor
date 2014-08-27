@@ -6,6 +6,7 @@
 [import org::dmanev::ArchExtractor::psm::uml::gen::files::RteImpl /]
 [import org::dmanev::ArchExtractor::psm::uml::gen::files::RteHeader /]
 [import org::dmanev::ArchExtractor::psm::uml::gen::files::RteComponentHeader /]
+[import org::dmanev::ArchExtractor::psm::uml::gen::files::RteComponentImpl /]
 
 [template public genArch(aModel : Model)]
 [comment @main/]
@@ -16,10 +17,13 @@
     [comment ** Generate Rte.h file ** /]
     [aModel.genRteHeader() /]
 
-    [comment ** Generate Rte_<component>.h file ** /]
+
     [for(cmp: Component | aModel.getAllComponentsRecursively()->filter(Component))]
         [if(cmp.interfaceRealization->notEmpty() or cmp.ownedElement->filter(Usage)->notEmpty())]
+            [comment ** Generate Rte_<component>.h file ** /]
             [cmp.genRteComponentHeader() /]
+            [comment ** Generate template for manually written <component>.c file ** /]
+            [cmp.genRteComponentImpl() /]
         [/if]
     [/for]
 
