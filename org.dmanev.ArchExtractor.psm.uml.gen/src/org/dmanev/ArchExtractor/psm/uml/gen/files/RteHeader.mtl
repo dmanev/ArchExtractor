@@ -67,29 +67,42 @@
 // extern tReturnType LAYCmpFunctionName(tTypeArgument1 ArgumentName1, ... );
 //------------------------------------------------------------------------------
 
-[comment]SenderReceiverInterface's getter/setter methods[/comment]
-[for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
-                        select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
-    [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
-                            select(iface: Interface | 
-                                iface.generalization.general.
-                                    name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
-                                        sortedBy(name) )]
-
-        [comment]SenderReceiverInterface setter[/comment]
-        [for(prop: Property | SRIf.ownedElement->filter(Property))]
+    [comment]SenderReceiverInterface's getter/setter methods[/comment]
+    [for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
+                            select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
+        [for(SRIf: Interface | pack.ownedElement->filter(Interface)->
+                                select(iface: Interface | 
+                                    iface.generalization.general.
+                                        name.equalsIgnoreCase('SenderReceiverInterface')->includes(true))->
+                                            sortedBy(name) )]
+            [comment]SenderReceiverInterface setter[/comment]
+            [for(prop: Property | SRIf.ownedElement->filter(Property))]
 // Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
 extern void Write_[SRIf.name /]_de_[prop.name /]([prop.type.name /] data);
-        [/for]
-
-        [comment]SenderReceiverInterface getter[/comment]
-        [for(prop: Property | SRIf.ownedElement->filter(Property))]
+            [/for]
+            [comment]SenderReceiverInterface getter[/comment]
+            [for(prop: Property | SRIf.ownedElement->filter(Property))]
 // Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
 extern void Read_[SRIf.name /]_de_[prop.name /](PVAR([prop.type.name /], data));
+            [/for]
         [/for]
     [/for]
-[/for]
 
+    [comment]ClientServerInterface's provided methods[/comment]
+    [for(pack: Package | aModel.nestedPackage.nestedPackage->filter(Package)->
+                            select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')))]
+        [for(CSIf: Interface | pack.ownedElement->filter(Interface)->
+                                    select(iface: Interface | 
+                                    iface.generalization.general.
+                                        name.equalsIgnoreCase('ClientServerInterface')->includes(true))->
+                                            sortedBy(name))]
+            [comment]ClientServerInterface call[/comment]
+            [for(op: Operation | CSIf.ownedElement->filter(Operation))]
+// Provided Call of "[CSIf.name /]" interface of type "[CSIf.generalization.general.name /]" operation "[op.name /]"
+extern  [CSIf.name /]_[op.name /](void);
+            [/for]
+        [/for]
+    [/for]
 
 #endif   // I_RTE_H 
 [/file]

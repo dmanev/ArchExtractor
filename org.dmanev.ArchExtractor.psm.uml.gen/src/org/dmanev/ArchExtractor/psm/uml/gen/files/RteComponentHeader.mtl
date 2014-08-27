@@ -42,12 +42,12 @@
                                         sortedBy(name))]
         [comment]SenderReceiverInterface setter[/comment]
         [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Provided Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
+// Provided Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
 #define Write_de_[prop.name /](data)    Write_[SRIf.name /]_de_[prop.name /](data)
         [/for]
         [comment]SenderReceiverInterface getter[/comment]
         [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Provided Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
+// Provided Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
 #define Read_de_[prop.name /](data) Read_[SRIf.name /]_de_[prop.name /](data)
         [/for]
     [/for]
@@ -60,17 +60,29 @@
                                         sortedBy(name))]
         [comment]SenderReceiverInterface setter[/comment]
         [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Required Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
+// Required Setter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
 #define Write_de_[prop.name /](data)    Write_[SRIf.name /]_de_[prop.name /](data)
         [/for]
         [comment]SenderReceiverInterface getter[/comment]
         [for(prop: Property | SRIf.ownedElement->filter(Property))]
-// Required Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element [prop.name /]
+// Required Getter for "[SRIf.name /]" interface of type "[SRIf.generalization.general.name /]" data element "[prop.name /]"
 #define Read_de_[prop.name /](data) Read_[SRIf.name /]_de_[prop.name /](data)
         [/for]
     [/for]
 
-    [comment]ClientServerInterface's provided/required methods[/comment]
+    [comment]ClientServerInterface's required methods[/comment]
+    [for(CSIf: Interface | aComponent.ownedElement->filter(Usage).supplier->filter(Interface)->
+                                select(iface: Interface | 
+                                iface.generalization.general.
+                                    name.equalsIgnoreCase('ClientServerInterface')->includes(true))->
+                                        sortedBy(name))]
+        [comment]ClientServerInterface call[/comment]
+        [for(op: Operation | CSIf.ownedElement->filter(Operation))]
+// Required Call of "[CSIf.name /]" interface of type "[CSIf.generalization.general.name /]" operation "[op.name /]"
+#define Call_[CSIf.name /]_[op.name /]()    [CSIf.name /]_[op.name /]()
+        [/for]
+    [/for]
+
 #endif   // I_[aComponent.name.toUpper() /]_H
 [/file]
 [/template]
