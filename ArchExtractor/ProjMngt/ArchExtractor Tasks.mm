@@ -71,19 +71,23 @@
 <font BOLD="true" NAME="SansSerif" SIZE="14"/>
 <node COLOR="#669900" CREATED="1408463096164" ID="ID_1057490698" MODIFIED="1408465341644" STYLE="fork" TEXT="SW Implementation">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#990000" CREATED="1408464041754" ID="ID_1397002824" MODIFIED="1408465761449" STYLE="fork" TEXT="Make generated XMI fully readable by Eclipse">
+<node COLOR="#338800" CREATED="1408464041754" ID="ID_1397002824" MODIFIED="1409232964549" TEXT="Make generated XMI fully readable by Eclipse">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="button_ok"/>
 </node>
 <node COLOR="#669900" CREATED="1408463119166" ID="ID_1234657054" MODIFIED="1408465719998" STYLE="fork" TEXT="Code Generator">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
-<node COLOR="#990000" CREATED="1408465659329" ID="ID_865136060" MODIFIED="1408465709201" TEXT="Create Acceleo project">
+<node COLOR="#338800" CREATED="1408465659329" ID="ID_865136060" MODIFIED="1409232967048" TEXT="Create Acceleo project">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#990000" CREATED="1408465674564" ID="ID_179926375" MODIFIED="1408465711870" TEXT="Create header file template">
+<node COLOR="#338800" CREATED="1408465674564" ID="ID_179926375" MODIFIED="1409232968506" TEXT="Create header file template">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="button_ok"/>
 </node>
-<node COLOR="#990000" CREATED="1408465721030" ID="ID_929829084" MODIFIED="1408465739697" TEXT="Create implementation file template">
+<node COLOR="#338800" CREATED="1408465721030" ID="ID_929829084" MODIFIED="1409232968973" TEXT="Create implementation file template">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="button_ok"/>
 </node>
 </node>
 <node COLOR="#990000" CREATED="1408467456343" ID="ID_59187852" MODIFIED="1408467479198" TEXT="Create AUTOSAR parser artefacts (demo level)">
