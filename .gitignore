@@ -51,3 +51,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# MS Office
+*.lnk
+~$*
+
+# LibreOffice
+.~lock.*

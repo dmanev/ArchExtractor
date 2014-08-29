@@ -83,7 +83,9 @@ relationcanvas 130287 relation_ref 317039 // <dependency>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 130543 relation_ref 167151 // <generalisation>
-  from ref 130415 z 2007 to ref 128111
+  from ref 130415 z 2007 to point 158 18
+  line 131055 z 2007 to point 764 18
+  line 131183 z 2007 to ref 128111
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end

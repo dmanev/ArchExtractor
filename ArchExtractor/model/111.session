@@ -18,18 +18,23 @@ diagrams
     1178 782 100 3 0 0
   usecasediagram_ref 141167 // Use Case diag
     942 625 100 3 0 0
-  active  classdiagram_ref 128111 // class diag
+  classdiagram_ref 128111 // class diag
     1178 782 100 2 0 0
+  classdiagram_ref 261999 // StkPortInterfaceFactory class diag
+    942 625 100 3 0 0
+  active  sequencediagram_ref 282351 // XMIConverter running diagram
+    1178 782 100 3 0 0
 end
 show_stereotypes
-selected classdiagram_ref 262255 // FactoryProvider class diag
+selected sequencediagram_ref 282351 // XMIConverter running diagram
 open
   usecaseview_ref 128111 // Use Case View
   classview_ref 134767 // Class View
   classview_ref 128111 // Class View
   class_ref 129519 // IAnalyzer
   
-package_ref 161775 // SwComponent
+  package_ref 181743 // Components
+  classview_ref 174447 // Class view
   classview_ref 160879 // Class view
   sequencediagram_ref 188271 // BaseFileParser.fulfillComponentData() seq diag
   classview_ref 194159 // Class view
@@ -46,6 +51,7 @@ package_ref 161775 // SwComponent
   classview_ref 167663 // Class view
   deploymentview_ref 141935 // deploy view
   class_ref 258415 // StkPortInterfaceFactory
+  class_ref 204911 // StkControlIf
   class_ref 211695 // StkTOSSignalIf
   class_ref 238063 // StkDATControlIf
   deploymentview_ref 155119 // deploy view
