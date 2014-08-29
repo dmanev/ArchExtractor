@@ -43,8 +43,9 @@
 <icon BUILTIN="edit"/>
 </node>
 </node>
-<node COLOR="#990000" CREATED="1408466838754" ID="ID_304912270" MODIFIED="1408467347512" TEXT="Install MS Office and convert LibreOffice files to MS formats">
+<node COLOR="#338800" CREATED="1408466838754" ID="ID_304912270" MODIFIED="1409332011656" TEXT="Install MS Office and convert LibreOffice files to MS formats">
 <icon BUILTIN="yes"/>
+<icon BUILTIN="button_ok"/>
 </node>
 </node>
 <node COLOR="#669900" CREATED="1408467376956" ID="ID_928335063" MODIFIED="1408467382757" STYLE="fork" TEXT="Content based">
@@ -52,17 +53,41 @@
 <node COLOR="#990000" CREATED="1408467520409" ID="ID_1524977373" MODIFIED="1408471046694" TEXT="Fill-in Front Page details">
 <icon BUILTIN="yes"/>
 </node>
-<node COLOR="#990000" CREATED="1408467816027" ID="ID_769622663" MODIFIED="1408468762028" TEXT="Fill-in &quot;4. Methods/Models/Technologies&quot;">
+<node COLOR="#990000" CREATED="1409329371626" ID="ID_819082126" MODIFIED="1409329480540" TEXT="Fill-in &quot;1. Introduction&quot;">
+<icon BUILTIN="yes"/>
+<node COLOR="#999999" CREATED="1409329557039" ID="ID_1023147763" MODIFIED="1409329568908" TEXT="The chapter already contains most important parts. Mainly copy-paste from the thesis proposal to be done">
+<font NAME="SansSerif" SIZE="10"/>
+<icon BUILTIN="edit"/>
+</node>
+</node>
+<node COLOR="#990000" CREATED="1409329602672" ID="ID_410823409" MODIFIED="1409329745172" TEXT="Fill-in &quot;2. Review of the problem&apos;s domain&quot;">
+<icon BUILTIN="yes"/>
+<node COLOR="#999999" CREATED="1409329557039" ID="ID_938389154" MODIFIED="1409329692260" TEXT="The chapter already contains most important parts. Last two sub-chapters to be filled in">
+<font NAME="SansSerif" SIZE="10"/>
+<icon BUILTIN="edit"/>
+</node>
+</node>
+<node COLOR="#990000" CREATED="1409329762025" ID="ID_483523433" MODIFIED="1409329907821" TEXT="Fill-in &quot;3. Used technologies, platforms and/or methodologies&quot;">
 <icon BUILTIN="yes"/>
 </node>
-<node COLOR="#990000" CREATED="1408467877644" ID="ID_1427263388" MODIFIED="1408468765844" TEXT="Fill-in &quot;5. Solution&quot;">
+<node COLOR="#990000" CREATED="1408467877644" ID="ID_1427263388" MODIFIED="1409329967413" TEXT="Fill-in &quot;4. Analysis&quot;">
 <icon BUILTIN="yes"/>
 </node>
-<node COLOR="#990000" CREATED="1408467921895" ID="ID_420728918" MODIFIED="1408468769216" TEXT="Fill-in &quot;6. Results and analysis&quot;">
+<node COLOR="#990000" CREATED="1409330077279" ID="ID_247198353" MODIFIED="1409330139305" TEXT="Fill-in &quot;5. Design&quot;">
+<icon BUILTIN="yes"/>
+</node>
+<node COLOR="#990000" CREATED="1408467921895" ID="ID_420728918" MODIFIED="1409330165560" TEXT="Fill-in &quot;6. Realization/Testing and experiments&quot;">
 <icon BUILTIN="yes"/>
 </node>
 <node COLOR="#990000" CREATED="1408467992741" ID="ID_1890612063" MODIFIED="1408468772501" TEXT="Fill-in &quot;7. Wrap-up and future work&quot;">
 <icon BUILTIN="yes"/>
+</node>
+<node COLOR="#990000" CREATED="1409330224116" ID="ID_917415012" MODIFIED="1409331992555" TEXT="Fill-in &quot;8. Used literature&quot;">
+<icon BUILTIN="yes"/>
+<node COLOR="#999999" CREATED="1409330304790" ID="ID_152839873" MODIFIED="1409330393120" TEXT="mainly enhance and apply the rules requred (MLA Style - http://www.library.mun.ca/guides/howto/mla.php)">
+<font NAME="SansSerif" SIZE="10"/>
+<icon BUILTIN="edit"/>
+</node>
 </node>
 </node>
 </node>
