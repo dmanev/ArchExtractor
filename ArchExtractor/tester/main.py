@@ -43,8 +43,11 @@ if __name__ == '__main__':
     JilTOSCtrlCriteria = StkJilTOSSignalCriteria()
     JilDataCriteria = StkJilDataCriteria()
 
-    JilFp = StkJilFileParser([JilCmpCriteria, JilOnCtrlCriteria, JilProdCtrlCriteria, 
-                                   JilTOSCtrlCriteria, JilDataCriteria])
+    JilFp = StkJilFileParser([JilCmpCriteria,
+                              JilOnCtrlCriteria,
+                              JilProdCtrlCriteria,
+                              JilTOSCtrlCriteria,
+                              JilDataCriteria])
 
     CHeaderProvRDCriteria = StkCHeaderProvReadDataCriteria()
     CHeaderProvWTCriteria = StkCHeaderProvWriteDataCriteria()
@@ -55,11 +58,18 @@ if __name__ == '__main__':
     CFileReqRDTOSSignalCriteria = StkCFileReqReadTOSSignalCriteria()
     CFileReqWTTOSSignalCriteria = StkCFileReqWriteTOSSignalCriteria()
 
-    CHeaderFp = StkCHeaderFileParser([CHeaderProvRDCriteria, CHeaderProvWTCriteria, CHeaderProvDATCtrlCriteria, 
-                                      CFileReqRDCriteria, CFileReqWTCriteria, CFileReqDATCtrlCriteria])
+    CHeaderFp = StkCHeaderFileParser([CHeaderProvRDCriteria,
+                                      CHeaderProvWTCriteria,
+                                      CHeaderProvDATCtrlCriteria,
+                                      CFileReqRDCriteria,
+                                      CFileReqWTCriteria,
+                                      CFileReqDATCtrlCriteria])
 
-    CFileFp = StkCImpFileParser([CFileReqRDCriteria, CFileReqWTCriteria, CFileReqDATCtrlCriteria, 
-                                 CFileReqRDTOSSignalCriteria, CFileReqWTTOSSignalCriteria])
+    CFileFp = StkCImpFileParser([CFileReqRDCriteria,
+                                 CFileReqWTCriteria,
+                                 CFileReqDATCtrlCriteria,
+                                 CFileReqRDTOSSignalCriteria,
+                                 CFileReqWTTOSSignalCriteria])
 
     ba = BaseAnalyzer([JilFp, CHeaderFp, CFileFp])
 

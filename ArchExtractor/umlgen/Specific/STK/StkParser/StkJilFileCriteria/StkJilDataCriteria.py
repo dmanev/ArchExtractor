@@ -28,11 +28,11 @@ class StkJilDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
                         dtf = self.getDataTypeFactory()
                         DT = dtf.getDataType(dataType)
                         DE = PortInterface.DataElement.DataElement()
-                        DE.setName(dataName)                                                           
+                        DE.setName(dataName)
                         if hasArray:
                             arrayProps = self.extractLevelOneBlock(dataType)
                             arraySize = re.findall(r'\s*Size\s*=\s*(\d+)', 
-                                                               arrayProps, re.I)[0]                  
+                                                               arrayProps, re.I)[0]
                             arrayDT = dtf.getArrayDataType('Arr'+arraySize+dataType)
                             arrayDT.itsDataType = DT
                             arrayDT.setMaxNumberOfElements(arraySize)
@@ -40,14 +40,14 @@ class StkJilDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
                         else:
                             DE.itsDataType = DT
                         pif = self.getPortInterfaceFactory()
-                        sendRecvIf = pif.getSenderReceiverIf(dataName, [DE])                            
+                        sendRecvIf = pif.getSenderReceiverIf(dataName, [DE])
                         provPortSetter = PortInterface.ProvidedPort.ProvidedPort(sendRecvIf)
                         provPortSetter.setName("set"+dataName)
                         provPortGetter = PortInterface.ProvidedPort.ProvidedPort(sendRecvIf)
                         provPortGetter.setName("get"+dataName)
                         inoutIComponent.addPort(provPortSetter)
                         inoutIComponent.addPort(provPortGetter)
-        return inoutIComponent                            
+        return inoutIComponent
         ## Bouml preserved body end 0003536F
         
     def __init__(self):
