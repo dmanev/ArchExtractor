@@ -1,6 +1,6 @@
 format 74
 "StkParser" // EA_Model::System::Specific::STK::StkParser
-  revision 24
+  revision 25
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

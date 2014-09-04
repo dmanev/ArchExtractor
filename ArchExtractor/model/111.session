@@ -16,24 +16,26 @@ diagrams
     1178 782 100 4 0 0
   classdiagram_ref 282223 // XMIConverter class diag
     1178 782 100 3 0 0
-  usecasediagram_ref 141167 // Use Case diag
-    942 625 100 3 0 0
+  active  usecasediagram_ref 141167 // Use Case diag
+    1178 782 100 3 0 0
   classdiagram_ref 128111 // class diag
     1178 782 100 2 0 0
   classdiagram_ref 261999 // StkPortInterfaceFactory class diag
     942 625 100 3 0 0
-  active  sequencediagram_ref 282351 // XMIConverter running diagram
-    1178 782 100 3 0 0
+  classdiagram_ref 262383 // BaseFileParser class diag
+    942 625 100 4 0 0
+  classdiagram_ref 221679 // StkPortCriteria class diag
+    942 625 100 4 0 0
+  classdiagram_ref 234991 // StkCHeaderFileParser class diag
+    942 625 100 4 0 0
 end
 show_stereotypes
-selected sequencediagram_ref 282351 // XMIConverter running diagram
 open
-  usecaseview_ref 128111 // Use Case View
-  classview_ref 134767 // Class View
+  usecase_ref 128111 // Create Architecture model
+  usecase_ref 128367 // Perform analysis
   classview_ref 128111 // Class View
   class_ref 129519 // IAnalyzer
-  
-  package_ref 181743 // Components
+  classview_ref 174191 // Class view
   classview_ref 174447 // Class view
   classview_ref 160879 // Class view
   sequencediagram_ref 188271 // BaseFileParser.fulfillComponentData() seq diag
@@ -41,8 +43,6 @@ open
   deploymentview_ref 168303 // deploy view
   classview_ref 141295 // Class view
   deploymentview_ref 141679 // deploy view
-  classdiagram_ref 234991 // StkCHeaderFileParser class diag
-  class_ref 156783 // StkFileParser
   class_ref 218351 // StkPortCriteria
   class_ref 231407 // StkCHeaderFileParser
   deploymentview_ref 141807 // deploy view
