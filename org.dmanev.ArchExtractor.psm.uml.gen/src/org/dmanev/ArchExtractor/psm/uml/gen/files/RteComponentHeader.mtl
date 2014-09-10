@@ -5,7 +5,6 @@
 
 [template public genRteComponentHeader(aComponent : Component)]
 
-[comment][file ('interfaces/rte_' + aComponent.name + '.h', false, 'UTF-8')][/comment]
 [file (aComponent.getModel().nestedPackage.nestedPackage->
         select(ifPack: Package | ifPack.name.equalsIgnoreCase('Interfaces')).getElementPath()
         + '/Interfaces/rte_' + aComponent.name + '.h',
