@@ -22,7 +22,7 @@ diagrams
     1178 782 100 2 0 0
 end
 show_stereotypes
-selected classdiagram_ref 242159 // StkCFileReqDATControlCriteria class diagram
+selected classview_ref 128111 // Class View
 open
   usecase_ref 128111 // Create Architecture model
   usecase_ref 128367 // Perform analysis

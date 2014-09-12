@@ -1,6 +1,6 @@
 format 74
 "EA_Model" // EA_Model
-  revision 7
+  revision 8
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -28,6 +28,7 @@ format 74
   
   package_ref 141935 // Use Cases
 
-  package_ref 128367 // System
+  package_ref 128367 // ArchExtractor
 
+  package_ref 208239 // Base code generation
 end
