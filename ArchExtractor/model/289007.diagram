@@ -2,30 +2,24 @@ format 74
 
 classcanvas 128111 class_ref 285423 // DataTypeFactory
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 67 129 2000
+  xyz 50 68 2000
 end
 classcanvas 128239 class_ref 170991 // DataType
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 354 137 2000
+  xyz 332 68 2000
 end
 classcanvas 128623 class_ref 185199 // ArrayDataType
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 302 349 2006
+  xyz 293 290 2006
 end
 classcanvas 128879 class_ref 185071 // CompositeDataType
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 325 253 2012
+  xyz 308 192 2012
 end
 relationcanvas 128495 relation_ref 308463 // <directional aggregation>
-  from ref 128111 z 2001 stereotype "<<map>>" xyz 249.5 172 3000 to ref 128239
-  role_a_pos 254 151 3000 no_role_b
-  multiplicity_a_pos 338 180 3000 no_multiplicity_b
-end
-relationcanvas 128751 relation_ref 191215 // <unidirectional association>
-  from ref 128623 z 2007 to point 616 291
-  line 129263 z 2007 to ref 128239
-  role_a_pos 434 174 3000 no_role_b
-  no_multiplicity_a no_multiplicity_b
+  from ref 128111 z 2001 stereotype "<<map>>" xyz 229.5 107 3000 to ref 128239
+  role_a_pos 232 82 3000 no_role_b
+  multiplicity_a_pos 316 111 3000 no_multiplicity_b
 end
 relationcanvas 129007 relation_ref 190959 // <generalisation>
   from ref 128879 z 2013 to ref 128239
@@ -38,7 +32,7 @@ relationcanvas 129135 relation_ref 191087 // <generalisation>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 129391 relation_ref 308591 // <dependency>
-  from ref 128111 z 2007 stereotype "<<import>>" xyz 205.5 293.5 3000 to ref 128623
+  from ref 128111 z 2007 stereotype "<<import>>" xyz 193 233 3000 to ref 128623
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end

@@ -21,7 +21,7 @@ relationcanvas 128623 relation_ref 275951 // <unidirectional association>
   from ref 128495 z 2001 to point 271 61
   line 128751 z 2001 to point 271 91
   line 128879 z 2001 to ref 128495
-  role_a_pos 221 81 3000 no_role_b
+  role_a_pos 221 78 3000 no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 129007 relation_ref 276079 // <generalisation>

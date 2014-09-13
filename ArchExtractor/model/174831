@@ -1,6 +1,6 @@
 format 74
-"Analyzer" // EA_Model::System::Base::Analyzer
-  revision 15
+"Analyzer" // EA_Model::ArchExtractor::Base::Analyzer
+  revision 16
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -146,7 +146,6 @@ ${docstring}self.itsIFileParserList = ${p0}
 	idl_name_spec "set_${name}"
 	set_of_relation classrelation_ref 151791 // itsIFileParserList (<directional composition>)
       end
-
     end
 
     class 129519 "IAnalyzer"

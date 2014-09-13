@@ -1,6 +1,6 @@
 format 74
-"Infrastructure" // EA_Model::System::Base::Infrastructure
-  revision 9
+"Infrastructure" // EA_Model::ArchExtractor::Base::Infrastructure
+  revision 10
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -44,6 +44,11 @@ format 74
     //activity diagram settings
     package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
     show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 302191 "Identifiable class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
     classdiagram 262255 "FactoryProvider class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A4
@@ -56,7 +61,7 @@ format 74
 
     classdiagram 282479 "AEModel class diag"
       draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A3
+      size A2
     end
 
     classdiagram 275695 "InfrastructureFactory class diag"
@@ -80,9 +85,14 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "FactoryProvider is an implementation of a \"Handler\" in 
+\"Chain of responsibility\" design pattern.
+It either will provide the requested factories for object
+or it will pass the request to its \"Successor\" object."
       classrelation 276463 // itsSuccessor (<unidirectional association>)
 	relation 275951 --->
 	  a role_name "itsSuccessor" private
+	    comment "Represents the \"Successor\" in \"Chain of responsibility\" design pattern"
 	    python "${comment}${self}${name} = ${value}
 "
 	    classrelation_ref 276463 // itsSuccessor (<unidirectional association>)
@@ -93,7 +103,7 @@ ${docstring}${members}
       operation 252911 "getPortInterfaceFactory"
 	preserve_cpp_body_indent public return_type class_ref 258287 // PortInterfaceFactory
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258543 // FactoryProvider
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -101,6 +111,49 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "returns PortInterfaceFactory"
+      end
+
+      operation 260335 "getComponentFactory"
+	preserve_cpp_body_indent public return_type class_ref 265455 // ComponentFactory
+	nparams 1
+	  param in name "self" type class_ref 258543 // FactoryProvider
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+	comment "Returns ComponentFactory"
+      end
+
+      operation 268015 "getInfrastructureFactory"
+	preserve_cpp_body_indent public return_type class_ref 271983 // InfrastructureFactory
+	nparams 1
+	  param in name "self" type class_ref 258543 // FactoryProvider
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+	comment "Returns InfrastructureFactory"
+      end
+
+      operation 285807 "getDataTypeFactory"
+	preserve_cpp_body_indent public return_type class_ref 285423 // DataTypeFactory
+	nparams 1
+	  param in name "self" type class_ref 258543 // FactoryProvider
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+	comment "Returns DataTypeFactory"
       end
 
       operation 253423 "set_itsSuccessor"
@@ -120,45 +173,7 @@ ${docstring}self.itsSuccessor = ${p0}
 	
 	idl_name_spec "set_${name}"
 	set_of_relation classrelation_ref 276463 // itsSuccessor (<unidirectional association>)
-      end
-
-      operation 260335 "getComponentFactory"
-	preserve_cpp_body_indent public return_type class_ref 265455 // ComponentFactory
-	nparams 1
-	  param in name "self" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      operation 268015 "getInfrastructureFactory"
-	preserve_cpp_body_indent public return_type class_ref 271983 // InfrastructureFactory
-	nparams 1
-	  param in name "self" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      operation 285807 "getDataTypeFactory"
-	preserve_cpp_body_indent public return_type class_ref 285423 // DataTypeFactory
-	nparams 1
-	  param in name "self" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
-${docstring}${body}
-"
-	
+	comment "setter for the \"Successor\" of the object."
       end
     end
 
@@ -173,6 +188,8 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Major class for the meta-model. A class who inherits it
+will be treated as \"Identifiable\", i.e. it has a name."
       attribute 141807 "Name"
 	private explicit_type "string"
 	cpp_decl ""
@@ -183,6 +200,7 @@ ${docstring}${members}
 	idl_decl ""
 	get_oper operation_ref 167023 // get_Name
 	set_oper operation_ref 167151 // set_Name
+	comment "Name of the class"
       end
 
       operation 167023 "get_Name"
@@ -234,6 +252,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Container of \"PackagableElements\" in the meta-model"
       classrelation 277615 // <generalisation>
 	relation 277103 ---|>
 	  a public
@@ -278,8 +297,8 @@ ${docstring}${members}
       operation 268783 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
-	  param in name "inpName" explicit_type ""
+	  param inout name "self" type class_ref 258671 // AEPackage
+	  param in name "inpName" explicit_type "string"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -293,7 +312,7 @@ ${body}
       operation 268911 "addElement"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258671 // AEPackage
 	  param in name "inpElement" type class_ref 258799 // PackageableElement
 	
 	preserve_java_body_indent 
@@ -302,12 +321,13 @@ ${body}
 ${docstring}${body}
 "
 	
+	comment "Adds \"PackagableElement\""
       end
 
       operation 277359 "getElementList"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258671 // AEPackage
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -315,6 +335,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Gets list of all elements"
       end
 
       operation 268527 "get_itsAEPackageList"
@@ -405,6 +426,9 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Major class for the meta-model. A class who inherits it
+will be treated as \"Packagable\", i.e. it can be directly
+included in \"AEPackage\"."
       classrelation 277231 // <generalisation>
 	relation 276719 ---|>
 	  a public
@@ -481,6 +505,14 @@ ${docstring}${members}
 	  b parent class_ref 164463 // Identifiable
       end
 
+      classrelation 310895 // <generalisation>
+	relation 310383 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 310895 // <generalisation>
+	  b parent class_ref 258543 // FactoryProvider
+      end
+
       classrelation 279023 // itsAEPackageList (<directional aggregation>)
 	relation 278511 o-->
 	  stereotype "list"
@@ -498,7 +530,6 @@ ${docstring}${members}
 "
 	    classrelation_ref 302191 // itsInfrastructureFactory (<directional composition>)
 	  b parent class_ref 271983 // InfrastructureFactory
-	get_oper operation_ref 276591 // get_itsInfrastructureFactory
 	set_oper operation_ref 286447 // set_itsInfrastructureFactory
       end
 
@@ -535,7 +566,7 @@ ${docstring}${members}
       operation 276463 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 258927 // AEModel
 	  param in name "inpInfrastructureFactory" type class_ref 271983 // InfrastructureFactory
 	
 	preserve_java_body_indent 
@@ -550,7 +581,7 @@ ${body}
       operation 276719 "getPackageList"
 	preserve_cpp_body_indent public return_type class_ref 258671 // AEPackage
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -560,18 +591,10 @@ ${docstring}${body}
 	
       end
 
-      classrelation 310895 // <generalisation>
-	relation 310383 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 310895 // <generalisation>
-	  b parent class_ref 258543 // FactoryProvider
-      end
-
       operation 285935 "getPortInterfaceFactory"
 	preserve_cpp_body_indent public return_type class_ref 258287 // PortInterfaceFactory
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -584,7 +607,7 @@ ${docstring}${body}
       operation 286063 "getComponentFactory"
 	preserve_cpp_body_indent public return_type class_ref 265455 // ComponentFactory
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -597,7 +620,7 @@ ${docstring}${body}
       operation 286191 "getInfrastructureFactory"
 	preserve_cpp_body_indent public return_type class_ref 271983 // InfrastructureFactory
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -610,7 +633,7 @@ ${docstring}${body}
       operation 286319 "getDataTypeFactory"
 	preserve_cpp_body_indent public return_type class_ref 285423 // DataTypeFactory
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -708,6 +731,8 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Method Factory for the meta-model elements in
+package \"Infrastructure\""
       classrelation 292719 // <dependency>
 	relation 292207 -_->
 	  stereotype "import"
@@ -730,7 +755,7 @@ ${docstring}${members}
       operation 267759 "getAEPackage"
 	preserve_cpp_body_indent public return_type class_ref 258671 // AEPackage
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 271983 // InfrastructureFactory
 	  param in name "inpPackagePath" explicit_type "string"
 	
 	preserve_java_body_indent 
@@ -744,7 +769,7 @@ ${docstring}${body}
       operation 276335 "getAEModel"
 	preserve_cpp_body_indent public return_type class_ref 258927 // AEModel
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 271983 // InfrastructureFactory
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -757,8 +782,8 @@ ${docstring}${body}
       operation 276847 "getRootPackageList"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param out name "outRootPackageList" explicit_type ""
+	  param in name "self" type class_ref 271983 // InfrastructureFactory
+	  param out name "outRootPackageList" type class_ref 258671 // AEPackage
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -766,6 +791,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns list of root packages (AEPackage)"
       end
     end
   end

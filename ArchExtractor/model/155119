@@ -1,6 +1,6 @@
 format 74
 "Base" // EA_Model::ArchExtractor::Base
-  revision 24
+  revision 25
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

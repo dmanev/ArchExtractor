@@ -1,6 +1,6 @@
 format 74
-"Components" // EA_Model::System::Base::SwComponent::Components
-  revision 11
+"Components" // EA_Model::ArchExtractor::Base::SwComponent::Components
+  revision 12
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -51,7 +51,7 @@ format 74
 
     classdiagram 269167 "ComponentFactory class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A4
+      size A3
     end
 
     class 129647 "IComponent"
@@ -65,10 +65,11 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Interface representing the Component."
       operation 165999 "getFileList"
 	preserve_cpp_body_indent public explicit_return_type "string"
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 129647 // IComponent
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -76,13 +77,14 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "Returns file list of the component"
       end
 
       operation 204015 "addPort"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inpIPort" explicit_type ""
+	  param in name "self" type class_ref 129647 // IComponent
+	  param in name "inpIPort" type class_ref 130287 // IPort
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -90,6 +92,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Includes a port into the component's port map"
       end
     end
 
@@ -104,12 +107,21 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents the BaseComponent of the meta-model"
       classrelation 128751 // <realization>
 	relation 128751 -_-|>
 	  a public
 	    python "${type}"
 	    classrelation_ref 128751 // <realization>
 	  b parent class_ref 129647 // IComponent
+      end
+
+      classrelation 277871 // <generalisation>
+	relation 277359 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 277871 // <generalisation>
+	  b parent class_ref 258799 // PackageableElement
       end
 
       classrelation 131567 // itsIPortMap (<directional composition>)
@@ -121,21 +133,6 @@ ${docstring}${members}
 	    classrelation_ref 131567 // itsIPortMap (<directional composition>)
 	  b parent class_ref 130287 // IPort
 	get_oper operation_ref 300783 // get_itsIPortMap
-      end
-
-      operation 164975 "__init__"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 2
-	  param inout name "self" explicit_type ""
-	  param in name "inpName" explicit_type "string"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}super(${class}, ${p0}).__init__()
-${body}
-"
-	
       end
 
       attribute 141423 "fileList"
@@ -153,11 +150,26 @@ ${body}
 	set_oper operation_ref 260591 // set_fileList
       end
 
+      operation 164975 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" type class_ref 128239 // BaseComponent
+	  param in name "inpName" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
       operation 204143 "addPort"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inpIPort" explicit_type ""
+	  param in name "self" type class_ref 129647 // IComponent
+	  param in name "inpIPort" type class_ref 130287 // IPort
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -167,12 +179,18 @@ ${docstring}${body}
 	
       end
 
-      classrelation 277871 // <generalisation>
-	relation 277359 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 277871 // <generalisation>
-	  b parent class_ref 258799 // PackageableElement
+      operation 260719 "addFileList"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" type class_ref 129647 // IComponent
+	  param in name "inpFileList" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
       end
 
       operation 260463 "get_fileList"
@@ -214,20 +232,6 @@ ${docstring}self.fileList = ${p0}
 	set_of_attribute attribute_ref 141423 // fileList
       end
 
-      operation 260719 "addFileList"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inpFileList" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}${body}
-"
-	
-      end
-
       operation 300783 "get_itsIPortMap"
 	stereotype "map"
 	force_body_gen const cpp_inline public return_type class_ref 130287 // IPort
@@ -259,6 +263,8 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Method Factory for the meta-model elements in
+package \"Component\""
       classrelation 285679 // <dependency>
 	relation 285167 -_->
 	  stereotype "import"
@@ -281,7 +287,7 @@ ${docstring}${members}
       operation 260207 "getBaseComponent"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 265455 // ComponentFactory
 	  param in name "inpNameCmp" explicit_type "string"
 	  param out name "outIComponent" type class_ref 129647 // IComponent
 	
@@ -291,12 +297,14 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "Returns BaseComponent by given Name.
+If the Name is not available it creates it."
       end
 
       operation 261231 "findComponent"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 265455 // ComponentFactory
 	  param in name "inpNameCmp" explicit_type "string"
 	  param out name "outIComponent" type class_ref 129647 // IComponent
 	
@@ -306,6 +314,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Finds a BaseComponent by Name"
       end
     end
   end

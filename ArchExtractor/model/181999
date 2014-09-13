@@ -1,6 +1,6 @@
 format 74
-"PortInterface" // EA_Model::System::Base::SwComponent::PortInterface
-  revision 14
+"PortInterface" // EA_Model::ArchExtractor::Base::SwComponent::PortInterface
+  revision 15
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -46,12 +46,7 @@ format 74
     show_infonote default drawing_language default show_stereotype_properties default
     classdiagram 261871 "PortInterfaceFactory class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A4
-    end
-
-    classdiagram 174319 "ParamData class diag"
-      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A4
+      size A3
     end
 
     classdiagram 167663 "SenderReceiverInterface class diag"
@@ -61,6 +56,11 @@ format 74
 
     classdiagram 167535 "ClientServerInterface class diag"
       draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 302319 "DataElement class diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A4
     end
 
@@ -75,6 +75,11 @@ format 74
     end
 
     classdiagram 215023 "Operation class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
+    classdiagram 174319 "ParamData class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A4
     end
@@ -96,6 +101,7 @@ ${members}};
 "
       explicit_switch_type ""
       
+      comment "Represents \"DataElement\" from the meta-model"
       classrelation 175599 // itsDataType (<directional composition>)
 	relation 175343 *-->
 	  a role_name "itsDataType" private
@@ -170,6 +176,7 @@ ${members}};
 "
       explicit_switch_type ""
       
+      comment "Represents \"Operation\" from the meta-model"
       classrelation 278255 // <generalisation>
 	relation 277743 ---|>
 	  a public
@@ -204,7 +211,7 @@ ${members}};
       operation 211311 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 1
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 164207 // Operation
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -303,6 +310,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents \"SenderReceiverInterface\" from the meta-model"
       classrelation 167407 // <generalisation>
 	relation 167151 ---|>
 	  a public
@@ -382,12 +390,21 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents \"ProvidedPort\" from the meta-model"
       classrelation 167151 // <generalisation>
 	relation 166895 ---|>
 	  a public
 	    python "${type}"
 	    classrelation_ref 167151 // <generalisation>
 	  b parent class_ref 130287 // IPort
+      end
+
+      classrelation 168175 // <generalisation>
+	relation 167919 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 168175 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
       end
 
       classrelation 167535 // itsIPortInterface (<directional composition>)
@@ -402,7 +419,7 @@ ${docstring}${members}
       operation 166767 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 163695 // ProvidedPort
 	  param in name "inpIPortIf" type class_ref 163823 // IPortInterface
 	
 	preserve_java_body_indent 
@@ -414,18 +431,10 @@ ${body}
 	
       end
 
-      classrelation 168175 // <generalisation>
-	relation 167919 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 168175 // <generalisation>
-	  b parent class_ref 164463 // Identifiable
-      end
-
       operation 202991 "getInterface"
 	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -438,7 +447,7 @@ ${docstring}${body}
       operation 203119 "setInterface"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	  param in name "inpIf" type class_ref 163823 // IPortInterface
 	
 	preserve_java_body_indent 
@@ -461,6 +470,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents \"SenderReceiverInterface\" from the meta-model"
       classrelation 167279 // <generalisation>
 	relation 167023 ---|>
 	  a public
@@ -525,6 +535,7 @@ ${members}};
 "
       explicit_switch_type ""
       
+      comment "Represents a BaseComponent port's interface"
     end
 
     class 163567 "RequiredPort"
@@ -538,12 +549,21 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents \"RequiredPort\" from the meta-model"
       classrelation 167023 // <generalisation>
 	relation 166767 ---|>
 	  a public
 	    python "${type}"
 	    classrelation_ref 167023 // <generalisation>
 	  b parent class_ref 130287 // IPort
+      end
+
+      classrelation 168303 // <generalisation>
+	relation 168047 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 168303 // <generalisation>
+	  b parent class_ref 164463 // Identifiable
       end
 
       classrelation 167663 // itsIPortInterface (<directional composition>)
@@ -558,7 +578,7 @@ ${docstring}${members}
       operation 166895 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 163567 // RequiredPort
 	  param in name "inpIPortIf" type class_ref 163823 // IPortInterface
 	
 	preserve_java_body_indent 
@@ -570,18 +590,10 @@ ${body}
 	
       end
 
-      classrelation 168303 // <generalisation>
-	relation 168047 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 168303 // <generalisation>
-	  b parent class_ref 164463 // Identifiable
-      end
-
       operation 203247 "getInterface"
 	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -594,7 +606,7 @@ ${docstring}${body}
       operation 203375 "setInterface"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	  param in name "inpIf" type class_ref 163823 // IPortInterface
 	
 	preserve_java_body_indent 
@@ -617,10 +629,11 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Interface representing Component's port"
       operation 166255 "getInterface"
 	preserve_cpp_body_indent public return_type class_ref 163823 // IPortInterface
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -628,12 +641,13 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "Returns the interface stored in the Port"
       end
 
       operation 166383 "setInterface"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130287 // IPort
 	  param in name "inpIf" type class_ref 163823 // IPortInterface
 	
 	preserve_java_body_indent 
@@ -642,6 +656,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns the interface in the Port"
       end
     end
 
@@ -656,6 +671,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents \"ParamData\" from the meta-model"
       classrelation 175983 // itsDataType (<directional composition>)
 	relation 175727 *-->
 	  a role_name "itsDataType" private
@@ -724,61 +740,8 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 275311 // itsIPortInterfaceMap (<directional aggregation>)
-	relation 274927 o-->
-	  stereotype "map"
-	  a role_name "itsIPortInterfaceMap" multiplicity "*" private
-	    python "${comment}${self}${name} = ${stereotype}()
-"
-	    classrelation_ref 275311 // itsIPortInterfaceMap (<directional aggregation>)
-	  b parent class_ref 163823 // IPortInterface
-	get_oper operation_ref 300655 // get_itsIPortInterfaceMap
-      end
-
-      operation 252783 "getAbstractPortInterface"
-	preserve_cpp_body_indent private return_type class_ref 163823 // IPortInterface
-	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "inpNameIf" explicit_type "string"
-	  param in name "inpClass" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      operation 252143 "getSenderReceiverIf"
-	preserve_cpp_body_indent public return_type class_ref 164079 // SenderReceiverInterface
-	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "inpNameIf" explicit_type "string"
-	  param in name "inpDataElementList" type class_ref 164335 // DataElement
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      operation 252271 "getClientServerIf"
-	preserve_cpp_body_indent public return_type class_ref 163951 // ClientServerInterface
-	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inpNameIf" explicit_type "string"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}${body}
-"
-	
-      end
-
+      comment "Method Factory for the meta-model elements in
+package \"PortInterface\""
       classrelation 275439 // <dependency>
 	relation 275055 -_->
 	  stereotype "import"
@@ -795,6 +758,67 @@ ${docstring}${body}
 	    python "${type}"
 	    classrelation_ref 275567 // <dependency>
 	  b parent class_ref 163951 // ClientServerInterface
+      end
+
+      classrelation 275311 // itsIPortInterfaceMap (<directional aggregation>)
+	relation 274927 o-->
+	  stereotype "map"
+	  a role_name "itsIPortInterfaceMap" multiplicity "*" private
+	    comment "A map storing all interfaces created with the Factory
+of type <string, IPortInterface>"
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 275311 // itsIPortInterfaceMap (<directional aggregation>)
+	  b parent class_ref 163823 // IPortInterface
+	get_oper operation_ref 300655 // get_itsIPortInterfaceMap
+      end
+
+      operation 252783 "getAbstractPortInterface"
+	preserve_cpp_body_indent private return_type class_ref 163823 // IPortInterface
+	nparams 3
+	  param in name "self" type class_ref 258287 // PortInterfaceFactory
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpClass" type class_ref 163823 // IPortInterface
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+	comment "Abstract Factory method which returns instance of IPortInterface
+based on given name and child class of IPortInterface"
+      end
+
+      operation 252143 "getSenderReceiverIf"
+	preserve_cpp_body_indent public return_type class_ref 164079 // SenderReceiverInterface
+	nparams 3
+	  param in name "self" type class_ref 258287 // PortInterfaceFactory
+	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpDataElementList" type class_ref 164335 // DataElement
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+	comment "Factory method which returns \"SenderReceiverInterface\" object element"
+      end
+
+      operation 252271 "getClientServerIf"
+	preserve_cpp_body_indent public return_type class_ref 163951 // ClientServerInterface
+	nparams 2
+	  param in name "self" type class_ref 258287 // PortInterfaceFactory
+	  param in name "inpNameIf" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+	comment "Factory method which returns \"ClientServerInterface\" object element"
       end
 
       operation 300655 "get_itsIPortInterfaceMap"

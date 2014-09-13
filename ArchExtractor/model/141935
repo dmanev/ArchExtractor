@@ -1,6 +1,6 @@
 format 74
 "Use Cases" // EA_Model::Use Cases
-  revision 5
+  revision 6
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -110,7 +110,6 @@ format 74
 	  stereotype "include"
 	  on usecase_ref 129007 // Scan source files
       end
-
     end
 
     usecase 128495 "Prepare File criteria"
@@ -306,5 +305,4 @@ ${docstring}${members}
       show_infonote default drawing_language default show_stereotype_properties default
     end
   end
-
 end

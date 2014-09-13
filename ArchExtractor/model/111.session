@@ -1,15 +1,5 @@
-window_sizes 1615 1026 431 1178 782 170
+window_sizes 1615 1026 373 1236 782 170
 diagrams
-  classdiagram_ref 261871 // PortInterfaceFactory class diag
-    942 625 100 4 0 0
-  classdiagram_ref 160751 // Component class diag
-    1178 782 100 3 0 0
-  classdiagram_ref 167535 // ClientServerInterface class diag
-    1178 782 100 4 0 0
-  classdiagram_ref 174319 // ParamData class diag
-    1178 782 100 4 0 0
-  classdiagram_ref 215023 // Operation class diag
-    1178 782 100 4 0 0
   classdiagram_ref 174191 // DataType class diag
     1178 782 100 4 0 0
   classdiagram_ref 187887 // CompositeDataType class diag
@@ -18,19 +8,25 @@ diagrams
     1178 782 100 3 0 0
   usecasediagram_ref 141167 // Use Case diag
     1178 782 100 3 0 0
-  active  classdiagram_ref 128111 // class diag
-    1178 782 100 2 0 0
+  active  classdiagram_ref 167663 // SenderReceiverInterface class diag
+    1236 782 100 4 0 0
 end
 show_stereotypes
-selected classview_ref 128111 // Class View
+selected class_ref 171119 // ParamData
 open
   usecase_ref 128111 // Create Architecture model
   usecase_ref 128367 // Perform analysis
   classview_ref 128111 // Class View
   class_ref 129519 // IAnalyzer
-  classview_ref 174191 // Class view
-  classview_ref 174447 // Class view
-  classview_ref 160879 // Class view
+  class_ref 129647 // IComponent
+  classrelation_ref 277871 // <generalisation>
+  classrelation_ref 131567 // itsIPortMap (<directional composition>)
+  class_ref 265455 // ComponentFactory
+  classview_ref 174319 // Class view
+  classdiagram_ref 167663 // SenderReceiverInterface class diag
+  classdiagram_ref 167279 // ProvidedPort class diag
+  classdiagram_ref 262511 // AEPackage class diag
+  class_ref 271983 // InfrastructureFactory
   sequencediagram_ref 188271 // BaseFileParser.fulfillComponentData() seq diag
   classview_ref 194159 // Class view
   deploymentview_ref 168303 // deploy view
