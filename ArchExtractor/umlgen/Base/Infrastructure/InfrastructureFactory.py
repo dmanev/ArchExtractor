@@ -4,7 +4,11 @@ import Infrastructure.AEPackage
 import Infrastructure.AEModel
 
 class InfrastructureFactory(object):
+    """Method Factory for the meta-model elements in
+    package 'Infrastructure'"""
     def getAEPackage(self, inpPackagePath):
+        """Returns 'AEPackage' by given input 'AEPackage' path.
+        If it does not exists yet it creates it."""
         ## Bouml preserved body begin 000415EF
         outAEPackage = None
         if(inpPackagePath in self.itsAEPackageMap.keys()):
@@ -43,6 +47,8 @@ class InfrastructureFactory(object):
         ## Bouml preserved body end 000415EF
         
     def getAEModel(self):
+        """Returns AEModel from the factory.
+        If it does not exists yet it creates it."""
         ## Bouml preserved body begin 0004376F
         outAEModel = Infrastructure.AEModel.AEModel(self)
         
@@ -50,6 +56,7 @@ class InfrastructureFactory(object):
         ## Bouml preserved body end 0004376F
         
     def getRootPackageList(self, outRootPackageList):
+        """Returns list of root packages (AEPackage)"""
         ## Bouml preserved body begin 0004396F
         outRootPackageList = []
         for pack in self.itsAEPackageMap.values():

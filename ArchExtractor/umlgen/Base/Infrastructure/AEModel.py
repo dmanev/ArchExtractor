@@ -1,13 +1,14 @@
 
 import Infrastructure.Identifiable
+import Infrastructure.FactoryProvider
 import Infrastructure.AEPackage
 import Infrastructure.InfrastructureFactory
 import Datatype.DataTypeFactory
 import PortInterface.PortInterfaceFactory
 import Components.ComponentFactory
-import Infrastructure.FactoryProvider
 
 class AEModel(Infrastructure.Identifiable.Identifiable, Infrastructure.FactoryProvider.FactoryProvider):
+    """Represents root element of the meta-model 'AEModel'"""
     def __init__(self, inpInfrastructureFactory):
         super(AEModel, self).__init__()
         self.itsAEPackageList = None

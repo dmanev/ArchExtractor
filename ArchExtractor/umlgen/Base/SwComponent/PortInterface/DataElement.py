@@ -3,6 +3,7 @@ import Datatype.DataType
 import Infrastructure.Identifiable
 
 class DataElement(Infrastructure.Identifiable.Identifiable):
+    """Represents 'DataElement' from the meta-model"""
     def getItsDataType(self):
         return self.itsDataType
         

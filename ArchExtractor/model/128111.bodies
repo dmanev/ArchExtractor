@@ -1,20 +1,20 @@
 class BaseAnalyzer
-!!!157167.python!!!	__init__(inout self : , in inpIFileParserList : IFileParser = None)
-        self.itsIFileParserList = inpIFileParserList
-        for iFileParser in self.itsIFileParserList:
-            iFileParser.setItsSuccessor(self)
-!!!128111.python!!!	scan(in self : , in topDir : , inout inoutAEModel : AEModel)
+!!!157167.python!!!	__init__(inout self : BaseAnalyzer, in inpBFParserList : BaseFileParser = None)
+        self.itsBaseFileParserList = inpBFParserList
+        for bfParser in self.itsBaseFileParserList:
+            bfParser.setItsSuccessor(self)
+!!!353775.python!!!	scan(in self : IAnalyzer, in topDir : string, inout inoutAEModel : AEModel)
         self.setItsSuccessor(inoutAEModel)
         inoutAEModel.setName(os.path.split(topDir)[1])
         for dirPath, dirList, fileList in os.walk(topDir):
             for fileName in fileList:
                 filePath = os.path.join(dirPath,fileName)
-                for iFileParser in self.itsIFileParserList:
-                    if iFileParser.fileFilter(fileName):
-                        cmpNameList = iFileParser.getComponentNameList(fileName)
+                for BFParser in self.itsBaseFileParserList:
+                    if BFParser.fileFilter(fileName):
+                        cmpNameList = BFParser.getComponentNameList(fileName)
                         iCmp = None
                         for cmpName in cmpNameList:
                             baseDir = os.path.relpath(filePath, os.path.split(topDir)[0])
-                            iCmp = iFileParser.updateComponent(cmpName, baseDir, iCmp)                            
-                            iCmp = iFileParser.fulfillComponentData(cmpName, filePath, iCmp)
+                            iCmp = BFParser.updateComponent(cmpName, baseDir, iCmp)                            
+                            iCmp = BFParser.fulfillComponentData(cmpName, filePath, iCmp)
         return inoutAEModel

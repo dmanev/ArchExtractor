@@ -1,6 +1,6 @@
 format 74
 "Components" // EA_Model::ArchExtractor::Base::SwComponent::Components
-  revision 12
+  revision 13
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -264,7 +264,7 @@ ${docstring}${members}
       explicit_switch_type ""
       
       comment "Method Factory for the meta-model elements in
-package \"Component\""
+package 'Component'"
       classrelation 285679 // <dependency>
 	relation 285167 -_->
 	  stereotype "import"

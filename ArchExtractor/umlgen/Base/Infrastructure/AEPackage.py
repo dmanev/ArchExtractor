@@ -3,6 +3,7 @@ import Infrastructure.Identifiable
 import Infrastructure.PackageableElement
 
 class AEPackage(Infrastructure.Identifiable.Identifiable):
+    """Container of 'PackagableElements' in the meta-model"""
     def __init__(self, inpName):
         super(AEPackage, self).__init__()
         self.itsElementMap = dict()
@@ -13,6 +14,7 @@ class AEPackage(Infrastructure.Identifiable.Identifiable):
         ## Bouml preserved body end 000419EF
         
     def addElement(self, inpElement):
+        """Adds 'PackagableElement'"""
         ## Bouml preserved body begin 00041A6F
         if(isinstance(inpElement, Infrastructure.PackageableElement.PackageableElement)):
             if(inpElement.getName() not in self.itsElementMap.keys()):
@@ -21,6 +23,7 @@ class AEPackage(Infrastructure.Identifiable.Identifiable):
         ## Bouml preserved body end 00041A6F
         
     def getElementList(self):
+        """Gets list of all elements"""
         ## Bouml preserved body begin 00043B6F
         return self.itsElementMap.values()
         ## Bouml preserved body end 00043B6F

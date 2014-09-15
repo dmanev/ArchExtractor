@@ -17,11 +17,11 @@ class StkJilDataCriteria
                         dtf = self.getDataTypeFactory()
                         DT = dtf.getDataType(dataType)
                         DE = PortInterface.DataElement.DataElement()
-                        DE.setName(dataName)                                                           
+                        DE.setName(dataName)
                         if hasArray:
                             arrayProps = self.extractLevelOneBlock(dataType)
                             arraySize = re.findall(r'\s*Size\s*=\s*(\d+)', 
-                                                               arrayProps, re.I)[0]                  
+                                                               arrayProps, re.I)[0]
                             arrayDT = dtf.getArrayDataType('Arr'+arraySize+dataType)
                             arrayDT.itsDataType = DT
                             arrayDT.setMaxNumberOfElements(arraySize)
@@ -29,11 +29,11 @@ class StkJilDataCriteria
                         else:
                             DE.itsDataType = DT
                         pif = self.getPortInterfaceFactory()
-                        sendRecvIf = pif.getSenderReceiverIf(dataName, [DE])                            
+                        sendRecvIf = pif.getSenderReceiverIf(dataName, [DE])
                         provPortSetter = PortInterface.ProvidedPort.ProvidedPort(sendRecvIf)
                         provPortSetter.setName("set"+dataName)
                         provPortGetter = PortInterface.ProvidedPort.ProvidedPort(sendRecvIf)
                         provPortGetter.setName("get"+dataName)
                         inoutIComponent.addPort(provPortSetter)
                         inoutIComponent.addPort(provPortGetter)
-        return inoutIComponent                            
+        return inoutIComponent

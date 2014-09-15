@@ -10,12 +10,12 @@ class StkCFileReqDATControlCriteria(StkParser.StkPortCriteria.StkPortCriteria):
         ## Bouml preserved body begin 00038B6F
         for datControl in re.findall(r'mDATControl\s*\(\s*(\w+)\s*,\s*\w+\s*\)', inpTextContent):
             pif = self.getPortInterfaceFactory()
-            dtf = self.getDataTypeFactory()            
+            dtf = self.getDataTypeFactory()
             clSrvIntIf = pif.getStkDATControlIf(datControl, dtf)
             reqPort = PortInterface.RequiredPort.RequiredPort(clSrvIntIf)
             reqPort.setName(datControl)
             reqPort.setInterface(clSrvIntIf)
-            inoutIComponent.addPort(reqPort)            
+            inoutIComponent.addPort(reqPort)
         ## Bouml preserved body end 00038B6F
         
     def __init__(self):

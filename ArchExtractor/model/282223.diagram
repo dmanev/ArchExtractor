@@ -81,47 +81,47 @@ relationcanvas 131439 relation_ref 300015 // <dependency>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 131695 relation_ref 300271 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 398 134.5 3000 to ref 128239
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 400.5 127 3000 to ref 128239
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 131823 relation_ref 300399 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 406.5 184 3000 to ref 128367
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 411.5 149.5 3000 to ref 128367
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 131951 relation_ref 300527 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 488 234 3000 to ref 128495
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 502.5 220 3000 to ref 128495
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132079 relation_ref 300655 // <dependency>
-  from ref 128111 z 2007 stereotype "<<import>>" xyz 73 387 3000 to ref 128623
+  from ref 128111 z 2007 stereotype "<<import>>" xyz 73 383 3000 to ref 128623
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132207 relation_ref 300783 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 436 324.5 3000 to ref 128879
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 436 324 3000 to ref 128879
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132335 relation_ref 300911 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 439 357.5 3000 to ref 129007
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 439 357 3000 to ref 129007
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132463 relation_ref 301039 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 255 357 3000 to ref 129135
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 255 350 3000 to ref 129135
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132591 relation_ref 301167 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 190 350.5 3000 to ref 129263
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 190 343 3000 to ref 129263
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 132719 relation_ref 301295 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 466 489 3000 to ref 129391
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 466 474 3000 to ref 129391
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
@@ -131,7 +131,7 @@ relationcanvas 133103 relation_ref 323567 // <dependency>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 133231 relation_ref 323695 // <dependency>
-  from ref 128111 z 2001 stereotype "<<import>>" xyz 317 547 3000 to ref 132847
+  from ref 128111 z 2001 stereotype "<<import>>" xyz 314 547 3000 to ref 132847
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end

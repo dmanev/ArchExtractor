@@ -1,6 +1,6 @@
 format 74
 "Analyzer" // EA_Model::ArchExtractor::Base::Analyzer
-  revision 16
+  revision 17
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -44,9 +44,24 @@ format 74
     //activity diagram settings
     package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
     show_infonote default drawing_language default show_stereotype_properties default
-    classdiagram 262127 "BaseAnalyzer class diag"
-      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    classdiagram 308975 "Analyzer pack diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A4
+    end
+
+    classdiagram 262127 "BaseAnalyzer class diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A3
+    end
+
+    sequencediagram 308847 "BaseAnalyzer init seq diag"
+      show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+      overlapping_bars size A4
+    end
+
+    sequencediagram 309103 "BaseAnalyzer run seq diag"
+      show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+      overlapping_bars size A3
     end
 
     class 128111 "BaseAnalyzer"
@@ -60,37 +75,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      operation 157167 "__init__"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 2
-	  param inout name "self" explicit_type ""
-	  param in name "inpIFileParserList" type class_ref 130159 // IFileParser
-	    defaultvalue "None"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}super(${class}, ${p0}).__init__()
-${body}
-"
-	
-      end
-
-      operation 128111 "scan"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "topDir" explicit_type ""
-	  param inout name "inoutAEModel" type class_ref 258927 // AEModel
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
-${docstring}${body}
-"
-	
-      end
-
+      comment "Base Analyzer class"
       classrelation 128623 // <realization>
 	relation 128623 -_-|>
 	  a public
@@ -108,15 +93,15 @@ ${docstring}${body}
 	  b parent class_ref 143599 // os
       end
 
-      classrelation 151791 // itsIFileParserList (<directional composition>)
-	relation 151535 *-->
+      classrelation 343919 // itsBaseFileParserList (<directional composition>)
+	relation 343407 *-->
 	  stereotype "list"
-	  a role_name "itsIFileParserList" multiplicity "*" private
+	  a role_name "itsBaseFileParserList" multiplicity "*" private
 	    python "${comment}${self}${name} = ${stereotype}()
 "
-	    classrelation_ref 151791 // itsIFileParserList (<directional composition>)
-	  b parent class_ref 130159 // IFileParser
-	set_oper operation_ref 253679 // set_itsIFileParserList
+	    classrelation_ref 343919 // itsBaseFileParserList (<directional composition>)
+	  b parent class_ref 128751 // BaseFileParser
+	set_oper operation_ref 353903 // set_itsBaseFileParserList
       end
 
       classrelation 276591 // <generalisation>
@@ -127,11 +112,44 @@ ${docstring}${body}
 	  b parent class_ref 258543 // FactoryProvider
       end
 
-      operation 253679 "set_itsIFileParserList"
+      operation 157167 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" type class_ref 128111 // BaseAnalyzer
+	  param in name "inpBFParserList" type class_ref 128751 // BaseFileParser
+	    defaultvalue "None"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 353775 "scan"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 3
+	  param in name "self" type class_ref 129519 // IAnalyzer
+	  param in name "topDir" explicit_type "string"
+	  param inout name "inoutAEModel" type class_ref 258927 // AEModel
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+	comment "Start walking over the \"topDir\" project's files.
+Resulting model artefacts to be filled in 'inoutAEModel'"
+      end
+
+      operation 353903 "set_itsBaseFileParserList"
 	stereotype "list"
 	force_body_gen public explicit_return_type "void"
 	nparams 1
-	  param in name "value" type class_ref 130159 // IFileParser
+	  param in name "value" type class_ref 128751 // BaseFileParser
 	
 	cpp_name_spec "set_${name}"
 	
@@ -139,12 +157,12 @@ ${docstring}${body}
 	
 	php_name_spec "set${Name}"
 	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
-${docstring}self.itsIFileParserList = ${p0}
+${docstring}self.itsBaseFileParserList = ${p0}
 "
 	python_name_spec "set${Name}"
 	
 	idl_name_spec "set_${name}"
-	set_of_relation classrelation_ref 151791 // itsIFileParserList (<directional composition>)
+	set_of_relation classrelation_ref 343919 // itsBaseFileParserList (<directional composition>)
       end
     end
 
@@ -159,11 +177,12 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Base Analyzer interface"
       operation 128879 "scan"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "topDir" explicit_type ""
+	  param in name "self" type class_ref 129519 // IAnalyzer
+	  param in name "topDir" explicit_type "string"
 	  param inout name "inoutAEModel" type class_ref 258927 // AEModel
 	
 	preserve_java_body_indent 
@@ -172,6 +191,8 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "Start walking over the \"topDir\" project's files.
+Resulting model artefacts to be filled in 'inoutAEModel'"
       end
     end
   end

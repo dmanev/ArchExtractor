@@ -3,7 +3,10 @@ import Datatype.DataType
 import Datatype.ArrayDataType
 
 class DataTypeFactory(object):
+    """Factory for data type elements"""
     def getDataType(self, inpDataTypeName):
+        """Returns DataType element by given name.
+        If the name does not exist it creates it."""
         ## Bouml preserved body begin 0004586F
         outDataType = None
         if(inpDataTypeName in self.itsDataTypeMap):
@@ -17,6 +20,8 @@ class DataTypeFactory(object):
         ## Bouml preserved body end 0004586F
         
     def getArrayDataType(self, inpDataTypeName):
+        """Returns ArrayDataType element by given name.
+        If the name does not exist it creates it."""
         ## Bouml preserved body begin 000457EF
         outArrayDataType = None
         if(inpDataTypeName in self.itsDataTypeMap):

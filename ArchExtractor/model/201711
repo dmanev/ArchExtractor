@@ -1,6 +1,6 @@
 format 74
 "ModelConverter" // EA_Model::ArchExtractor::Base::ModelConverter
-  revision 15
+  revision 16
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

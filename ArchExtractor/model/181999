@@ -1,6 +1,6 @@
 format 74
 "PortInterface" // EA_Model::ArchExtractor::Base::SwComponent::PortInterface
-  revision 15
+  revision 16
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -101,7 +101,7 @@ ${members}};
 "
       explicit_switch_type ""
       
-      comment "Represents \"DataElement\" from the meta-model"
+      comment "Represents 'DataElement' from the meta-model"
       classrelation 175599 // itsDataType (<directional composition>)
 	relation 175343 *-->
 	  a role_name "itsDataType" private
@@ -176,7 +176,7 @@ ${members}};
 "
       explicit_switch_type ""
       
-      comment "Represents \"Operation\" from the meta-model"
+      comment "Represents 'Operation' from the meta-model"
       classrelation 278255 // <generalisation>
 	relation 277743 ---|>
 	  a public
@@ -310,7 +310,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"SenderReceiverInterface\" from the meta-model"
+      comment "Represents 'SenderReceiverInterface' from the meta-model"
       classrelation 167407 // <generalisation>
 	relation 167151 ---|>
 	  a public
@@ -390,7 +390,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"ProvidedPort\" from the meta-model"
+      comment "Represents 'ProvidedPort' from the meta-model"
       classrelation 167151 // <generalisation>
 	relation 166895 ---|>
 	  a public
@@ -470,7 +470,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"SenderReceiverInterface\" from the meta-model"
+      comment "Represents 'SenderReceiverInterface' from the meta-model"
       classrelation 167279 // <generalisation>
 	relation 167023 ---|>
 	  a public
@@ -549,7 +549,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"RequiredPort\" from the meta-model"
+      comment "Represents 'RequiredPort' from the meta-model"
       classrelation 167023 // <generalisation>
 	relation 166767 ---|>
 	  a public
@@ -671,7 +671,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"ParamData\" from the meta-model"
+      comment "Represents 'ParamData' from the meta-model"
       classrelation 175983 // itsDataType (<directional composition>)
 	relation 175727 *-->
 	  a role_name "itsDataType" private
@@ -741,7 +741,7 @@ ${docstring}${members}
       explicit_switch_type ""
       
       comment "Method Factory for the meta-model elements in
-package \"PortInterface\""
+package 'PortInterface'"
       classrelation 275439 // <dependency>
 	relation 275055 -_->
 	  stereotype "import"
@@ -803,7 +803,7 @@ based on given name and child class of IPortInterface"
 ${docstring}${body}
 "
 	
-	comment "Factory method which returns \"SenderReceiverInterface\" object element"
+	comment "Factory method which returns 'SenderReceiverInterface' object element"
       end
 
       operation 252271 "getClientServerIf"
@@ -818,7 +818,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
-	comment "Factory method which returns \"ClientServerInterface\" object element"
+	comment "Factory method which returns 'ClientServerInterface' object element"
       end
 
       operation 300655 "get_itsIPortInterfaceMap"

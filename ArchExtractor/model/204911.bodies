@@ -2,5 +2,5 @@ class StkControlIf
 !!!204527.python!!!	__init__(inout self : )
         self.setName('Control')
         ctrlOp = PortInterface.Operation.Operation()
-        ctrlOp.setName('Envoke')
+        ctrlOp.setName('Invoke')
         self.itsOperationList = [ctrlOp] 

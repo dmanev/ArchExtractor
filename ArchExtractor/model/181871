@@ -1,6 +1,6 @@
 format 74
 "Datatype" // EA_Model::ArchExtractor::Base::SwComponent::Datatype
-  revision 8
+  revision 9
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -70,6 +70,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents compositional data type element"
       classrelation 191215 // <generalisation>
 	relation 190959 ---|>
 	  a public
@@ -90,7 +91,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Represents \"DataType\" from the meta-model"
+      comment "Represents 'DataType' from the meta-model"
       attribute 148335 "lowerLimit"
 	private explicit_type "long"
 	cpp_decl ""
@@ -99,6 +100,7 @@ ${docstring}${members}
 	python_decl "${comment}${self}${name} = ${value}
 "
 	idl_decl ""
+	comment "Lower limit of the data type element"
       end
 
       attribute 148463 "upperLimit"
@@ -109,6 +111,7 @@ ${docstring}${members}
 	python_decl "${comment}${self}${name} = ${value}
 "
 	idl_decl ""
+	comment "Upper limit of the data type element"
       end
 
       classrelation 278767 // <generalisation>
@@ -131,6 +134,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents array data element"
       classrelation 191343 // <generalisation>
 	relation 191087 ---|>
 	  a public
@@ -248,6 +252,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Factory for data type elements"
       classrelation 308975 // itsDataTypeMap (<directional aggregation>)
 	relation 308463 o-->
 	  stereotype "map"
@@ -280,6 +285,8 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "Returns DataType element by given name.
+If the name does not exist it creates it."
       end
 
       operation 284655 "getArrayDataType"
@@ -294,6 +301,8 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns ArrayDataType element by given name.
+If the name does not exist it creates it."
       end
 
       operation 300399 "get_itsDataTypeMap"

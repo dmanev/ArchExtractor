@@ -3,6 +3,7 @@ import Datatype.CompositeDataType
 import Datatype.DataType
 
 class ArrayDataType(Datatype.CompositeDataType.CompositeDataType):
+    """Represents array data element"""
     def getMaxNumberOfElements(self):
         return self.maxNumberOfElements
         

@@ -3,6 +3,7 @@ import Datatype.DataType
 import Infrastructure.Identifiable
 
 class ParamData(Infrastructure.Identifiable.Identifiable):
+    """Represents 'ParamData' from the meta-model"""
     def getItsDataType(self):
         return self.itsDataType
         

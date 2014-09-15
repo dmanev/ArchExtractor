@@ -4,6 +4,7 @@ import PortInterface.ParamData
 import Datatype.DataType
 
 class Operation(Infrastructure.Identifiable.Identifiable):
+    """Represents 'Operation' from the meta-model"""
     def __init__(self):
         super(Operation, self).__init__()
         self.itsParamList = list()

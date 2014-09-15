@@ -1,9 +1,10 @@
 
 import PortInterface.IPort
-import PortInterface.IPortInterface
 import Infrastructure.Identifiable
+import PortInterface.IPortInterface
 
 class RequiredPort(PortInterface.IPort.IPort, Infrastructure.Identifiable.Identifiable):
+    """Represents 'RequiredPort' from the meta-model"""
     def __init__(self, inpIPortIf):
         super(RequiredPort, self).__init__()
         self.itsIPortInterface = PortInterface.IPortInterface.IPortInterface()

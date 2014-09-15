@@ -1,6 +1,6 @@
 format 74
-"StkJilFileCriteria" // EA_Model::System::Specific::STK::StkParser::StkJilFileCriteria
-  revision 12
+"StkJilFileCriteria" // EA_Model::ArchExtractor::Specific::STK::StkParser::StkJilFileCriteria
+  revision 13
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

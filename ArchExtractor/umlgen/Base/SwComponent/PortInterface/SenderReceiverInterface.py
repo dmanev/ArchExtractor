@@ -4,6 +4,7 @@ import PortInterface.DataElement
 import Infrastructure.PackageableElement
 
 class SenderReceiverInterface(PortInterface.IPortInterface.IPortInterface, Infrastructure.PackageableElement.PackageableElement):
+    """Represents 'SenderReceiverInterface' from the meta-model"""
     def getItsDataElementList(self):
         return self.itsDataElementList
         

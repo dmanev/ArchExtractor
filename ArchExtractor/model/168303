@@ -1,6 +1,6 @@
 format 74
 "Infrastructure" // EA_Model::ArchExtractor::Base::Infrastructure
-  revision 10
+  revision 11
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -85,14 +85,14 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "FactoryProvider is an implementation of a \"Handler\" in 
-\"Chain of responsibility\" design pattern.
+      comment "FactoryProvider is an implementation of a 'Handler' in 
+'Chain of responsibility' design pattern.
 It either will provide the requested factories for object
-or it will pass the request to its \"Successor\" object."
+or it will pass the request to its 'Successor' object."
       classrelation 276463 // itsSuccessor (<unidirectional association>)
 	relation 275951 --->
 	  a role_name "itsSuccessor" private
-	    comment "Represents the \"Successor\" in \"Chain of responsibility\" design pattern"
+	    comment "Represents the 'Successor' in 'Chain of responsibility' design pattern"
 	    python "${comment}${self}${name} = ${value}
 "
 	    classrelation_ref 276463 // itsSuccessor (<unidirectional association>)
@@ -189,7 +189,7 @@ ${docstring}${members}
       explicit_switch_type ""
       
       comment "Major class for the meta-model. A class who inherits it
-will be treated as \"Identifiable\", i.e. it has a name."
+will be treated as 'Identifiable', i.e. it has a name."
       attribute 141807 "Name"
 	private explicit_type "string"
 	cpp_decl ""
@@ -200,7 +200,7 @@ will be treated as \"Identifiable\", i.e. it has a name."
 	idl_decl ""
 	get_oper operation_ref 167023 // get_Name
 	set_oper operation_ref 167151 // set_Name
-	comment "Name of the class"
+	comment "Name of the element"
       end
 
       operation 167023 "get_Name"
@@ -252,7 +252,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      comment "Container of \"PackagableElements\" in the meta-model"
+      comment "Container of 'PackagableElements' in the meta-model"
       classrelation 277615 // <generalisation>
 	relation 277103 ---|>
 	  a public
@@ -321,7 +321,7 @@ ${body}
 ${docstring}${body}
 "
 	
-	comment "Adds \"PackagableElement\""
+	comment "Adds 'PackagableElement'"
       end
 
       operation 277359 "getElementList"
@@ -427,8 +427,8 @@ ${docstring}${members}
       explicit_switch_type ""
       
       comment "Major class for the meta-model. A class who inherits it
-will be treated as \"Packagable\", i.e. it can be directly
-included in \"AEPackage\"."
+will be treated as 'Packagable', i.e. it can be directly
+included in 'AEPackage'."
       classrelation 277231 // <generalisation>
 	relation 276719 ---|>
 	  a public
@@ -497,6 +497,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Represents root element of the meta-model 'AEModel'"
       classrelation 302063 // <generalisation>
 	relation 301551 ---|>
 	  a public
@@ -732,7 +733,7 @@ ${docstring}${members}
       explicit_switch_type ""
       
       comment "Method Factory for the meta-model elements in
-package \"Infrastructure\""
+package 'Infrastructure'"
       classrelation 292719 // <dependency>
 	relation 292207 -_->
 	  stereotype "import"
@@ -764,6 +765,8 @@ package \"Infrastructure\""
 ${docstring}${body}
 "
 	
+	comment "Returns 'AEPackage' by given input 'AEPackage' path.
+If it does not exists yet it creates it."
       end
 
       operation 276335 "getAEModel"
@@ -777,6 +780,8 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns AEModel from the factory.
+If it does not exists yet it creates it."
       end
 
       operation 276847 "getRootPackageList"

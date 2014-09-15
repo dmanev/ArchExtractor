@@ -1,6 +1,6 @@
 format 74
-"StkPortInterfaces" // EA_Model::System::Specific::STK::StkPortInterfaces
-  revision 11
+"StkPortInterfaces" // EA_Model::ArchExtractor::Specific::STK::StkPortInterfaces
+  revision 12
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
