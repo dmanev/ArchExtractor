@@ -37,6 +37,8 @@ format 74
 
   mark_for_import
   
+  ncouples 1
+  key "html dir" value "/tmp/umlGenDoc/"
   package_ref 128239 // EA_Model
 preserve_bodies
 

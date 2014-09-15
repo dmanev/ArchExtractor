@@ -44,6 +44,11 @@ format 74
     //activity diagram settings
     package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
     show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 309231 "Parser pack diag"
+      draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
     classdiagram 188143 "BasePortCriteria class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A4
@@ -51,10 +56,15 @@ format 74
 
     classdiagram 262383 "BaseFileParser class diag"
       draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-      size A4
+      size A3
     end
 
-    sequencediagram 188271 "BaseFileParser.fulfillComponentData() seq diag"
+    sequencediagram 309359 "BaseFileParser init seq diag"
+      show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
+      overlapping_bars size A3
+    end
+
+    sequencediagram 188271 "BaseFileParser run seq diag"
       show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
       overlapping_bars size A3
     end
@@ -70,6 +80,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Abstract class (Interface) representing all connector criteria in the system"
       operation 182127 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
@@ -97,10 +108,11 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Abstract class (Interface) representing all file parsers in the system"
       operation 188783 "updateComponent"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 4
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 130159 // IFileParser
 	  param in name "inpName" explicit_type "string"
 	  param in name "filePath" explicit_type "string"
 	  param out name "outIComponent" type class_ref 129647 // IComponent
@@ -111,13 +123,15 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
+	comment "This method will find or create a component based on 
+the path given"
       end
 
       operation 129391 "getComponentNameList"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "fileName" explicit_type ""
+	  param in name "self" type class_ref 130159 // IFileParser
+	  param in name "fileName" explicit_type "string"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -125,12 +139,13 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns Components' name list"
       end
 
       operation 149359 "fulfillComponentData"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 4
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 130159 // IFileParser
 	  param in name "cmpName" explicit_type "string"
 	  param in name "filePath" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
@@ -141,12 +156,13 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Fulfills Component's data based on the file under analysis"
       end
 
       operation 149999 "fileFilter"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130159 // IFileParser
 	  param in name "fileName" explicit_type "string"
 	
 	preserve_java_body_indent 
@@ -155,6 +171,8 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns True if the given path is of known file extension,
+otherwise returns False"
       end
     end
 
@@ -169,12 +187,41 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Base abstract realization of IFileParser"
+      classrelation 158319 // <dependency>
+	relation 158063 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 158319 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
       classrelation 129263 // <realization>
 	relation 129263 -_-|>
 	  a public
 	    python "${type}"
 	    classrelation_ref 129263 // <realization>
 	  b parent class_ref 130159 // IFileParser
+      end
+
+      classrelation 276975 // <generalisation>
+	relation 276463 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 276975 // <generalisation>
+	  b parent class_ref 258543 // FactoryProvider
+      end
+
+      classrelation 344047 // itsBasePortCriteriaList (<directional composition>)
+	relation 343535 *-->
+	  stereotype "list"
+	  a role_name "itsBasePortCriteriaList" multiplicity "*" private
+	    python "${comment}${self}${name} = ${stereotype}()
+"
+	    classrelation_ref 344047 // itsBasePortCriteriaList (<directional composition>)
+	  b parent class_ref 185327 // BasePortCriteria
+	set_oper operation_ref 354287 // set_itsBasePortCriteriaList
       end
 
       attribute 134767 "fileFilterCriteria"
@@ -186,6 +233,7 @@ ${docstring}${members}
 "
 	idl_decl ""
 	get_oper operation_ref 150383 // get_fileFilterCriteria
+	comment "Represents the file criteria for method fileFilter()"
       end
 
       attribute 161519 "fileContent"
@@ -197,6 +245,71 @@ ${docstring}${members}
 	python_decl "${comment}${self}${name} = ${value}
 "
 	idl_decl ""
+	comment "Stores the content of a file"
+      end
+
+      operation 175215 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param inout name "self" type class_ref 128751 // BaseFileParser
+	  param in name "inpBasePortCriteriaList" type class_ref 185327 // BasePortCriteria
+	    defaultvalue "None"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 354031 "fileFilter"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 2
+	  param in name "self" type class_ref 130159 // IFileParser
+	  param in name "fileName" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+	comment "Returns True if the given path is of known file extension,
+otherwise returns False"
+      end
+
+      operation 182255 "preprocessFile"
+	preserve_cpp_body_indent public explicit_return_type "bool"
+	nparams 2
+	  param in name "self" explicit_type "any"
+	  param in name "inpFilePath" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+	comment "Preprocess input file"
+      end
+
+      operation 354159 "fulfillComponentData"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 4
+	  param in name "self" type class_ref 130159 // IFileParser
+	  param in name "cmpName" explicit_type "string"
+	  param in name "filePath" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}, ${p3}${v3}${)}:
+${docstring}${body}
+"
+	
+	comment "Fulfills Component's data based on the file under analysis"
       end
 
       operation 150383 "get_fileFilterCriteria"
@@ -217,99 +330,11 @@ ${docstring}return self.fileFilterCriteria
 	get_of_attribute attribute_ref 134767 // fileFilterCriteria
       end
 
-      operation 157551 "fileFilter"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "fileName" explicit_type "string"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      classrelation 158319 // <dependency>
-	relation 158063 -_->
-	  stereotype "import"
-	  a package
-	    python "${type}"
-	    classrelation_ref 158319 // <dependency>
-	  b parent class_ref 156655 // re
-      end
-
-      classrelation 168687 // itsIPortCriteriaList (<directional composition>)
-	relation 168431 *-->
-	  stereotype "list"
-	  a role_name "itsIPortCriteriaList" multiplicity "*" private
-	    python "${comment}${self}${name} = ${stereotype}()
-"
-	    classrelation_ref 168687 // itsIPortCriteriaList (<directional composition>)
-	  b parent class_ref 130415 // IPortCriteria
-	set_oper operation_ref 253551 // set_itsIPortCriteriaList
-      end
-
-      operation 175215 "__init__"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 2
-	  param inout name "self" explicit_type ""
-	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
-	    defaultvalue "None"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}super(${class}, ${p0}).__init__()
-${body}
-"
-	
-      end
-
-      operation 182255 "preprocessFile"
-	preserve_cpp_body_indent public explicit_return_type "bool"
-	nparams 2
-	  param in name "self" explicit_type "any"
-	  param in name "inpFilePath" explicit_type "string"
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      operation 189039 "fulfillComponentData"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 4
-	  param in name "self" explicit_type "any"
-	  param in name "cmpName" explicit_type "string"
-	  param in name "filePath" explicit_type "string"
-	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}, ${p3}${v3}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      classrelation 276975 // <generalisation>
-	relation 276463 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 276975 // <generalisation>
-	  b parent class_ref 258543 // FactoryProvider
-      end
-
-      operation 253551 "set_itsIPortCriteriaList"
+      operation 354287 "set_itsBasePortCriteriaList"
 	stereotype "list"
 	force_body_gen public explicit_return_type "void"
 	nparams 1
-	  param in name "value" type class_ref 130415 // IPortCriteria
+	  param in name "value" type class_ref 185327 // BasePortCriteria
 	
 	cpp_name_spec "set_${name}"
 	
@@ -317,12 +342,12 @@ ${docstring}${body}
 	
 	php_name_spec "set${Name}"
 	python_def "${@}${static}${abstract}def ${name}${(}self, ${p0}${)}:
-${docstring}self.itsIPortCriteriaList = ${p0}
+${docstring}self.itsBasePortCriteriaList = ${p0}
 "
 	python_name_spec "set${Name}"
 	
 	idl_name_spec "set_${name}"
-	set_of_relation classrelation_ref 168687 // itsIPortCriteriaList (<directional composition>)
+	set_of_relation classrelation_ref 344047 // itsBasePortCriteriaList (<directional composition>)
       end
     end
 
@@ -337,6 +362,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Base abstract realization of IPortCriteria"
       classrelation 276719 // <realization>
 	relation 276207 -_-|>
 	  a public

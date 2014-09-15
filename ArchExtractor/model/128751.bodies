@@ -1,21 +1,21 @@
 class BaseFileParser
-!!!157551.python!!!	fileFilter(in self : , in fileName : string)
+!!!175215.python!!!	__init__(inout self : BaseFileParser, in inpBasePortCriteriaList : BasePortCriteria = None)
+        self.itsBasePortCriteriaList = inpBasePortCriteriaList
+        for BPCriteria in self.itsBasePortCriteriaList:
+            BPCriteria.setItsSuccessor(self)
+!!!354031.python!!!	fileFilter(in self : IFileParser, in fileName : string)
         bResult = False
         if re.match(self.fileFilterCriteria, fileName, re.I):
             bResult = True
             
         return bResult
-!!!175215.python!!!	__init__(inout self : , in inpIPortCriteriaList : IPortCriteria = None)
-        self.itsIPortCriteriaList = inpIPortCriteriaList
-        for iPortCriteria in self.itsIPortCriteriaList:
-            iPortCriteria.setItsSuccessor(self)
 !!!182255.python!!!	preprocessFile(in self : any, in inpFilePath : string) : bool
         pass
-!!!189039.python!!!	fulfillComponentData(in self : any, in cmpName : string, in filePath : string, inout inoutIComponent : IComponent)
+!!!354159.python!!!	fulfillComponentData(in self : IFileParser, in cmpName : string, in filePath : string, inout inoutIComponent : IComponent)
             
         bValidityCheck = self.preprocessFile(filePath)
         
         if(False != bValidityCheck):
-            for iPortCriteria in self.itsIPortCriteriaList:
-                iPortCriteria.execute(self.fileContent, inoutIComponent)
+            for BPCriteria in self.itsBasePortCriteriaList:
+                BPCriteria.execute(self.fileContent, inoutIComponent)
         return inoutIComponent

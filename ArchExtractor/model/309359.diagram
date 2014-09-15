@@ -1,0 +1,48 @@
+format 74
+
+classinstance 128111 class_ref 129519 // IAnalyzer
+  name ""   xyz 30 4 2000 life_line_z 2000
+classinstance 128239 class_ref 128751 // BaseFileParser
+  name ""   xyz 357 7 2000 life_line_z 2000
+classinstance 128367 class_ref 185327 // BasePortCriteria
+  name ""   xyz 631 4 2000 life_line_z 2000
+fragment 129391 "loop for BPCriteria in itsBasePortCriteriaList"
+  xyzwh 123 153 2000 605 107
+end
+durationcanvas 128495 classinstance_ref 128111 // :IAnalyzer
+  xyzwh 53 106 2010 11 184
+end
+durationcanvas 128623 classinstance_ref 128239 // :BaseFileParser
+  xyzwh 401 106 2010 11 184
+end
+durationcanvas 128879 classinstance_ref 128239 // :BaseFileParser
+  xyzwh 401 134 2010 11 51
+end
+durationcanvas 129007 classinstance_ref 128367 // :BasePortCriteria
+  xyzwh 678 166 2010 11 54
+end
+msg 128751 synchronous
+  from durationcanvas_ref 128495
+  to durationcanvas_ref 128623
+  yz 107 2015 msg operation_ref 175215 // "__init__(inout self : BaseFileParser, in inpBasePortCriteriaList : BasePortCriteria = None)"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  args "<List of BasePortCriteria instances>"
+  label_xy 126 91
+msg 129135 synchronous
+  from durationcanvas_ref 128879
+  to durationcanvas_ref 129007
+  yz 172 2015 msg operation_ref 285807 // "getDataTypeFactory(in self : FactoryProvider) : DataTypeFactory"
+  show_full_operations_definition default drawing_language default show_context_mode default
+  args "self"
+  label_xy 485 156
+msg 129263 return
+  from durationcanvas_ref 128623
+  to durationcanvas_ref 128495
+  yz 279 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default show_context_mode default
+msg 129519 return
+  from durationcanvas_ref 129007
+  to durationcanvas_ref 128623
+  yz 202 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default show_context_mode default
+end

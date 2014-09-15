@@ -1,51 +1,58 @@
 
-import Parser.IFileParser
 import re
-import PortInterface.IPortCriteria
-import Components.IComponent
+import Parser.IFileParser
 import Infrastructure.FactoryProvider
+import Parser.BasePortCriteria
+import Components.IComponent
 
 class BaseFileParser(Parser.IFileParser.IFileParser, Infrastructure.FactoryProvider.FactoryProvider):
-    def getFileFilterCriteria(self):
-        return self.fileFilterCriteria
+    """Base abstract realization of IFileParser"""
+    def __init__(self, inpBasePortCriteriaList = None):
+        super(BaseFileParser, self).__init__()
+        self.itsBasePortCriteriaList = list()
+        #Represents the file criteria for method fileFilter()
+        self.fileFilterCriteria = None
+        #Stores the content of a file
+        self.fileContent = ''
+        ## Bouml preserved body begin 0002AC6F
+        self.itsBasePortCriteriaList = inpBasePortCriteriaList
+        for BPCriteria in self.itsBasePortCriteriaList:
+            BPCriteria.setItsSuccessor(self)
+        ## Bouml preserved body end 0002AC6F
         
     def fileFilter(self, fileName):
-        ## Bouml preserved body begin 0002676F
+        """Returns True if the given path is of known file extension,
+        otherwise returns False"""
+        ## Bouml preserved body begin 000566EF
         bResult = False
         if re.match(self.fileFilterCriteria, fileName, re.I):
             bResult = True
             
         return bResult
-        ## Bouml preserved body end 0002676F
-        
-    def __init__(self, inpIPortCriteriaList = None):
-        super(BaseFileParser, self).__init__()
-        self.fileFilterCriteria = None
-        self.fileContent = ''
-        self.itsIPortCriteriaList = list()
-        ## Bouml preserved body begin 0002AC6F
-        self.itsIPortCriteriaList = inpIPortCriteriaList
-        for iPortCriteria in self.itsIPortCriteriaList:
-            iPortCriteria.setItsSuccessor(self)
-        ## Bouml preserved body end 0002AC6F
+        ## Bouml preserved body end 000566EF
         
     def preprocessFile(self, inpFilePath):
+        """Preprocess input file"""
         ## Bouml preserved body begin 0002C7EF
         pass
         ## Bouml preserved body end 0002C7EF
         
     def fulfillComponentData(self, cmpName, filePath, inoutIComponent):
-        ## Bouml preserved body begin 0002E26F
+        """Fulfills Component's data based on the file under analysis"""
+        ## Bouml preserved body begin 0005676F
             
         bValidityCheck = self.preprocessFile(filePath)
         
         if(False != bValidityCheck):
-            for iPortCriteria in self.itsIPortCriteriaList:
-                iPortCriteria.execute(self.fileContent, inoutIComponent)
+            for BPCriteria in self.itsBasePortCriteriaList:
+                BPCriteria.execute(self.fileContent, inoutIComponent)
         return inoutIComponent
-        ## Bouml preserved body end 0002E26F
+        ## Bouml preserved body end 0005676F
         
-    def setItsIPortCriteriaList(self, value):
-        self.itsIPortCriteriaList = value
+    def getFileFilterCriteria(self):
+        return self.fileFilterCriteria
+        
+    def setItsBasePortCriteriaList(self, value):
+        self.itsBasePortCriteriaList = value
         
     
