@@ -1,9 +1,11 @@
 
-import Components.IComponent
 import re
 import Parser.BasePortCriteria
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkJilComponentCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK JIL file Component criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0002FD6F
         componentNameList = re.findall(r'Component\s+(\w+)', inpTextContent, re.I)

@@ -1,11 +1,13 @@
 
-import Parser.BasePortCriteria
 import re
 import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.RequiredPort
+import Parser.BasePortCriteria
 import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCFileReqWriteTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK C implementation file reaquired TOSSignal write criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0003BF6F
         for tosSignal in re.findall(r'TOSWriteSignal\s*\(\s*c(TOSSignal\w+)\s*\)', inpTextContent):

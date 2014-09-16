@@ -6,6 +6,7 @@ import StkPortInterfaces.StkControlIf
 import Parser.BasePortCriteria
 
 class StkJilOnControlCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK JIL file required Control criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0003186F
         for seq in re.findall(r'OnControl\s*=\s*(\w+)\s*\{([\w\s=\";]*)\};', inpTextContent, re.I):

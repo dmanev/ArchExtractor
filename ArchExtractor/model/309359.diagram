@@ -31,7 +31,7 @@ msg 128751 synchronous
 msg 129135 synchronous
   from durationcanvas_ref 128879
   to durationcanvas_ref 129007
-  yz 172 2015 msg operation_ref 285807 // "getDataTypeFactory(in self : FactoryProvider) : DataTypeFactory"
+  yz 172 2015 msg operation_ref 253423 // "set_itsSuccessor(in value : FactoryProvider) : void"
   show_full_operations_definition default drawing_language default show_context_mode default
   args "self"
   label_xy 485 156

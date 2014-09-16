@@ -13,6 +13,7 @@ import Datatype.DataType
 import Datatype.ArrayDataType
 
 class XMIConverter(object):
+    """Base class for serialization of AEModel to XMI UML model"""
     def __init__(self):
         self.interfaceCreateMap = None
         self.xmiTypesMap = None
@@ -26,6 +27,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 0004356F
         
     def getXMIBaseDataType(self):
+        """Returns XMI base data type"""
         ## Bouml preserved body begin 0004FF6F
         xmiDtCls = self.xmiFactory.create_Class()
         xmiDtCls.name = 'DataType'
@@ -43,6 +45,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 0004FF6F
         
     def getXMIBaseArrayDataType(self):
+        """Returns XMI base array data type"""
         ## Bouml preserved body begin 000518EF
         xmiArrDtCls = self.xmiFactory.create_Class()
         xmiArrDtCls.name = 'ArrayDataType'
@@ -60,6 +63,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 000518EF
         
     def importBaseComponent(self, inpBaseComponent, inoutXmiPackage):
+        """Imports BaseComponent into the XMI package"""
         ## Bouml preserved body begin 000454EF
         xmiComponent = self.xmiFactory.create_Component()
         xmiComponent.name = inpBaseComponent.getName()
@@ -77,6 +81,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 000454EF
         
     def importBaseInterfaces(self, inoutXmiPackage):
+        """Imports base interfaces(SenderReceiverInterface, ClientServerInterface) into XMI Package"""
         ## Bouml preserved body begin 00054C6F
         baseIfList = [iface() for iface in self.interfaceCreateMap.keys()]
         for baseIf in baseIfList:
@@ -87,6 +92,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 00054C6F
         
     def importSenderReceiverInterface(self, inpSRIf, inoutXmiPackage):
+        """Imports SenderReceiverInterface into XMI package"""
         ## Bouml preserved body begin 000455EF
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpSRIf.getName()
@@ -107,6 +113,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 000455EF
         
     def importClientServerInterface(self, inpCSIf, inoutXmiPackage):
+        """Imports ClientServerInterface into XMI package"""
         ## Bouml preserved body begin 0004566F
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpCSIf.getName()
@@ -131,6 +138,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 0004566F
         
     def importAEPackage(self, inpAEPackage, inoutXmiPackage):
+        """Imports AEPackage into XMI package"""
         ## Bouml preserved body begin 00043AEF
         newXmiPackage = self.xmiFactory.create_Package()
         newXmiPackage.name = inpAEPackage.getName()
@@ -148,6 +156,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 00043AEF
         
     def importTypes(self, inpAEModel, inoutXmiPackage):
+        """Imports all data types into XMI package"""
         ## Bouml preserved body begin 000494EF
         dtf = inpAEModel.getDataTypeFactory()
         ifPack = self.xmiFactory.create_Package()
@@ -193,6 +202,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 000494EF
         
     def importInterfaces(self, inpAEModel, inoutXmiPackage):
+        """Imports all interfaces into XMI package"""
         ## Bouml preserved body begin 000495EF
         pif = inpAEModel.getPortInterfaceFactory()
         xmiIfPack = self.xmiFactory.create_Package()
@@ -216,6 +226,7 @@ class XMIConverter(object):
         ## Bouml preserved body end 000495EF
         
     def convert(self, inpAEModel, outXMIMdlRepo):
+        """Converts AEModel into XMI model"""
         ## Bouml preserved body begin 000434EF
         outXMIMdlRepo = xmi.core.Repository()
         self.xmiFactory = xmi.core.Factory(outXMIMdlRepo)

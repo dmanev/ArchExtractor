@@ -1,6 +1,6 @@
 format 74
 "Parser" // EA_Model::ArchExtractor::Base::Parser
-  revision 20
+  revision 21
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -84,7 +84,7 @@ ${docstring}${members}
       operation 182127 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -283,7 +283,7 @@ otherwise returns False"
       operation 182255 "preprocessFile"
 	preserve_cpp_body_indent public explicit_return_type "bool"
 	nparams 2
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 128751 // BaseFileParser
 	  param in name "inpFilePath" explicit_type "string"
 	
 	preserve_java_body_indent 

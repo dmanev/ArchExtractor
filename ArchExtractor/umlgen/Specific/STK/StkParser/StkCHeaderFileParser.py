@@ -1,8 +1,10 @@
 
 import StkParser.StkFileParser
 import PortInterface.IPortCriteria
+import Parser.BaseFileParser
 
 class StkCHeaderFileParser(StkParser.StkFileParser.StkFileParser):
+    """C header file parser"""
     def __init__(self, inpIPortCriteriaList):
         super(StkCHeaderFileParser, self).__init__(inpIPortCriteriaList)
         ## Bouml preserved body begin 00036EEF

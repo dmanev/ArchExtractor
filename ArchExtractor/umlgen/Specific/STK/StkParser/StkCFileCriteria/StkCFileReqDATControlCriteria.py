@@ -6,6 +6,7 @@ import PortInterface.RequiredPort
 import Components.IComponent
 
 class StkCFileReqDATControlCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK C implementation file reaquired DATControl criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 00038B6F
         for datControl in re.findall(r'mDATControl\s*\(\s*(\w+)\s*,\s*\w+\s*\)', inpTextContent):

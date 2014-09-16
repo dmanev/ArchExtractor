@@ -3,12 +3,14 @@ import re
 import PortInterface.ProvidedPort
 import PortInterface.RequiredPort
 import PortInterface.SenderReceiverInterface
-import Components.IComponent
-import StkParser.StkPortCriteria
 import Datatype.ArrayDataType
 import PortInterface.DataElement
+import StkParser.StkPortCriteria
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkJilDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK JIL file data access criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0003536F
         if re.search(r'Data\s+(\w+)', inpTextContent):

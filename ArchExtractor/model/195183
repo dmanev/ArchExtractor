@@ -1,6 +1,6 @@
 format 74
 "StkJilFileCriteria" // EA_Model::ArchExtractor::Specific::STK::StkParser::StkJilFileCriteria
-  revision 13
+  revision 14
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -80,6 +80,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK JIL file data access criteria"
       classrelation 226671 // <dependency>
 	relation 226415 -_->
 	  stereotype "import"
@@ -116,29 +117,6 @@ ${docstring}${members}
 	  b parent class_ref 164079 // SenderReceiverInterface
       end
 
-      operation 217967 "execute"
-	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
-	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "inpTextContent" explicit_type "string"
-	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      classrelation 228079 // <generalisation>
-	relation 227823 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 228079 // <generalisation>
-	  b parent class_ref 218351 // StkPortCriteria
-      end
-
       classrelation 228335 // <dependency>
 	relation 228079 -_->
 	  stereotype "import"
@@ -156,6 +134,29 @@ ${docstring}${body}
 	    classrelation_ref 229871 // <dependency>
 	  b parent class_ref 164335 // DataElement
       end
+
+      classrelation 228079 // <generalisation>
+	relation 227823 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 228079 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
+      operation 217967 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" type class_ref 130415 // IPortCriteria
+	  param in name "inpTextContent" explicit_type "string"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
+      end
     end
 
     class 211567 "StkJilTOSSignalCriteria"
@@ -169,6 +170,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK JIL file TOSSignal criteria"
       classrelation 219119 // <dependency>
 	relation 218863 -_->
 	  stereotype "import"
@@ -196,10 +198,18 @@ ${docstring}${members}
 	  b parent class_ref 163695 // ProvidedPort
       end
 
+      classrelation 227823 // <generalisation>
+	relation 227567 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227823 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
       operation 211439 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -209,14 +219,6 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
-      end
-
-      classrelation 227823 // <generalisation>
-	relation 227567 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 227823 // <generalisation>
-	  b parent class_ref 185327 // BasePortCriteria
       end
     end
 
@@ -231,6 +233,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK JIL file required Control criteria"
       classrelation 204911 // <dependency>
 	relation 204655 -_->
 	  stereotype "import"
@@ -293,6 +296,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK JIL file provided Control criteria"
       classrelation 218607 // <dependency>
 	relation 218351 -_->
 	  stereotype "import"
@@ -320,10 +324,18 @@ ${docstring}${members}
 	  b parent class_ref 163695 // ProvidedPort
       end
 
+      classrelation 227695 // <generalisation>
+	relation 227439 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227695 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
       operation 211055 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -333,14 +345,6 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
-      end
-
-      classrelation 227695 // <generalisation>
-	relation 227439 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 227695 // <generalisation>
-	  b parent class_ref 185327 // BasePortCriteria
       end
     end
 
@@ -355,21 +359,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      operation 195951 "execute"
-	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
-	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "inpTextContent" explicit_type "char"
-	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
-${docstring}${body}
-"
-	
-      end
-
+      comment "STK JIL file Component criteria"
       classrelation 198255 // <dependency>
 	relation 197999 -_->
 	  stereotype "import"
@@ -385,6 +375,21 @@ ${docstring}${body}
 	    python "${type}"
 	    classrelation_ref 227311 // <generalisation>
 	  b parent class_ref 185327 // BasePortCriteria
+      end
+
+      operation 195951 "execute"
+	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
+	nparams 3
+	  param in name "self" type class_ref 130415 // IPortCriteria
+	  param in name "inpTextContent" explicit_type "char"
+	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
+${docstring}${body}
+"
+	
       end
     end
   end

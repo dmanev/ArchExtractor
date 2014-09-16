@@ -1,6 +1,6 @@
 format 74
 "Datatype" // EA_Model::ArchExtractor::Base::SwComponent::Datatype
-  revision 9
+  revision 10
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

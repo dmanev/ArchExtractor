@@ -4,8 +4,10 @@ import re
 import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.RequiredPort
 import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCFileReqReadTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK C implementation file reaquired TOSSignal read criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0003BEEF
         for tosSignal in re.findall(r'TOSReadSignal\s*\(\s*c(TOSSignal\w+)\s*\)', inpTextContent):

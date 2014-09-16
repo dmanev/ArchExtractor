@@ -1,6 +1,6 @@
 format 74
 "ModelConverter" // EA_Model::ArchExtractor::Base::ModelConverter
-  revision 16
+  revision 17
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -44,12 +44,17 @@ format 74
     //activity diagram settings
     package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
     show_infonote default drawing_language default show_stereotype_properties default
+    classdiagram 315887 "ModelConverter pack diag"
+      draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+      size A4
+    end
+
     classdiagram 282223 "XMIConverter class diag"
       draw_all_relations no hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
       size A3
     end
 
-    sequencediagram 282351 "XMIConverter running diagram"
+    sequencediagram 282351 "XMIConverter run seq diag"
       show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default show_class_context_mode default show_msg_context_mode default
       overlapping_bars size A3
     end
@@ -65,6 +70,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "Base class for serialization of AEModel to XMI UML model"
       classrelation 300527 // <dependency>
 	relation 300015 -_->
 	  stereotype "import"
@@ -155,6 +161,24 @@ ${docstring}${members}
 	  b parent class_ref 258927 // AEModel
       end
 
+      classrelation 324079 // <dependency>
+	relation 323567 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 324079 // <dependency>
+	  b parent class_ref 170991 // DataType
+      end
+
+      classrelation 324207 // <dependency>
+	relation 323695 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 324207 // <dependency>
+	  b parent class_ref 185199 // ArrayDataType
+      end
+
       attribute 181231 "interfaceCreateMap"
 	private explicit_type ""
 	stereotype "map"
@@ -191,7 +215,7 @@ ${docstring}${members}
       operation 275823 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 1
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 278511 // XMIConverter
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -202,9 +226,9 @@ ${docstring}${body}
       end
 
       operation 327535 "getXMIBaseDataType"
-	preserve_cpp_body_indent public explicit_return_type ""
+	preserve_cpp_body_indent public explicit_return_type "any"
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -212,12 +236,13 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns XMI base data type"
       end
 
       operation 334063 "getXMIBaseArrayDataType"
-	preserve_cpp_body_indent public explicit_return_type ""
+	preserve_cpp_body_indent public explicit_return_type "any"
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -225,14 +250,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Returns XMI base array data type"
       end
 
       operation 283887 "importBaseComponent"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpBaseComponent" type class_ref 128239 // BaseComponent
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -240,13 +266,14 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports BaseComponent into the XMI package"
       end
 
       operation 347247 "importBaseInterfaces"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inoutXmiPackage" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
+	  param in name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -254,14 +281,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports base interfaces(SenderReceiverInterface, ClientServerInterface) into XMI Package"
       end
 
       operation 284143 "importSenderReceiverInterface"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpSRIf" type class_ref 164079 // SenderReceiverInterface
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -269,14 +297,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports SenderReceiverInterface into XMI package"
       end
 
       operation 284271 "importClientServerInterface"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpCSIf" type class_ref 163951 // ClientServerInterface
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -284,14 +313,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports ClientServerInterface into XMI package"
       end
 
       operation 277231 "importAEPackage"
 	preserve_cpp_body_indent private explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
-	  param in name "inpAEPackage" explicit_type ""
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
+	  param in name "inpAEPackage" type class_ref 258671 // AEPackage
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -299,14 +329,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports AEPackage into XMI package"
       end
 
       operation 300271 "importTypes"
 	preserve_cpp_body_indent private explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpAEModel" type class_ref 258927 // AEModel
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -314,14 +345,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports all data types into XMI package"
       end
 
       operation 300527 "importInterfaces"
 	preserve_cpp_body_indent private explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpAEModel" type class_ref 258927 // AEModel
-	  param inout name "inoutXmiPackage" explicit_type ""
+	  param inout name "inoutXmiPackage" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -329,14 +361,15 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
+	comment "Imports all interfaces into XMI package"
       end
 
       operation 275695 "convert"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 278511 // XMIConverter
 	  param in name "inpAEModel" type class_ref 258927 // AEModel
-	  param out name "outXMIMdlRepo" explicit_type ""
+	  param out name "outXMIMdlRepo" explicit_type "any"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -344,24 +377,7 @@ ${docstring}${body}
 ${docstring}${body}
 "
 	
-      end
-
-      classrelation 324079 // <dependency>
-	relation 323567 -_->
-	  stereotype "import"
-	  a package
-	    python "${type}"
-	    classrelation_ref 324079 // <dependency>
-	  b parent class_ref 170991 // DataType
-      end
-
-      classrelation 324207 // <dependency>
-	relation 323695 -_->
-	  stereotype "import"
-	  a package
-	    python "${type}"
-	    classrelation_ref 324207 // <dependency>
-	  b parent class_ref 185199 // ArrayDataType
+	comment "Converts AEModel into XMI model"
       end
     end
   end

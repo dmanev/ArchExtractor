@@ -1,9 +1,10 @@
 
-import Parser.BasePortCriteria
 import re
 import StkDataTypes.StkDataTypeFactory
+import Parser.BasePortCriteria
 
 class StkPortCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """Base STK port criteria class"""
     def __init__(self):
         super(StkPortCriteria, self).__init__()
         ## Bouml preserved body begin 00036E6F
@@ -12,6 +13,7 @@ class StkPortCriteria(Parser.BasePortCriteria.BasePortCriteria):
         ## Bouml preserved body end 00036E6F
         
     def registerAccessModes(self):
+        """Register specific access modes for STK architecture"""
         ## Bouml preserved body begin 00036DEF
         self.itsAccessModes = {'Defaut' : 'Default',
                                'Default' : 'Default', 
@@ -22,6 +24,7 @@ class StkPortCriteria(Parser.BasePortCriteria.BasePortCriteria):
         ## Bouml preserved body end 00036DEF
         
     def extractLevelOneBlock(self, inpText):
+        """Extract block of type : '{...}'"""
         ## Bouml preserved body begin 000353EF
         openningBrace=0
         closingBrace=0

@@ -1,11 +1,13 @@
 
-import StkParser.StkPortCriteria
 import StkPortInterfaces.StkDATControlIf
 import PortInterface.ProvidedPort
 import re
+import StkParser.StkPortCriteria
 import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCHeaderProvDATControlCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK C Header file provided DATControl criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 000389EF
         for datControl in re.findall(r'\#define\s+mDATControl(\w+)\s*\(\s*\w+\s*\)', inpTextContent):

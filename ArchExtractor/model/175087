@@ -1,6 +1,6 @@
 format 74
-"StkParser" // EA_Model::System::Specific::STK::StkParser
-  revision 25
+"StkParser" // EA_Model::ArchExtractor::Specific::STK::StkParser
+  revision 27
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -80,6 +80,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "JIL format file parser"
       classrelation 158959 // <dependency>
 	relation 158703 -_->
 	  stereotype "import"
@@ -100,7 +101,7 @@ ${docstring}${members}
       operation 196079 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 150127 // StkJilFileParser
 	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
 	
 	preserve_java_body_indent 
@@ -115,7 +116,7 @@ ${body}
       operation 189423 "preprocessFile"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 128751 // BaseFileParser
 	  param in name "inpFilePath" explicit_type "string"
 	
 	preserve_java_body_indent 
@@ -138,14 +139,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 159343 // <generalisation>
-	relation 159087 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 159343 // <generalisation>
-	  b parent class_ref 128751 // BaseFileParser
-      end
-
+      comment "Base STK File parser"
       classrelation 159599 // <dependency>
 	relation 159343 -_->
 	  stereotype "import"
@@ -173,10 +167,18 @@ ${docstring}${members}
 	  b parent class_ref 128239 // BaseComponent
       end
 
+      classrelation 159343 // <generalisation>
+	relation 159087 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 159343 // <generalisation>
+	  b parent class_ref 128751 // BaseFileParser
+      end
+
       operation 196207 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 156783 // StkFileParser
 	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
 	
 	preserve_java_body_indent 
@@ -191,8 +193,8 @@ ${body}
       operation 164591 "getComponentNameList"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "fileName" explicit_type ""
+	  param in name "self" type class_ref 130159 // IFileParser
+	  param in name "fileName" explicit_type "string"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -205,7 +207,7 @@ ${docstring}${body}
       operation 189295 "updateComponent"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 4
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 130159 // IFileParser
 	  param in name "inpName" explicit_type "string"
 	  param in name "filePath" explicit_type "string"
 	  param out name "outIComponent" type class_ref 129647 // IComponent
@@ -221,7 +223,7 @@ ${docstring}${body}
       operation 196335 "removeComment"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 1
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 156783 // StkFileParser
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
@@ -243,55 +245,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      operation 224879 "__init__"
-	preserve_cpp_body_indent public explicit_return_type ""
-	nparams 1
-	  param inout name "self" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
-${docstring}super(${class}, ${p0}).__init__()
-${body}
-"
-	
-      end
-
-      operation 224751 "registerAccessModes"
-	preserve_cpp_body_indent public explicit_return_type "void"
-	nparams 1
-	  param in name "self" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
-${docstring}${body}
-"
-	
-      end
-
-      classrelation 227951 // <generalisation>
-	relation 227695 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 227951 // <generalisation>
-	  b parent class_ref 185327 // BasePortCriteria
-      end
-
-      operation 218095 "extractLevelOneBlock"
-	preserve_cpp_body_indent public explicit_return_type "string"
-	nparams 2
-	  param in name "self" explicit_type ""
-	  param in name "inpText" explicit_type ""
-	
-	preserve_java_body_indent 
-	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
-${docstring}${body}
-"
-	
-      end
-
+      comment "Base STK port criteria class"
       classrelation 228207 // <dependency>
 	relation 227951 -_->
 	  stereotype "import"
@@ -309,6 +263,57 @@ ${docstring}${body}
 	    classrelation_ref 311023 // <dependency>
 	  b parent class_ref 285551 // StkDataTypeFactory
       end
+
+      classrelation 227951 // <generalisation>
+	relation 227695 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 227951 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
+      operation 224879 "__init__"
+	preserve_cpp_body_indent public explicit_return_type ""
+	nparams 1
+	  param in name "self" type class_ref 218351 // StkPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+	
+      end
+
+      operation 224751 "registerAccessModes"
+	preserve_cpp_body_indent public explicit_return_type "void"
+	nparams 1
+	  param in name "self" type class_ref 218351 // StkPortCriteria
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}${body}
+"
+	
+	comment "Register specific access modes for STK architecture"
+      end
+
+      operation 218095 "extractLevelOneBlock"
+	preserve_cpp_body_indent public explicit_return_type "string"
+	nparams 2
+	  param in name "self" type class_ref 218351 // StkPortCriteria
+	  param in name "inpText" explicit_type "string"
+	
+	preserve_java_body_indent 
+	preserve_php_body_indent 
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+${docstring}${body}
+"
+	
+	comment "Extract block of type : '{...}'"
+      end
     end
 
     class 231407 "StkCHeaderFileParser"
@@ -322,6 +327,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "C header file parser"
       classrelation 243951 // <generalisation>
 	relation 243567 ---|>
 	  a public
@@ -333,7 +339,7 @@ ${docstring}${members}
       operation 225007 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 231407 // StkCHeaderFileParser
 	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
 	
 	preserve_java_body_indent 
@@ -348,7 +354,7 @@ ${body}
       operation 225135 "preprocessFile"
 	preserve_cpp_body_indent public explicit_return_type "bool"
 	nparams 2
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 128751 // BaseFileParser
 	  param in name "inpFilePath" explicit_type "string"
 	
 	preserve_java_body_indent 
@@ -371,6 +377,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C implementation file parser"
       classrelation 261231 // <generalisation>
 	relation 260847 ---|>
 	  a public
@@ -382,7 +389,7 @@ ${docstring}${members}
       operation 238831 "__init__"
 	preserve_cpp_body_indent public explicit_return_type ""
 	nparams 2
-	  param inout name "self" explicit_type ""
+	  param inout name "self" type class_ref 245103 // StkCImpFileParser
 	  param in name "inpIPortCriteriaList" type class_ref 130415 // IPortCriteria
 	
 	preserve_java_body_indent 
@@ -397,7 +404,7 @@ ${body}
       operation 238959 "preprocessFile"
 	preserve_cpp_body_indent public explicit_return_type "bool"
 	nparams 2
-	  param in name "self" explicit_type "any"
+	  param in name "self" type class_ref 128751 // BaseFileParser
 	  param in name "inpFilePath" explicit_type "string"
 	
 	preserve_java_body_indent 

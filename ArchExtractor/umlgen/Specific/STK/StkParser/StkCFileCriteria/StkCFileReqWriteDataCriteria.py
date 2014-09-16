@@ -4,10 +4,12 @@ import Datatype.ArrayDataType
 import PortInterface.SenderReceiverInterface
 import PortInterface.DataElement
 import PortInterface.RequiredPort
-import Components.IComponent
 import re
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCFileReqWriteDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK C implementation file reaquired data write criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 00038AEF
         signalIdentifiers = []      

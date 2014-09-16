@@ -1,65 +1,67 @@
 format 74
 
 classinstance 128111 class_ref 128751 // BaseFileParser
-  name ""   xyz 361 6 2000 life_line_z 2000
+  name ""   xyz 372 10 2000 life_line_z 2000
 classinstance 128239 class_ref 129519 // IAnalyzer
   name ""   xyz 37 5 2000 life_line_z 2000
-fragment 129135 "loop for each iPortCriteria in itsIPortCriteria"
-  xyzwh 141 353 1995 742 226
+fragment 129135 "loop for each BPCriteria in itsBasePortCriteriaList"
+  xyzwh 116 259 1995 766 229
 end
 continuation 130031 "Perform Text analyzis on inpTextContent"
-  xyzwh 611.5 406.5 2015 252 37
-continuation 130159 "Update inpIComponent"
-  xyzwh 666.5 479.5 2015 159 41
+  xyzwh 611.5 315.5 2015 252 37
+continuation 130159 "Update inOutIComponent"
+  xyzwh 658.5 386.5 2015 171 41
 note 130287 "Validity check as well"
-  xyzwh 247 207 2000 145 37
+  xyzwh 247 116 2000 145 37
 fragment 130543 "alt validity check passes OK"
-  xyzwh 122 313 1990 782 284
+  xyzwh 103 223 1990 800 283
 end
 classinstance 130671 class_ref 185327 // BasePortCriteria
-  name ""   xyz 690 4 2000 life_line_z 2000
+  name ""   xyz 689 8 2000 life_line_z 2000
 durationcanvas 128367 classinstance_ref 128239 // :IAnalyzer
-  xyzwh 60 129 2010 11 487
+  xyzwh 60 73 2010 11 490
 end
 durationcanvas 128495 classinstance_ref 128111 // :BaseFileParser
-  xyzwh 405 128 2010 11 487
+  xyzwh 416 73 2010 11 480
   overlappingdurationcanvas 129647
-    xyzwh 411 248 2020 11 25
+    xyzwh 422 157 2020 11 25
   end
 end
 durationcanvas 130799 classinstance_ref 130671 // :BasePortCriteria
-  xyzwh 737 371 2010 11 178
+  xyzwh 736 278 2010 11 180
 end
 msg 128623 synchronous
   from durationcanvas_ref 128367
   to durationcanvas_ref 128495
-  yz 129 2015 msg operation_ref 149359 // "fulfillComponentData(in self : IFileParser, in cmpName : string, in filePath : string, inout inoutIComponent : IComponent)"
+  yz 73 2015 msg operation_ref 354159 // "fulfillComponentData(in self : IFileParser, in cmpName : string, in filePath : string, inout inoutIComponent : IComponent)"
   show_full_operations_definition default drawing_language default show_context_mode default
-  args "inpIComponent, cmpName, filePath"
-  label_xy 82 113
+  args "cmpName, filePath, inOutIComponent"
+  label_xy 82 57
 msg 128879 return
   from durationcanvas_ref 128495
   to durationcanvas_ref 128367
-  yz 596 2015 unspecifiedmsg
+  yz 529 2015 explicitmsg "inOutIComponent"
   show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 189 513
 reflexivemsg 129775 synchronous
   to durationcanvas_ref 129647
-  yz 248 2025 msg operation_ref 182255 // "preprocessFile(in self : any, in inpFilePath : string) : bool"
+  yz 157 2025 msg operation_ref 182255 // "preprocessFile(in self : any, in inpFilePath : string) : bool"
   show_full_operations_definition default drawing_language default show_context_mode default
   args "filePath"
-  label_xy 421 230
+  label_xy 432 139
 msg 130927 synchronous
   from durationcanvas_ref 128495
   to durationcanvas_ref 130799
-  yz 371 3005 msg operation_ref 182127 // "execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent"
+  yz 278 3005 msg operation_ref 182127 // "execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent"
   show_full_operations_definition default drawing_language default show_context_mode default
-  args "inpTextContent, inpIComponent"
-  label_xy 495 355
+  args "inpTextContent, inOutIComponent"
+  label_xy 489 264
 msg 131055 return
   from durationcanvas_ref 130799
   to durationcanvas_ref 128495
-  yz 536 2015 unspecifiedmsg
+  yz 443 2015 explicitmsg "inOutIComponent"
   show_full_operations_definition default drawing_language default show_context_mode default
+  label_xy 538 427
 line 130415 -_-_
   from ref 130287 z 2021 to ref 129647
 end

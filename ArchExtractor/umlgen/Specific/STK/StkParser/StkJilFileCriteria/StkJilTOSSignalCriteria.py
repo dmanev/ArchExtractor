@@ -2,10 +2,12 @@
 import re
 import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.ProvidedPort
-import Components.IComponent
 import Parser.BasePortCriteria
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkJilTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK JIL file TOSSignal criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 000339EF
         for tosSignal in re.findall(r'Signal\s*(\w+)\s*;', inpTextContent, re.I):

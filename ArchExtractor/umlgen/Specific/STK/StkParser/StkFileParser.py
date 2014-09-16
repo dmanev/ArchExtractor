@@ -1,12 +1,14 @@
 
-import Parser.BaseFileParser
 import os
 import re
 import Components.BaseComponent
+import Parser.BaseFileParser
 import PortInterface.IPortCriteria
+import Parser.IFileParser
 import Components.IComponent
 
 class StkFileParser(Parser.BaseFileParser.BaseFileParser):
+    """Base STK File parser"""
     def __init__(self, inpIPortCriteriaList):
         super(StkFileParser, self).__init__(inpIPortCriteriaList)
         ## Bouml preserved body begin 0002FE6F

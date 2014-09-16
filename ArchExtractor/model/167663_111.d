@@ -17,7 +17,7 @@ classcanvas 129519 class_ref 258799 // PackageableElement
   xyz 287 51 2012
 end
 relationcanvas 128623 relation_ref 167663 // <directional composition>
-  from ref 128239 z 2007 stereotype "<<list>>" xyz 381 225.5 2007 to ref 128495
+  from ref 128239 z 2007 stereotype "<<list>>" xyz 381 225 2007 to ref 128495
   role_a_pos 354 198 3000 no_role_b
   multiplicity_a_pos 438 227 3000 no_multiplicity_b
 end

@@ -1,23 +1,36 @@
 format 74
 
-packagecanvas 128239 
-  package_ref 174959 // Parser
-   color darkgreen  xyzwh 63.5 72.5 2005 605 425
-end
-classcanvas 128367 class_ref 130415 // IPortCriteria
+classcanvas 128111 class_ref 185327 // BasePortCriteria
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 439 132 2010
+  xyz 319.5 82.5 2000
 end
-classcanvas 128495 class_ref 130159 // IFileParser
-  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 131 128 2010
+classcanvas 128239 class_ref 218351 // StkPortCriteria
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations no show_members_full_definition yes show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 175 230 2000
 end
-classcanvas 128623 class_ref 128751 // BaseFileParser
+classcanvas 128495 class_ref 156655 // re
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 138 321 2016
+  xyz 70 246 2000
 end
-classcanvas 129007 class_ref 185327 // BasePortCriteria
+classcanvas 130799 class_ref 285551 // StkDataTypeFactory
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 424 321 2010
+  xyz 308 381 2000
+end
+relationcanvas 128367 relation_ref 227695 // <generalisation>
+  decenter_begin 483
+  decenter_end 440
+  from ref 128239 z 2001 to ref 128111
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128623 relation_ref 227951 // <dependency>
+  from ref 128239 z 2001 stereotype "<<import>>" xyz 109.5 275 3000 to ref 128495
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 130927 relation_ref 310511 // <dependency>
+  from ref 128239 z 2001 stereotype "<<import>>" xyz 377.5 340 3000 to ref 130799
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
 end
 end

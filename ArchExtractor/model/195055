@@ -1,6 +1,6 @@
 format 74
 "StkCFileCriteria" // EA_Model::ArchExtractor::Specific::STK::StkParser::StkCFileCriteria
-  revision 15
+  revision 16
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -95,6 +95,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C Header file provided data read criteria"
       classrelation 236527 // <dependency>
 	relation 236143 -_->
 	  stereotype "import"
@@ -140,10 +141,18 @@ ${docstring}${members}
 	  b parent class_ref 185199 // ArrayDataType
       end
 
+      classrelation 243823 // <generalisation>
+	relation 243439 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 243823 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
       operation 224623 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -153,14 +162,6 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
-      end
-
-      classrelation 243823 // <generalisation>
-	relation 243439 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 243823 // <generalisation>
-	  b parent class_ref 218351 // StkPortCriteria
       end
     end
 
@@ -175,6 +176,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C Header file provided data write criteria"
       classrelation 250863 // <generalisation>
 	relation 250479 ---|>
 	  a public
@@ -231,7 +233,7 @@ ${docstring}${members}
       operation 231663 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -255,14 +257,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 252143 // <generalisation>
-	relation 251759 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 252143 // <generalisation>
-	  b parent class_ref 218351 // StkPortCriteria
-      end
-
+      comment "STK C Header file provided DATControl criteria"
       classrelation 252271 // <dependency>
 	relation 251887 -_->
 	  stereotype "import"
@@ -290,10 +285,18 @@ ${docstring}${members}
 	  b parent class_ref 156655 // re
       end
 
+      classrelation 252143 // <generalisation>
+	relation 251759 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 252143 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
       operation 231919 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -317,14 +320,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 252655 // <generalisation>
-	relation 252271 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 252655 // <generalisation>
-	  b parent class_ref 218351 // StkPortCriteria
-      end
-
+      comment "STK C implementation file reaquired data read criteria"
       classrelation 252783 // <dependency>
 	relation 252399 -_->
 	  stereotype "import"
@@ -370,10 +366,18 @@ ${docstring}${members}
 	  b parent class_ref 163567 // RequiredPort
       end
 
+      classrelation 252655 // <generalisation>
+	relation 252271 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 252655 // <generalisation>
+	  b parent class_ref 218351 // StkPortCriteria
+      end
+
       operation 232047 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -397,6 +401,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C implementation file reaquired data write criteria"
       classrelation 253423 // <generalisation>
 	relation 253039 ---|>
 	  a public
@@ -441,10 +446,19 @@ ${docstring}${members}
 	  b parent class_ref 163567 // RequiredPort
       end
 
+      classrelation 254063 // <dependency>
+	relation 253679 -_->
+	  stereotype "import"
+	  a package
+	    python "${type}"
+	    classrelation_ref 254063 // <dependency>
+	  b parent class_ref 156655 // re
+      end
+
       operation 232175 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -454,15 +468,6 @@ ${docstring}${members}
 ${docstring}${body}
 "
 	
-      end
-
-      classrelation 254063 // <dependency>
-	relation 253679 -_->
-	  stereotype "import"
-	  a package
-	    python "${type}"
-	    classrelation_ref 254063 // <dependency>
-	  b parent class_ref 156655 // re
       end
     end
 
@@ -477,6 +482,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C implementation file reaquired DATControl criteria"
       classrelation 254191 // <generalisation>
 	relation 253807 ---|>
 	  a public
@@ -539,6 +545,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+      comment "STK C implementation file reaquired TOSSignal read criteria"
       classrelation 267887 // <generalisation>
 	relation 267503 ---|>
 	  a public
@@ -577,7 +584,7 @@ ${docstring}${members}
       operation 245487 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	
@@ -601,14 +608,7 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
-      classrelation 268399 // <generalisation>
-	relation 268015 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 268399 // <generalisation>
-	  b parent class_ref 185327 // BasePortCriteria
-      end
-
+      comment "STK C implementation file reaquired TOSSignal write criteria"
       classrelation 268527 // <dependency>
 	relation 268143 -_->
 	  stereotype "import"
@@ -636,10 +636,18 @@ ${docstring}${members}
 	  b parent class_ref 163567 // RequiredPort
       end
 
+      classrelation 268399 // <generalisation>
+	relation 268015 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 268399 // <generalisation>
+	  b parent class_ref 185327 // BasePortCriteria
+      end
+
       operation 245615 "execute"
 	preserve_cpp_body_indent public return_type class_ref 129647 // IComponent
 	nparams 3
-	  param in name "self" explicit_type ""
+	  param in name "self" type class_ref 130415 // IPortCriteria
 	  param in name "inpTextContent" explicit_type "string"
 	  param inout name "inoutIComponent" type class_ref 129647 // IComponent
 	

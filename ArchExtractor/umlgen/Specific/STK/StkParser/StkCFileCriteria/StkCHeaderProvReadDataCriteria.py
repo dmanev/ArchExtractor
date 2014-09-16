@@ -4,10 +4,12 @@ import PortInterface.ProvidedPort
 import PortInterface.SenderReceiverInterface
 import PortInterface.DataElement
 import Datatype.ArrayDataType
-import Components.IComponent
 import StkParser.StkPortCriteria
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCHeaderProvReadDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK C Header file provided data read criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 00036D6F
         signalIdentifiers = []

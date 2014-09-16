@@ -6,8 +6,10 @@ import Datatype.ArrayDataType
 import PortInterface.SenderReceiverInterface
 import PortInterface.DataElement
 import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkCHeaderProvWriteDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
+    """STK C Header file provided data write criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 000388EF
         signalIdentifiers = []

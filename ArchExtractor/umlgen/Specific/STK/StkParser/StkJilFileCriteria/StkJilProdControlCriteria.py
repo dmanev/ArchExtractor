@@ -2,10 +2,12 @@
 import re
 import StkPortInterfaces.StkControlIf
 import PortInterface.ProvidedPort
-import Components.IComponent
 import Parser.BasePortCriteria
+import Components.IComponent
+import PortInterface.IPortCriteria
 
 class StkJilProdControlCriteria(Parser.BasePortCriteria.BasePortCriteria):
+    """STK JIL file provided Control criteria"""
     def execute(self, inpTextContent, inoutIComponent):
         ## Bouml preserved body begin 0003386F
         for control in re.findall(r'ProdControl\s*{\s*Name\s*=\s*\"(\w+)\"\s*;\s*}\s*;', inpTextContent, re.I):

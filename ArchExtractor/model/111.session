@@ -1,33 +1,24 @@
 window_sizes 1615 1026 373 1236 782 170
 diagrams
-  classdiagram_ref 174191 // DataType class diag
-    1178 782 100 4 0 0
-  classdiagram_ref 187887 // CompositeDataType class diag
-    1178 782 100 4 0 0
-  classdiagram_ref 282223 // XMIConverter class diag
-    1178 782 100 3 0 0
   usecasediagram_ref 141167 // Use Case diag
-    1178 782 100 3 0 0
-  active  classdiagram_ref 167663 // SenderReceiverInterface class diag
-    1236 782 100 4 0 0
+    1178 782 100 3 48 0
+  active  classdiagram_ref 154223 // StkFileParser class diag
+    1236 782 100 3 0 0
 end
 show_stereotypes
-selected class_ref 171119 // ParamData
+selected classdiagram_ref 154223 // StkFileParser class diag
 open
   usecase_ref 128111 // Create Architecture model
   usecase_ref 128367 // Perform analysis
   classview_ref 128111 // Class View
   class_ref 129519 // IAnalyzer
-  class_ref 129647 // IComponent
-  classrelation_ref 277871 // <generalisation>
-  classrelation_ref 131567 // itsIPortMap (<directional composition>)
-  class_ref 265455 // ComponentFactory
+  classview_ref 174191 // Class view
   classview_ref 174319 // Class view
-  classdiagram_ref 167663 // SenderReceiverInterface class diag
-  classdiagram_ref 167279 // ProvidedPort class diag
+  
+  package_ref 181999 // PortInterface
   classdiagram_ref 262511 // AEPackage class diag
-  class_ref 271983 // InfrastructureFactory
-  sequencediagram_ref 188271 // BaseFileParser.fulfillComponentData() seq diag
+  class_ref 130415 // IPortCriteria
+  class_ref 130159 // IFileParser
   classview_ref 194159 // Class view
   deploymentview_ref 168303 // deploy view
   classview_ref 141295 // Class view
@@ -38,10 +29,7 @@ open
   classdiagram_ref 214639 // StkJilProdControlCriteria class diag
   classview_ref 167663 // Class view
   deploymentview_ref 141935 // deploy view
-  class_ref 258415 // StkPortInterfaceFactory
-  class_ref 204911 // StkControlIf
-  class_ref 211695 // StkTOSSignalIf
-  class_ref 238063 // StkDATControlIf
+  classview_ref 180975 // Class view
   deploymentview_ref 155119 // deploy view
 end
 end
