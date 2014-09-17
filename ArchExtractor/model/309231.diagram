@@ -2,7 +2,7 @@ format 74
 
 packagecanvas 128239 
   package_ref 174959 // Parser
-   color darkgreen  xyzwh 63.5 72.5 2005 605 425
+   color darkgreen  xyzwh 63 72 2005 605 425
 end
 classcanvas 128367 class_ref 130415 // IPortCriteria
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
@@ -14,10 +14,10 @@ classcanvas 128495 class_ref 130159 // IFileParser
 end
 classcanvas 128623 class_ref 128751 // BaseFileParser
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 138 321 2016
+  xyz 138 296 2016
 end
 classcanvas 129007 class_ref 185327 // BasePortCriteria
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_context default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 424 321 2010
+  xyz 424 296 2010
 end
 end

@@ -1,6 +1,6 @@
 format 74
 "Parser" // EA_Model::ArchExtractor::Base::Parser
-  revision 21
+  revision 22
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

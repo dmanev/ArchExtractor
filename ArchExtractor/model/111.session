@@ -1,12 +1,16 @@
-window_sizes 1615 1026 373 1236 782 170
+window_sizes 1615 998 373 1236 754 170
 diagrams
   usecasediagram_ref 141167 // Use Case diag
-    1178 782 100 3 48 0
-  active  classdiagram_ref 154223 // StkFileParser class diag
-    1236 782 100 3 0 0
+    1178 782 100 3 0 0
+  classdiagram_ref 147695 // Class diag
+    988 603 100 4 0 0
+  classdiagram_ref 322415 // LIB pack diag
+    1236 754 100 4 0 0
+  active  classdiagram_ref 309231 // Parser pack diag
+    1236 754 100 4 0 0
 end
 show_stereotypes
-selected classdiagram_ref 154223 // StkFileParser class diag
+selected classdiagram_ref 309231 // Parser pack diag
 open
   usecase_ref 128111 // Create Architecture model
   usecase_ref 128367 // Perform analysis
@@ -16,17 +20,16 @@ open
   classview_ref 174319 // Class view
   
   package_ref 181999 // PortInterface
-  classdiagram_ref 262511 // AEPackage class diag
-  class_ref 130415 // IPortCriteria
-  class_ref 130159 // IFileParser
-  classview_ref 194159 // Class view
+  classview_ref 160879 // Class view
+  classview_ref 167535 // Class view
+  classdiagram_ref 282223 // XMIConverter class diag
   deploymentview_ref 168303 // deploy view
-  classview_ref 141295 // Class view
+  class_ref 143599 // os
   deploymentview_ref 141679 // deploy view
   classview_ref 147823 // Class view
   deploymentview_ref 141807 // deploy view
   classview_ref 187503 // Class view
-  classdiagram_ref 214639 // StkJilProdControlCriteria class diag
+  classview_ref 187631 // Class view
   classview_ref 167663 // Class view
   deploymentview_ref 141935 // deploy view
   classview_ref 180975 // Class view
