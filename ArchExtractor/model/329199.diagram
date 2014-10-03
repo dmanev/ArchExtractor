@@ -1,0 +1,10 @@
+format 74
+
+packagecanvas 128111 
+  package_ref 201711 // ModelConverter
+   color darkorange  xyzwh 36 49 2000 337 269
+end
+artifactcanvas 128239 artifact_ref 271087 // XMIConverter
+  xyz 140 177 2005
+end
+end

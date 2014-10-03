@@ -1,0 +1,25 @@
+format 74
+
+packagecanvas 128111 
+  package_ref 168303 // Infrastructure
+   color gold  xyzwh 10 19 2000 385 337
+end
+artifactcanvas 128239 artifact_ref 250863 // FactoryProvider
+  xyz 225 77 2005
+end
+artifactcanvas 128367 artifact_ref 162159 // Identifiable
+  xyz 43 77 2005
+end
+artifactcanvas 128495 artifact_ref 250991 // AEPackage
+  xyz 225 246 2005
+end
+artifactcanvas 128623 artifact_ref 251119 // PackageableElement
+  xyz 43 246 2005
+end
+artifactcanvas 128751 artifact_ref 251247 // AEModel
+  xyz 43 165 2005
+end
+artifactcanvas 128879 artifact_ref 264303 // InfrastructureFactory
+  xyz 225 165 2005
+end
+end

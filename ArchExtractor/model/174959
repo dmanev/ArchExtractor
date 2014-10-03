@@ -419,15 +419,6 @@ ${definition}"
       associated_classes
 	class_ref 128751 // BaseFileParser
       end
-      simplerelation 135151
-	-_->
-	  on artifact_ref 135791 // IFileParser
-      end
-
-      simplerelation 161903
-	-_->
-	  on artifact_ref 155375 // re
-      end
     end
 
     artifact 184175 "BasePortCriteria"

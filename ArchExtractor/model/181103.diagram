@@ -1,18 +1,19 @@
 format 74
 
-artifactcanvas 128111 artifact_ref 155375 // re
-  xyz 307.5 51 2000
-end
 artifactcanvas 128239 artifact_ref 135791 // IFileParser
-  xyz 39.5 209 2000
+  xyz 83.5 75 2000
 end
 artifactcanvas 128367 artifact_ref 135151 // BaseFileParser
-  xyz 307.5 209 2000
+  xyz 83.5 171 2000
 end
-simplerelationcanvas 128495 simplerelation_ref 135151
-  from ref 128367 z 2001 to ref 128239
+artifactcanvas 128751 artifact_ref 162031 // IPortCriteria
+  xyz 262 75 2000
 end
-simplerelationcanvas 128623 simplerelation_ref 161903
-  from ref 128367 z 2001 to ref 128111
+artifactcanvas 128879 artifact_ref 184175 // BasePortCriteria
+  xyz 262 171 2000
+end
+packagecanvas 129007 
+  package_ref 174959 // Parser
+   color darkgreen  xyzwh 33 20 1995 415 245
 end
 end

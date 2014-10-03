@@ -1,6 +1,6 @@
 format 74
 "StkParser" // EA_Model::ArchExtractor::Specific::STK::StkParser
-  revision 27
+  revision 28
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -435,10 +435,6 @@ ${definition}"
       associated_classes
 	class_ref 156783 // StkFileParser
       end
-      simplerelation 162159
-	-_->
-	  on artifact_ref 135151 // BaseFileParser
-      end
     end
 
     artifact 148847 "StkJilFileParser"
@@ -448,15 +444,6 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 150127 // StkJilFileParser
-      end
-      simplerelation 162031
-	-_->
-	  on artifact_ref 155503 // StkFileParser
-      end
-
-      simplerelation 169583
-	-_->
-	  on artifact_ref 169967 // StkVoid
       end
     end
 
@@ -468,10 +455,6 @@ ${definition}"
       associated_classes
 	class_ref 218351 // StkPortCriteria
       end
-      simplerelation 215535
-	-_->
-	  on artifact_ref 184175 // BasePortCriteria
-      end
     end
 
     artifact 223727 "StkCHeaderFileParser"
@@ -481,10 +464,6 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 231407 // StkCHeaderFileParser
-      end
-      simplerelation 222063
-	-_->
-	  on artifact_ref 155503 // StkFileParser
       end
     end
 

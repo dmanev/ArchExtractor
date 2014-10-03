@@ -10,7 +10,7 @@ packagecanvas 128239
 end
 packagecanvas 128367 
   package_ref 161775 // SwComponent
-   color gold  xyzwh 162 338 2005 125 83
+   color gold  xyzwh 163 338 2005 125 83
 end
 packagecanvas 128495 
   package_ref 168303 // Infrastructure

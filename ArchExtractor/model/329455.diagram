@@ -1,0 +1,117 @@
+format 74
+
+packagecanvas 128111 
+  package_ref 155247 // STK
+   color mediumblue  xyzwh 32 51 2000 1055 1023
+end
+packagecanvas 128239 
+  package_ref 175087 // StkParser
+   color mediumgreen  xyzwh 56 94 2005 1005 541
+end
+artifactcanvas 128367 artifact_ref 155503 // StkFileParser
+  xyz 87 150 2010
+end
+artifactcanvas 128495 artifact_ref 148847 // StkJilFileParser
+  xyz 240 150 2016
+end
+artifactcanvas 128751 artifact_ref 210671 // StkPortCriteria
+  xyz 742 150 2010
+end
+artifactcanvas 128879 artifact_ref 223727 // StkCHeaderFileParser
+  xyz 394 150 2010
+end
+artifactcanvas 129007 artifact_ref 237423 // StkCImplFileParser
+  xyz 566 150 2010
+end
+packagecanvas 129135 
+  package_ref 195055 // StkCFileCriteria
+   color lightmediumgreen  xyzwh 78 223 2005 957 243
+end
+artifactcanvas 129263 artifact_ref 217199 // StkCHeaderProvReadDataCriteria
+  xyz 97 288 2010
+end
+artifactcanvas 129391 artifact_ref 230255 // StkCHeaderProvWriteDataCriteria
+  xyz 343 288 2010
+end
+artifactcanvas 129519 artifact_ref 230511 // StkCHeaderProvDATControlCriteria
+  xyz 589 288 2010
+end
+artifactcanvas 129647 artifact_ref 230639 // StkCFileReqReadDataCriteria
+  xyz 828 372 2010
+end
+artifactcanvas 129775 artifact_ref 230895 // StkCFileReqDATControlCriteria
+  xyz 589 372 2010
+end
+artifactcanvas 129903 artifact_ref 243951 // StkCFileReqReadTOSSignalCriteria
+  xyz 99 372 2010
+end
+artifactcanvas 130031 artifact_ref 244079 // StkCFileReqWriteTOSSignalCriteria
+  xyz 343 372 2010
+end
+packagecanvas 130159 
+  package_ref 195183 // StkJilFileCriteria
+   color lightmediumgreen  xyzwh 75 482 2010 961 129
+end
+artifactcanvas 130287 artifact_ref 210543 // StkJilDataCriteria
+  xyz 105 536 2015
+end
+artifactcanvas 130415 artifact_ref 204015 // StkJilTOSSignalCriteria
+  xyz 275 536 2015
+end
+artifactcanvas 130543 artifact_ref 203759 // StkJilProdControlCriteria
+  xyz 651 536 2015
+end
+artifactcanvas 130671 artifact_ref 190703 // StkJilOnCotrolCriteria
+  xyz 862 536 2015
+end
+artifactcanvas 130799 artifact_ref 184047 // StkJilComponentCriteria
+  xyz 458 536 2015
+end
+packagecanvas 130927 
+  package_ref 175215 // StkDataTypes
+   color mediumyellow  xyzwh 56 650 2005 1005 241
+end
+artifactcanvas 131055 artifact_ref 197231 // StkControlIf
+  xyz 105 966 2010
+end
+artifactcanvas 131183 artifact_ref 203887 // StkTOSSignalIf
+  xyz 291 966 2010
+end
+artifactcanvas 131311 artifact_ref 230383 // StkDATControlIf
+  xyz 477 966 2010
+end
+packagecanvas 131439 
+  package_ref 188527 // StkPortInterfaces
+   color mediumyellow  xyzwh 56 910 2005 827 139
+end
+artifactcanvas 131567 artifact_ref 169967 // StkVoid
+  xyz 116 720 2010
+end
+artifactcanvas 131695 artifact_ref 170095 // StkU1
+  xyz 116 805 2010
+end
+artifactcanvas 131823 artifact_ref 170223 // StkU8
+  xyz 305 805 2010
+end
+artifactcanvas 131951 artifact_ref 170351 // StkS8
+  xyz 305 720 2010
+end
+artifactcanvas 132079 artifact_ref 170479 // StkU16
+  xyz 486 805 2010
+end
+artifactcanvas 132207 artifact_ref 170607 // StkS16
+  xyz 486 720 2010
+end
+artifactcanvas 132335 artifact_ref 170735 // StkU32
+  xyz 678 805 2010
+end
+artifactcanvas 132463 artifact_ref 170863 // StkS32
+  xyz 678 720 2010
+end
+artifactcanvas 132591 artifact_ref 277871 // StkDataTypeFactory
+  xyz 867 720 2010
+end
+artifactcanvas 132719 artifact_ref 250735 // StkPortInterfaceFactory
+  xyz 662 966 2010
+end
+end

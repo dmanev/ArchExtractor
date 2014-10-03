@@ -1,0 +1,19 @@
+format 74
+
+packagecanvas 128111 
+  package_ref 148463 // Lib
+   color midmagenta  xyzwh 20 22 2000 387 275
+end
+artifactcanvas 128239 artifact_ref 155375 // re
+  xyz 239 93 2005
+end
+artifactcanvas 128367 artifact_ref 142319 // os
+  xyz 57 93 2005
+end
+artifactcanvas 128495 artifact_ref 270831 // xmi.core
+  xyz 57 193 2005
+end
+artifactcanvas 128623 artifact_ref 271215 // xmi.dumper
+  xyz 239 193 2005
+end
+end
