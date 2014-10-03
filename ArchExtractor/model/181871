@@ -1,6 +1,6 @@
 format 74
 "Datatype" // EA_Model::ArchExtractor::Base::SwComponent::Datatype
-  revision 10
+  revision 11
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -354,10 +354,6 @@ ${definition}"
       associated_classes
 	class_ref 185071 // CompositeDataType
       end
-      simplerelation 176111
-	-_->
-	  on artifact_ref 169711 // DataType
-      end
     end
 
     artifact 177519 "ArrayDataType"
@@ -367,10 +363,6 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 185199 // ArrayDataType
-      end
-      simplerelation 176239
-	-_->
-	  on artifact_ref 177391 // CompositeDataType
       end
     end
 

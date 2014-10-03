@@ -2,7 +2,7 @@
 import re
 import Parser.BasePortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkJilComponentCriteria(Parser.BasePortCriteria.BasePortCriteria):
     """STK JIL file Component criteria"""

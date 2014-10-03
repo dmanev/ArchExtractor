@@ -3,7 +3,7 @@ import os
 import re
 import Components.BaseComponent
 import Parser.BaseFileParser
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 import Parser.IFileParser
 import Components.IComponent
 

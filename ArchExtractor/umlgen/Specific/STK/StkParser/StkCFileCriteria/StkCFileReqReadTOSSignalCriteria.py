@@ -4,7 +4,7 @@ import re
 import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.RequiredPort
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCFileReqReadTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
     """STK C implementation file reaquired TOSSignal read criteria"""

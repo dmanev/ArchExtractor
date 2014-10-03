@@ -6,7 +6,7 @@ import PortInterface.DataElement
 import Datatype.ArrayDataType
 import StkParser.StkPortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCHeaderProvReadDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
     """STK C Header file provided data read criteria"""

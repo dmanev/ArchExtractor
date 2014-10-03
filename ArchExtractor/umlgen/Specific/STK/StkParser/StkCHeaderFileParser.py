@@ -1,6 +1,6 @@
 
 import StkParser.StkFileParser
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 import Parser.BaseFileParser
 
 class StkCHeaderFileParser(StkParser.StkFileParser.StkFileParser):

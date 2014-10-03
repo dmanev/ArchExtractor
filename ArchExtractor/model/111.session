@@ -1,27 +1,27 @@
-window_sizes 1615 998 373 1236 754 170
+window_sizes 1615 1026 373 1236 782 170
 diagrams
   usecasediagram_ref 141167 // Use Case diag
     1178 782 100 3 0 0
   classdiagram_ref 147695 // Class diag
     988 603 100 4 0 0
-  classdiagram_ref 322415 // LIB pack diag
-    1236 754 100 4 0 0
-  active  classdiagram_ref 309231 // Parser pack diag
-    1236 754 100 4 0 0
+  active  classdiagram_ref 322415 // LIB pack diag
+    1236 782 100 4 36 0
 end
 show_stereotypes
-selected classdiagram_ref 309231 // Parser pack diag
+selected deploymentdiagram_ref 208111 // deploy diag
 open
   usecase_ref 128111 // Create Architecture model
   usecase_ref 128367 // Perform analysis
   classview_ref 128111 // Class View
   class_ref 129519 // IAnalyzer
+  deploymentview_ref 141423 // deploy view
   classview_ref 174191 // Class view
   classview_ref 174319 // Class view
   
-  package_ref 181999 // PortInterface
+package_ref 181999 // PortInterface
   classview_ref 160879 // Class view
   classview_ref 167535 // Class view
+  deploymentview_ref 141551 // deploy view
   classdiagram_ref 282223 // XMIConverter class diag
   deploymentview_ref 168303 // deploy view
   class_ref 143599 // os
@@ -30,6 +30,7 @@ open
   deploymentview_ref 141807 // deploy view
   classview_ref 187503 // Class view
   classview_ref 187631 // Class view
+  deploymentview_ref 161775 // deploy view
   classview_ref 167663 // Class view
   deploymentview_ref 141935 // deploy view
   classview_ref 180975 // Class view

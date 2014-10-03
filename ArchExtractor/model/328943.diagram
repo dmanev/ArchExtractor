@@ -1,0 +1,61 @@
+format 74
+
+packagecanvas 128239 
+  package_ref 161775 // SwComponent
+   color gold  xyzwh 43 72 2000 929 757
+end
+packagecanvas 128367 
+  package_ref 181743 // Components
+    xyzwh 85 122 2005 377 285
+end
+artifactcanvas 128495 artifact_ref 135407 // IComponent
+  xyz 105 183 2010
+end
+artifactcanvas 128623 artifact_ref 134767 // BaseComponent
+  xyz 123 275 2010
+end
+artifactcanvas 128751 artifact_ref 257775 // ComponentFactory
+  xyz 297 189 2010
+end
+packagecanvas 128879 
+  package_ref 181871 // Datatype
+    xyzwh 519 128 2005 357 277
+end
+artifactcanvas 129007 artifact_ref 169711 // DataType
+  xyz 550 180 2010
+end
+artifactcanvas 129135 artifact_ref 177391 // CompositeDataType
+  xyz 552 280 2010
+end
+artifactcanvas 129263 artifact_ref 177519 // ArrayDataType
+  xyz 716 278 2010
+end
+artifactcanvas 129391 artifact_ref 277743 // DataTypeFactory
+  xyz 717 181 2010
+end
+packagecanvas 129519 
+  package_ref 181999 // PortInterface
+    xyzwh 86 452 2005 793 331
+end
+artifactcanvas 129647 artifact_ref 169839 // ParamData
+  xyz 112 499 2010
+end
+artifactcanvas 129775 artifact_ref 169583 // Operation
+  xyz 114 580 2010
+end
+artifactcanvas 129903 artifact_ref 169455 // DataElement
+  xyz 112 659 2010
+end
+artifactcanvas 130031 artifact_ref 162927 // SenderReceiverInterface
+  xyz 438 497 2010
+end
+artifactcanvas 130159 artifact_ref 162799 // ClientServerInterface
+  xyz 441 579 2010
+end
+artifactcanvas 130287 artifact_ref 162671 // IPortInterface
+  xyz 282 496 2010
+end
+artifactcanvas 130415 artifact_ref 162543 // RequiredPort
+  xyz 280 579 2010
+end
+end

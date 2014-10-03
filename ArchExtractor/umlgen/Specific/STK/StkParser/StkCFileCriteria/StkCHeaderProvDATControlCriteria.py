@@ -4,7 +4,7 @@ import PortInterface.ProvidedPort
 import re
 import StkParser.StkPortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCHeaderProvDATControlCriteria(StkParser.StkPortCriteria.StkPortCriteria):
     """STK C Header file provided DATControl criteria"""

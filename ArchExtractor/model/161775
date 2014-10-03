@@ -1,6 +1,6 @@
 format 74
-"SwComponent" // EA_Model::System::Base::SwComponent
-  revision 5
+"SwComponent" // EA_Model::ArchExtractor::Base::SwComponent
+  revision 6
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -33,4 +33,15 @@ format 74
   package_ref 181871 // Datatype
 
   package_ref 181999 // PortInterface
+
+  deploymentview 174831 "deploy view"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    deploymentdiagram 328943 "SwComponent deploy diag"
+      package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+      draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+      size A3
+    end
+  end
 end

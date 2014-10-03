@@ -6,7 +6,7 @@ import PortInterface.DataElement
 import PortInterface.RequiredPort
 import re
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCFileReqWriteDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
     """STK C implementation file reaquired data write criteria"""

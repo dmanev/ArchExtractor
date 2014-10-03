@@ -4,7 +4,7 @@ import StkPortInterfaces.StkControlIf
 import PortInterface.ProvidedPort
 import Parser.BasePortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkJilProdControlCriteria(Parser.BasePortCriteria.BasePortCriteria):
     """STK JIL file provided Control criteria"""

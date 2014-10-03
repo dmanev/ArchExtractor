@@ -1,6 +1,6 @@
 format 74
 "PortInterface" // EA_Model::ArchExtractor::Base::SwComponent::PortInterface
-  revision 17
+  revision 18
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -953,16 +953,6 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 130287 // IPort
-      end
-    end
-
-    artifact 162031 "IPortCriteria"
-      stereotype "source"
-      python_src "${comment}
-${import}
-${definition}"
-      associated_classes
-	class_ref 130415 // IPortCriteria
       end
     end
 

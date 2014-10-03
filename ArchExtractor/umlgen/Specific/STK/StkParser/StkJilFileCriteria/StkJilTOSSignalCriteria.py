@@ -4,7 +4,7 @@ import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.ProvidedPort
 import Parser.BasePortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkJilTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
     """STK JIL file TOSSignal criteria"""

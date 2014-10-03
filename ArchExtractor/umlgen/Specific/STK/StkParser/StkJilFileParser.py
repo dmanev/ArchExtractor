@@ -1,7 +1,7 @@
 
 import re
 import StkParser.StkFileParser
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 import Parser.BaseFileParser
 
 class StkJilFileParser(StkParser.StkFileParser.StkFileParser):

@@ -1,6 +1,6 @@
 format 74
 "Components" // EA_Model::ArchExtractor::Base::SwComponent::Components
-  revision 13
+  revision 14
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -346,10 +346,6 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 128239 // BaseComponent
-      end
-      simplerelation 134895
-	-_->
-	  on artifact_ref 135407 // IComponent
       end
     end
 

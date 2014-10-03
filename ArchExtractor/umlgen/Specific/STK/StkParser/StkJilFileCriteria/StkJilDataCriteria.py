@@ -7,7 +7,7 @@ import Datatype.ArrayDataType
 import PortInterface.DataElement
 import StkParser.StkPortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkJilDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
     """STK JIL file data access criteria"""

@@ -6,7 +6,7 @@ import Datatype.ArrayDataType
 import PortInterface.SenderReceiverInterface
 import PortInterface.DataElement
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCHeaderProvWriteDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
     """STK C Header file provided data write criteria"""

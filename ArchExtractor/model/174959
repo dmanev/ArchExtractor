@@ -1,6 +1,6 @@
 format 74
 "Parser" // EA_Model::ArchExtractor::Base::Parser
-  revision 22
+  revision 23
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -398,6 +398,16 @@ ${import}
 ${definition}"
       associated_classes
 	class_ref 130159 // IFileParser
+      end
+    end
+
+    artifact 162031 "IPortCriteria"
+      stereotype "source"
+      python_src "${comment}
+${import}
+${definition}"
+      associated_classes
+	class_ref 130415 // IPortCriteria
       end
     end
 

@@ -4,7 +4,7 @@ import StkPortInterfaces.StkTOSSignalIf
 import PortInterface.RequiredPort
 import Parser.BasePortCriteria
 import Components.IComponent
-import PortInterface.IPortCriteria
+import Parser.IPortCriteria
 
 class StkCFileReqWriteTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
     """STK C implementation file reaquired TOSSignal write criteria"""
