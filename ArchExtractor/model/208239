@@ -1,6 +1,6 @@
 format 74
-"Base code generation" // EA_Model::Base code generation
-  revision 1
+"Base code generation" // Base code generation
+  revision 2
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

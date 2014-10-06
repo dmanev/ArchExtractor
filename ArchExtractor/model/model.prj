@@ -1,6 +1,6 @@
 format 74
-"IAnalyzer"
-  revision 4
+"model"
+  revision 7
   modified_by 111 "mitko"
   python_root_dir "/home/mitko/Documents/MD Diploma/Models/bouml/IAnalyzer/gen-src/"
 
@@ -37,7 +37,21 @@ format 74
 
   mark_for_import
   
-  package_ref 128239 // EA_Model
+  ncouples 11
+  key "gxmi path" value "/home/mitko/git/ArchExtractor/ArchExtractor/model/export/modelExport.xmi"
+  key "gxmi gen views" value "no"
+  key "gxmi encoding" value "UTF-8"
+  key "gxmi uml2.0" value "no"
+  key "gxmi pk prefix" value "no"
+  key "gxmi vis prefix" value "no"
+  key "gxmi primitive type" value "yes"
+  key "gxmi gen extensions" value "no"
+  key "gxmi gen eclipse" value "yes"
+  key "gxmi comment exporter" value "no"
+  key "gxmi linefeed" value "no"
+  package_ref 128367 // ArchExtractor
+
+  package_ref 208239 // Base code generation
 preserve_bodies
 
 end
