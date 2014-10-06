@@ -1,0 +1,42 @@
+[comment encoding = UTF-8 /]
+[module unittest('http://www.eclipse.org/uml2/4.0.0/UML')]
+
+[import org::dmanev::ArchExtractor::uml::gen::test::services::uml2services /]
+
+[template public genUnitTest(anArtifact : Artifact)]
+
+[comment modifications based on the model structure /]
+[let artifactCodePath : String = anArtifact.getElementPath().replace('/model/model/ArchExtractor/', '') ]
+[file ('/' + artifactCodePath + '/' + anArtifact.name + 'Test.py', false, 'UTF-8')]
+#auto-generated test file
+import unittest
+import [artifactCodePath.replaceAll('/', '.') + '.' + anArtifact.name/]
+#[protected ('imports')]
+#[/protected]
+
+class [anArtifact.manifestation.supplier.name /]Test(unittest.TestCase):
+    def setUp(self):
+        self._testInstance = [artifactCodePath.replaceAll('/', '.') + '.' + anArtifact.manifestation.supplier.name 
+                                                              + '.' + anArtifact.manifestation.supplier.name + '()' /]
+        #[protected ('setUp')]
+        #[/protected]
+        pass
+
+    def tearDown(self):
+        #[protected ('tearDown')]
+        #[/protected]
+        pass
+
+    [for(op: Operation | anArtifact.manifestation.supplier.ownedElement->filter(Operation)->sortedBy(name))]
+    def test[op.name/](self):
+        #[protected (op.name)]
+        #[/protected]
+        pass
+
+    [/for]
+
+if __name__ == '__main__':
+    unittest.main()
+[/file]
+[/let]
+[/template]
