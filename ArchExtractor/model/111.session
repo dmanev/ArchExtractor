@@ -1,8 +1,8 @@
 window_sizes 1615 1026 373 1236 782 170
 show_stereotypes
-selected 
-  package_ref 129 // model
+selected usecaseview_ref 128111 // Use Case View
 open
+  classview_ref 200687 // Class View
   
   package_ref 128367 // ArchExtractor
 end
