@@ -8,10 +8,11 @@ usage: ./BU2Eclipse -i <input file> [-x <schema file>] [-o <output file>]
 
 import lxml.etree as ET
 import re
+import os
 import argparse
 
 xml_filename = "Build.xmi"
-xsl_filename = "BoUml2Eclipse.xsl"
+xsl_filename = os.path.join(os.path.dirname(__file__), "BoUml2Eclipse.xsl")
 out_filename = "Build.out.uml"
 
 oldNsUML = r'xmlns:uml="http://schema.omg.org/spec/UML/2.1"'
@@ -30,7 +31,7 @@ def updateNamespaces(inpStr):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input-file', default=xml_filename)
-    parser.add_argument('-x', '--input-schema', default='BoUml2Eclipse.xsl')
+    parser.add_argument('-x', '--input-schema', default=xsl_filename)
     parser.add_argument('-o', '--output-file', default=out_filename)
 
     args = parser.parse_args()
