@@ -107,5 +107,8 @@
     <xsl:template match="packagedElement[@name='Interfaces']/packagedElement[@xmi:type='uml:Class']/@xmi:type">
         <xsl:attribute name="xmi:type" namespace="{namespace-uri()}">uml:Interface</xsl:attribute>        
     </xsl:template>
+    
+    <!-- Remove packagedElement node when attribute xmi:type is 'uml:Collaboration'. -->
+    <xsl:template match="packagedElement[@xmi:type='uml:Collaboration']" />
 
 </xsl:stylesheet>
