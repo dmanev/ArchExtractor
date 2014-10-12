@@ -1,6 +1,6 @@
 format 74
-"Analyzer" // EA_Model::ArchExtractor::Base::Analyzer
-  revision 18
+"Analyzer" // ArchExtractor::Base::Analyzer
+  revision 19
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -117,7 +117,7 @@ ${docstring}${members}
 	nparams 2
 	  param inout name "self" type class_ref 128111 // BaseAnalyzer
 	  param in name "inpBFParserList" type class_ref 128751 // BaseFileParser
-	    defaultvalue "None"
+	    defaultvalue "[]"
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 

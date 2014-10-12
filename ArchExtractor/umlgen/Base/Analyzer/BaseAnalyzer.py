@@ -7,7 +7,7 @@ import Infrastructure.AEModel
 
 class BaseAnalyzer(Analyzer.IAnalyzer.IAnalyzer, Infrastructure.FactoryProvider.FactoryProvider):
     """Base Analyzer class"""
-    def __init__(self, inpBFParserList = None):
+    def __init__(self, inpBFParserList = []):
         super(BaseAnalyzer, self).__init__()
         self.itsBaseFileParserList = list()
         ## Bouml preserved body begin 000265EF
