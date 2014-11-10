@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Created on Oct 23, 2013
 
@@ -87,7 +88,6 @@ class ArchExtractor(object):
         Dumper('AEModel').dump(xmiMdlRepo,
                                os.path.join(dirPath,
                                             self.aeModel.getName() + '.xmi'))
-
         return self.aeModel
 
 
