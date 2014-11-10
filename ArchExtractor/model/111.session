@@ -1,8 +1,29 @@
-window_sizes 1615 1026 373 1236 782 170
+window_sizes 1615 1026 468 1141 782 170
+diagrams
+  usecasediagram_ref 141167 // Use Case diag
+    982 625 100 3 12 0
+  classdiagram_ref 295663 // General architecture class diag
+    982 625 100 3 0 0
+  classdiagram_ref 128111 // Main class diag
+    982 625 100 2 0 0
+  classdiagram_ref 308975 // Analyzer pack diag
+    982 625 100 4 0 0
+  sequencediagram_ref 308847 // BaseAnalyzer init seq diag
+    982 625 100 4 0 0
+  active  sequencediagram_ref 309103 // BaseAnalyzer run seq diag
+    1141 782 100 3 0 0
+end
 show_stereotypes
-selected operation_ref 157167 // __init__
+selected sequencediagram_ref 309103 // BaseAnalyzer run seq diag
 open
   classview_ref 200687 // Class View
-  class_ref 128111 // BaseAnalyzer
+  usecaseview_ref 128111 // Use Case View
+  classview_ref 128111 // Class View
+  classview_ref 167407 // Class view
+  
+package_ref 161775 // SwComponent
+  classview_ref 167535 // Class view
+  
+package_ref 175087 // StkParser
 end
 end

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="main" name="org.dmanev.ArchExtractor.uml.gen.test">
-    <property name="ECLIPSE_HOME" value="../../../../../../../opt/eclipse/eclipse4.3"/>
-    <property name="ECLIPSE_WORKSPACE" value="../.."/>
+    <property name="ECLIPSE_HOME" value="../../../../../../opt/eclipse/eclipse4.3"/>
+    <property name="ECLIPSE_WORKSPACE" value="../../../../Documents/MD Diploma/ws"/>
 
     <!-- The classpath with only the dependencies used by the project -->
     <path id="org.dmanev.ArchExtractor.uml.gen.test.libraryclasspath">
