@@ -3,7 +3,6 @@
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/ArchExtractor</path>
 <path>/ArchExtractor/umlgen</path>
-<path>/ArchExtractor/tester</path>
 <path>/ArchExtractor/umlgen/Base</path>
 <path>/ArchExtractor/umlgen/Specific/STK</path>
 <path>/ArchExtractor/umlgen/Base/SwComponent</path>
