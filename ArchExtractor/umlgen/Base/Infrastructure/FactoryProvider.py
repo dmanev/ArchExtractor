@@ -1,11 +1,12 @@
-#Note: due to circular dependency of:
+# Note: due to circular dependency of:
 #
-#Infrastructure.AEModel->Infrastructure.FactoryProvider->
-#Infrastructure.InfrastructureFactory->Infrastructure.AEModel
+#   Infrastructure.AEModel->Infrastructure.FactoryProvider->
+#   Infrastructure.InfrastructureFactory->Infrastructure.AEModel
 #
-#module imports in Infrastructure.FactoryProvider are removed
-#in the template, as they are not needed.
-#This will be tracked with github dmanev/ArchExtractor issue: #39
+# as work-around module imports in Infrastructure.FactoryProvider 
+# are removed from the template, as they are not needed.
+#
+# This will be tracked with github dmanev/ArchExtractor issue: #39
 
 class FactoryProvider(object):
     """FactoryProvider is an implementation of a 'Handler' in 
