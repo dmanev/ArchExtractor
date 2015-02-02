@@ -8,6 +8,7 @@ class IAnalyzerTest(unittest.TestCase):
     def setUp(self):
         #self._testInstance = umlgen.Base.Analyzer.IAnalyzer.IAnalyzer()
         #Start of user code setUp
+        self._testInstance = umlgen.Base.Analyzer.IAnalyzer.IAnalyzer()
         #End of user code
         pass
 
@@ -18,6 +19,11 @@ class IAnalyzerTest(unittest.TestCase):
 
     def testscan(self):
         #Start of user code scan
+        dummyModel = "123"
+        self.assertEqual(self._testInstance.scan("topDir", dummyModel),
+                         dummyModel,
+                         "dummyModel value should be the\
+                          result of the interface")
         #End of user code
         pass
 
