@@ -1,6 +1,6 @@
 format 74
-"Infrastructure" // EA_Model::ArchExtractor::Base::Infrastructure
-  revision 13
+"Infrastructure" // ArchExtractor::Base::Infrastructure
+  revision 14
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -814,11 +814,19 @@ ${docstring}${body}
     artifact 250863 "FactoryProvider"
       stereotype "source"
       python_src "${comment}
-${import}
 ${definition}"
       associated_classes
 	class_ref 258543 // FactoryProvider
       end
+      comment "Note: due to circular dependency of:
+
+Infrastructure.AEModel->Infrastructure.FactoryProvider->
+Infrastructure.InfrastructureFactory->Infrastructure.AEModel
+
+module imports in Infrastructure.FactoryProvider are removed
+in the template, as they are not needed.
+This will be tracked with github dmanev/ArchExtractor issue: #39
+"
     end
 
     artifact 162159 "Identifiable"
