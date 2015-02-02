@@ -7,6 +7,12 @@
 
 [comment modifications based on the model structure /]
 [let artifactCodePath : String = anArtifact.getElementPath().replace('/model/model/ArchExtractor/', '') ]
+
+[comment include package init python file /]
+[file ('/' + artifactCodePath + '/__init__.py', false, 'UTF-8')]
+[/file]
+
+[comment generate unit test /]
 [file ('/' + artifactCodePath + '/' + anArtifact.name + 'Test.py', false, 'UTF-8')]
 #auto-generated test file
 import unittest

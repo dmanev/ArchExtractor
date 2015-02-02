@@ -9,7 +9,7 @@
 [comment @main/]
 
     [for(art: Artifact | aModel.getAllArtifactsRecursively()->filter(Artifact))]
-        [comment ** Generate Rte_<component>.h file ** /]
+        [comment ** Generate Unit Test for the Artifact file ** /]
         [art.genUnitTest() /]
     [/for]
 
