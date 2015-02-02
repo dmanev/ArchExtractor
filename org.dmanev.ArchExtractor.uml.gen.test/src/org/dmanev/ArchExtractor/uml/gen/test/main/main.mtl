@@ -9,8 +9,12 @@
 [comment @main/]
 
     [for(art: Artifact | aModel.getAllArtifactsRecursively()->filter(Artifact))]
-        [comment ** Generate Unit Test for the Artifact file ** /]
-        [art.genUnitTest() /]
+      
+        [comment ** If the class(interface) has any methods then generate ** /]
+        [if (art.manifestation.supplier.ownedElement->filter(Operation)->notEmpty())]
+            [comment ** Generate Unit Test for the Artifact file ** /]
+            [art.genUnitTest() /]
+        [/if]
     [/for]
 
 [/template]
