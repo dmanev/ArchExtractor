@@ -14,30 +14,30 @@
 
 [comment generate unit test /]
 [file ('/' + artifactCodePath + '/' + anArtifact.name + 'Test.py', false, 'UTF-8')]
-#auto-generated test file
+# auto-generated test file
 import unittest
 import ['umlgen.' + artifactCodePath.replaceAll('/', '.') + '.' + anArtifact.name/]
-#[protected ('imports')]
-#[/protected]
+# [protected ('imports')]
+# [/protected]
 
 class [anArtifact.manifestation.supplier.name /]Test(unittest.TestCase):
     def setUp(self):
-        #self._testInstance = ['umlgen.' + artifactCodePath.replaceAll('/', '.')
+        # self._testInstance = ['umlgen.' + artifactCodePath.replaceAll('/', '.')
                                         + '.' + anArtifact.manifestation.supplier.name 
                                         + '.' + anArtifact.manifestation.supplier.name + '()' /]
-        #[protected ('setUp')]
-        #[/protected]
+        # [protected ('setUp')]
+        # [/protected]
         pass
 
     def tearDown(self):
-        #[protected ('tearDown')]
-        #[/protected]
+        # [protected ('tearDown')]
+        # [/protected]
         pass
 
     [for(op: Operation | anArtifact.manifestation.supplier.ownedElement->filter(Operation)->sortedBy(name))]
     def test[op.name/](self):
-        #[protected (op.name)]
-        #[/protected]
+        # [protected (op.name)]
+        # [/protected]
         pass
 
     [/for]
