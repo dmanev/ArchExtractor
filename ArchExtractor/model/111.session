@@ -1,29 +1,35 @@
-window_sizes 1615 1026 257 1352 782 170
+window_sizes 1615 1026 321 1288 782 170
 diagrams
   usecasediagram_ref 141167 // Use Case diag
     982 625 100 3 12 0
   classdiagram_ref 295663 // General architecture class diag
     982 625 100 3 0 0
-  classdiagram_ref 128111 // Main class diag
-    982 625 100 2 0 0
+  active  classdiagram_ref 128111 // Main class diag
+    1288 782 100 2 0 0
   classdiagram_ref 308975 // Analyzer pack diag
     982 625 100 4 0 0
   sequencediagram_ref 308847 // BaseAnalyzer init seq diag
     982 625 100 4 0 0
-  active  sequencediagram_ref 309103 // BaseAnalyzer run seq diag
-    1352 782 140 3 0 106
+  sequencediagram_ref 309103 // BaseAnalyzer run seq diag
+    1352 782 140 3 0 0
+  classdiagram_ref 275695 // InfrastructureFactory class diag
+    1081 625 100 4 0 0
+  classdiagram_ref 262255 // FactoryProvider class diag
+    1081 625 100 4 0 0
 end
 show_stereotypes
-selected sequencediagram_ref 309103 // BaseAnalyzer run seq diag
+selected classdiagram_ref 128111 // Main class diag
 open
   classview_ref 200687 // Class View
   usecaseview_ref 128111 // Use Case View
   classview_ref 128111 // Class View
   classview_ref 167407 // Class view
   
-package_ref 161775 // SwComponent
+  package_ref 161775 // SwComponent
+  class_ref 258543 // FactoryProvider
+  deploymentview_ref 141295 // deploy view
   classview_ref 167535 // Class view
   
-package_ref 175087 // StkParser
+  package_ref 175087 // StkParser
 end
 end

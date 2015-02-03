@@ -1,0 +1,169 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_CPU
+// -----------------------------------------------------------------------------
+// $Date:   Apr 27 2009 16:21:54  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CPU/DAT_CPU.JIL-arc  $
+// $Revision:   1.3  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CPU/DAT_CPU.JIL-arc  $
+// 
+//    Rev 1.3   Apr 27 2009 16:21:54   adzhelp
+// Cm003619: GraphGroupSleep added
+// 
+//    Rev 1.2   Apr 13 2009 15:25:36   adzhelp
+// Cm003619: GraphGroup80Ms added
+// 
+//    Rev 1.1   Mar 30 2009 13:47:02   adzhelp
+// Cm004676: GraphGroup20Ms added
+// 
+//    Rev 1.0   04 Feb 2009 17:02:44   adzhelp
+// Initial revision.
+//******************************************************************************
+
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_CPU_JIL 
+#define I_DAT_CPU_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_CPU 
+{
+    
+/*--------------------------------------------------------------------------
+  Declaration of Task 
+
+  Task TaskName
+  {
+    Id          = "IdName";              --> this field is optional
+    Fct         = "FonctionName";        --> this field is optional
+    GraphGroup  =  GraphGroupReference;  --> this field is optional
+    Resource    =  ResourceReference;   --> this field is optional
+    Npg         =  NpgReference;         --> this field is optional
+    Priority    =  Priority;             --> this field is optional
+
+  };
+  --------------------------------------------------------------------------*/
+    Task DATCpuIdleTask 
+    {
+    };
+    Task GraphEngineTask // on 10 ms
+    {
+        GraphGroup = Default;
+    };
+    Task GraphEngineTask20Ms // on 20 ms
+    {
+        GraphGroup = GraphGroup20Ms;
+    };
+    Task GraphEngineTaskSleep // on 20 ms (sleep and nominal)
+    {
+        GraphGroup = GraphGroupSleep;
+    };
+    Task GraphEngineTask80Ms // on 80 ms
+    {
+        GraphGroup = GraphGroup80Ms;
+    };
+    Task DATCpuRefreshWatchDogTask 
+    {
+    };
+
+// The Default Graph group is periodic
+
+  /*--------------------------------------------------------------------------
+  Declaration of GraphGroup
+
+  Graph GraphGroupName
+  {
+    Macro       = "MacroName";            --> this field is optional
+    Default     =  TRUE;                  --> this field is optional
+    Graph       = Graph1;                 --> this field is optional
+    Graph       = Graph2;                 --> this field is optional
+    Graph       = ...;                    --> this field is optional
+  };
+  --------------------------------------------------------------------------*/
+    GraphGroup Default 
+    {
+        Default = TRUE;
+    };
+    
+    // The Idle Graph group is called by IDLE TASK
+    GraphGroup IdleGraphGroup 
+    {
+
+    };
+
+    GraphGroup GraphGroup20Ms
+    {
+    };
+
+    GraphGroup GraphGroupSleep
+    {
+    };
+
+    GraphGroup GraphGroup80Ms
+    {
+    };
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATCpuInit";
+    };
+
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_CPU_JIL */ /*cLIBStkScc2_Used*/

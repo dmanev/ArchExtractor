@@ -1,0 +1,343 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_CMN
+// -----------------------------------------------------------------------------
+// $Date:   Sep 24 2009 10:09:06  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CMN/DAT_CMN.jil-arc  $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_CMN/DAT_CMN.jil-arc  $
+// 
+//    Rev 1.1   Sep 24 2009 10:09:06   adzhelp
+// Cm003262: EFX90_SW2_FP04 : Implementation of the Rear Wipers functionality
+// 
+//    Rev 1.0   Apr 27 2009 16:15:30   adzhelp
+// Initial revision.
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_DAT_CMN_JIL
+#define I_DAT_CMN_JIL (1)
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+// if you are using JIL.EXE keep the first part of this #ifndef
+// if you are using SCC2.EXE keep the second part of this #ifndef
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component DAT_CMN 
+{
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    GraphGroup GraphGroupName                // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+    Signal Changing_RR_DOORS_SW_LAP_ILL;
+    Signal Falling_RR_DOORS_SW_LAP_ILL;
+    Signal Rising_RR_DOORS_SW_LAP_ILL;
+	
+    Signal Changing_FR_DOORS_SW_LAP_ILL;
+    Signal Falling_FR_DOORS_SW_LAP_ILL;
+    Signal Rising_FR_DOORS_SW_LAP_ILL;
+    
+    Signal Falling_PWR_IGN_LAP_ILL;
+    Signal Rising_PWR_IGN_LAP_ILL;
+    Signal Falling_PWR_IGN_LAP_BUZ;
+    Signal Rising_PWR_IGN_LAP_FLI;
+
+    Signal Falling_HAZARD_SW_LAP_FLI;
+
+    Signal FrontStopPositionDetected_LAP_FRW1;
+    Signal FrontStopPositionDetected_LAP_FRW2;
+
+    Signal RearStopPositionDetected_LAP_RRW1;
+    Signal RearStopPositionDetected_LAP_RRW2;
+    
+    // DLK
+    Signal Rising_PWR_IGN_LAP_DLK;
+    Signal Falling_PWR_IGN_LAP_DLK;
+
+    Signal Rising_FR_DOORS_SW_LAP_DLK;
+    Signal Falling_FR_DOORS_SW_LAP_DLK;
+    Signal Changing_FR_DOORS_SW_LAP_DLK;
+    
+    Signal Rising_RR_DOORS_SW_LAP_DLK;
+    Signal Falling_RR_DOORS_SW_LAP_DLK;
+    Signal Changing_RR_DOORS_SW_LAP_DLK;
+
+    Signal Rising_DOOR_LOCK_SW_LAP_DLK;
+    Signal Rising_DOOR_UNLOCK_LOCK_SW_LAP_DLK;
+    Signal Rising_RF_UNLOCK_DRIVER_DOOR_LAP_DLK;// DLK, for SW2
+
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+  // Init component
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct  = "DATCmnInitialize";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct  = "DATCmnLeaveStartingStepState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "GetAprTrpResource";
+        Fct  = "DATCmnGetAprTrpResource";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "ReleaseAprTrpResource";
+        Fct  = "DATCmnReleaseAprTrpResource";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "GetCarTrpResource";
+        Fct  = "DATCmnGetCarTrpResource";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "ReleaseCarTrpResource";
+        Fct  = "DATCmnReleaseCarTrpResource";
+    };
+    // Signals written on digital input changes:
+    OnControl = SetSignal
+    {
+        Ctrl = "Changing_RR_DOORS_SW";
+        Signal = Changing_RR_DOORS_SW_LAP_ILL;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Changing_FR_DOORS_SW";
+        Signal = Changing_FR_DOORS_SW_LAP_ILL;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_HAZARD_SW";
+        Signal = Falling_HAZARD_SW_LAP_FLI;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_PWR_IGN";
+        Signal = Falling_PWR_IGN_LAP_ILL;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_PWR_IGN";
+        Signal = Falling_PWR_IGN_LAP_BUZ;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_PWR_IGN";
+        Signal = Rising_PWR_IGN_LAP_ILL;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_PWR_IGN";
+        Signal = Rising_PWR_IGN_LAP_FLI;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "FrontStopPositionDetected";
+        Signal = FrontStopPositionDetected_LAP_FRW1;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "FrontStopPositionDetected";
+        Signal = FrontStopPositionDetected_LAP_FRW2;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "RearStopPositionDetected";
+        Signal = RearStopPositionDetected_LAP_RRW1;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "RearStopPositionDetected";
+        Signal = RearStopPositionDetected_LAP_RRW2;
+    };
+
+    // DLK
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_PWR_IGN";
+        Signal = Rising_PWR_IGN_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_PWR_IGN";
+        Signal = Falling_PWR_IGN_LAP_DLK;
+    };
+
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_FR_DOORS_SW";
+        Signal = Rising_FR_DOORS_SW_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_FR_DOORS_SW";
+        Signal = Falling_FR_DOORS_SW_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Changing_FR_DOORS_SW";
+        Signal = Changing_FR_DOORS_SW_LAP_DLK;
+    };
+
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_RR_DOORS_SW";
+        Signal = Rising_RR_DOORS_SW_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Falling_RR_DOORS_SW";
+        Signal = Falling_RR_DOORS_SW_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Changing_RR_DOORS_SW";
+        Signal = Changing_RR_DOORS_SW_LAP_DLK;
+    };
+
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_DOOR_LOCK_SW";
+        Signal = Rising_DOOR_LOCK_SW_LAP_DLK;
+    };
+    OnControl = SetSignal
+    {
+        Ctrl = "Rising_DOOR_UNLOCK_SW";
+        Signal = Rising_DOOR_UNLOCK_LOCK_SW_LAP_DLK;
+    };
+
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U32, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+};
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_DAT_CMN_JIL */
+
+

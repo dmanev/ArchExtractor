@@ -1,0 +1,180 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    LAP_TFC
+// -----------------------------------------------------------------------------
+// $Date:   Mar 08 2010 14:52:26  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_TFC/LAP_TFC.JIL-arc  $
+// $Revision:   1.3  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/LAP_TFC/LAP_TFC.JIL-arc  $
+// 
+//    Rev 1.3   Mar 08 2010 14:52:26   adzhelp
+// Cm007695: Request for Clearing System+Counter faults
+// 
+//    Rev 1.2   15 Apr 2009 12:03:22   akodzhh
+// Cm003517: Added SerialLine Immo and Eeprom Test. Constants for Flasher Test renamed. Checks for BCD formad removed from $38$90 frame. Analog values - read converted data 5s. OPEN_DOOR_LED/Alarm output - ensure diag control.
+// 
+//    Rev 1.1   20 Mar 2009 18:18:34   akodzhh
+// Cm003128 - fixes for warnings and some data names, Checksum calculation, sleep timeout measurement - use graph instead of task.
+// 
+//    Rev 1.0   Mar 17 2009 16:53:32   akodzhh
+// Initial revision.
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_LAP_TFC_JIL
+#define I_LAP_TFC_JIL (1)
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_TFC 
+{
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    GraphGroup GraphGroupName                // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+    Graph LAPTfcAutoTestIO                         // Declaration of Graph
+    {
+        Id   = "cTOSSeqLAPTfcAutoTestIO";
+        
+    };
+    Graph LAPTfcGraph                         // Declaration of Graph
+    {
+        Id   = "cTOSSeqLAPTfcGraph";
+        
+    };
+    Graph LAPTfcEepTest                       // Declaration of Graph
+    {
+        Id   = "cTOSSeqLAPTfcEepTest";
+        
+    };
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+ProdControl { Name = "RightFlashingForTFC";};
+ProdControl { Name = "LeftFlashingForTFC";};
+ProdControl { Name = "ActivateFinalTest";};
+ProdControl { Name = "ClearFaultFlagsAndCounters"; };
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U32, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+};
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_LAP_TFC_JIL */
+
+

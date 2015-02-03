@@ -1,0 +1,74 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      <PROJECT>
+// Language:     C
+// -----------------------------------------------------------------------------
+// Component:    <Comments about the component (role, algorithm, structure, 
+//               limitations, defined tasks and events...)>
+// -----------------------------------------------------------------------------
+// $Date    :   $
+// $Archive :   $
+// $Revision:   1.1  $
+// -----------------------------------------------------------------------------
+// $Log     :   $
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//                      Function prototypes
+//------------------------------------------------------------------------------
+
+#ifndef dat_pee
+   extern const tTOSSeqGraphType EepromManager;
+   extern const tTOSSeqGraphType EepromNormalization; 
+#endif
+
+#ifdef dat_pee
+   extern BOOL DATPeeIsTimerElapsed(void);
+   extern void     DATPeeNormalizeParameters(void);
+   extern void     DATPeeRestoreBanks(void);
+   extern void     DATPeeStartTimer(void);
+   extern BOOL TOSSeqEvalVrai(void); 
+#endif
+
+//------------------------------------------------------------------------------
+//                      Component rules
+//------------------------------------------------------------------------------
+
+#ifdef dat_pee
+  const tTOSSeqGraphType EepromManager =
+  {
+#ifdef COMPILATION_NATIVE
+    "EepromManager",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,DATPeeStartTimer,cTOSSeqInvalidRule,mTOSSeqRuleNumber(1)},
+  /*   1*/  {DATPeeIsTimerElapsed,DATPeeRestoreBanks,cTOSSeqInvalidRule,cTOSSeqInvalidRule}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+
+#ifdef dat_pee
+  const tTOSSeqGraphType EepromNormalization =
+  {
+#ifdef COMPILATION_NATIVE
+    "EepromNormalization",
+    {
+#endif
+  /*   0*/  {TOSSeqEvalVrai,DATPeeNormalizeParameters,cTOSSeqInvalidRule,mTOSSeqRuleNumber(0)}, 
+#ifdef COMPILATION_NATIVE
+    }
+#endif
+  };
+#endif
+ 
+
+//------------------------------------------------------------------------------
+//                      End of generation
+//------------------------------------------------------------------------------

@@ -1,0 +1,129 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_POU
+// -----------------------------------------------------------------------------
+// $Date:   Dec 14 2009 11:42:28  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_POU/DAT_POU.JIL-arc  $
+// $Revision:   1.3  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_POU/DAT_POU.JIL-arc $
+// 
+//    Rev 1.3   Dec 14 2009 11:42:28   adzhelp
+// Cm005566: Implementation of full HW protection and overvoltage protection
+// 
+//    Rev 1.2   Oct 07 2009 09:07:08   adzhelp
+// Cm005497: Configuration of LDB_DOU according to ECUType 
+// 
+//    Rev 1.1   Mar 20 2009 17:32:28   adzhelp
+// Cm003619: Parameterization needed for diagnostics
+// 
+//    Rev 1.0   10 Nov 2008 10:26:18   ailievb
+// Initial revision.
+//******************************************************************************
+
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_POU_JIL 
+#define I_DAT_POU_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_POU 
+{
+    
+
+
+
+
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATPouInit";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "ActivateFinalTest";
+        Fct = "DATPouActivateFinalTest";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct = "DATPouLeaveStartingStepState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "DATLeaveActiveState";
+        Fct = "DATPouLeaveActiveState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "AirbagUnlock";
+        Fct = "DATPouAirbagUnlockStarted";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "CrashUnlockFinished";
+        Fct = "DATPouAirbagUnlockFinished";
+    };
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_POU_JIL */

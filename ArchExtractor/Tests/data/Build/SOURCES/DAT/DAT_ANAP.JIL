@@ -1,0 +1,278 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    DAT_ANA
+// -----------------------------------------------------------------------------
+// $Date:   Apr 13 2009 15:59:52  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_ANA/DAT_ANAP.JIL-arc  $
+// $Revision:   1.4  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_ANA/DAT_ANAP.JIL-arc  $
+// 
+//    Rev 1.4   Apr 13 2009 15:59:52   adzhelp
+// Cm003619: Analog converter changed to 10 bit
+// 
+//    Rev 1.3   Mar 20 2009 10:30:58   adzhelp
+// Cm003619: FR_WIPER_INT_SW renamed to AI_FR_WIPER_INT_SW
+// 
+//    Rev 1.2   Mar 11 2009 09:07:26   adzhelp
+// Cm003619: Analog inputs parameterization according to HSI
+// 
+//    Rev 1.1   27 Jan 2009 11:18:26   avidoly
+// Cm003619: DAT_ANA parameterization
+//
+//    Rev 1.0   20 Nov 2008 15:20:18   ailievb
+// Initial revision.
+//
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_DAT_ANAp_JIL
+#define I_DAT_ANAp_JIL (1)
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    AnalogInputManager
+//    {
+//        Sampling period in ms
+//        SamplingPeriodMs      = 10;
+//
+//        Bit size of Analog Digital Converter
+//        ConverterBitSize      = 12;
+//
+//        Maximum allowed size for internal calculation 
+//        CalculationBitSize    = 32;
+//        
+//        Force the use of Fast Algorithm
+//        This Algorithm doesn't use multiply and divide operators.
+//        This choice will limit the possible value of time constant
+//        ForceFastAlogorithm   = TRUE;
+//
+//        Number of data
+//        NbrOfChannels = 3;
+//
+//        Default Time constant in ms 
+//        This value will be used for analog inputs 
+//        without time constant specification.
+//        DefaultTimeConstantMs      = 80;
+//
+//        Default allowed shift in per cent
+//        This value will be used for analog inputs 
+//        without allowed shift specification.
+//        DefaultAllowedShiftPerCent = 10;
+//    };
+//------------------------------------------------------------------------------
+AnalogInputManager
+{
+    SamplingPeriodMs     	 	= 10;
+    ConverterBitSize      		= 10;
+    CalculationBitSize    		= 16;
+    ForceFastAlogorithm   		= TRUE;
+    NbrOfChannels				= 8;
+    DefaultTimeConstantMs      	= 80;
+    DefaultAllowedShiftPerCent 	= 10;
+};
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component DAT_ANAp
+{        
+    //--------------------------------------------------------------------------
+    //    Data DataName                
+    //    {
+    //        Type = U16;
+    //        BytePosition = 0;
+    //        Specialization = AnalogInput 
+    //        { 
+    //            First order filter time constant in ms
+    //            The 95% rising time is equal to 3xTimeConstant
+    //            TimeConstantMs = 80; 
+    //  
+    //            Time constant allowed shift in per cent          
+    //            According to general customization, all value of time constant 
+    //            are not possible.
+    //            If the effective time constant is out of allowed range, the 
+    //            generator will display a warning.
+    //            AllowedShiftPerCent = 10; 
+    //        };
+    //    };
+    //--------------------------------------------------------------------------
+
+    // Byte position of each input is ANI number * 2
+    
+    // ANI7
+    Data DIAG_BAT  // POWER SUPPLY & diagnosis: Battery (BCM+indicators+Rear wiper )
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 14;
+        ResetValue = 766; // For 12 V calculated with R6006 = 68 kOhm
+    };
+
+    // ANI6
+    Data DIAG_FLASHER // FLASHER INCICATORS current diagnosis: Current flasher diagnosis.
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 12;
+        ResetValue = 0;
+    };
+
+    // ANI5
+    Data DIAG_DRIVER_ULQ // DIAGNOSIS: Current through ULQ  for extenal output CC protection
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 10;
+        ResetValue = 0;
+    };
+
+    // ANI4
+    Data AI_FR_WIPER_INT_SW // FRONT WIPERS: Front wiper Cadance switch
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 8;
+        ResetValue = 0;
+    };
+
+    // ANI3
+    Data DIAG_DRIVER_KLAXON // DIAGNOSIS: Current through transistor (klaxon) for  CC protection
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 6;
+        ResetValue = 0;
+    };
+
+    // ANI2
+    Data AI_DOOR_UNLOCK_SW // DOOR LOCK: Door lock/unlock  switch
+
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 4;
+        ResetValue = 1023;
+    };
+
+    // ANI1
+    Data AI_RR_DOORS_SW // OPENING STATUS: Rear door & trunck & hood switch
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 2;
+        ResetValue = 1023;
+    };
+
+    // ANI0
+    Data DIAG_DRIVER_HIGH_SIDE // RF RSSI / REAR FOG/REAR WIPER diagnosis:	High side CC diagnosis
+    {
+        Type = U16;
+        Specialization = AnalogInput { TimeConstantMs = 40; };
+        BytePosition = 0;
+        ResetValue = 0;
+    };
+
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//    
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Graph GraphGroupName                    // Declaration of GraphGroup
+//    {
+//        Macro         = "MacroName";          --> this field is optional
+//        Default       = TRUE;                 --> this field is optional
+//        Graph         = Graph1;               --> this field is optional
+//        Graph         = Graph2;               --> this field is optional
+//        Graph         = ...;                  --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//    
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    In                                      // Declaration of Data flow
+//    {
+//        Data = "DataName";
+//        Type = U1 or U8, U16, U32, S8, S16, S32;
+//        or
+//        Type = U1Array or U8Array, ..., S32Array
+//        {
+//                Size = ItemNumber;
+//        };
+//    };
+//..
+//    Out
+//    {
+//        ...(see In)
+//    };
+//------------------------------------------------------------------------------
+};
+
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif    /* I_DAT_ANAp_JIL */

@@ -1,0 +1,136 @@
+/****************************************************************************
+  Project ......................... STANDARD
+  Component ....................... DAT_PEE
+  File revision.................... $Revision:   1.1  $
+  Last modification date .......... $Modtime:   Feb 26 2010 13:19:42  $
+  -------------------------------------------------------------------------
+  Copyright ... This software is JCI property. Duplication or
+                disclosure is prohibited without JCI written permission
+  ------------------------------------------------------------------------- 
+    
+  - This file defines the interaction of components with TOS services and
+    other component
+
+	See NT 02 0994 for language utilisation
+
+  -------------------------------------------------------------------------
+  cmp.jil file review :
+  
+  $Log:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/DAT/DAT_PEE/DAT_PEE.JIL-arc  $
+// 
+//    Rev 1.1   Mar 05 2010 10:33:08   adzhelp
+// Cm006814, Cm007684: Normalization of calibration parameters
+
+*****************************************************************************/
+/*-------------------------------------------------------------------------
+  Includes non re entry
+  -------------------------------------------------------------------------*/
+#ifndef I_DAT_PEE_JIL 
+#define I_DAT_PEE_JIL (1)
+
+/*--------------------------------------------------------------------------
+  Included jil files
+
+  #include "project_file_name.jil"
+  --------------------------------------------------------------------------*/
+
+/****************************************************************************
+  Component declaration
+  Component ComponentName
+  {
+    // All declaration needed
+  };
+
+/****************************************************************************/
+Component DAT_PEE 
+{
+    
+
+
+  /*--------------------------------------------------------------------------
+  Declaration of Graph
+
+  Graph GraphName
+  {
+    Id          = "IdName";              --> this field is optional
+    GraphGroup  =  GraphGroupReference; --> this field is optional
+    NbInstances =  NbInstances;          --> this field is optional
+  };
+  --------------------------------------------------------------------------*/
+    Graph EepromManager 
+    {
+    };
+
+    Graph EepromNormalization
+    {
+        GraphGroup = GraphGroup80Ms;
+    };
+
+
+// Init component
+
+/*--------------------------------------------------------------------------
+  Declaration of Control consumed 
+
+  OnControl = Callback
+  {
+     Ctrl = "ControlName";
+     Fct = "FonctionName";
+  }; 
+
+  Or 
+  
+  OnControl = ActivateTask
+  {
+     Ctrl = "ControlName";
+     Task = TaskReference;
+  };
+
+  Or
+
+  OnControl = SetSignal
+  {
+    Ctrl = "ControlName";
+    Signal = SignalReference;
+  }; 
+  --------------------------------------------------------------------------*/
+    OnControl = CallBack
+    {
+        Ctrl = "DATInitialize";
+        Fct = "DATPeeInit";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "IsAnybodyMaintainStartingStepState";
+        Fct = "DATPeeIsMaintainStartingStepState";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "EnterStartingStepState";
+        Fct = "DATPeeReadAllBanks";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "LeaveStartingStepState";
+        Fct = "DATPeeCanRestoreBanks";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "DATLeaveActiveState";
+        Fct = "DATPeeUpdateBanks";
+    };
+
+
+};
+/****************************************************************************
+  End of component declaration
+/****************************************************************************/
+/*-------------------------------------------------------------------------
+  End of includes non re entry
+  -------------------------------------------------------------------------*/
+#endif
+/* I_DAT_PEE_JIL */ /*cLIBStkScc2_Used*/
