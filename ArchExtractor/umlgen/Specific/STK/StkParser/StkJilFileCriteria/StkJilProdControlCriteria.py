@@ -13,11 +13,12 @@ class StkJilProdControlCriteria(Parser.BasePortCriteria.BasePortCriteria):
         for control in re.findall(r'ProdControl\s*{\s*Name\s*=\s*\"(\w+)\"\s*;\s*}\s*;', inpTextContent, re.I):
             if control not in inoutIComponent.getItsIPortMap():
                 pif = self.getPortInterfaceFactory()
-                clSrvIntIf = pif.getStkControlIf(control)                
+                dtf = self.getDataTypeFactory()
+                clSrvIntIf = pif.getStkControlIf(control, dtf)
                 provPort = PortInterface.ProvidedPort.ProvidedPort(clSrvIntIf)
                 provPort.setName(control)
                 provPort.setInterface(clSrvIntIf)
-                inoutIComponent.addPort(provPort)                        
+                inoutIComponent.addPort(provPort)
         ## Bouml preserved body end 0003386F
         
     def __init__(self):

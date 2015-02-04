@@ -8,6 +8,7 @@ class StkVoidTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Specific.STK.StkDataTypes.StkVoid.StkVoid()
         # Start of user code setUp
+        self._testInstance = umlgen.Specific.STK.StkDataTypes.StkVoid.StkVoid()
         # End of user code
         pass
 
@@ -18,6 +19,9 @@ class StkVoidTest(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertEqual(self._testInstance.Name, 'void')
+        self.assertEqual(self._testInstance.lowerLimit, 0)
+        self.assertEqual(self._testInstance.upperLimit, 0)
         # End of user code
         pass
 

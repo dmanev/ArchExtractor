@@ -8,6 +8,7 @@ class StkS8Test(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Specific.STK.StkDataTypes.StkS8.StkS8()
         # Start of user code setUp
+        self._testInstance = umlgen.Specific.STK.StkDataTypes.StkS8.StkS8()
         # End of user code
         pass
 
@@ -18,6 +19,9 @@ class StkS8Test(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertEqual(self._testInstance.Name, 'S8')
+        self.assertEqual(self._testInstance.lowerLimit, -126)
+        self.assertEqual(self._testInstance.upperLimit, 127)
         # End of user code
         pass
 

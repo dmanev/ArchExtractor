@@ -8,6 +8,7 @@ class IComponentTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.SwComponent.Components.IComponent.IComponent()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.SwComponent.Components.IComponent.IComponent()
         # End of user code
         pass
 
@@ -18,11 +19,15 @@ class IComponentTest(unittest.TestCase):
 
     def testaddPort(self):
         # Start of user code addPort
+        self._testInstance.addPort("dummyPort")
+        '''This is interface class so nothing to test'''
         # End of user code
         pass
 
     def testgetFileList(self):
         # Start of user code getFileList
+        self._testInstance.getFileList()
+        '''This is interface class so nothing to test'''
         # End of user code
         pass
 

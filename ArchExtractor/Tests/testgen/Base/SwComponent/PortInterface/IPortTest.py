@@ -8,6 +8,7 @@ class IPortTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.SwComponent.PortInterface.IPort.IPort()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.SwComponent.PortInterface.IPort.IPort()
         # End of user code
         pass
 
@@ -18,11 +19,15 @@ class IPortTest(unittest.TestCase):
 
     def testgetInterface(self):
         # Start of user code getInterface
+        self._testInstance.getInterface()
+        '''This is interface class so nothing to test'''
         # End of user code
         pass
 
     def testsetInterface(self):
         # Start of user code setInterface
+        self._testInstance.setInterface("dummyIf")
+        '''This is interface class so nothing to test'''
         # End of user code
         pass
 

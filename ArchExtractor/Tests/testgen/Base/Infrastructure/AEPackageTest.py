@@ -8,6 +8,7 @@ class AEPackageTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.Infrastructure.AEPackage.AEPackage()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.Infrastructure.AEPackage.AEPackage("DummyPack")
         # End of user code
         pass
 
@@ -43,6 +44,10 @@ class AEPackageTest(unittest.TestCase):
 
     def testset_itsAEPackageList(self):
         # Start of user code set_itsAEPackageList
+        dummyPackList = ["dummyPack1", "dummyPack2"]
+        self._testInstance.setItsAEPackageList(dummyPackList)
+        self.assertListEqual(self._testInstance.getItsAEPackageList(),
+                             dummyPackList)
         # End of user code
         pass
 

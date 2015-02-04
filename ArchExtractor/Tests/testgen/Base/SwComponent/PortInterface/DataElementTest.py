@@ -2,12 +2,14 @@
 import unittest
 import umlgen.Base.SwComponent.PortInterface.DataElement
 # Start of user code imports
+from Datatype.DataType import DataType
 # End of user code
 
 class DataElementTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.SwComponent.PortInterface.DataElement.DataElement()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.SwComponent.PortInterface.DataElement.DataElement()
         # End of user code
         pass
 
@@ -23,6 +25,8 @@ class DataElementTest(unittest.TestCase):
 
     def testset_itsDataType(self):
         # Start of user code set_itsDataType
+        self._testInstance.setItsDataType(DataType())
+        self.assertIsInstance(self._testInstance.getItsDataType(), DataType)
         # End of user code
         pass
 

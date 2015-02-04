@@ -8,16 +8,17 @@ import PortInterface.ClientServerInterface
 import PortInterface.SenderReceiverInterface
 
 class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFactory):
-    def getStkControlIf(self, inpNameIf):
+    def getStkControlIf(self, inpNameIf, inpDataTypeFactory):
         ## Bouml preserved body begin 0003D9EF
         outIPortInterface = self.getAbstractPortInterface('Ctrl_'+inpNameIf+'_If', 
                                                           PortInterface.ClientServerInterface.ClientServerInterface)
         if(len(outIPortInterface.getItsOperationList()) == 0):
             ctrlOp = PortInterface.Operation.Operation()
             ctrlOp.setName('Invoke')
+            ctrlOp.setItsDataType(inpDataTypeFactory.getStkVoid())
             outIPortInterface.itsOperationList = [ctrlOp]
 
-        return outIPortInterface        
+        return outIPortInterface
         ## Bouml preserved body end 0003D9EF
         
     def getStkTOSSignalIf(self, inpNameIf, inpDataTypeFactory):
@@ -46,6 +47,7 @@ class StkPortInterfaceFactory(PortInterface.PortInterfaceFactory.PortInterfaceFa
             param.itsDataType = inpDataTypeFactory.getStkU8()
             param.setName('SubControlSelector')
             ctrlOp.setItsParamList([param])
+            ctrlOp.setItsDataType(inpDataTypeFactory.getStkVoid())
             outIPortInterface.itsOperationList = [ctrlOp]
 
         return outIPortInterface

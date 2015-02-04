@@ -2,12 +2,15 @@
 import unittest
 import umlgen.Base.Infrastructure.AEModel
 # Start of user code imports
+from Infrastructure.InfrastructureFactory import InfrastructureFactory
+from Components.ComponentFactory import ComponentFactory
 # End of user code
 
 class AEModelTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.Infrastructure.AEModel.AEModel()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.Infrastructure.AEModel.AEModel(InfrastructureFactory())
         # End of user code
         pass
 
@@ -18,6 +21,9 @@ class AEModelTest(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertIsInstance(self._testInstance.getInfrastructureFactory(),
+                              InfrastructureFactory)
+        self.assertEqual(self._testInstance.getPackageList(), [])
         # End of user code
         pass
 
@@ -48,6 +54,9 @@ class AEModelTest(unittest.TestCase):
 
     def testset_itsComponentFactory(self):
         # Start of user code set_itsComponentFactory
+        self._testInstance.setItsComponentFactory(ComponentFactory())
+        self.assertIsInstance(self._testInstance.getComponentFactory(),
+                              ComponentFactory)
         # End of user code
         pass
 
@@ -58,6 +67,9 @@ class AEModelTest(unittest.TestCase):
 
     def testset_itsInfrastructureFactory(self):
         # Start of user code set_itsInfrastructureFactory
+        self._testInstance.setItsInfrastructureFactory(InfrastructureFactory())
+        self.assertIsInstance(self._testInstance.getInfrastructureFactory(),
+                              InfrastructureFactory)
         # End of user code
         pass
 

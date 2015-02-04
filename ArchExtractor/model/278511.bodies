@@ -1,11 +1,11 @@
 class XMIConverter
-!!!275823.python!!!	__init__(inout self : )
+!!!275823.python!!!	__init__(inout self : XMIConverter)
         self.interfaceCreateMap = {PortInterface.SenderReceiverInterface.SenderReceiverInterface:
                                         XMIConverter.importSenderReceiverInterface,
                                    PortInterface.ClientServerInterface.ClientServerInterface:
                                         XMIConverter.importClientServerInterface}
         self.xmiTypesMap = dict()
-!!!327535.python!!!	getXMIBaseDataType(in self : )
+!!!327535.python!!!	getXMIBaseDataType(in self : XMIConverter) : any
         xmiDtCls = self.xmiFactory.create_Class()
         xmiDtCls.name = 'DataType'
         xmiPropLL = self.xmiFactory.create_Property()
@@ -19,7 +19,7 @@ class XMIConverter
         if xmiDtCls.name not in self.xmiTypesMap:
             self.xmiTypesMap[xmiDtCls.name] = xmiDtCls
         return xmiDtCls
-!!!334063.python!!!	getXMIBaseArrayDataType(in self : )
+!!!334063.python!!!	getXMIBaseArrayDataType(in self : XMIConverter) : any
         xmiArrDtCls = self.xmiFactory.create_Class()
         xmiArrDtCls.name = 'ArrayDataType'
         xmiPropMNE = self.xmiFactory.create_Property()
@@ -33,28 +33,27 @@ class XMIConverter
         if xmiArrDtCls.name not in self.xmiTypesMap:
             self.xmiTypesMap[xmiArrDtCls.name] = xmiArrDtCls
         return xmiArrDtCls
-!!!283887.python!!!	importBaseComponent(in self : , in inpBaseComponent : BaseComponent, inout inoutXmiPackage : )
+!!!283887.python!!!	importBaseComponent(in self : XMIConverter, in inpBaseComponent : BaseComponent, inout inoutXmiPackage : any)
         xmiComponent = self.xmiFactory.create_Component()
         xmiComponent.name = inpBaseComponent.getName()
         for portName in sorted(inpBaseComponent.getItsIPortMap()):
             port = inpBaseComponent.getItsIPortMap()[portName]
-            xmiInterface = self.xmiTypesMap[port.getInterface().getName()]          
+            xmiInterface = self.xmiTypesMap[port.getInterface().getName()]
             if(isinstance(port, PortInterface.ProvidedPort.ProvidedPort)):
                 xmiComponent.add_providedClass(xmiInterface)
-            elif(isinstance(port, PortInterface.RequiredPort.RequiredPort)):
+            else:  # isinstance(port, PortInterface.RequiredPort.RequiredPort)
                 xmiComponent.add_requiredClass(xmiInterface)
-            else:
-                pass
+
         inoutXmiPackage.add_ownedType(xmiComponent)
         return inoutXmiPackage
-!!!347247.python!!!	importBaseInterfaces(in self : , in inoutXmiPackage : )
+!!!347247.python!!!	importBaseInterfaces(in self : XMIConverter, in inoutXmiPackage : any)
         baseIfList = [iface() for iface in self.interfaceCreateMap.keys()]
         for baseIf in baseIfList:
             xmiBaseIf = self.xmiFactory.create_Class()
             xmiBaseIf.name = baseIf.__class__.__name__
             inoutXmiPackage.add_ownedType(xmiBaseIf)
             self.xmiTypesMap[xmiBaseIf.name] = xmiBaseIf
-!!!284143.python!!!	importSenderReceiverInterface(in self : , in inpSRIf : SenderReceiverInterface, inout inoutXmiPackage : )
+!!!284143.python!!!	importSenderReceiverInterface(in self : XMIConverter, in inpSRIf : SenderReceiverInterface, inout inoutXmiPackage : any)
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpSRIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
@@ -71,7 +70,7 @@ class XMIConverter
             xmiProp.set_type(xmiDT)
             xmiIfCls.add_ownedAttribute(xmiProp)
         return inoutXmiPackage
-!!!284271.python!!!	importClientServerInterface(in self : , in inpCSIf : ClientServerInterface, inout inoutXmiPackage : )
+!!!284271.python!!!	importClientServerInterface(in self : XMIConverter, in inpCSIf : ClientServerInterface, inout inoutXmiPackage : any)
         xmiIfCls = self.xmiFactory.create_Class()
         xmiIfCls.name = inpCSIf.getName()
         inoutXmiPackage.add_ownedType(xmiIfCls)
@@ -92,7 +91,7 @@ class XMIConverter
                 xmiOp.add_ownedParameter(xmiPrm)
             xmiIfCls.add_ownedOperation(xmiOp)
         return inoutXmiPackage        
-!!!277231.python!!!	importAEPackage(in self : , in inpAEPackage : , inout inoutXmiPackage : )
+!!!277231.python!!!	importAEPackage(in self : XMIConverter, in inpAEPackage : AEPackage, inout inoutXmiPackage : any)
         newXmiPackage = self.xmiFactory.create_Package()
         newXmiPackage.name = inpAEPackage.getName()
 
@@ -106,7 +105,7 @@ class XMIConverter
                 newXmiPackage = self.importBaseComponent(element, newXmiPackage)
 
         return inoutXmiPackage
-!!!300271.python!!!	importTypes(in self : , in inpAEModel : AEModel, inout inoutXmiPackage : )
+!!!300271.python!!!	importTypes(in self : XMIConverter, in inpAEModel : AEModel, inout inoutXmiPackage : any)
         dtf = inpAEModel.getDataTypeFactory()
         ifPack = self.xmiFactory.create_Package()
         ifPack.name = "DataTypes"
@@ -148,7 +147,7 @@ class XMIConverter
             self.xmiTypesMap[arrDt.getName()] = xmiDtCls
 
         return inoutXmiPackage
-!!!300527.python!!!	importInterfaces(in self : , in inpAEModel : AEModel, inout inoutXmiPackage : )
+!!!300527.python!!!	importInterfaces(in self : XMIConverter, in inpAEModel : AEModel, inout inoutXmiPackage : any)
         pif = inpAEModel.getPortInterfaceFactory()
         xmiIfPack = self.xmiFactory.create_Package()
         xmiIfPack.name = "Interfaces"
@@ -168,7 +167,7 @@ class XMIConverter
                                                                        xmiIfPack)
 
         return inoutXmiPackage
-!!!275695.python!!!	convert(in self : , in inpAEModel : AEModel, out outXMIMdlRepo : )
+!!!275695.python!!!	convert(in self : XMIConverter, in inpAEModel : AEModel, out outXMIMdlRepo : any)
         outXMIMdlRepo = xmi.core.Repository()
         self.xmiFactory = xmi.core.Factory(outXMIMdlRepo)
 

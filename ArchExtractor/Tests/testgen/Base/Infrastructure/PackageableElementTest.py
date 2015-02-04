@@ -8,6 +8,7 @@ class PackageableElementTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.Infrastructure.PackageableElement.PackageableElement()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.Infrastructure.PackageableElement.PackageableElement()
         # End of user code
         pass
 
@@ -18,6 +19,7 @@ class PackageableElementTest(unittest.TestCase):
 
     def testget_itsParentPackage(self):
         # Start of user code get_itsParentPackage
+        self.assertEqual(self._testInstance.getItsParentPackage(), None)
         # End of user code
         pass
 

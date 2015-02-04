@@ -8,6 +8,7 @@ class StkTOSSignalIfTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Specific.STK.StkPortInterfaces.StkTOSSignalIf.StkTOSSignalIf()
         # Start of user code setUp
+        self._testInstance = umlgen.Specific.STK.StkPortInterfaces.StkTOSSignalIf.StkTOSSignalIf()
         # End of user code
         pass
 
@@ -18,6 +19,7 @@ class StkTOSSignalIfTest(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertEqual(self._testInstance.getName(), 'TOSSignal')
         # End of user code
         pass
 

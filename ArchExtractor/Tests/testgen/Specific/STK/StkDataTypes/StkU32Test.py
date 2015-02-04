@@ -8,6 +8,7 @@ class StkU32Test(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Specific.STK.StkDataTypes.StkU32.StkU32()
         # Start of user code setUp
+        self._testInstance = umlgen.Specific.STK.StkDataTypes.StkU32.StkU32()
         # End of user code
         pass
 
@@ -18,6 +19,9 @@ class StkU32Test(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertEqual(self._testInstance.Name, 'U32')
+        self.assertEqual(self._testInstance.lowerLimit, 0)
+        self.assertEqual(self._testInstance.upperLimit, 4294967295)
         # End of user code
         pass
 

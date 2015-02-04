@@ -1,6 +1,6 @@
 format 74
-"StkPortInterfaces" // EA_Model::ArchExtractor::Specific::STK::StkPortInterfaces
-  revision 12
+"StkPortInterfaces" // ArchExtractor::Specific::STK::StkPortInterfaces
+  revision 13
   modified_by 111 "mitko"
   // class settings
   //class diagram settings
@@ -112,13 +112,14 @@ ${docstring}${members}
 
       operation 252399 "getStkControlIf"
 	preserve_cpp_body_indent public return_type class_ref 204911 // StkControlIf
-	nparams 2
+	nparams 3
 	  param in name "self" explicit_type ""
 	  param in name "inpNameIf" explicit_type "string"
+	  param in name "inpDataTypeFactory" type class_ref 285423 // DataTypeFactory
 	
 	preserve_java_body_indent 
 	preserve_php_body_indent 
-	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}${)}:
+	preserve_python_body_indent python_def "${@}${static}${abstract}def ${name}${(}${p0}${v0}, ${p1}${v1}, ${p2}${v2}${)}:
 ${docstring}${body}
 "
 	

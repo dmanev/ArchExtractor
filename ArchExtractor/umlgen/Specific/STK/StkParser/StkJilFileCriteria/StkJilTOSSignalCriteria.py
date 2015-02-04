@@ -13,7 +13,7 @@ class StkJilTOSSignalCriteria(Parser.BasePortCriteria.BasePortCriteria):
         for tosSignal in re.findall(r'Signal\s*(\w+)\s*;', inpTextContent, re.I):
             pif = self.getPortInterfaceFactory()
             dtf = self.getDataTypeFactory()
-            tosCtrlIf = pif.getStkTOSSignalIf(tosSignal, dtf)                  
+            tosCtrlIf = pif.getStkTOSSignalIf(tosSignal, dtf)
             provPort = PortInterface.ProvidedPort.ProvidedPort(tosCtrlIf)
             provPort.setName(tosSignal)
             provPort.setInterface(tosCtrlIf)

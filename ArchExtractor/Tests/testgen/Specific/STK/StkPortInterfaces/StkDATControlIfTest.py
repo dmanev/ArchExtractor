@@ -8,6 +8,7 @@ class StkDATControlIfTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Specific.STK.StkPortInterfaces.StkDATControlIf.StkDATControlIf()
         # Start of user code setUp
+        self._testInstance = umlgen.Specific.STK.StkPortInterfaces.StkDATControlIf.StkDATControlIf()
         # End of user code
         pass
 
@@ -18,6 +19,7 @@ class StkDATControlIfTest(unittest.TestCase):
 
     def test__init__(self):
         # Start of user code __init__
+        self.assertEqual(self._testInstance.getName(), 'DATCtrl')
         # End of user code
         pass
 

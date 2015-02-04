@@ -1,6 +1,6 @@
 format 74
-"StkDataTypes" // EA_Model::System::Specific::STK::StkDataTypes
-  revision 8
+"StkDataTypes" // ArchExtractor::Specific::STK::StkDataTypes
+  revision 9
   modified_by 111 "mitko"
   // class settings
   //class diagram settings

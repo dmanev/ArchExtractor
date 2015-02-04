@@ -8,6 +8,7 @@ class IPortCriteriaTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.Parser.IPortCriteria.IPortCriteria()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.Parser.IPortCriteria.IPortCriteria()
         # End of user code
         pass
 
@@ -18,6 +19,8 @@ class IPortCriteriaTest(unittest.TestCase):
 
     def testexecute(self):
         # Start of user code execute
+        self._testInstance.execute("TestTextContent", None)
+        '''This is interface class so nothing to test'''
         # End of user code
         pass
 

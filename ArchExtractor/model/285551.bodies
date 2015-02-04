@@ -7,7 +7,7 @@ class StkDataTypeFactory
 !!!284911.python!!!	getStkVoid(in self : )
         outDataType = self.getDataType('void')
         outDataType.lowerLimit = None
-        outDataType.upperLimit = None        
+        outDataType.upperLimit = None
         return outDataType
 !!!285039.python!!!	getStkU1(in self : )
         outDataType = self.getDataType('U1')
@@ -17,12 +17,12 @@ class StkDataTypeFactory
 !!!285167.python!!!	getStkU8(in self : )
         outDataType = self.getDataType('U8')
         outDataType.lowerLimit = '0'
-        outDataType.upperLimit = '255'        
+        outDataType.upperLimit = '255'
         return outDataType
 !!!285295.python!!!	getStkS8(in self : )
         outDataType = self.getDataType('S8')
         outDataType.lowerLimit = '-126'
-        outDataType.upperLimit = '127'        
+        outDataType.upperLimit = '127'
         return outDataType
 !!!285423.python!!!	getStkS16(in self : )
         outDataType = self.getDataType('S16')
@@ -37,7 +37,7 @@ class StkDataTypeFactory
 !!!285551.python!!!	getStkU32(in self : )
         outDataType = self.getDataType('U32')
         outDataType.lowerLimit = '0'
-        outDataType.upperLimit = '4294967295'        
+        outDataType.upperLimit = '4294967295'
         return outDataType
 !!!285679.python!!!	getStkS32(in self : )
         outDataType = self.getDataType('S32')

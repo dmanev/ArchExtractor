@@ -23,7 +23,7 @@ class StkDataTypeFactory(Datatype.DataTypeFactory.DataTypeFactory):
         ## Bouml preserved body begin 000458EF
         outDataType = self.getDataType('void')
         outDataType.lowerLimit = None
-        outDataType.upperLimit = None        
+        outDataType.upperLimit = None
         return outDataType
         ## Bouml preserved body end 000458EF
         
@@ -39,7 +39,7 @@ class StkDataTypeFactory(Datatype.DataTypeFactory.DataTypeFactory):
         ## Bouml preserved body begin 000459EF
         outDataType = self.getDataType('U8')
         outDataType.lowerLimit = '0'
-        outDataType.upperLimit = '255'        
+        outDataType.upperLimit = '255'
         return outDataType
         ## Bouml preserved body end 000459EF
         
@@ -47,7 +47,7 @@ class StkDataTypeFactory(Datatype.DataTypeFactory.DataTypeFactory):
         ## Bouml preserved body begin 00045A6F
         outDataType = self.getDataType('S8')
         outDataType.lowerLimit = '-126'
-        outDataType.upperLimit = '127'        
+        outDataType.upperLimit = '127'
         return outDataType
         ## Bouml preserved body end 00045A6F
         
@@ -71,7 +71,7 @@ class StkDataTypeFactory(Datatype.DataTypeFactory.DataTypeFactory):
         ## Bouml preserved body begin 00045B6F
         outDataType = self.getDataType('U32')
         outDataType.lowerLimit = '0'
-        outDataType.upperLimit = '4294967295'        
+        outDataType.upperLimit = '4294967295'
         return outDataType
         ## Bouml preserved body end 00045B6F
         

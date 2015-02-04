@@ -1,10 +1,11 @@
 class StkJilProdControlCriteria
-!!!211055.python!!!	execute(in self : , in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
+!!!211055.python!!!	execute(in self : IPortCriteria, in inpTextContent : string, inout inoutIComponent : IComponent) : IComponent
         for control in re.findall(r'ProdControl\s*{\s*Name\s*=\s*\"(\w+)\"\s*;\s*}\s*;', inpTextContent, re.I):
             if control not in inoutIComponent.getItsIPortMap():
                 pif = self.getPortInterfaceFactory()
-                clSrvIntIf = pif.getStkControlIf(control)                
+                dtf = self.getDataTypeFactory()
+                clSrvIntIf = pif.getStkControlIf(control, dtf)
                 provPort = PortInterface.ProvidedPort.ProvidedPort(clSrvIntIf)
                 provPort.setName(control)
                 provPort.setInterface(clSrvIntIf)
-                inoutIComponent.addPort(provPort)                        
+                inoutIComponent.addPort(provPort)

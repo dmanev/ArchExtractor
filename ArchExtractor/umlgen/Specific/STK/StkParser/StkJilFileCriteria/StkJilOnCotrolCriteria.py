@@ -16,7 +16,8 @@ class StkJilOnControlCriteria(Parser.BasePortCriteria.BasePortCriteria):
 
                     if control not in inoutIComponent.getItsIPortMap():
                         pif = self.getPortInterfaceFactory()
-                        clSrvIntIf = pif.getStkControlIf(control)                                            
+                        dtf = self.getDataTypeFactory()
+                        clSrvIntIf = pif.getStkControlIf(control, dtf)
                         reqPort = PortInterface.RequiredPort.RequiredPort(clSrvIntIf)
                         reqPort.setName(control)
                         reqPort.setInterface(clSrvIntIf)

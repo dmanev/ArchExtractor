@@ -8,6 +8,7 @@ class BaseComponentTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.SwComponent.Components.BaseComponent.BaseComponent()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.SwComponent.Components.BaseComponent.BaseComponent("TestCmp")
         # End of user code
         pass
 
@@ -33,6 +34,7 @@ class BaseComponentTest(unittest.TestCase):
 
     def testget_fileList(self):
         # Start of user code get_fileList
+        self.assertEqual(self._testInstance.getFileList(), [])
         # End of user code
         pass
 
@@ -43,6 +45,10 @@ class BaseComponentTest(unittest.TestCase):
 
     def testset_fileList(self):
         # Start of user code set_fileList
+        fileList = ["File1", "File2", "File3"]
+        self._testInstance.setFileList(fileList)
+        self.assertListEqual(self._testInstance.getFileList(),
+                             fileList)
         # End of user code
         pass
 

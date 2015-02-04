@@ -69,13 +69,12 @@ class XMIConverter(object):
         xmiComponent.name = inpBaseComponent.getName()
         for portName in sorted(inpBaseComponent.getItsIPortMap()):
             port = inpBaseComponent.getItsIPortMap()[portName]
-            xmiInterface = self.xmiTypesMap[port.getInterface().getName()]          
+            xmiInterface = self.xmiTypesMap[port.getInterface().getName()]
             if(isinstance(port, PortInterface.ProvidedPort.ProvidedPort)):
                 xmiComponent.add_providedClass(xmiInterface)
-            elif(isinstance(port, PortInterface.RequiredPort.RequiredPort)):
+            else:  # isinstance(port, PortInterface.RequiredPort.RequiredPort)
                 xmiComponent.add_requiredClass(xmiInterface)
-            else:
-                pass
+
         inoutXmiPackage.add_ownedType(xmiComponent)
         return inoutXmiPackage
         ## Bouml preserved body end 000454EF

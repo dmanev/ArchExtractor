@@ -8,6 +8,7 @@ class FactoryProviderTest(unittest.TestCase):
     def setUp(self):
         # self._testInstance = umlgen.Base.Infrastructure.FactoryProvider.FactoryProvider()
         # Start of user code setUp
+        self._testInstance = umlgen.Base.Infrastructure.FactoryProvider.FactoryProvider()
         # End of user code
         pass
 
