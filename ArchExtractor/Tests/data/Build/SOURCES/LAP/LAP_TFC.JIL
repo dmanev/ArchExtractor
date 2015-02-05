@@ -170,6 +170,14 @@ ProdControl { Name = "ClearFaultFlagsAndCounters"; };
 //        ...(see In)
 //    };
 //------------------------------------------------------------------------------
+    In                                      // Declaration of Data flow
+    {
+        Data = "DummyArrayU8";
+        Type = U8Array
+        {
+                Size = 5;
+        };
+    };
 };
 
 //------------------------------------------------------------------------------

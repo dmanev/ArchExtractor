@@ -1,0 +1,346 @@
+//******************************************************************************
+// Company:      Johnson Controls Inc.
+// -----------------------------------------------------------------------------
+// Copyright:    This software is JCI property.
+//               Duplication or disclosure without JCI written authorization
+//               is prohibited.
+// -----------------------------------------------------------------------------
+// Project:      X90_BCM
+// Language:     JIL
+// -----------------------------------------------------------------------------
+// Component:    LAP_SUP
+//               Supervisor
+// -----------------------------------------------------------------------------
+// $Date:   Feb 03 2010 11:52:56  $
+// $Archive:   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/SUP/LAP_SUP.JIL-arc  $
+// $Revision:   1.16  $
+// -----------------------------------------------------------------------------
+// $Log::   J:/_PVCSRoot/Renault/X90_BCM/SOFTWARE/PVCS/archives/DEVELOPMENT/X90_BCM/K0/L7/CMP/LAP/SUP/LAP_SUP.JIL-arc  $
+// 
+//    Rev 1.16   Feb 03 2010 11:52:56   adzhelp
+// Cm005245: Sleep graph priority set below other tasks
+// 
+//    Rev 1.15   Oct 15 2009 10:04:34   adzhelp
+// Cm005225: Code review corrections
+// 
+//    Rev 1.14   Sep 25 2009 09:04:48   adzhelp
+// Cm005225: LAP_PAL.jil added to analysis
+// 
+//    Rev 1.13   Sep 24 2009 11:05:56   adzhelp
+// Cm004744: LAP_EXL.jil added to analysis
+// 
+//    Rev 1.12   Sep 24 2009 10:19:14   adzhelp
+// Cm003262: LAP_RRW.jil added to analysis
+// 
+//    Rev 1.11   Jul 24 2009 08:56:32   adzhelp
+// Cm005104: ANA task with higher priority than DIN task
+// 
+//    Rev 1.10   Apr 29 2009 14:22:40   adzhelp
+// Cm003265, Cm003272, Cm003264: Integration changes
+// 
+//    Rev 1.9   Apr 22 2009 10:46:56   adzhelp
+// Cm003271, Cm003264, Cm003261: DAT_ALA.JIL, DAT_RBG.JIL added.
+// Signals for front stop position added
+// 
+//    Rev 1.8   Apr 10 2009 15:32:50   adzhelp
+// Cm003264: DAT_SPD.jil added; graph group on 80 ms added
+// 
+//    Rev 1.7   Apr 07 2009 12:25:18   adzhelp
+// Cm003270: LAP_DFR.jil added to analysis
+// 
+//    Rev 1.6   Mar 31 2009 15:55:04   adzhelp
+// Cm003276: Signals written to respective components on inputs changes
+// 
+//    Rev 1.5   Mar 30 2009 12:29:46   adzhelp
+// Cm004676: Priority of GraphEngineTask20Ms added
+// 
+//    Rev 1.4   Mar 20 2009 17:59:34   adzhelp
+// Cm003619, Cm003128, Cm003209, Cm003273, Cm003517: Inclusion of respective JIL files 
+// and specification of signals and task priorities
+// 
+//    Rev 1.3   06 Feb 2009 10:56:00   adzhelp
+// Cm003619: DAT_ANAp.jil added; LAP_EEP.jil  excluded; signal names corrected
+// 
+//    Rev 1.2   02 Dec 2008 16:29:50   ailievb
+// Cm003209: DAT_PWM and LAP_ILL JIL files added
+// 
+//    Rev 1.1   12 Nov 2008 15:23:18   ailievb
+// Cm003619: DAT_ANA JIL files excluded
+//  
+//    Rev 1.0   Nov 10 2008 14:06:52   ailievb
+// Initial revision.
+//
+//******************************************************************************
+
+//------------------------------------------------------------------------------
+//    Includes non re entry
+//------------------------------------------------------------------------------
+#ifndef I_LAP_SUP_JIL 
+#define I_LAP_SUP_JIL (1)
+
+// This definition enable the using of TOS_SIG component
+#define USE_TOS_SIG     (1)
+
+Application STK
+{
+
+//------------------------------------------------------------------------------
+//    Included jil files
+//..
+//    #include "project_file_name.jil"
+//------------------------------------------------------------------------------
+// TOS Components
+#include"TOS.JIL"
+// DAT_CPU Component
+#include"DAT_CPU.JIL"
+// DAT_EEP Components
+#include"DAT_EEP.JIL"
+#include"DAT_DEA.JIL"
+#include"DAT_SBK.JIL"
+#include"DAT_DBK.JIL"
+#include"DAT_PEE.JIL"
+// DAT_DIN Components
+#include"DAT_DIN.JIL"
+#include"DAT_PIN.JIL"
+// DAT_DOU Components
+#include"DAT_DOU.JIL"
+#include"DAT_POU.JIL"
+// DAT_ANA Components
+#include"DAT_PAN.JIL"
+#include"DAT_ANA.JIL"
+#include"DAT_ANAp.JIL"
+// DAT_CMN Component
+#include"DAT_CMN.jil"
+// DAT_KWP Component
+#include "DAT_KWP.JIL"
+// DAT_PWM Component
+#include "DAT_PWM.JIL"
+// DAT_RF Component
+#include "DAT_RF.JIL"
+// DAT_BUZ Component
+#include "DAT_BUZ.JIL"
+//DAT_TRP Component
+#include"DAT_TRP.JIL"
+//DAT_VLG Component
+#include"DAT_VLG.JIL"
+//DAT_APR Component
+#include"DAT_APR.JIL"
+// DAT_SPD Component
+#include "DAT_SPD.JIL"
+// DAT_ALA Component
+#include "DAT_ALA.JIL"
+// DAT_RBG Component
+#include "DAT_RBG.JIL"
+
+// LAP Components
+	
+// LAP_DIA Components
+#include "LAP_KWP.JIL"
+#include "LAP_AFS.JIL"
+#include "LAP_TFC.JIL"
+// LAP_DLK Component
+#include "LAP_DLK.JIL"
+// LAP_ILL Component
+#include "LAP_ILL.JIL"
+// LAP_BUZ Component
+#include "LAP_BUZ.JIL"
+// LAP_FLI Component
+#include "LAP_FLI.JIL"
+//LAP_LRN component
+#include"LAP_LRN.JIL"
+//LAP_CAR component
+#include"LAP_CAR.JIL"
+//LAP_VLD component
+#include"LAP_VLD.JIL"
+// LAP_DFR Component
+#include "LAP_DFR.JIL"
+// LAP_ALA Component
+#include "LAP_ALA.JIL"
+// LAP_FRW Component
+#include "LAP_FRW.JIL"
+// LAP_RRW Component
+#include "LAP_RRW.JIL"
+// LAP_EXL Component
+#include "LAP_EXL.JIL"
+// LAP_PAL Component
+#include "LAP_PAL.JIL"
+
+//------------------------------------------------------------------------------
+//    Component ComponentName                 // Component declaration
+//    {
+//        // All declaration needed
+//    };
+//------------------------------------------------------------------------------
+Component LAP_SUP 
+{
+    
+//------------------------------------------------------------------------------
+//    Task TaskName                           // Declaration of Task
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        Fct           = "FonctionName";       --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        Resource      = ResourceReference;    --> this field is optional
+//        Npg           = NpgReference;         --> this field is optional
+//        Priority      = Priority;             --> this field is optional
+//    
+//    };
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Resource ResourceName                   // Declaration of Resource
+//                                            // (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//    Npg NonPreemptiveGroup;                // Declaration of non preemptive
+//                                           // group (for Pre-emptive TOS only)
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//    TaskPriority TaskName
+//    {
+//        Priority = Priority;                  --> this field is optional
+//
+//        Npg = NonPreemptiveGroupReference;    --> this field is optional
+//                                                  (for Pre-emptive TOS only)
+//    };
+//
+//    !!this table should be used into LAP_SUP.jil only, it permit to set all
+//    task priority and non pre-emptive group in one unique file, "TaskName" 
+//    must be the task name declared for the "Task" table
+//
+//------------------------------------------------------------------------------
+    TaskPriority DATCpuIdleTask 
+    {
+        Priority = 0;
+    };
+    TaskPriority DATEepTask 
+    {
+        Priority = 10;
+    };
+    TaskPriority DATCpuRefreshWatchDogTask
+    {
+        Priority = 20;
+    };
+    TaskPriority GraphEngineTaskSleep
+    {
+        Priority = 30;
+    };
+    TaskPriority DATBuzTask
+    {
+        Priority = 40;
+    };
+    TaskPriority DATDouTask
+    {
+        Priority = 50;
+    };
+    TaskPriority GraphEngineTask80Ms
+    {
+        Priority = 60;
+    };        
+    TaskPriority GraphEngineTask20Ms
+    {
+        Priority = 62;
+    };
+    TaskPriority GraphEngineTask
+    {
+        Priority = 64;
+    };
+    TaskPriority DATKwpTask
+    {
+        Priority = 70;
+    };
+    TaskPriority DATRbgTask
+    {
+        Priority = 80;
+    };
+    TaskPriority DATDinTask
+    {
+        Priority = 90;
+    };
+    TaskPriority DATAnaTask
+    {
+        Priority = 100;
+    };
+    TaskPriority TOSClock 
+    {
+        Priority = 500;
+    };
+
+//------------------------------------------------------------------------------
+//    Graph GraphName                         // Declaration of Graph
+//    {
+//        Id            = "IdName";             --> this field is optional
+//        GraphGroup    = GraphGroupReference;  --> this field is optional
+//        NbInstances   = NbInstances;          --> this field is optional
+//    };
+//------------------------------------------------------------------------------
+    Graph Supervisor 
+    {
+        GraphGroup = IdleGraphGroup;
+    };
+
+//------------------------------------------------------------------------------
+//    Signal SignalName;                      // Declaration of Signal
+//------------------------------------------------------------------------------
+    Signal ActiveSleepRequested;
+    Signal WakeUpRequested;
+    Signal SomebodyMaintainStartingStepState;
+    Signal SomebodyMaintainActiveSleepState;
+    Signal SomebodyMaintainActiveState;
+
+//------------------------------------------------------------------------------
+//    ProdControl { Name = "ControlName";};   // Declaration of Control produced
+//------------------------------------------------------------------------------
+    ProdControl {Name="DATInitialize";};
+    ProdControl {Name="LAPInitialize";};
+    ProdControl {Name="EnterStartingStepState";};
+    ProdControl {Name="LeaveStartingStepState";};
+    ProdControl {Name="DATEnterActiveState";};
+    ProdControl {Name="LAPEnterActiveState";};
+    ProdControl {Name="LAPLeaveActiveState";};
+    ProdControl {Name="DATLeaveActiveState";};
+    ProdControl {Name="IsAnybodyMaintainStartingStepState";};
+    ProdControl {Name="IsAnybodyMaintainActiveSleepState";};
+    ProdControl {Name="IsAnybodyMaintainActiveState";};
+
+//------------------------------------------------------------------------------
+//    OnControl = CallBack                    // Declaration of Control consumed 
+//    {
+//         Ctrl = "ControlName";
+//         Fct = "FonctionName";
+//    }; 
+//    
+//    OnControl = ActivateTask
+//    {
+//         Ctrl = "ControlName";
+//         Task = TaskReference;
+//    };
+//    
+//    OnControl = SetSignal
+//    {
+//        Ctrl = "ControlName";
+//        Signal = SignalReference;
+//    }; 
+//------------------------------------------------------------------------------
+    OnControl = CallBack
+    {
+        Ctrl = "ActiveSleepRequest";
+        Fct = "LAPSupActiveSleepRequest";
+    };
+
+    OnControl = CallBack
+    {
+        Ctrl = "WakeUpRequest";
+        Fct = "LAPSupWakeUpRequest";
+    };
+
+};
+};
+
+//------------------------------------------------------------------------------
+// End of includes non re entry
+//------------------------------------------------------------------------------
+#endif /* I_LAP_SUP_JIL */

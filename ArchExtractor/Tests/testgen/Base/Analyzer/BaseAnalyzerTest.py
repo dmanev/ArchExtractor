@@ -119,11 +119,13 @@ class BaseAnalyzerTest(unittest.TestCase):
         datPack = lvlThreePack[1]
         self.assertEqual(lapPack.getName(), "LAP")
         self.assertEqual(datPack.getName(), "DAT")
-        self.assertItemsEqual(["lap_tfc"], lapPack.itsElementMap.keys())
+        self.assertItemsEqual(["lap_tfc", "lap_sup", "lap_supp"],
+                              lapPack.itsElementMap.keys())
         self.assertItemsEqual(["dat", "dat_ana", "dat_cmn", "dat_cpu",
                                "dat_cpup", "dat_din", "dat_dou", "dat_kwp",
                                "dat_pan", "dat_pee", "dat_peep", "dat_pin",
-                               "dat_pin_", "dat_pou", "dat_pwm", "datparam"],
+                               "dat_pin_", "dat_pou", "dat_pwm", "datparam",
+                               "dat_fake"],
                               datPack.itsElementMap.keys())
         for element in lapPack.getElementList():
             self.assertIsInstance(element,

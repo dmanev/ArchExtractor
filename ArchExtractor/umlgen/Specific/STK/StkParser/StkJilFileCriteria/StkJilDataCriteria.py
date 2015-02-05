@@ -32,7 +32,7 @@ class StkJilDataCriteria(StkParser.StkPortCriteria.StkPortCriteria):
                         DE = PortInterface.DataElement.DataElement()
                         DE.setName(dataName)
                         if hasArray:
-                            arrayProps = self.extractLevelOneBlock(dataType)
+                            arrayProps = self.extractLevelOneBlock(dataProps)
                             arraySize = re.findall(r'\s*Size\s*=\s*(\d+)', 
                                                                arrayProps, re.I)[0]
                             arrayDT = dtf.getArrayDataType('Arr'+arraySize+dataType)

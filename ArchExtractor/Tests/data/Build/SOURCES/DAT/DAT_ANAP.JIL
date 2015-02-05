@@ -148,7 +148,10 @@ Component DAT_ANAp
     // ANI4
     Data AI_FR_WIPER_INT_SW // FRONT WIPERS: Front wiper Cadance switch
     {
-        Type = U16;
+        Type = U8Array
+        {
+            Size = 10;
+        };
         Specialization = AnalogInput { TimeConstantMs = 40; };
         BytePosition = 8;
         ResetValue = 0;
