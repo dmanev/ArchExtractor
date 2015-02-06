@@ -16,12 +16,12 @@ class ComponentFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testfindComponent(self):
+    def test_findComponent(self):
         # Start of user code findComponent
         # End of user code
         pass
 
-    def testgetBaseComponent(self):
+    def test_getBaseComponent(self):
         # Start of user code getBaseComponent
         # End of user code
         pass

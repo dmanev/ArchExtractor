@@ -17,26 +17,26 @@ class ArrayDataTypeTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_itsDataType(self):
+    def test_get_itsDataType(self):
         # Start of user code get_itsDataType
         self.assertEqual(self._testInstance.getItsDataType(), None)
         # End of user code
         pass
 
-    def testget_maxNumberOfElements(self):
+    def test_get_maxNumberOfElements(self):
         # Start of user code get_maxNumberOfElements
         self.assertEqual(self._testInstance.getMaxNumberOfElements(), None)
         # End of user code
         pass
 
-    def testset_itsDataType(self):
+    def test_set_itsDataType(self):
         # Start of user code set_itsDataType
         self._testInstance.setItsDataType("DummyDataType")
         self.assertEqual(self._testInstance.getItsDataType(), "DummyDataType")
         # End of user code
         pass
 
-    def testset_maxNumberOfElements(self):
+    def test_set_maxNumberOfElements(self):
         # Start of user code set_maxNumberOfElements
         self._testInstance.setMaxNumberOfElements(123)
         self.assertEqual(self._testInstance.getMaxNumberOfElements(), 123)

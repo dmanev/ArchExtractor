@@ -16,12 +16,12 @@ class StkJilFileParserTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testpreprocessFile(self):
+    def test_preprocessFile(self):
         # Start of user code preprocessFile
         # End of user code
         pass

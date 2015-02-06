@@ -16,17 +16,17 @@ class DataTypeFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetArrayDataType(self):
+    def test_getArrayDataType(self):
         # Start of user code getArrayDataType
         # End of user code
         pass
 
-    def testgetDataType(self):
+    def test_getDataType(self):
         # Start of user code getDataType
         # End of user code
         pass
 
-    def testget_itsDataTypeMap(self):
+    def test_get_itsDataTypeMap(self):
         # Start of user code get_itsDataTypeMap
         # End of user code
         pass

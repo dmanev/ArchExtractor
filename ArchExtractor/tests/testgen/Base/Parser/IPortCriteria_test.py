@@ -17,7 +17,7 @@ class IPortCriteriaTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testexecute(self):
+    def test_execute(self):
         # Start of user code execute
         self._testInstance.execute("TestTextContent", None)
         '''This is interface class so nothing to test'''

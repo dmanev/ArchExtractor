@@ -92,14 +92,14 @@ class BaseAnalyzerTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         for bfp in self._testInstance.itsBaseFileParserList:
             self.assertIsInstance(bfp, Parser.BaseFileParser.BaseFileParser)
         # End of user code
         pass
 
-    def testscan(self):
+    def test_scan(self):
         # Start of user code scan
         self.aeModel = self.baseAnalyzer.scan(self._testDirPath, self.aeModel)
         self.assertEqual(self.aeModel.getName(), "Build")
@@ -136,7 +136,7 @@ class BaseAnalyzerTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testset_itsBaseFileParserList(self):
+    def test_set_itsBaseFileParserList(self):
         # Start of user code set_itsBaseFileParserList
         self._testInstance.setItsBaseFileParserList(
             self.baseAnalyzer.itsBaseFileParserList)

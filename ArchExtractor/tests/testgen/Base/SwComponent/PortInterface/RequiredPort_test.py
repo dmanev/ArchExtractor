@@ -16,17 +16,17 @@ class RequiredPortTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testgetInterface(self):
+    def test_getInterface(self):
         # Start of user code getInterface
         # End of user code
         pass
 
-    def testsetInterface(self):
+    def test_setInterface(self):
         # Start of user code setInterface
         # End of user code
         pass

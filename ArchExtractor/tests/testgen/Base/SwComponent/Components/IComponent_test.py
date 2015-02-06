@@ -17,14 +17,14 @@ class IComponentTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testaddPort(self):
+    def test_addPort(self):
         # Start of user code addPort
         self._testInstance.addPort("dummyPort")
         '''This is interface class so nothing to test'''
         # End of user code
         pass
 
-    def testgetFileList(self):
+    def test_getFileList(self):
         # Start of user code getFileList
         self._testInstance.getFileList()
         '''This is interface class so nothing to test'''

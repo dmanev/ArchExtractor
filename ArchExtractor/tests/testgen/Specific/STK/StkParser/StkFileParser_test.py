@@ -16,22 +16,22 @@ class StkFileParserTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testgetComponentNameList(self):
+    def test_getComponentNameList(self):
         # Start of user code getComponentNameList
         # End of user code
         pass
 
-    def testremoveComment(self):
+    def test_removeComment(self):
         # Start of user code removeComment
         # End of user code
         pass
 
-    def testupdateComponent(self):
+    def test_updateComponent(self):
         # Start of user code updateComponent
         # End of user code
         pass

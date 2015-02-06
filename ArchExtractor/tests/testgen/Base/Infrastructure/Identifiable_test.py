@@ -16,12 +16,12 @@ class IdentifiableTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_Name(self):
+    def test_get_Name(self):
         # Start of user code get_Name
         # End of user code
         pass
 
-    def testset_Name(self):
+    def test_set_Name(self):
         # Start of user code set_Name
         # End of user code
         pass

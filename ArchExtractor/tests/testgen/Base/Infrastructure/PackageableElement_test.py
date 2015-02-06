@@ -17,13 +17,13 @@ class PackageableElementTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_itsParentPackage(self):
+    def test_get_itsParentPackage(self):
         # Start of user code get_itsParentPackage
         self.assertEqual(self._testInstance.getItsParentPackage(), None)
         # End of user code
         pass
 
-    def testset_itsParentPackage(self):
+    def test_set_itsParentPackage(self):
         # Start of user code set_itsParentPackage
         # End of user code
         pass

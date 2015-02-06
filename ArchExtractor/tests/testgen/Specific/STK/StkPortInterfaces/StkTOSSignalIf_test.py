@@ -17,7 +17,7 @@ class StkTOSSignalIfTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         self.assertEqual(self._testInstance.getName(), 'TOSSignal')
         # End of user code

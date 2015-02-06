@@ -17,14 +17,14 @@ class IPortTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetInterface(self):
+    def test_getInterface(self):
         # Start of user code getInterface
         self._testInstance.getInterface()
         '''This is interface class so nothing to test'''
         # End of user code
         pass
 
-    def testsetInterface(self):
+    def test_setInterface(self):
         # Start of user code setInterface
         self._testInstance.setInterface("dummyIf")
         '''This is interface class so nothing to test'''

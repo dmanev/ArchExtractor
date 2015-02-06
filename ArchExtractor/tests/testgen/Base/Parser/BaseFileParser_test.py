@@ -19,35 +19,35 @@ class BaseFileParserTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testfileFilter(self):
+    def test_fileFilter(self):
         # Start of user code fileFilter
         # End of user code
         pass
 
-    def testfulfillComponentData(self):
+    def test_fulfillComponentData(self):
         # Start of user code fulfillComponentData
         # End of user code
         pass
 
-    def testget_fileFilterCriteria(self):
+    def test_get_fileFilterCriteria(self):
         # Start of user code get_fileFilterCriteria
         self.assertEqual(self._testInstance.getFileFilterCriteria(), None)
         # End of user code
         pass
 
-    def testpreprocessFile(self):
+    def test_preprocessFile(self):
         # Start of user code preprocessFile
         self._testInstance.preprocessFile("File/Path")
         '''This function is not implemented'''
         # End of user code
         pass
 
-    def testset_itsBasePortCriteriaList(self):
+    def test_set_itsBasePortCriteriaList(self):
         # Start of user code set_itsBasePortCriteriaList
         self._testInstance.setItsBasePortCriteriaList([BasePortCriteria(),
                                                        BasePortCriteria()])

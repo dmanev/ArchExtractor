@@ -17,32 +17,32 @@ class AEPackageTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testaddElement(self):
+    def test_addElement(self):
         # Start of user code addElement
         # End of user code
         pass
 
-    def testgetElementList(self):
+    def test_getElementList(self):
         # Start of user code getElementList
         # End of user code
         pass
 
-    def testget_itsAEPackageList(self):
+    def test_get_itsAEPackageList(self):
         # Start of user code get_itsAEPackageList
         # End of user code
         pass
 
-    def testget_itsParentPackage(self):
+    def test_get_itsParentPackage(self):
         # Start of user code get_itsParentPackage
         # End of user code
         pass
 
-    def testset_itsAEPackageList(self):
+    def test_set_itsAEPackageList(self):
         # Start of user code set_itsAEPackageList
         dummyPackList = ["dummyPack1", "dummyPack2"]
         self._testInstance.setItsAEPackageList(dummyPackList)
@@ -51,7 +51,7 @@ class AEPackageTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testset_itsParentPackage(self):
+    def test_set_itsParentPackage(self):
         # Start of user code set_itsParentPackage
         # End of user code
         pass

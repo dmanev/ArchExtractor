@@ -92,12 +92,12 @@ class PortInterfaceFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetAbstractPortInterface(self):
+    def test_getAbstractPortInterface(self):
         # Start of user code getAbstractPortInterface
         # End of user code
         pass
 
-    def testgetClientServerIf(self):
+    def test_getClientServerIf(self):
         # Start of user code getClientServerIf
         # Fulfill model data
         self.aeModel = self.baseAnalyzer.scan(self._testDirPath, self.aeModel)
@@ -107,12 +107,12 @@ class PortInterfaceFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetSenderReceiverIf(self):
+    def test_getSenderReceiverIf(self):
         # Start of user code getSenderReceiverIf
         # End of user code
         pass
 
-    def testget_itsIPortInterfaceMap(self):
+    def test_get_itsIPortInterfaceMap(self):
         # Start of user code get_itsIPortInterfaceMap
         # End of user code
         pass

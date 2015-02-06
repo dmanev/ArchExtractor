@@ -17,7 +17,7 @@ class IAnalyzerTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testscan(self):
+    def test_scan(self):
         # Start of user code scan
         dummyModel = "123"
         self.assertEqual(self._testInstance.scan("topDir", dummyModel),

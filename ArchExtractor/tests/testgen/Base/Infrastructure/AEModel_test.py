@@ -19,7 +19,7 @@ class AEModelTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         self.assertIsInstance(self._testInstance.getInfrastructureFactory(),
                               InfrastructureFactory)
@@ -27,32 +27,32 @@ class AEModelTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetComponentFactory(self):
+    def test_getComponentFactory(self):
         # Start of user code getComponentFactory
         # End of user code
         pass
 
-    def testgetDataTypeFactory(self):
+    def test_getDataTypeFactory(self):
         # Start of user code getDataTypeFactory
         # End of user code
         pass
 
-    def testgetInfrastructureFactory(self):
+    def test_getInfrastructureFactory(self):
         # Start of user code getInfrastructureFactory
         # End of user code
         pass
 
-    def testgetPackageList(self):
+    def test_getPackageList(self):
         # Start of user code getPackageList
         # End of user code
         pass
 
-    def testgetPortInterfaceFactory(self):
+    def test_getPortInterfaceFactory(self):
         # Start of user code getPortInterfaceFactory
         # End of user code
         pass
 
-    def testset_itsComponentFactory(self):
+    def test_set_itsComponentFactory(self):
         # Start of user code set_itsComponentFactory
         self._testInstance.setItsComponentFactory(ComponentFactory())
         self.assertIsInstance(self._testInstance.getComponentFactory(),
@@ -60,12 +60,12 @@ class AEModelTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testset_itsDataTypeFactory(self):
+    def test_set_itsDataTypeFactory(self):
         # Start of user code set_itsDataTypeFactory
         # End of user code
         pass
 
-    def testset_itsInfrastructureFactory(self):
+    def test_set_itsInfrastructureFactory(self):
         # Start of user code set_itsInfrastructureFactory
         self._testInstance.setItsInfrastructureFactory(InfrastructureFactory())
         self.assertIsInstance(self._testInstance.getInfrastructureFactory(),
@@ -73,7 +73,7 @@ class AEModelTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testset_itsPortInterfaceFactory(self):
+    def test_set_itsPortInterfaceFactory(self):
         # Start of user code set_itsPortInterfaceFactory
         # End of user code
         pass

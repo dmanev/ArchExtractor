@@ -16,12 +16,12 @@ class SenderReceiverInterfaceTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_itsDataElementList(self):
+    def test_get_itsDataElementList(self):
         # Start of user code get_itsDataElementList
         # End of user code
         pass
 
-    def testset_itsDataElementList(self):
+    def test_set_itsDataElementList(self):
         # Start of user code set_itsDataElementList
         # End of user code
         pass

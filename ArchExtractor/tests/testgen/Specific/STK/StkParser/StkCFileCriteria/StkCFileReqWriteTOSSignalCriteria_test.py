@@ -16,7 +16,7 @@ class StkCFileReqWriteTOSSignalCriteriaTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testexecute(self):
+    def test_execute(self):
         # Start of user code execute
         # End of user code
         pass

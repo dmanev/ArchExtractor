@@ -16,7 +16,7 @@ class ClientServerInterfaceTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_itsOperationList(self):
+    def test_get_itsOperationList(self):
         # Start of user code get_itsOperationList
         # End of user code
         pass

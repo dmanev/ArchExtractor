@@ -17,14 +17,14 @@ class IFileParserTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testfileFilter(self):
+    def test_fileFilter(self):
         # Start of user code fileFilter
         self._testInstance.fileFilter("TestFileName")
         '''This is interface class so nothing to test'''
         # End of user code
         pass
 
-    def testfulfillComponentData(self):
+    def test_fulfillComponentData(self):
         # Start of user code fulfillComponentData
         self._testInstance.fulfillComponentData("TestCmpName",
                                                 "File/Path",
@@ -33,14 +33,14 @@ class IFileParserTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetComponentNameList(self):
+    def test_getComponentNameList(self):
         # Start of user code getComponentNameList
         self._testInstance.getComponentNameList("TestFileName")
         '''This is interface class so nothing to test'''
         # End of user code
         pass
 
-    def testupdateComponent(self):
+    def test_updateComponent(self):
         # Start of user code updateComponent
         self._testInstance.updateComponent("NoName", "File/Path", None)
         '''This is interface class so nothing to test'''

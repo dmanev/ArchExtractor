@@ -18,12 +18,12 @@ class DataElementTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testget_itsDataType(self):
+    def test_get_itsDataType(self):
         # Start of user code get_itsDataType
         # End of user code
         pass
 
-    def testset_itsDataType(self):
+    def test_set_itsDataType(self):
         # Start of user code set_itsDataType
         self._testInstance.setItsDataType(DataType())
         self.assertIsInstance(self._testInstance.getItsDataType(), DataType)

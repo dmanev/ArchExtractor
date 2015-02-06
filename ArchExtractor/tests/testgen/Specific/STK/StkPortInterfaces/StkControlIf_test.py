@@ -18,7 +18,7 @@ class StkControlIfTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         self.assertEqual(self._testInstance.getName(), 'Control')
         self.assertNotEqual(self._testInstance.getItsOperationList(), [])

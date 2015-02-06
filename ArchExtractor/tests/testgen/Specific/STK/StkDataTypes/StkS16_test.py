@@ -17,7 +17,7 @@ class StkS16Test(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         self.assertEqual(self._testInstance.Name, 'S16')
         self.assertEqual(self._testInstance.lowerLimit, -32766)

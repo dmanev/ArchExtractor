@@ -16,17 +16,17 @@ class StkPortInterfaceFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetStkControlIf(self):
+    def test_getStkControlIf(self):
         # Start of user code getStkControlIf
         # End of user code
         pass
 
-    def testgetStkDATControlIf(self):
+    def test_getStkDATControlIf(self):
         # Start of user code getStkDATControlIf
         # End of user code
         pass
 
-    def testgetStkTOSSignalIf(self):
+    def test_getStkTOSSignalIf(self):
         # Start of user code getStkTOSSignalIf
         # End of user code
         pass

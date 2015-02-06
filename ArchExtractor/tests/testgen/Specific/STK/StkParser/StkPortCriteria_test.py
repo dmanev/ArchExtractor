@@ -16,17 +16,17 @@ class StkPortCriteriaTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testextractLevelOneBlock(self):
+    def test_extractLevelOneBlock(self):
         # Start of user code extractLevelOneBlock
         # End of user code
         pass
 
-    def testregisterAccessModes(self):
+    def test_registerAccessModes(self):
         # Start of user code registerAccessModes
         # End of user code
         pass

@@ -16,47 +16,47 @@ class StkDataTypeFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testgetStkS16(self):
+    def test_getStkS16(self):
         # Start of user code getStkS16
         # End of user code
         pass
 
-    def testgetStkS32(self):
+    def test_getStkS32(self):
         # Start of user code getStkS32
         # End of user code
         pass
 
-    def testgetStkS8(self):
+    def test_getStkS8(self):
         # Start of user code getStkS8
         # End of user code
         pass
 
-    def testgetStkU1(self):
+    def test_getStkU1(self):
         # Start of user code getStkU1
         # End of user code
         pass
 
-    def testgetStkU16(self):
+    def test_getStkU16(self):
         # Start of user code getStkU16
         # End of user code
         pass
 
-    def testgetStkU32(self):
+    def test_getStkU32(self):
         # Start of user code getStkU32
         # End of user code
         pass
 
-    def testgetStkU8(self):
+    def test_getStkU8(self):
         # Start of user code getStkU8
         # End of user code
         pass
 
-    def testgetStkVoid(self):
+    def test_getStkVoid(self):
         # Start of user code getStkVoid
         # End of user code
         pass

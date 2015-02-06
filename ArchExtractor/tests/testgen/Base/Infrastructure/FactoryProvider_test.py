@@ -17,27 +17,27 @@ class FactoryProviderTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetComponentFactory(self):
+    def test_getComponentFactory(self):
         # Start of user code getComponentFactory
         # End of user code
         pass
 
-    def testgetDataTypeFactory(self):
+    def test_getDataTypeFactory(self):
         # Start of user code getDataTypeFactory
         # End of user code
         pass
 
-    def testgetInfrastructureFactory(self):
+    def test_getInfrastructureFactory(self):
         # Start of user code getInfrastructureFactory
         # End of user code
         pass
 
-    def testgetPortInterfaceFactory(self):
+    def test_getPortInterfaceFactory(self):
         # Start of user code getPortInterfaceFactory
         # End of user code
         pass
 
-    def testset_itsSuccessor(self):
+    def test_set_itsSuccessor(self):
         # Start of user code set_itsSuccessor
         # End of user code
         pass

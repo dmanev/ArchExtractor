@@ -17,33 +17,33 @@ class BaseComponentTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         # End of user code
         pass
 
-    def testaddFileList(self):
+    def test_addFileList(self):
         # Start of user code addFileList
         # End of user code
         pass
 
-    def testaddPort(self):
+    def test_addPort(self):
         # Start of user code addPort
         # End of user code
         pass
 
-    def testget_fileList(self):
+    def test_get_fileList(self):
         # Start of user code get_fileList
         self.assertEqual(self._testInstance.getFileList(), [])
         # End of user code
         pass
 
-    def testget_itsIPortMap(self):
+    def test_get_itsIPortMap(self):
         # Start of user code get_itsIPortMap
         # End of user code
         pass
 
-    def testset_fileList(self):
+    def test_set_fileList(self):
         # Start of user code set_fileList
         fileList = ["File1", "File2", "File3"]
         self._testInstance.setFileList(fileList)

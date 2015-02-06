@@ -32,7 +32,7 @@ from umlgen.Base.ModelConverter.XMIConverter import XMIConverter
 
 class XMIConverterTest(unittest.TestCase):
     def setUp(self):
-        # self._testInstance = umlgen.Base.ModelConverter.XMIConverter.XMIConverter
+        # self._testInstance = umlgen.Base.ModelConverter.XMIConverter.XMIConverter()
         # Start of user code setUp
         JilCmpCriteria = StkJilComponentCriteria()
         JilOnCtrlCriteria = StkJilOnControlCriteria()
@@ -93,14 +93,14 @@ class XMIConverterTest(unittest.TestCase):
         # End of user code
         pass
 
-    def test__init__(self):
+    def test___init__(self):
         # Start of user code __init__
         self.assertEqual(self._testInstance.xmiFactory, None)
         self.assertEqual(self._testInstance.xmiTypesMap, {})
         # End of user code
         pass
 
-    def testconvert(self):
+    def test_convert(self):
         # Start of user code convert
 
         # Fulfill model data
@@ -112,32 +112,32 @@ class XMIConverterTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetXMIBaseArrayDataType(self):
+    def test_getXMIBaseArrayDataType(self):
         # Start of user code getXMIBaseArrayDataType
         # End of user code
         pass
 
-    def testgetXMIBaseDataType(self):
+    def test_getXMIBaseDataType(self):
         # Start of user code getXMIBaseDataType
         # End of user code
         pass
 
-    def testimportAEPackage(self):
+    def test_importAEPackage(self):
         # Start of user code importAEPackage
         # End of user code
         pass
 
-    def testimportBaseComponent(self):
+    def test_importBaseComponent(self):
         # Start of user code importBaseComponent
         # End of user code
         pass
 
-    def testimportBaseInterfaces(self):
+    def test_importBaseInterfaces(self):
         # Start of user code importBaseInterfaces
         # End of user code
         pass
 
-    def testimportClientServerInterface(self):
+    def test_importClientServerInterface(self):
         # Start of user code importClientServerInterface
         # Fulfill model data
         self.aeModel = self.baseAnalyzer.scan(self._testDirPath, self.aeModel)
@@ -161,17 +161,17 @@ class XMIConverterTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testimportInterfaces(self):
+    def test_importInterfaces(self):
         # Start of user code importInterfaces
         # End of user code
         pass
 
-    def testimportSenderReceiverInterface(self):
+    def test_importSenderReceiverInterface(self):
         # Start of user code importSenderReceiverInterface
         # End of user code
         pass
 
-    def testimportTypes(self):
+    def test_importTypes(self):
         # Start of user code importTypes
         # End of user code
         pass

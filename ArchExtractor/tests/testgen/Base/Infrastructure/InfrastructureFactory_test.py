@@ -16,17 +16,17 @@ class InfrastructureFactoryTest(unittest.TestCase):
         # End of user code
         pass
 
-    def testgetAEModel(self):
+    def test_getAEModel(self):
         # Start of user code getAEModel
         # End of user code
         pass
 
-    def testgetAEPackage(self):
+    def test_getAEPackage(self):
         # Start of user code getAEPackage
         # End of user code
         pass
 
-    def testgetRootPackageList(self):
+    def test_getRootPackageList(self):
         # Start of user code getRootPackageList
         # End of user code
         pass
