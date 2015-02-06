@@ -13,7 +13,7 @@
 [/file]
 
 [comment generate unit test /]
-[file ('/' + artifactCodePath + '/' + anArtifact.name + 'Test.py', false, 'UTF-8')]
+[file ('/' + artifactCodePath + '/' + anArtifact.name + '_test.py', false, 'UTF-8')]
 # auto-generated test file
 import unittest
 import ['umlgen.' + artifactCodePath.replaceAll('/', '.') + '.' + anArtifact.name/]
@@ -35,7 +35,7 @@ class [anArtifact.manifestation.supplier.name /]Test(unittest.TestCase):
         pass
 
     [for(op: Operation | anArtifact.manifestation.supplier.ownedElement->filter(Operation)->sortedBy(name))]
-    def test[op.name/](self):
+    def test_[op.name/](self):
         # [protected (op.name)]
         # [/protected]
         pass
