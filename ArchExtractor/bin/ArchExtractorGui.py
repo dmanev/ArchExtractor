@@ -44,7 +44,7 @@ class ArchExtractorGui(tk.Frame):
         self.label.pack(side="top", fill="x")
 
         self.buttonGetDir = tk.Button(button_frame,
-                                      text=u"Get Project Directory",
+                                      text=u"Set Project Directory",
                                       command=self.askDirectory,
                                       font=self.customFont)
         self.buttonGetDir.pack(side="left", fill="both", expand=True)
