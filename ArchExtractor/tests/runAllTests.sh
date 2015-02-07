@@ -5,7 +5,7 @@
 
 COVERDIR="./cover"
 TMPFILE="report.tmp"
-REPORTFILE="${COVERDIR}/report.txt"
+REPORTFILE="report.txt"
 
 export PYTHONPATH="${PYTHONPATH}:../:../umlgen:../umlgen/Base:\
 ../umlgen/Base/SwComponent:../umlgen/Specific/STK:../../xmi"
