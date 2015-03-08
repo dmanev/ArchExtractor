@@ -1,43 +1,26 @@
-window_sizes 1615 1026 321 1288 782 170
+window_sizes 1615 1026 402 1207 782 170
 diagrams
-  usecasediagram_ref 141167 // Use Case diag
-    982 625 100 3 12 0
-  classdiagram_ref 295663 // General architecture class diag
-    982 625 100 3 0 0
-  classdiagram_ref 128111 // Main class diag
-    1288 782 100 2 0 0
-  classdiagram_ref 308975 // Analyzer pack diag
-    982 625 100 4 0 0
-  sequencediagram_ref 308847 // BaseAnalyzer init seq diag
-    982 625 100 4 0 0
-  sequencediagram_ref 309103 // BaseAnalyzer run seq diag
-    1352 782 140 3 0 0
-  classdiagram_ref 275695 // InfrastructureFactory class diag
-    1081 625 100 4 0 0
-  classdiagram_ref 262255 // FactoryProvider class diag
-    1081 625 100 4 0 0
-  classdiagram_ref 262511 // AEPackage class diag
-    1288 782 100 4 0 0
-  classdiagram_ref 167535 // ClientServerInterface class diag
+  classdiagram_ref 154223 // StkFileParser class diag
+    1027 553 100 3 0 0
+  classdiagram_ref 221679 // StkPortCriteria class diag
     1030 625 100 4 0 0
-  active  classdiagram_ref 289007 // DataTypeFactory class diag
-    1030 625 100 4 0 0
+  active  classdiagram_ref 241519 // StkCHeaderProvReadDataCriteria class diag
+    1207 782 100 3 0 0
 end
 show_stereotypes
-selected class_ref 258415 // StkPortInterfaceFactory
+selected classdiagram_ref 241519 // StkCHeaderProvReadDataCriteria class diag
 open
   classview_ref 200687 // Class View
   usecaseview_ref 128111 // Use Case View
   classview_ref 128111 // Class View
   classview_ref 167407 // Class view
-  classview_ref 174319 // Class view
-  classview_ref 174447 // Class view
-  class_ref 258543 // FactoryProvider
-  class_ref 258671 // AEPackage
+  
+package_ref 161775 // SwComponent
+  classview_ref 160879 // Class view
   deploymentview_ref 141295 // deploy view
   classview_ref 167535 // Class view
-  
-  package_ref 175087 // StkParser
+  classview_ref 147823 // Class view
+  classview_ref 187503 // Class view
   classview_ref 180975 // Class view
 end
 end
